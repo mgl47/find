@@ -12,10 +12,12 @@ import { recommendedEvents, trendingEvents } from "../components/Data/events";
 import MediumCard from "../components/cards/MediumCard";
 import BigCard from "../components/cards/BigCard";
 import SmallCard from "../components/cards/SmallCard";
+import MainHeader from "../components/navigation/MainHeader";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   return (
     <Screen>
+      <MainHeader navigation={navigation} />
       <FlatList
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
@@ -45,7 +47,8 @@ export default function HomeScreen() {
             />
             <Text style={styles.headerText}>Upcoming Event</Text>
             <TouchableOpacity
-            // onPress={() => navigation.navigate("Photo")}
+              // onPress={() => navigation.navigate("event")}
+              onPress={() => navigation.openDrawer()}
             >
               <BigCard
                 title="Photography Workshop"

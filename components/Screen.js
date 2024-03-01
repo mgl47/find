@@ -1,12 +1,18 @@
 import React from "react";
 import Constants from "expo-constants";
-import { StyleSheet, View, Platform, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Platform,
+  StatusBar,
+  SafeAreaView,
+} from "react-native";
 
 function Screen({ children, style }) {
   return (
-    <View style={[styles.container, style]}>
+    <SafeAreaView style={[styles.container, style]}>
       <View style={[styles.screen]}>{children}</View>
-    </View>
+    </SafeAreaView>
   );
 }
 
