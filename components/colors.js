@@ -1,26 +1,22 @@
-
-
 export default {
-  primary: "#296575",
+  primary: "#0072CE",
   secondary: "#E78200",
-  black2:"#333333",
+  black2: "#333333",
   primary2: "#169ABD",
   blue: "#1412a3",
   white: "white",
   white_shade: "#FFF5EE",
   description: "#7F7F7F",
   description2: "#9F9F9F",
-darkSeparator:"#404040",
+  darkSeparator: "#404040",
 
   // light: "#F2F2F2",
 
+  light: "white",
+  // light2: "#E8E8E8",
+  light2: "#F2F2F2",
 
-
-    light: "white",
-    // light2: "#E8E8E8",
-    light2: "#F2F2F2",
-
-  dark2:"#2e2e2e",
+  dark2: "#2e2e2e",
   // light: "white",
   // dark2:"#2e2e2e",
 

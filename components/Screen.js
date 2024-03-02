@@ -19,7 +19,7 @@ function Screen({ children, style }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight + 10,
     // backgroundColor:colors.light
   },
   screen: {

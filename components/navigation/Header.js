@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../colors";
-const MainHeader = ({
+const Header = ({
   title,
   navigation,
   mainScreen,
@@ -12,22 +12,10 @@ const MainHeader = ({
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.openDrawer()}
+        onPress={() => navigation.goBack()}
         style={{ position: "absolute", left: 20, top: 10 }}
       >
-        <Image
-          source={{
-            uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-          }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 50,
-            // marginLeft: 20,
-            // position: "absolute",
-          }}
-          // resizeMode="contain"
-        />
+        <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
       </TouchableOpacity>
       {title ? (
         <Text style={styles.title}>{title}</Text>
@@ -70,7 +58,7 @@ const MainHeader = ({
   );
 };
 
-export default MainHeader;
+export default Header;
 
 const styles = StyleSheet.create({
   container: {

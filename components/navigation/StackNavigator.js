@@ -3,6 +3,7 @@ import HomeScreen from "../../screens/HomeScreen";
 import { Image, TouchableOpacity } from "react-native";
 import EventScreen from "../../screens/EventScreen";
 import TabNavigator from "./TabNavigator";
+import SearchScreen from "../../screens/HomeScreens/SearchScreen";
 // import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
@@ -47,6 +48,8 @@ function StackNavigator() {
           headerTitle: "Notification",
         })}
       />
+      <Stack.Screen name="search" component={SearchScreen} />
+
       <Stack.Screen name="event" component={EventScreen} />
     </Stack.Navigator>
   );

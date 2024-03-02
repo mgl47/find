@@ -5,8 +5,9 @@ import {
 } from "@react-navigation/drawer";
 import EventScreen from "../../screens/EventScreen";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+import { MaterialCommunityIcons, Octicons, Entypo } from "@expo/vector-icons";
 
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import {
   Avatar,
@@ -17,88 +18,155 @@ import {
   TouchableRipple,
 } from "react-native-paper";
 import StackNavigator from "./StackNavigator";
+import Screen from "../Screen";
+import { useNavigation } from "@react-navigation/native";
+import colors from "../colors";
+
 export const Drawer = createDrawerNavigator();
 
 export function DrawerContent(props) {
+  const navigation = useNavigation();
+
   return (
-    <DrawerContentScrollView {...props}>
-      {/* <View style={styles.drawerContent}>
-        <View style={styles.userInfoSection}>
-          <Avatar.Image
-            source={{
-              uri: "https://pbs.twimg.com/profile_images/952545910990495744/b59hSXUd_400x400.jpg",
-            }}
-            size={50}
-          />
-          <Title style={styles.title}>Dawid Urbaniak</Title>
-          <Caption style={styles.caption}>@trensik</Caption>
-          <View style={styles.row}>
-            <View style={styles.section}>
-              <Paragraph style={[styles.paragraph, styles.caption]}>
-                202
-              </Paragraph>
-              <Caption style={styles.caption}>Following</Caption>
-            </View>
-            <View style={styles.section}>
-              <Paragraph style={[styles.paragraph, styles.caption]}>
-                159
-              </Paragraph>
-              <Caption style={styles.caption}>Followers</Caption>
-            </View>
-          </View>
-        </View>
-        <Drawer.Section style={styles.drawerSection}>
-          <DrawerItem
-            icon={({ color, size }) => (
-              <MaterialCommunityIcons
-                name="account-outline"
-                color={color}
-                size={size}
-              />
-            )}
-            label="Profile"
-            onPress={() => {}}
-          />
-          <DrawerItem
-            icon={({ color, size }) => (
-              <MaterialCommunityIcons name="tune" color={color} size={size} />
-            )}
-            label="Preferences"
-            onPress={() => {}}
-          />
-          <DrawerItem
-            icon={({ color, size }) => (
-              <MaterialCommunityIcons
-                name="bookmark-outline"
-                color={color}
-                size={size}
-              />
-            )}
-            label="Bookmarks"
-            onPress={() => {}}
-          />
-        </Drawer.Section>
-        <Drawer.Section title="Preferences">
-          <TouchableRipple onPress={() => {}}>
-            <View style={styles.preference}>
-              <Text>Dark Theme</Text>
-              <View pointerEvents="none">
-                <Switch value={false} />
-              </View>
-            </View>
-          </TouchableRipple>
-          <TouchableRipple onPress={() => {}}>
-            <View style={styles.preference}>
-              <Text>RTL</Text>
-              <View pointerEvents="none">
-                <Switch value={false} />
-              </View>
-            </View>
-          </TouchableRipple>
-        </Drawer.Section>
-      </View> */}
-      <Text>fdassfdvsafs</Text>
-    </DrawerContentScrollView>
+    <Screen style={{}}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+          }}
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: 50,
+            marginLeft: 20,
+            //   marginTop: 5,
+            // position: "absolute",
+          }}
+        />
+        <TouchableOpacity style={{ marginRight: 20 }}>
+          {/* <MaterialCommunityIcons name="logout" size={25} color="black" /> */}
+        </TouchableOpacity>
+      </View>
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "600",
+          marginLeft: 20,
+          marginLeft: 20,
+          marginTop: 10,
+          paddingBottom: 5,
+        }}
+      >
+        Erickson
+      </Text>
+      <DrawerContentScrollView
+        {...props}
+        contentContainerStyle={{ paddingTop: 5 }}
+      >
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-outline"
+              color={color}
+              size={35}
+            />
+          )}
+          label="Profile"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => navigation.navigate("event")}
+        />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons
+              name="ticket-confirmation-outline"
+              color={color}
+              size={35}
+            />
+          )}
+          label="My tickets"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => {}}
+        />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons
+              name="calendar-heart"
+              color={color}
+              size={35}
+            />
+          )}
+          label="Interested"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => {}}
+        />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <Entypo name="location" size={35} color="black" />
+          )}
+          label="Venues"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => {}}
+        />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <Octicons name="gear" size={35} color={color} />
+          )}
+          label="Settings"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => {}}
+        />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="logout" size={35} color={color} />
+          )}
+          label="Log Out"
+          labelStyle={{
+            fontSize: 17,
+            fontWeight: "600",
+            right: 20,
+            // color: colors.primary,
+          }}
+          onPress={() => {}}
+        />
+      </DrawerContentScrollView>
+    </Screen>
   );
 }
 const sideMenuDisabledScreens = ["event"];
@@ -107,6 +175,7 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       screenOptions={{
+        drawerType: "front",
         headerShown: false,
         drawerIcon: () => (
           <Image

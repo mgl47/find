@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
 
@@ -14,6 +14,18 @@ export default function App() {
   return (
     <PaperProvider>
       <NavigationContainer>
+        <StatusBar
+          barStyle={
+            // Platform.OS === "ios"
+            //   ? "default"
+            //   : darkMode
+            //   ? "light-content"
+            //   : "dark-content"
+            "light-content"
+          }
+          backgroundColor={"transparent"}
+          translucent={true}
+        />
         {/* <StackNavigator /> */}
         <DrawerNavigator />
       </NavigationContainer>
