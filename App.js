@@ -4,7 +4,7 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
 
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import StackNavigator from "./components/navigation/StackNavigator";
 // export const Drawer = createDrawerNavigator();
 import DrawerNavigator, {
@@ -13,7 +13,7 @@ import DrawerNavigator, {
 export default function App() {
   return (
     <PaperProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={DefaultTheme}>
         <StatusBar
           barStyle={
             // Platform.OS === "ios"

@@ -464,6 +464,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   alignItems: "center",
                   // justifyContent: "center",
                 }}
+                onPress={() => navigation.navigate("artist", item)}
               >
                 <Image
                   style={{
@@ -511,12 +512,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               marginTop: 5,
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
-              // shadowOffset: { width: 0.5, height: 0.5 },
-              // shadowOpacity: 0.3,
-              // shadowRadius: 1,
-              // elevation: 2,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
               height: 50,
-              // padding: 5,
+              padding: 10,
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
