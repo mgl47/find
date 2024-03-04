@@ -8,15 +8,18 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import Screen from "../components/Screen";
-import { recommendedEvents, trendingEvents } from "../components/Data/events";
-import MediumCard from "../components/cards/MediumCard";
-import BigCard from "../components/cards/BigCard";
-import SmallCard from "../components/cards/SmallCard";
-import MainHeader from "../components/navigation/MainHeader";
+import Screen from "../../components/Screen";
+import {
+  recommendedEvents,
+  trendingEvents,
+} from "../../components/Data/events";
+import MediumCard from "../../components/cards/MediumCard";
+import BigCard from "../../components/cards/BigCard";
+import SmallCard from "../../components/cards/SmallCard";
+import MainHeader from "../../components/navigation/MainHeader";
 import { Chip } from "react-native-paper";
-import { categories } from "../components/Data/categories";
-import colors from "../components/colors";
+import { categories } from "../../components/Data/categories";
+import colors from "../../components/colors";
 import Animated, {
   FadeInRight,
   FadeOutLeft,
@@ -27,7 +30,7 @@ import Animated, {
   SlideOutUp,
 } from "react-native-reanimated";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
-import AppTextInput from "../components/AppTextInput";
+import AppTextInput from "../../components/AppTextInput";
 
 export default function HomeScreen({ navigation }) {
   const [showSearch, setShowSearch] = useState(false);
@@ -90,7 +93,12 @@ export default function HomeScreen({ navigation }) {
             }}
             activeOpacity={1}
           >
-            <Entypo name="chevron-right" size={27} color="black" />
+            <Entypo name="cross" size={27} color={colors.black2} />
+            {/* <MaterialCommunityIcons
+              name="close"
+              size={27}
+              color={colors.primary}
+            /> */}
           </TouchableOpacity>
         </Animated.View>
       )}
@@ -138,21 +146,17 @@ export default function HomeScreen({ navigation }) {
               renderItem={({ item }) => {
                 return (
                   <TouchableOpacity
-                  //   onPress={() => navigation.navigate(event.onPress)}
+                    onPress={() => navigation.navigate("event", item)}
                   >
-                    <MediumCard
-                      title={item.title}
-                      date={item.date}
-                      city={item.city}
-                      uri={item.uri}
-                      Category={item.Category}
-                    />
+                    <MediumCard {...item} />
                   </TouchableOpacity>
                 );
               }}
             />
             <Text style={styles.headerText}>Upcoming Event</Text>
-            <TouchableOpacity onPress={() => navigation.navigate("event")}>
+            <TouchableOpacity
+            // onPress={() => navigation.navigate("event")}
+            >
               <BigCard
                 title="Photography Workshop"
                 date=" Sun, 29 May - 3:00 pm
@@ -170,16 +174,9 @@ Wroclaw"
               renderItem={({ item }) => {
                 return (
                   <TouchableOpacity
-                  //   onPress={() => navigation.navigate(event.onPress)}
+                    onPress={() => navigation.navigate("event", item)}
                   >
-                    <SmallCard
-                      title={item.title}
-                      date={item.date}
-                      city={item.city}
-                      uri={item.uri}
-                      Category={item.Category}
-                      interest={item.interest}
-                    />
+                    <SmallCard {...item} />
                   </TouchableOpacity>
                 );
               }}

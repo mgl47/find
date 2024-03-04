@@ -1,7 +1,6 @@
 import { createStackNavigator } from "@react-navigation/stack";
-import HomeScreen from "../../screens/HomeScreen";
 import { Image, TouchableOpacity } from "react-native";
-import EventScreen from "../../screens/EventScreen";
+import EventScreen from "../../screens/HomeScreens/EventScreen";
 import TabNavigator from "./TabNavigator";
 import SearchScreen from "../../screens/HomeScreens/SearchScreen";
 // import TabNavigator from "./TabNavigator";

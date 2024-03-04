@@ -1,10 +1,9 @@
 import React from "react";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import HomeScreen from "../../screens/HomeScreen";
+import HomeScreen from "../../screens/HomeScreens/HomeScreen";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Appbar, Avatar } from "react-native-paper";
 import NotificationScreen from "../../screens/NotificationScreen";
-import EventScreen from "../../screens/EventScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
 import colors from "../colors";
 // import StackNavigator from "./StackNavigator";

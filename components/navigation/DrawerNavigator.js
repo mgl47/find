@@ -3,7 +3,6 @@ import {
   DrawerItem,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
-import EventScreen from "../../screens/EventScreen";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { MaterialCommunityIcons, Octicons, Entypo } from "@expo/vector-icons";
 
