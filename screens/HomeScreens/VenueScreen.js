@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -19,8 +18,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
   Entypo,
-  AntDesign,
-  Fontisto,
+  FontAwesome5,
   Feather,
   Ionicons,
 } from "@expo/vector-icons";
@@ -32,20 +30,19 @@ import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
-import { artist } from "../../components/Data/artist";
-const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
+const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [muted, setMuted] = useState(true);
+  const [venue, setVenue] = useState(venues[0]);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
   const handleScroll = (event) => {
-    setScrolling(event.nativeEvent.contentOffset.y > 120);
+    setScrolling(event.nativeEvent.contentOffset.y > 200);
     console.log(event.nativeEvent.contentOffset.y);
   };
   const [inFullscreen, setInFullsreen] = useState(false);
-  const [isMute, setIsMute] = useState(true);
 
   const [liked, setLiked] = useState(false);
   const renderViewMore = (onPress) => {
@@ -91,44 +88,43 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
-      {!inFullscreen && (
-        <View
-          style={[
-            styles.headerContainer,
-            {
-              zIndex: 2,
-              justifyContent: "space-between",
-            },
-          ]}
+      <View
+        style={[
+          styles.headerContainer,
+          {
+            zIndex: 2,
+            justifyContent: "space-between",
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.back}
         >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.back}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={28}
-              color={scrolling ? colors.black : colors.white}
-            />
-          </TouchableOpacity>
-          {scrolling && (
-            <View style={{ width: "66%" }}>
-              <Text
-                numberOfLines={1}
-                style={{
-                  fontSize: 18,
-                  fontWeight: "500",
-                  top: 40,
-                  color: colors.black,
-                }}
-              >
-                {artist?.displayName}
-              </Text>
-            </View>
-          )}
-          <View style={styles.share_like}></View>
-        </View>
-      )}
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={28}
+            color={scrolling ? colors.black : colors.white}
+          />
+        </TouchableOpacity>
+        {scrolling && (
+          <View style={{ width: "66%" }}>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontSize: 19,
+                fontWeight: "500",
+                top: 40,
+                color: colors.black,
+              }}
+            >
+              {venue?.displayName}
+            </Text>
+          </View>
+        )}
+        <View style={styles.share_like}></View>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -136,43 +132,29 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         onScroll={handleScroll}
         bounces={false}
       >
-        {/* <View style={{ width: "100%" }}> */}
-        <TouchableOpacity activeOpacity={0.9}>
-          <Image
-            style={{ height: 150, width: "100%" }}
-            source={{ uri: artist?.cover }}
-          />
-        </TouchableOpacity>
-        <View style={{ flexDirection: "row" }}>
-          <TouchableHighlight
-            underlayColor={colors.light}
-            onPress={() => {}}
-            style={{
-              backgroundColor: colors.black,
-              borderRadius: 100,
-              bottom: 50,
-              marginLeft: 10,
-            }}
-            // activeOpacity={0.7}
-          >
-            <Image
-              style={{
-                height: 100,
-                width: 100,
-                borderRadius: 100,
-                //   marginTop: 100,
-              }}
-              source={{ uri: artist?.avatar }}
-            />
-          </TouchableHighlight>
-          <View
-            style={{
-              flexDirection: "row",
-              marginVertical: 10,
-              marginLeft: 20,
-              height: 30,
-            }}
-          >
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          horizontal
+          data={venue?.photos}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
+            {
+              return (
+                <Image
+                  style={{ width: initialWidth, height: 270 }}
+                  source={{ uri: item?.uri }}
+                />
+              );
+            }
+          }}
+        />
+        <View style={styles.container}>
+          <Text style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}>
+            {venue?.displayName}
+          </Text>
+
+          <View style={{ flexDirection: "row", marginVertical: 3 }}>
             <Chip
               // elevated
               elevation={1}
@@ -222,56 +204,157 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               Partilhar
             </Chip>
           </View>
+          <View style={styles.separator} />
+          <ViewMoreText
+            numberOfLines={6}
+            renderViewMore={renderViewMore}
+            renderViewLess={renderViewLess}
+            textStyle={{ textAlign: "left" }}
+          >
+            <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
+          </ViewMoreText>
         </View>
-        {/* </View> */}
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={venue?.artists}
+          keyExtractor={(item) => item?.id}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  padding: 5,
+                  alignItems: "center",
+                  // justifyContent: "center",
+                }}
+                onPress={() => navigation.navigate("artist", item)}
+              >
+                <Image
+                  style={{
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    marginBottom: 2,
+                    borderWidth: 0.009,
+                  }}
+                  source={{ uri: item?.avatar }}
+                />
+                <Text
+                  style={{
+                    width: item?.displayName?.length > 15 ? 100 : null,
+                    textAlign: "center",
+                  }}
+                >
+                  {item?.displayName}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
         <View style={styles.container}>
-          <Text style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}>
-            {artist?.displayName}
-          </Text>
-          {artist?.description && (
-            <ViewMoreText
-              numberOfLines={6}
-              renderViewMore={renderViewMore}
-              renderViewLess={renderViewLess}
-              textStyle={{ textAlign: "left" }}
-            >
-              <Text style={{ fontSize: 15 }}>{artist?.description}</Text>
-            </ViewMoreText>
-          )}
           <View
             style={{
-              flexDirection: "row",
+              // height: 200,
+              backgroundColor: colors.white,
+              //   padding: 10,
               alignItems: "center",
-              marginVertical: 10,
+              borderBottomRightRadius: 10,
+              borderBottomLeftRadius: 10,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+              // shadowColor: colors.light2,
             }}
           >
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <AntDesign
-                name="facebook-square"
-                size={26}
+            <MapView
+              initialRegion={{
+                latitude: venue?.address?.lat,
+                longitude: venue?.address?.long,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.011,
+              }}
+              provider="google"
+              mapType="standard"
+              style={styles.map}
+            >
+              <Marker
+                pinColor={colors.primary}
+                coordinate={{
+                  latitude: venue?.address?.lat,
+                  longitude: venue?.address?.long,
+                }}
+                //listing?.latitude listing?.longitude
+              />
+            </MapView>
+
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                marginTop: 5,
+                padding: 10,
+              }}
+            >
+              <View>
+                <Text
+                  style={{ fontSize: 15, fontWeight: "600", marginBottom: 3 }}
+                >
+                  Direções
+                </Text>
+                <Text style={{ color: colors.black2 }}>
+                  {venue?.address?.zone}, {venue?.address?.city}
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="car"
+                size={25}
                 color={colors.primary}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <AntDesign name="instagram" size={26} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <AntDesign name="twitter" size={27} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <Entypo name="spotify" size={27} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <Fontisto name="applemusic" size={25} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 15 }}>
-              <Fontisto name="youtube-play" size={24} color={colors.primary} />
+            <TouchableOpacity
+              style={{
+                padding: 10,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                width: "100%",
+                // marginVertical: 5,
+              }}
+            >
+              <View>
+                <Text
+                  style={{ fontSize: 15, fontWeight: "600", marginBottom: 3 }}
+                >
+                  Telefonar
+                </Text>
+                <Text style={{ color: colors.black2 }}>{venue?.phone1}</Text>
+              </View>
+              <MaterialCommunityIcons
+                name="phone"
+                size={25}
+                color={colors.primary}
+              />
             </TouchableOpacity>
           </View>
-          <View style={styles.separator} />
           <Text
             style={{
-              fontSize: 21,
+              fontSize: 20,
+              fontWeight: "500",
+              // width: "80%",
+              color: colors.primary,
+              // marginLeft: 5,
+              marginTop: 15,
+              //   marginBottom: 5,
+            }}
+          >
+            Próximos Eventos
+          </Text>
+          <Text
+            style={{
+              fontSize: 19,
               fontWeight: "500",
               // width: "80%",
               color: colors.black2,
@@ -280,14 +363,14 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               marginBottom: 5,
             }}
           >
-            {artist?.upcomingEvents?.length > 1
-              ? artist?.upcomingEvents?.length + " Eventos"
-              : artist?.upcomingEvents?.length > 0
-              ? artist?.upcomingEvents?.length + " Evento"
+            {venue?.upcomingEvents?.length > 1
+              ? venue?.upcomingEvents?.length + " Eventos"
+              : venue?.upcomingEvents?.length > 0
+              ? venue?.upcomingEvents?.length + " Evento"
               : ""}
           </Text>
           <FlatList
-            data={artist?.upcomingEvents}
+            data={venue?.upcomingEvents}
             keyExtractor={(item) => item?.id}
             renderItem={({ item }) => {
               return (
@@ -338,19 +421,19 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               );
             }}
           />
+          <View style={{ marginBottom: 100 }} />
         </View>
       </ScrollView>
     </>
   );
 };
 
-export default ArtistScreen;
+export default VenueScreen;
 
 const styles = StyleSheet.create({
   container: {
     padding: 10,
     flex: 1,
-    bottom: 50,
     // backgroundColor: colors.white,
   },
   headerContainer: {
@@ -385,7 +468,6 @@ const styles = StyleSheet.create({
   },
   more: {
     position: "absolute",
-
     backgroundColor: colors.background,
     color: colors.primary,
     alignSelf: "flex-end",

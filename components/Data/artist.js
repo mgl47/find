@@ -18,7 +18,7 @@ export const artist = {
     {
       id: 2,
       title: "Sun7ven",
-      date: "Sexta, 27 May - 16:30",
+      date: "Sexta, 27 Mai - 16:30",
       promoter: "Linha d'Água",
     },
   ],

@@ -28,7 +28,7 @@ import { TouchableWithoutFeedback } from "react-native";
 import * as ScreenOrientation from "expo-screen-orientation";
 import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
-import { venues } from "../../components/Data/venue";
+import { venue } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
