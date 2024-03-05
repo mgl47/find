@@ -1,27 +1,42 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import {
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "../colors";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import SignInScreen from "../../screens/authScreens/SignInScreen";
+import SignUpScreen from "../../screens/authScreens/SignUpScreen";
+import Screen from "../Screen";
+
+const Tab = createMaterialTopTabNavigator();
 const MainHeader = ({
   title,
   navigation,
   mainScreen,
   onPressSearch,
   onPressCalendar,
+  user,
 }) => {
+  const [showModal, setShowModal] = useState(false);
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.openDrawer()}
-        style={{ position: "absolute", left: 20, top: 10 }}
+        onPress={() => (user ? navigation.openDrawer() : setShowModal(true))}
+        style={{ position: "absolute", left: 20,bottom:3}}
       >
         <Image
           source={{
             uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
           }}
           style={{
-            width: 40,
-            height: 40,
+            width: 38,
+            height:38,
             borderRadius: 50,
             // marginLeft: 20,
             // position: "absolute",
@@ -51,7 +66,7 @@ const MainHeader = ({
             <MaterialCommunityIcons
               name="calendar-month"
               size={26}
-              color="black"
+              color={colors.black}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -62,10 +77,71 @@ const MainHeader = ({
             }}
             onPress={onPressSearch}
           >
-            <MaterialCommunityIcons name="magnify" size={26} color="black" />
+            <MaterialCommunityIcons name="magnify" size={26}              color={colors.black}
+ />
           </TouchableOpacity>
         </View>
       )}
+      <Modal animationType="slide" visible={showModal}>
+        <Screen style={{ backgroundColor: colors.background }}>
+          <View
+            style={{
+              flexDirection: "row",
+              // backgroundColor: "red",
+              width: "100%",
+              alignItems: "center",
+              justifyContent:"center"
+            }}
+          >
+            <Text
+              style={{
+                // position: "absolute",
+                alignSelf: "center",
+                fontSize: 22,
+                // left:1,
+                color:colors.primary,
+
+                fontWeight: "500",
+              }}
+            >
+              Conta
+            </Text>
+            <TouchableOpacity
+              onPress={() => setShowModal(false)}
+              style={{ padding: 10, right: 5, position:"absolute"}}
+            >
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 15,
+                  fontWeight: "500",
+                }}
+              >
+                Cancelar
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Tab.Navigator
+            screenOptions={{
+              tabBarActiveTintColor: colors.primary,
+              tabBarInactiveTintColor: colors.darkGrey,
+              tabBarIndicatorContainerStyle: {
+                backgroundColor: colors.background,
+              },
+              tabBarLabelStyle: {
+                fontWeight: "600",
+              },
+              tabBarIndicatorStyle: {
+                width: "40%",
+                left: "5%",
+              },
+            }}
+          >
+            <Tab.Screen name="Entrar" component={SignInScreen} />
+            <Tab.Screen name="Criar Conta" component={SignUpScreen} />
+          </Tab.Navigator>
+        </Screen>
+      </Modal>
     </View>
   );
 };
@@ -75,10 +151,12 @@ export default MainHeader;
 const styles = StyleSheet.create({
   container: {
     // flexDirection: "row",
+    backgroundColor: colors.white,
+
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    height: 60,
+    height: 40,
     borderBottomWidth: 0.2,
     borderColor: colors.grey,
   },

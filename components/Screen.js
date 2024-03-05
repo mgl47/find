@@ -7,6 +7,7 @@ import {
   StatusBar,
   SafeAreaView,
 } from "react-native";
+import colors from "./colors";
 
 function Screen({ children, style }) {
   return (
@@ -24,6 +25,7 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
+
     // backgroundColor:"transparent"
   },
 });

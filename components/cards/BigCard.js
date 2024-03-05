@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   card: {
     height: 185,
     borderRadius: 20,
-    backgroundColor: colors.white,
+    // backgroundColor: colors.white,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",

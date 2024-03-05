@@ -2,11 +2,10 @@ import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 
-function MediumCard({ title, date, uri, Category, city }) {
-  console.log(uri);
+function MediumCard({ title, date, photos, Category, city }) {
   return (
     <View style={styles.card}>
-      <Image style={styles.image} source={{ uri }} />
+      <Image style={styles.image} source={{ uri: photos[0]?.uri }} />
       <Text style={styles.Category}>{Category}</Text>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.city}>{city}</Text>
@@ -19,7 +18,7 @@ const styles = StyleSheet.create({
   card: {
     height: 185,
     borderRadius: 20,
-    backgroundColor: colors.white,
+    // backgroundColor: colors.white,
     overflow: "hidden",
     width: 195,
     marginRight: 3,

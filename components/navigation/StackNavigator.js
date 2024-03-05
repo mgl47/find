@@ -5,6 +5,7 @@ import TabNavigator from "./TabNavigator";
 import SearchScreen from "../../screens/HomeScreens/SearchScreen";
 import ArtistScreen from "../../screens/HomeScreens/ArtistScreen";
 import VenueScreen from "../../screens/HomeScreens/VenueScreen";
+
 // import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
@@ -54,6 +55,7 @@ function StackNavigator() {
       <Stack.Screen name="event" component={EventScreen} />
       <Stack.Screen name="artist" component={ArtistScreen} />
       <Stack.Screen name="venue" component={VenueScreen} />
+
     </Stack.Navigator>
   );
 }

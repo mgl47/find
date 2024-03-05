@@ -6,6 +6,7 @@ import { Appbar, Avatar } from "react-native-paper";
 import NotificationScreen from "../../screens/NotificationScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
 import colors from "../colors";
+import { Platform } from "react-native";
 // import StackNavigator from "./StackNavigator";
 
 const Tab = createMaterialBottomTabNavigator();
@@ -13,6 +14,7 @@ const Tab = createMaterialBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
+      keyboardHidesNavigationBar={true}
       // activeColor="#f0edf6"
       initialRouteName="Home"
       // inactiveColor="#3e2465"
@@ -20,14 +22,14 @@ const TabNavigator = () => {
         backgroundColor: "white",
         borderTopWidth: 0.2,
         borderColor: colors.grey,
-        marginBottom: -30,
+        marginBottom: Platform.OS == "ios" ? -30 : -10,
         //         marginBottom: -10,
       }}
       backBehavior="initialRoute"
       shifting={true}
       sceneAnimationEnabled={false}
       activeColor={colors.primary}
-      activeIndicatorStyle={{ backgroundColor: colors.light2 }}
+      activeIndicatorStyle={{ backgroundColor: "transparent" }}
       screenOptions={{}}
     >
       <Tab.Screen

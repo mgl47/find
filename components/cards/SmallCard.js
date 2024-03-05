@@ -2,10 +2,10 @@ import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 
-function SmallCard({ title, date, uri, interest, city }) {
+function SmallCard({ title, date, photos, interest, city }) {
   return (
     <View style={styles.card}>
-      <Image style={styles.image} source={{ uri }} />
+      <Image style={styles.image} source={{ uri: photos[0]?.uri }} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.date}>{date}</Text>
       <Text style={styles.city}>{city}</Text>
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   card: {
     height: 120,
     borderRadius: 20,
-    backgroundColor: colors.soft,
+    // backgroundColor: colors.soft,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",

@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeIn, SlideOutUp } from "react-native-reanimated";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import colors from "../../components/colors";
 import {
   MaterialCommunityIcons,
@@ -71,7 +71,20 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
       </TouchableOpacity>
     );
   };
+  const [categoryIndex, setCategoryIndex] = useState(0);
 
+  function onScrollEnd(e) {
+    let contentOffset = e.nativeEvent.contentOffset;
+    let viewSize = e.nativeEvent.layoutMeasurement;
+
+    // Divide the horizontal offset by the width of the view to see which page is visible
+    let pageNum = Math.floor(contentOffset.x / viewSize.width);
+    setCategoryIndex(pageNum);
+    console.log(categoryIndex);
+  }
+  useEffect(() => {
+    console.log(categoryIndex);
+  }, [categoryIndex]);
   return (
     <>
       {scrolling && (
@@ -125,305 +138,287 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         <View style={styles.share_like}></View>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
+      <FlatList
+        data={venue?.upcomingEvents}
+        keyExtractor={(item) => item?.id}
         scrollEventThrottle={16}
         scrollEnabled={!inFullscreen}
         onScroll={handleScroll}
+        // onMomentumScrollEnd={onScrollEnd}
         bounces={false}
-      >
-        <FlatList
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          horizontal
-          data={venue?.photos}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            {
-              return (
-                <Image
-                  style={{ width: initialWidth, height: 270 }}
-                  source={{ uri: item?.uri }}
-                />
-              );
-            }
-          }}
-        />
-        <View style={styles.container}>
-          <Text style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}>
-            {venue?.displayName}
-          </Text>
-
-          <View style={{ flexDirection: "row", marginVertical: 3 }}>
-            <Chip
-              // elevated
-              elevation={1}
-              icon={() => (
-                <MaterialCommunityIcons
-                  name={!liked ? "heart" : "heart-outline"}
-                  color={!liked ? colors.white : colors.black2}
-                  size={20}
-                />
-              )}
-              textStyle={{
-                color: !liked ? colors.white : colors.black,
-              }}
-              style={{
-                backgroundColor: !liked ? colors.primary : colors.white,
-                // paddingHorizontal: 2,
-                marginRight: 10,
-                borderRadius: 20,
-              }}
-              onPress={() => console.log("Pressed")}
-            >
-              Favorito
-            </Chip>
-
-            <Chip
-              elevation={1}
-              icon={() => (
-                <MaterialIcons
-                  name="ios-share"
-                  size={20}
-                  color={colors.black2}
-                />
-              )}
-              textStyle={
+        ListHeaderComponent={
+          <>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              pagingEnabled
+              horizontal
+              data={venue?.photos}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => {
                 {
-                  // color: colors.white,
+                  return (
+                    <Image
+                      style={{ width: initialWidth, height: 270 }}
+                      source={{ uri: item?.uri }}
+                    />
+                  );
                 }
-              }
-              style={{
-                backgroundColor: colors.white,
-                // paddingHorizontal: 2,
-                marginHorizontal: 10,
-                borderRadius: 20,
               }}
-              onPress={() => console.log("Pressed")}
-            >
-              Partilhar
-            </Chip>
-          </View>
-          <View style={styles.separator} />
-          <ViewMoreText
-            numberOfLines={6}
-            renderViewMore={renderViewMore}
-            renderViewLess={renderViewLess}
-            textStyle={{ textAlign: "left" }}
-          >
-            <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
-          </ViewMoreText>
-        </View>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={venue?.artists}
-          keyExtractor={(item) => item?.id}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                style={{
-                  padding: 5,
-                  alignItems: "center",
-                  // justifyContent: "center",
-                }}
-                onPress={() => navigation.navigate("artist", item)}
+            />
+            <View style={styles.container}>
+              <Text
+                style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}
               >
-                <Image
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 50,
-                    marginBottom: 2,
-                    borderWidth: 0.009,
-                  }}
-                  source={{ uri: item?.avatar }}
-                />
-                <Text
-                  style={{
-                    width: item?.displayName?.length > 15 ? 100 : null,
-                    textAlign: "center",
-                  }}
-                >
-                  {item?.displayName}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-        <View style={styles.container}>
-          <View
-            style={{
-              // height: 200,
-              backgroundColor: colors.white,
-              //   padding: 10,
-              alignItems: "center",
-              borderBottomRightRadius: 10,
-              borderBottomLeftRadius: 10,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-              // shadowColor: colors.light2,
-            }}
-          >
-            <MapView
-              initialRegion={{
-                latitude: venue?.address?.lat,
-                longitude: venue?.address?.long,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.011,
-              }}
-              provider="google"
-              mapType="standard"
-              style={styles.map}
-            >
-              <Marker
-                pinColor={colors.primary}
-                coordinate={{
-                  latitude: venue?.address?.lat,
-                  longitude: venue?.address?.long,
-                }}
-                //listing?.latitude listing?.longitude
-              />
-            </MapView>
+                {venue?.displayName}
+              </Text>
 
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                marginTop: 5,
-                padding: 10,
-              }}
-            >
-              <View>
-                <Text
-                  style={{ fontSize: 15, fontWeight: "600", marginBottom: 3 }}
+              <View style={{ flexDirection: "row", marginVertical: 3 }}>
+                <Chip
+                  // elevated
+                  elevation={1}
+                  icon={() => (
+                    <MaterialCommunityIcons
+                      name={!liked ? "heart" : "heart-outline"}
+                      color={!liked ? colors.white : colors.black2}
+                      size={20}
+                    />
+                  )}
+                  textStyle={{
+                    color: !liked ? colors.white : colors.black,
+                  }}
+                  style={{
+                    backgroundColor: !liked ? colors.primary : colors.white,
+                    // paddingHorizontal: 2,
+                    marginRight: 10,
+                    borderRadius: 20,
+                  }}
+                  onPress={() => console.log("Pressed")}
                 >
-                  Direções
-                </Text>
-                <Text style={{ color: colors.black2 }}>
-                  {venue?.address?.zone}, {venue?.address?.city}
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="car"
-                size={25}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                padding: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                // marginVertical: 5,
-              }}
-            >
-              <View>
-                <Text
-                  style={{ fontSize: 15, fontWeight: "600", marginBottom: 3 }}
+                  Favorito
+                </Chip>
+
+                <Chip
+                  elevation={1}
+                  icon={() => (
+                    <MaterialIcons
+                      name="ios-share"
+                      size={20}
+                      color={colors.black2}
+                    />
+                  )}
+                  textStyle={
+                    {
+                      // color: colors.white,
+                    }
+                  }
+                  style={{
+                    backgroundColor: colors.white,
+                    // paddingHorizontal: 2,
+                    marginHorizontal: 10,
+                    borderRadius: 20,
+                  }}
+                  onPress={() => console.log("Pressed")}
                 >
-                  Telefonar
-                </Text>
-                <Text style={{ color: colors.black2 }}>{venue?.phone1}</Text>
+                  Partilhar
+                </Chip>
               </View>
-              <MaterialCommunityIcons
-                name="phone"
-                size={25}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
-          </View>
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "500",
-              // width: "80%",
-              color: colors.primary,
-              // marginLeft: 5,
-              marginTop: 15,
-              //   marginBottom: 5,
-            }}
-          >
-            Próximos Eventos
-          </Text>
-          <Text
-            style={{
-              fontSize: 19,
-              fontWeight: "500",
-              // width: "80%",
-              color: colors.black2,
-              // marginLeft: 5,
-              marginTop: 5,
-              marginBottom: 5,
-            }}
-          >
-            {venue?.upcomingEvents?.length > 1
-              ? venue?.upcomingEvents?.length + " Eventos"
-              : venue?.upcomingEvents?.length > 0
-              ? venue?.upcomingEvents?.length + " Evento"
-              : ""}
-          </Text>
-          <FlatList
-            data={venue?.upcomingEvents}
-            keyExtractor={(item) => item?.id}
-            renderItem={({ item }) => {
-              return (
+              <View style={styles.separator} />
+              <ViewMoreText
+                numberOfLines={6}
+                renderViewMore={renderViewMore}
+                renderViewLess={renderViewLess}
+                textStyle={{ textAlign: "left" }}
+              >
+                <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
+              </ViewMoreText>
+            </View>
+
+            <View style={styles.container}>
+              <View
+                style={{
+                  // height: 200,
+                  backgroundColor: colors.white,
+                  //   padding: 10,
+                  alignItems: "center",
+                  borderBottomRightRadius: 10,
+                  borderBottomLeftRadius: 10,
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 1,
+                  elevation: 2,
+                  // shadowColor: colors.light2,
+                }}
+              >
+                <MapView
+                  initialRegion={{
+                    latitude: venue?.address?.lat,
+                    longitude: venue?.address?.long,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.011,
+                  }}
+                  provider="google"
+                  mapType="standard"
+                  style={styles.map}
+                >
+                  <Marker
+                    pinColor={colors.primary}
+                    coordinate={{
+                      latitude: venue?.address?.lat,
+                      longitude: venue?.address?.long,
+                    }}
+                    //listing?.latitude listing?.longitude
+                  />
+                </MapView>
+
                 <TouchableOpacity
                   style={{
-                    borderRadius: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginTop: 5,
                     padding: 10,
-                    marginBottom: 10,
-                    backgroundColor: colors.white,
-                    shadowOffset: { width: 1, height: 1 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 1,
-                    elevation: 1,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: colors.black,
-                      marginBottom: 3,
-                      fontWeight: "500",
-                      fontSize: 15,
-                    }}
-                  >
-                    {item?.date}
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      marginBottom: 3,
-                      fontWeight: "500",
-                      fontSize: 16,
-                    }}
-                  >
-                    {item?.title}
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.black2,
-                      marginBottom: 3,
-                      fontWeight: "500",
-                      fontSize: 15,
-                    }}
-                  >
-                    {item?.promoter}
-                  </Text>
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontWeight: "600",
+                        marginBottom: 3,
+                      }}
+                    >
+                      Direções
+                    </Text>
+                    <Text style={{ color: colors.black2 }}>
+                      {venue?.address?.zone}, {venue?.address?.city}
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="car"
+                    size={25}
+                    color={colors.primary}
+                  />
                 </TouchableOpacity>
-              );
-            }}
-          />
-          <View style={{ marginBottom: 100 }} />
-        </View>
-      </ScrollView>
+                <TouchableOpacity
+                  style={{
+                    padding: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    // marginVertical: 5,
+                  }}
+                >
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 15,
+                        fontWeight: "600",
+                        marginBottom: 3,
+                      }}
+                    >
+                      Telefonar
+                    </Text>
+                    <Text style={{ color: colors.black2 }}>
+                      {venue?.phone1}
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="phone"
+                    size={25}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "500",
+                  // width: "80%",
+                  color: colors.primary,
+                  // marginLeft: 5,
+                  marginTop: 15,
+                  //   marginBottom: 5,
+                }}
+              >
+                Próximos Eventos
+              </Text>
+              <Text
+                style={{
+                  fontSize: 19,
+                  fontWeight: "500",
+                  // width: "80%",
+                  color: colors.black2,
+                  // marginLeft: 5,
+                  marginTop: 5,
+                  marginBottom: 5,
+                }}
+              >
+                {venue?.upcomingEvents?.length > 1
+                  ? venue?.upcomingEvents?.length + " Eventos"
+                  : venue?.upcomingEvents?.length > 0
+                  ? venue?.upcomingEvents?.length + " Evento"
+                  : ""}
+              </Text>
+
+              <View style={{ marginBottom: 100 }} />
+            </View>
+          </>
+        }
+        renderItem={({ item, index }) => {
+          // console.log(index);
+          return (
+            <TouchableOpacity
+              style={{
+                borderRadius: 10,
+                padding: 10,
+                marginBottom: 10,
+                backgroundColor: colors.white,
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 1,
+                bottom: 100,
+                width: "95%",
+                alignSelf: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.black,
+                  marginBottom: 3,
+                  fontWeight: "500",
+                  fontSize: 15,
+                }}
+              >
+                {item?.date}
+              </Text>
+              <Text
+                style={{
+                  color: colors.primary,
+                  marginBottom: 3,
+                  fontWeight: "500",
+                  fontSize: 16,
+                }}
+              >
+                {item?.title}
+              </Text>
+
+              <Text
+                style={{
+                  color: colors.black2,
+                  marginBottom: 3,
+                  fontWeight: "500",
+                  fontSize: 15,
+                }}
+              >
+                {item?.promoter}
+              </Text>
+            </TouchableOpacity>
+          );
+        }}
+      />
     </>
   );
 };

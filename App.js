@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet, Text, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import StackNavigator from "./components/navigation/StackNavigator";

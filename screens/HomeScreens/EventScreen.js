@@ -37,9 +37,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
+  const [scrollingPos, setScrollingPos] = useState(0);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
-    console.log(event.nativeEvent.contentOffset.y);
+    setScrollingPos(event.nativeEvent.contentOffset.y / 20);
+    console.log(event.nativeEvent.contentOffset.y / 13);
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
@@ -228,6 +230,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Image
                   style={{ width: initialWidth, height: 270 }}
                   source={{ uri: item?.uri }}
+                  blurRadius={scrollingPos}
                 />
               ) : (
                 []
