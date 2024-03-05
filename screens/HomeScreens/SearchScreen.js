@@ -12,6 +12,7 @@ import Screen from "../../components/Screen";
 import Svg, { Path, Defs, ClipPath, Image as SvgImage } from "react-native-svg";
 import { RNHoleView } from "react-native-hole-view";
 import BigTicket from "../../components/tickets/BigTicket";
+import { LinearGradient } from "expo-linear-gradient";
 
 const SearchScreen = ({ navigation: { goBack }, route }) => {
   const { height, width } = useWindowDimensions();
@@ -27,46 +28,35 @@ const SearchScreen = ({ navigation: { goBack }, route }) => {
           alignItems: "center",
         }}
       >
-        {/* <Image
-          style={{ height: 300, width: 200, marginBottom: 50 }}
-          source={{
-            uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-          }}
-          blurRadius={10}
-        /> */}
-        <BigTicket />
+        {/* <LinearGradient
+        // Background Linear Gradient
+        colors={['rgba(0,0,0,0.8)', 'transparent']}
+        style={styles.background}
+      /> */}
+        <View style={{ borderRadius: 20, overflow: "hidden" }}>
+          <Image
+            style={{
+              height: 195,
+              width: 200,
+              borderRadius: 20,
 
-        {/* <Svg
-          width={200}
-          height={300}
-          viewBox="0 0 443 743"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <Defs>
-            <ClipPath id="clipPath">
-              <Path
-                d="M.502 42.003c0-22.92 18.58-41.5 41.5-41.5h358c22.92 0 41.5 18.58 41.5 41.5v471.504c-27.66.268-50 22.774-50 50.497 0 27.724 22.34 50.229 50 50.498v85.502c0 22.92-18.58 41.5-41.5 41.5h-358c-22.92 0-41.5-18.58-41.5-41.5v-85.502c27.66-.269 50-22.774 50-50.498 0-27.723-22.34-50.229-50-50.497V42.003z"
-                fill="#E2E2E2"
-                stroke="#000"
-              />
-            </ClipPath>
-          </Defs>
-
-
-          <Text style={{ fontSize: 18, top: 30 }}>sgh jhgjfjiujgdajfvhskl</Text>
-          <SvgImage
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid slice"
-            href={{
+              marginBottom: 50,
+              zIndex: 1,
+              top: 150,
+            }}
+            source={{
               uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
             }}
-            clipPath="url(#clipPath)"
+            // blurRadius={10}
           />
-        </Svg> */}
+          <LinearGradient
+            // Button Linear Gradient
+            colors={["transparent", "#00233aE", "#0072CE"]}
+            style={{ height: 150, zIndex: 2 }}
+          ></LinearGradient>
+        </View>
+
+        {/* <BigTicket /> */}
       </View>
     </Screen>
   );

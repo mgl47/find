@@ -35,13 +35,13 @@ import AppTextInput from "../../components/AppTextInput";
 export default function HomeScreen({ navigation }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const[user,setUser]=useState(false)
+  const [user, setUser] = useState(false);
 
   return (
     <>
       <Screen style={styles.container}>
         <MainHeader
-        user={user}
+          user={user}
           navigation={navigation}
           mainScreen
           onPressSearch={() => setShowSearch(true)}
@@ -60,7 +60,7 @@ export default function HomeScreen({ navigation }) {
 
               zIndex: 1,
               padding: 5,
-              top: 5,
+              top: -8,
               height: 50,
             }}
           >
@@ -183,12 +183,20 @@ Wroclaw"
                   renderItem={({ item }) => {
                     return (
                       <TouchableOpacity
+                        style={{
+                          shadowOffset: { width: 0.5, height: 0.5 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 1,
+                          elevation: 2,
+                          padding: 10,
+                        }}
                         onPress={() => navigation.navigate("event", item)}
                       >
                         <SmallCard {...item} />
                       </TouchableOpacity>
                     );
                   }}
+                  ListFooterComponent={<View style={{ marginBottom: 50 }} />}
                 />
               </>
             }
@@ -202,7 +210,7 @@ Wroclaw"
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    // backgroundColor: colors.background,
+    backgroundColor: colors.background,
   },
   headerText: {
     fontSize: 20,

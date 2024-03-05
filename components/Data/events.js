@@ -174,8 +174,16 @@ export const recommendedEvents = [
   {
     id: 1,
     title: "Sun7ven",
-    date: " Fri, 27 May - 4:30 pm",
-    city: "Wroclaw",
+    date: "Sexta, 27 Mai - 16:30",
+    city: "Praia",
+    venue: {
+      id: 1,
+      displayName: "Kebra Cabana",
+      city: "Praia",
+      lat: 14.904463,
+      long: -23.517431,
+      uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
+    },
 
     photos: [
       {

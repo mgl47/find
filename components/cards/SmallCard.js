@@ -1,59 +1,85 @@
 import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
-
-function SmallCard({ title, date, photos, interest, city }) {
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+function SmallCard({ title, date, photos, venue, city }) {
   return (
     <View style={styles.card}>
       <Image style={styles.image} source={{ uri: photos[0]?.uri }} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.date}>{date}</Text>
-      <Text style={styles.city}>{city}</Text>
-      <Text style={styles.interest}>{interest}</Text>
+      <View style={{ padding: 10 }}>
+        <Text style={styles.title}>{title}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text style={styles.venue}>
+            {venue?.displayName}, {venue?.city}
+          </Text>
+        </View>
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MaterialCommunityIcons
+            name="calendar-blank"
+            size={18}
+            color="black"
+          />
+          <Text style={styles.date}>{date}</Text>
+        </View>
+
+        {/* <Text style={styles.interest}>{interest}</Text> */}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    height: 120,
-    borderRadius: 20,
-    // backgroundColor: colors.soft,
+    flexDirection: "row",
+    // alignItems:"center",
+    height: 100,
+    // borderRadius: 5,
+    backgroundColor: colors.white,
     overflow: "hidden",
-    width: "95%",
+    width: "100%",
     alignSelf: "center",
-    marginBottom: 15,
+
+    borderRadius: 10,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 1,
+    elevation: 3,
   },
 
   image: {
-    width: 175,
-    height: 120,
-    borderRadius: 20,
+    width: 130,
+    height: "100%",
+    borderRadius: 10,
+    
   },
   title: {
     fontSize: 17,
-    fontWeight: "700",
-    bottom: 105,
+    fontWeight: "600",
+    // bottom: 105,
     color: colors.black,
-    left: 185,
+    //  marginLeft: 185,
+    marginTop:2,
+    marginBottom:2,
   },
-
-  date: {
-    fontSize: 13,
+  venue: {
+    fontSize: 14,
     alignSelf: "flex-start",
-    color: colors.description,
-    lineHeight: 15,
-    bottom: 90,
-    left: 180,
-  },
-  city: {
-    fontSize: 13,
-    alignSelf: "flex-start",
-    color: colors.description,
+    fontWeight: "500",
+    color: colors.dark2,
     lineHeight: 30,
-    bottom: 95,
-    left: 190,
+    marginBottom:2,
+
   },
+  date: {
+    fontSize: 14,
+    alignSelf: "flex-start",
+    color: colors.darkGrey,
+    fontWeight: "500",
+    marginLeft:5
+    // lineHeight: 15,
+  },
+ 
   interest: {
     fontSize: 13,
     alignSelf: "flex-start",
