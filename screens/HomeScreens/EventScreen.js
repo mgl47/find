@@ -41,12 +41,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
-    console.log(event.nativeEvent.contentOffset.y / 13);
+
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
 
-  const [liked, setLiked] = useState(false);
+  const [interested, setInterested] = useState(false);
+  const [going,setGoing]=useState(false)
   const renderViewMore = (onPress) => {
     return (
       <TouchableOpacity style={styles.more} onPress={onPress}>
@@ -340,22 +341,22 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               icon={() => (
                 <MaterialCommunityIcons
                   name="calendar-heart"
-                  color={colors.black2}
+                  color={interested?colors.white: colors.black}
                   size={20}
                 />
               )}
               textStyle={
                 {
-                  // color: colors.white,
+                  color:interested?colors.white:  colors.black,
                 }
               }
               style={{
-                backgroundColor: colors.white,
+                backgroundColor:interested?colors.primary: colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 20,
               }}
-              onPress={() => console.log("Pressed")}
+              onPress={() => {setInterested(!interested),setGoing(false)}}
             >
               Interressado
             </Chip>
@@ -365,20 +366,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Ionicons
                   name="ticket-outline"
                   size={20}
-                  color={colors.black2}
+                  color={going?colors.white: colors.black}
                 />
               )}
               textStyle={
                 {
-                  // color: colors.white,
+                  color:going?colors.white:  colors.black,
                 }
               }
               style={{
-                backgroundColor: colors.white,
+                backgroundColor:going?colors.primary: colors.white,
                 // paddingHorizontal: 2,
                 borderRadius: 20,
               }}
-              onPress={() => console.log("Pressed")}
+              onPress={() => {setGoing(!going),setInterested(false)}}
             >
               Vou
             </Chip>
@@ -604,11 +605,19 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   {Event?.venue?.displayName}, {Event?.venue?.city}
                 </Text>
               </View>
-              <MaterialCommunityIcons
-                name="car"
-                size={25}
-                color={colors.primary}
-              />
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <FontAwesome5
+                      name="walking"
+                      size={20}
+                      color={colors.primary}
+                    />
+                    <Text style={{fontSize:22,color:colors.black2}}> | </Text>
+                    <MaterialCommunityIcons
+                      name="car"
+                      size={25}
+                      color={colors.primary}
+                    />
+                  </View>
             </TouchableOpacity>
             {/* <View style={styles.separator} /> */}
             {/* <TouchableOpacity

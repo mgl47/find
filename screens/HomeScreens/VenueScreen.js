@@ -21,26 +21,31 @@ import {
   FontAwesome5,
   Feather,
   Ionicons,
+  AntDesign,
 } from "@expo/vector-icons";
-import { Video, ResizeMode } from "expo-av";
-import VideoPlayer from "expo-video-player";
-import { TouchableWithoutFeedback } from "react-native";
-import * as ScreenOrientation from "expo-screen-orientation";
+import { LinearGradient } from "expo-linear-gradient";
+
 import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
+import { ImageBackground } from "react-native";
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
-  const Event = route.params;
-  const videoRef = React.useRef(null);
-  const [muted, setMuted] = useState(true);
+
   const [venue, setVenue] = useState(venues[0]);
+
+
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
+  // const handleScroll = (event) => {
+  //   setScrolling(event.nativeEvent.contentOffset.y > 200);
+  //   console.log(event.nativeEvent.contentOffset.y);
+  // };
+  const [scrollingPos, setScrollingPos] = useState(0);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
-    console.log(event.nativeEvent.contentOffset.y);
+    setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
   const [inFullscreen, setInFullsreen] = useState(false);
 
@@ -137,7 +142,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         )}
         <View style={styles.share_like}></View>
       </View>
-
+    
       <FlatList
         data={venue?.upcomingEvents}
         keyExtractor={(item) => item?.id}
@@ -148,29 +153,66 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         bounces={false}
         ListHeaderComponent={
           <>
+            <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "500",
+          marginBottom: 5,
+          color: colors.white,
+          position: "absolute",
+          top: 230,
+          zIndex:2,
+          marginLeft: 10,
+        }}
+      >
+        {venue?.displayName}
+      </Text>
             <FlatList
               showsHorizontalScrollIndicator={false}
               pagingEnabled
               horizontal
+              scrollEventThrottle={20}
               data={venue?.photos}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => {
                 {
                   return (
-                    <Image
+                    <ImageBackground
+                      source={{ uri: item?.uri }}
+                      style={{ width: initialWidth, height: 270 }}
+                    >
+                      <LinearGradient
+                        colors={[
+                          "transparent",
+                          "transparent",
+                          "transparent",
+                          "transparent",
+                          colors.dark2,
+                        ]}
+                        //                         colors={["#00000000", "#0000000000", "#000000000"]}
+
+                        style={{ height: "100%", width: "100%" }}
+                      ></LinearGradient>
+
+                      {/* <Image
                       style={{ width: initialWidth, height: 270 }}
                       source={{ uri: item?.uri }}
-                    />
+                      blurRadius={scrollingPos}
+
+
+                    /> */}
+                      {/* </LinearGradient> */}
+                    </ImageBackground>
                   );
                 }
               }}
             />
             <View style={styles.container}>
-              <Text
+              {/* <Text
                 style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}
               >
                 {venue?.displayName}
-              </Text>
+              </Text> */}
 
               <View style={{ flexDirection: "row", marginVertical: 3 }}>
                 <Chip
@@ -221,6 +263,36 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 >
                   Partilhar
                 </Chip>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    // marginVertical: 10,
+                    marginLeft: 10,
+                  }}
+                >
+                  <TouchableOpacity style={{ marginRight: 10 }}>
+                    <AntDesign
+                      name="facebook-square"
+                      size={26}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ marginRight: 10 }}>
+                    <AntDesign
+                      name="instagram"
+                      size={26}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ marginRight: 10 }}>
+                    <AntDesign
+                      name="twitter"
+                      size={27}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
               </View>
               <View style={styles.separator} />
               <ViewMoreText
@@ -294,11 +366,22 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                       {venue?.address?.zone}, {venue?.address?.city}
                     </Text>
                   </View>
-                  <MaterialCommunityIcons
-                    name="car"
-                    size={25}
-                    color={colors.primary}
-                  />
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <FontAwesome5
+                      name="walking"
+                      size={20}
+                      color={colors.primary}
+                    />
+                    <Text style={{ fontSize: 22, color: colors.black2 }}>
+                      {" "}
+                      |{" "}
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="car"
+                      size={25}
+                      color={colors.primary}
+                    />
+                  </View>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={{

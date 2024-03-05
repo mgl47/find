@@ -38,8 +38,9 @@ export default function HomeScreen({ navigation }) {
   const [user, setUser] = useState(false);
 
   return (
-    <>
-      <Screen style={styles.container}>
+
+
+      <Screen >
         <MainHeader
           user={user}
           navigation={navigation}
@@ -93,7 +94,7 @@ export default function HomeScreen({ navigation }) {
                 width: 30,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: colors.background,
+                backgroundColor: colors.white,
                 borderRadius: 50,
               }}
               activeOpacity={1}
@@ -130,8 +131,9 @@ export default function HomeScreen({ navigation }) {
                           margin: 2,
                           backgroundColor: colors.white,
                           // paddingHorizontal: 2,
-                          marginTop: 5,
+                          marginVertical: 5,
                           marginHorizontal: 3,
+                          marginBottom:10,
                           borderRadius: 20,
                         }}
                         // background={{ color: colors.description }}
@@ -155,7 +157,15 @@ export default function HomeScreen({ navigation }) {
                   renderItem={({ item }) => {
                     return (
                       <TouchableOpacity
-                        onPress={() => navigation.navigate("event", item)}
+                      activeOpacity={0.8}
+                        style={{
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowOpacity: 1,
+                          shadowRadius: 1,
+                          elevation: 3,
+                          marginVertical:10
+                        }}
+                        onPress={() =>item.valid? navigation.navigate("event", item):null}
                       >
                         <MediumCard {...item} />
                       </TouchableOpacity>
@@ -164,12 +174,25 @@ export default function HomeScreen({ navigation }) {
                 />
                 <Text style={styles.headerText}>Upcoming Event</Text>
                 <TouchableOpacity
+                                      activeOpacity={0.8}
+
                 // onPress={() => navigation.navigate("event")}
+                style={{
+                  shadowOffset: { width: 1, height: 1 },
+                  shadowOpacity: 1,
+                  shadowRadius: 1,
+                  elevation: 3,
+                  marginVertical:10
+                }}
                 >
                   <BigCard
-                    title="Photography Workshop"
-                    date=" Sun, 29 May - 3:00 pm
-Wroclaw"
+                    title="Workshop de fotografia"
+                    date="Domingo, 29 Mai - 14h00"
+                    venue={{
+                      displayName: "Praça Alexandre Abluquerque",
+                      city: "Praia",
+                    }}
+
                     image={{
                       uri: "https://images.unsplash.com/photo-1553249067-9571db365b57?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
                     }}
@@ -183,6 +206,8 @@ Wroclaw"
                   renderItem={({ item }) => {
                     return (
                       <TouchableOpacity
+                      activeOpacity={0.8}
+
                         style={{
                           shadowOffset: { width: 0.5, height: 0.5 },
                           shadowOpacity: 0.3,
@@ -190,7 +215,7 @@ Wroclaw"
                           elevation: 2,
                           padding: 10,
                         }}
-                        onPress={() => navigation.navigate("event", item)}
+                        // onPress={() => navigation.navigate("event", item)}
                       >
                         <SmallCard {...item} />
                       </TouchableOpacity>
@@ -203,7 +228,7 @@ Wroclaw"
           />
         </View>
       </Screen>
-    </>
+
   );
 }
 
@@ -215,8 +240,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: "600",
-    padding: 5,
-    marginVertical: 5,
+    // padding: 5,
+    left:20
+    // marginVertical: 5,
   },
   search: {
     height: 40,

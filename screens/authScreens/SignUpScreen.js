@@ -9,7 +9,6 @@ const SignUpScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRepPassword, setShowRepPassword] = useState(false);
 
-
   const [confPassword, setConfPassword] = useState("");
 
   return (
@@ -20,7 +19,6 @@ const SignUpScreen = () => {
         contentStyle={{ backgroundColor: colors.background }}
         label="Nome de usuário (único)"
         activeUnderlineColor={colors.primary}
-
         value={user?.userName}
         onChangeText={(text) => setUser({ ...user, userName: text })}
       />
@@ -30,7 +28,6 @@ const SignUpScreen = () => {
         contentStyle={{ backgroundColor: colors.background }}
         label="Email"
         activeUnderlineColor={colors.primary}
-
         value={user?.email}
         onChangeText={(text) => setUser({ ...user, email: text })}
       />
@@ -47,7 +44,6 @@ const SignUpScreen = () => {
         secureTextEntry={!showPassword}
         label="Palavra Passe"
         activeUnderlineColor={colors.primary}
-
         value={user?.password}
         onChangeText={(text) => setUser({ ...user, password: text })}
       />
@@ -64,7 +60,6 @@ const SignUpScreen = () => {
         secureTextEntry={!showRepPassword}
         label="Confirmar Palavra Passe"
         activeUnderlineColor={colors.primary}
-
         value={confPassword}
         onChangeText={(text) => setConfPassword(text)}
       />
@@ -78,6 +73,10 @@ const SignUpScreen = () => {
           borderRadius: 10,
           alignItems: "center",
           justifyContent: "center",
+          shadowOffset: { width: 0.5, height: 0.5 },
+          shadowOpacity: 0.3,
+          shadowRadius: 1,
+          elevation: 2,
         }}
       >
         <MaterialCommunityIcons
@@ -91,6 +90,7 @@ const SignUpScreen = () => {
             marginLeft: 5,
             fontSize: 17,
             fontWeight: "500",
+      
           }}
         >
           Criar Conta

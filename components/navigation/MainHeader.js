@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons ,FontAwesome5} from "@expo/vector-icons";
 import colors from "../colors";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SignInScreen from "../../screens/authScreens/SignInScreen";
@@ -48,7 +48,7 @@ const MainHeader = ({
         <Text style={styles.title}>{title}</Text>
       ) : (
         <Image
-          source={require("../../assets/logos/mainLogo.png")}
+          source={require("../../assets/logos/mainLogo2.png")}
           style={{ width: 100, flex: 1, marginBottom: 5 }}
           resizeMode="contain"
         />
@@ -82,7 +82,7 @@ const MainHeader = ({
           </TouchableOpacity>
         </View>
       )}
-      <Modal animationType="slide" visible={showModal}>
+      <Modal style={{backgroundColor:colors.background}} animationType="slide" visible={showModal}>
         <Screen style={{ backgroundColor: colors.background }}>
           <View
             style={{
@@ -93,7 +93,7 @@ const MainHeader = ({
               justifyContent:"center"
             }}
           >
-            <Text
+            {/* <Text
               style={{
                 // position: "absolute",
                 alignSelf: "center",
@@ -105,7 +105,8 @@ const MainHeader = ({
               }}
             >
               Conta
-            </Text>
+            </Text> */}
+            <FontAwesome5 name="user-circle" size={40} color={colors.black} />
             <TouchableOpacity
               onPress={() => setShowModal(false)}
               style={{ padding: 10, right: 5, position:"absolute"}}
@@ -114,7 +115,7 @@ const MainHeader = ({
                 style={{
                   color: colors.primary,
                   fontSize: 15,
-                  fontWeight: "500",
+                  fontWeight: "600",
                 }}
               >
                 Cancelar
@@ -130,6 +131,8 @@ const MainHeader = ({
               },
               tabBarLabelStyle: {
                 fontWeight: "600",
+                fontSize:14,
+                color:colors.black2
               },
               tabBarIndicatorStyle: {
                 width: "40%",
@@ -159,6 +162,11 @@ const styles = StyleSheet.create({
     height: 40,
     borderBottomWidth: 0.2,
     borderColor: colors.grey,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 0.3,
+    // shadowRadius: -3,
+    // elevation: 2
+    
   },
   title: {
     fontSize: 18,

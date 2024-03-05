@@ -1,6 +1,7 @@
 export const trendingEvents = [
   {
     id: 1,
+    valid:true,
     prices: [
       {
         id: 1,
@@ -43,7 +44,7 @@ export const trendingEvents = [
     ],
     going: 74,
     title: "Rolling Loud Cv: Edição 2024",
-    date: "Quarta, 06-08 Jul - 15:00",
+    date: "Quarta, 06-08 Jul - 15h00",
     description:
       "Prepare-se para experimentar a fusão definitiva de música, cultura e emoção no Rolling Loud CV 2024! Junte-se a nós para um fim de semana inesquecível de performances sem parar dos artistas mais quentes do hip-hop, rap e além. Dos cabeças de cartaz icônicos aos talentos emergentes, nossa programação promete eletrizar cada momento. Mergulhe nos ritmos pulsantes, na atmosfera vibrante e na energia incomparável enquanto transformamos Cabo Verde no epicentro da cena musical global. Garanta seu lugar agora e faça parte da história sendo feita no Rolling Loud CV 2024!",
     city: "Praia",
@@ -146,7 +147,7 @@ export const trendingEvents = [
     id: 4,
 
     title: "Color Content",
-    date: " Thu, 14 July - 3:00 pm",
+    date: "Quinta, 14 Jul - 10h00",
     city: "Wroclaw",
     photos: [
       {
@@ -174,15 +175,20 @@ export const recommendedEvents = [
   {
     id: 1,
     title: "Sun7ven",
-    date: "Sexta, 27 Mai - 16:30",
+    date: "Sexta, 27 Mai - 16h30",
     city: "Praia",
     venue: {
       id: 1,
-      displayName: "Kebra Cabana",
-      city: "Praia",
-      lat: 14.904463,
-      long: -23.517431,
+      displayName: "Linha d'Água",
       uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
+
+      address:{
+        city: "Praia",
+        zone:"Prainha",
+        lat: 14.904463,
+        long: -23.517431,
+      },
+     
     },
 
     photos: [
@@ -210,8 +216,20 @@ export const recommendedEvents = [
     id: 2,
 
     title: "Space Y",
-    date: " Sun, 05 June - 1:00 pm",
-    city: "Wroclaw",
+    date: "Domingo, 05 June - 13h00",
+    venue: {
+      id: 1,
+      displayName: "Auditório Nacional",
+      uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
+
+      address:{
+        city: "Praia",
+        zone:"Achadda Santo António",
+        lat: 14.904463,
+        long: -23.517431,
+      },
+     
+    },
     photos: [
       {
         id: 1,
@@ -236,10 +254,21 @@ export const recommendedEvents = [
   {
     id: 3,
 
-    title: "Cookies Stap",
-    date: " Wed, 25 May - 4:00 pm",
-    city: "Wrocalw",
-    photos: [
+    title: "Prendi cuzinha ku Tanxinha - Bolachas",
+    date: "Quarta, 25 Mai - 16h00",
+    venue: {
+      id: 1,
+      displayName: "Parque 5 de Julho",
+      uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
+
+      address:{
+        city: "Praia",
+        zone:"Achadda Santo António",
+        lat: 14.904463,
+        long: -23.517431,
+      },
+     
+    },    photos: [
       {
         id: 1,
         uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",
