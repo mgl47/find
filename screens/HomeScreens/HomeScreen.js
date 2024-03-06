@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -31,204 +32,375 @@ import Animated, {
 } from "react-native-reanimated";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import AppTextInput from "../../components/AppTextInput";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 
 export default function HomeScreen({ navigation }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState("");
+
   const [user, setUser] = useState(false);
+  LocaleConfig.locales["pt"] = {
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNamesShort: [
+      "Jan.",
+      "Fev.",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul.",
+      "Ago",
+      "Set.",
+      "Out.",
+      "Nov.",
+      "Dez.",
+    ],
+    dayNames: [
+      "Domingo",
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+    ],
+    dayNamesShort: ["Dom.", "Seg.", "Ter.", "Qua.", "Qui.", "Sex.", "Sab."],
+    today: "hoje",
+  };
+  LocaleConfig.defaultLocale = "pt";
 
   return (
+    <Screen>
+      <MainHeader
+        user={user}
+        navigation={navigation}
+        mainScreen
+        onPressSearch={() => setShowSearch(true)}
+        onPressCalendar={() => setCalendarModalVisible(true)}
+      />
 
+      {showSearch && (
+        <Animated.View
+          entering={SlideInRight.duration(250)}
+          exiting={SlideOutRight.duration(250)}
+          style={{
+            width: "100%",
+            position: "absolute",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexDirection: "row",
 
-      <Screen >
-        <MainHeader
-          user={user}
-          navigation={navigation}
-          mainScreen
-          onPressSearch={() => setShowSearch(true)}
-        />
+            zIndex: 1,
+            padding: 5,
+            top: -8,
+            height: 50,
+          }}
+        >
+          <View style={{ flexDirection: "row", width: "90%" }}>
+            <MaterialCommunityIcons
+              style={{ position: "absolute", zIndex: 1, left: 10, top: 8 }}
+              name="magnify"
+              size={25}
+              color="black"
+            />
 
-        {showSearch && (
-          <Animated.View
-            entering={SlideInRight.duration(250)}
-            exiting={SlideOutRight.duration(250)}
-            style={{
-              width: "100%",
-              position: "absolute",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexDirection: "row",
-
-              zIndex: 1,
-              padding: 5,
-              top: -8,
-              height: 50,
+            <TextInput
+              value={searchText}
+              onChangeText={setSearchText}
+              onSubmitEditing={() => navigation.navigate("search", searchText)}
+              returnKeyType="search"
+              autoFocus
+              style={styles.search}
+            />
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              setShowSearch(false), setSearchText("");
             }}
+            style={{
+              right: 5,
+              height: 40,
+              width: 30,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: colors.white,
+              borderRadius: 50,
+            }}
+            activeOpacity={1}
           >
-            <View style={{ flexDirection: "row", width: "90%" }}>
-              <MaterialCommunityIcons
-                style={{ position: "absolute", zIndex: 1, left: 10, top: 8 }}
-                name="magnify"
-                size={25}
-                color="black"
-              />
-
-              <TextInput
-                value={searchText}
-                onChangeText={setSearchText}
-                onSubmitEditing={() =>
-                  navigation.navigate("search", searchText)
-                }
-                returnKeyType="search"
-                autoFocus
-                style={styles.search}
-              />
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                setShowSearch(false), setSearchText("");
-              }}
-              style={{
-                right: 5,
-                height: 40,
-                width: 30,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.white,
-                borderRadius: 50,
-              }}
-              activeOpacity={1}
-            >
-              <Entypo name="cross" size={27} color={colors.black2} />
-              {/* <MaterialCommunityIcons
+            <Entypo name="cross" size={27} color={colors.black2} />
+            {/* <MaterialCommunityIcons
               name="close"
               size={27}
               color={colors.primary}
             /> */}
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-        <View style={styles.container}>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={
-              <>
-                <FlatList
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={categories}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => {
-                    return (
-                      <Chip
-                        elevation={1}
-                        textStyle={
-                          {
-                            // color: colors.white,
-                          }
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+      <View style={styles.container}>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={
+            <>
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={categories}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  return (
+                    <Chip
+                      elevation={1}
+                      textStyle={
+                        {
+                          // color: colors.white,
                         }
-                        style={{
-                          margin: 2,
-                          backgroundColor: colors.white,
-                          // paddingHorizontal: 2,
-                          marginVertical: 5,
-                          marginHorizontal: 3,
-                          marginBottom:10,
-                          borderRadius: 20,
-                        }}
-                        // background={{ color: colors.description }}
-                        // icon="information"
-                        // onPress={() => console.log("Pressed")}
-                        onPress={() => {}}
-                      >
-                        {item.label}
-                      </Chip>
-                    );
-                  }}
-                />
+                      }
+                      style={{
+                        margin: 2,
+                        backgroundColor: colors.white,
+                        // paddingHorizontal: 2,
+                        marginVertical: 10,
+                        marginHorizontal: 3,
+                        marginBottom: 10,
+                        borderRadius: 20,
+                      }}
+                      // background={{ color: colors.description }}
+                      // icon="information"
+                      // onPress={() => console.log("Pressed")}
+                      onPress={() => {}}
+                    >
+                      {item.label}
+                    </Chip>
+                  );
+                }}
+              />
 
-                <Text style={styles.headerText}>Trending in your area</Text>
+              <Text style={styles.headerText}>Trending in your area</Text>
 
-                <FlatList
-                  showsHorizontalScrollIndicator={false}
-                  horizontal
-                  data={trendingEvents}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => {
-                    return (
-                      <TouchableOpacity
+              <FlatList
+                showsHorizontalScrollIndicator={false}
+                horizontal
+                data={trendingEvents}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity
                       activeOpacity={0.8}
-                        style={{
-                          shadowOffset: { width: 1, height: 1 },
-                          shadowOpacity: 1,
-                          shadowRadius: 1,
-                          elevation: 3,
-                          marginVertical:10
-                        }}
-                        onPress={() =>item.valid? navigation.navigate("event", item):null}
-                      >
-                        <MediumCard {...item} />
-                      </TouchableOpacity>
-                    );
-                  }}
-                />
-                <Text style={styles.headerText}>Upcoming Event</Text>
-                <TouchableOpacity
-                                      activeOpacity={0.8}
-
+                      style={{
+                        shadowOffset: { width: 1, height: 1 },
+                        shadowOpacity: 1,
+                        shadowRadius: 1,
+                        elevation: 3,
+                        marginVertical: 10,
+                      }}
+                      onPress={() =>
+                        item.valid ? navigation.navigate("event", item) : null
+                      }
+                    >
+                      <MediumCard {...item} />
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+              <Text style={styles.headerText}>Upcoming Event</Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
                 // onPress={() => navigation.navigate("event")}
                 style={{
                   shadowOffset: { width: 1, height: 1 },
                   shadowOpacity: 1,
                   shadowRadius: 1,
                   elevation: 3,
-                  marginVertical:10
+                  marginVertical: 10,
                 }}
-                >
-                  <BigCard
-                    title="Workshop de fotografia"
-                    date="Domingo, 29 Mai - 14h00"
-                    venue={{
-                      displayName: "Praça Alexandre Abluquerque",
-                      city: "Praia",
-                    }}
-
-                    image={{
-                      uri: "https://images.unsplash.com/photo-1553249067-9571db365b57?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
-                    }}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.headerText}>Recommended for you</Text>
-                <FlatList
-                  data={recommendedEvents}
-                  showsVerticalScrollIndicator={false}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => {
-                    return (
-                      <TouchableOpacity
-                      activeOpacity={0.8}
-
-                        style={{
-                          shadowOffset: { width: 0.5, height: 0.5 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 1,
-                          elevation: 2,
-                          padding: 10,
-                        }}
-                        // onPress={() => navigation.navigate("event", item)}
-                      >
-                        <SmallCard {...item} />
-                      </TouchableOpacity>
-                    );
+              >
+                <BigCard
+                  title="Workshop de fotografia"
+                  date="Domingo, 29 Mai - 14h00"
+                  venue={{
+                    displayName: "Praça Alexandre Abluquerque",
+                    city: "Praia",
                   }}
-                  ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+                  image={{
+                    uri: "https://images.unsplash.com/photo-1553249067-9571db365b57?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
+                  }}
                 />
-              </>
-            }
-          />
-        </View>
-      </Screen>
+              </TouchableOpacity>
+              <Text style={styles.headerText}>Recommended for you</Text>
+              <FlatList
+                data={recommendedEvents}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      style={{
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 1,
+                        elevation: 2,
+                        padding: 10,
+                      }}
+                      // onPress={() => navigation.navigate("event", item)}
+                    >
+                      <SmallCard {...item} />
+                    </TouchableOpacity>
+                  );
+                }}
+                ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+              />
+            </>
+          }
+        />
+      </View>
+      <Modal animationType="slide" visible={calendarModalVisible}>
+        <Screen style={{ backgroundColor: colors.background }}>
+         
+          <View
+            style={{
+              flexDirection: "row",
+              // backgroundColor: "red",
+              width: "100%",
+              alignItems: "center",
+              justifyContent:"center",
+              marginBottom: 10,
 
+            }}
+          >
+            <Text
+              style={{
+                // position: "absolute",
+                alignSelf: "center",
+                fontSize: 22,
+                // left:1,
+                color:colors.black2,
+
+                fontWeight: "500",
+              }}
+            >
+              Calendário
+            </Text>
+            {/* <FontAwesome5 name="user-circle" size={40} color={colors.black2} /> */}
+        
+            <TouchableOpacity
+            onPress={() => setCalendarModalVisible(false)}
+            style={{
+              padding: 10,
+              right: 10,
+              // alignSelf: "flex-end",
+              position:"absolute",
+              marginBottom: 10,
+              
+            }}
+          >
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Cancelar
+            </Text>
+          </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+          >
+            <Calendar
+              onDayPress={(day) => {
+                setSelectedDay(day.dateString);
+              }}
+
+
+              
+              theme={{
+                textSectionTitleColor: "#b6c1cd",
+                selectedDayBackgroundColor: colors.primary,
+                selectedDayTextColor: "#ffffff",
+                textMonthFontWeight: "500",
+                textDayFontWeight: "500",
+                todayTextColor: colors.primary,
+//  textDayHeaderFontWeight:"500",
+// textDayHeaderFontSize:14,
+
+
+                
+                
+                // textDisabledColor: "#d9e",
+              }}
+              markedDates={{
+                [selectedDay]: {
+                  selected: true,
+                  disableTouchEvent: true,
+                  selectedDotColor: "orange",
+                },
+              }}
+            />
+          </View>
+          <FlatList
+            data={recommendedEvents.slice(1,3).reverse()}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={<View style={{ marginTop: 10 }} />}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={{
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 1,
+                    elevation: 2,
+                    padding: 10,
+                  }}
+                  // onPress={() => navigation.navigate("event", item)}
+                >
+                  <SmallCard {...item} />
+                </TouchableOpacity>
+              );
+            }}
+            ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+          />
+        </Screen>
+      </Modal>
+    </Screen>
   );
 }
 
@@ -241,7 +413,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     // padding: 5,
-    left:20
+    left: 20,
     // marginVertical: 5,
   },
   search: {

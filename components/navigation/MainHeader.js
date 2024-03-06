@@ -30,7 +30,7 @@ const MainHeader = ({
         onPress={() => (user ? navigation.openDrawer() : setShowModal(true))}
         style={{ position: "absolute", left: 20,bottom:3}}
       >
-        <Image
+      {!user?  <Image
           source={{
             uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
           }}
@@ -41,14 +41,16 @@ const MainHeader = ({
             // marginLeft: 20,
             // position: "absolute",
           }}
+          
           // resizeMode="contain"
-        />
+        />:            <FontAwesome5 name="user-circle" size={38} color={colors.black} />
+      }
       </TouchableOpacity>
       {title ? (
         <Text style={styles.title}>{title}</Text>
       ) : (
         <Image
-          source={require("../../assets/logos/mainLogo2.png")}
+          source={require("../../assets/logos/logo1.png")}
           style={{ width: 100, flex: 1, marginBottom: 5 }}
           resizeMode="contain"
         />
@@ -106,7 +108,7 @@ const MainHeader = ({
             >
               Conta
             </Text> */}
-            <FontAwesome5 name="user-circle" size={40} color={colors.black} />
+            <FontAwesome5 name="user-circle" size={40} color={colors.black2} />
             <TouchableOpacity
               onPress={() => setShowModal(false)}
               style={{ padding: 10, right: 5, position:"absolute"}}

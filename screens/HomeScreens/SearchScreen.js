@@ -6,7 +6,7 @@ import {
   Image,
   ImageBackground,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/navigation/Header";
 import Screen from "../../components/Screen";
 import Svg, { Path, Defs, ClipPath, Image as SvgImage } from "react-native-svg";
@@ -14,62 +14,74 @@ import { RNHoleView } from "react-native-hole-view";
 import BigTicket from "../../components/tickets/BigTicket";
 import { LinearGradient } from "expo-linear-gradient";
 import colors from "../../components/colors";
+// import { Calendar } from "react-native-calendario";
+import {Calendar} from 'react-native-calendars';
 
 const SearchScreen = ({ navigation: { goBack }, route }) => {
   const { height, width } = useWindowDimensions();
+  const [selected, setSelected] = useState('');
 
   return (
     <Screen>
       <Header />
-
-      <View
-        style={{
-          borderRadius: 20,
-          overflow: "hidden",
-          backgroundColor: "red",
-          height: 195,
-          width: 200,
+      <Calendar
+      onDayPress={day => {
+        setSelected(day.dateString);
+      }}
+      markedDates={{
+        [selected]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+      }}
+    />
+      {/* <Calendar
+        onChange={(range) => console.log(range)}
+        renderAllMonths={false}
+        minDate={new Date(2018, 3, 20)}
+        startDate={new Date()}
+        endDate={new Date(2018, 4, 5)}
+        theme={{
+          activeDayColor: {},
+          monthTitleTextStyle: {
+            color: "#6d95da",
+            fontWeight: "300",
+            fontSize: 16,
+          },
+          emptyMonthContainerStyle: {},
+          emptyMonthTextStyle: {
+            fontWeight: "200",
+          },
+          weekColumnsContainerStyle: {},
+          weekColumnStyle: {
+            paddingVertical: 10,
+          },
+          weekColumnTextStyle: {
+            color: "#b6c1cd",
+            fontSize: 13,
+          },
+          nonTouchableDayContainerStyle: {},
+          nonTouchableDayTextStyle: {},
+          startDateContainerStyle: {},
+          endDateContainerStyle: {},
+          dayContainerStyle: {},
+          dayTextStyle: {
+            color: "#2d4150",
+            fontWeight: "200",
+            fontSize: 15,
+          },
+          dayOutOfRangeContainerStyle: {},
+          dayOutOfRangeTextStyle: {},
+          todayContainerStyle: {},
+          todayTextStyle: {
+            color: "#6d95da",
+          },
+          activeDayContainerStyle: {
+            backgroundColor: "#6d95da",
+          },
+          activeDayTextStyle: {
+            color: "white",
+          },
+          nonTouchableLastMonthDayTextStyle: {},
         }}
-      >
-        <Image
-          style={{
-            height: 195,
-            width: 200,
-            borderRadius: 20,
-            position: "absolute",
-            // marginBottom: 50,
-            zIndex: 2,
-            // top: 150,
-          }}
-          source={{
-            uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-          }}
-        />
-        <LinearGradient
-          // Button Linear Gradient
-
-          colors={["transparent", colors.grey, colors.background]}
-          style={{ height: 145, width: 200, zIndex: 2, top: 50 }}
-        />
-      </View>
-      <ImageBackground
-        style={{
-          width: 225,
-          height: 195,
-          borderRadius: 10,
-          overflow: "hidden",
-          left:70,
-        }}
-        source={{
-          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-        }}
-      >
-        <LinearGradient
-          colors={["#00000000", "#000000"]}
-          style={{ height: "100%", width: "100%" }}
-        ></LinearGradient>
-      </ImageBackground>
-
+      /> */}
       {/* <BigTicket /> */}
     </Screen>
   );

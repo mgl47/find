@@ -23,16 +23,18 @@
     "lottie-react-native": "6.5.1",
     "react": "18.2.0",
     "react-native": "0.73.4",
+    "react-native-calendario": "^3.5.0",
+    "react-native-calendars": "^1.1304.1",
     "react-native-gesture-handler": "~2.14.0",
     "react-native-hole-view": "^3.0.0-alpha4",
     "react-native-image-colors": "^2.4.0",
+    "react-native-maps": "1.10.0",
     "react-native-pager-view": "6.2.3",
     "react-native-paper": "^5.12.3",
     "react-native-reanimated": "~3.6.2",
     "react-native-svg": "14.1.0",
     "react-native-tab-view": "^3.5.2",
-    "react-native-view-more-text": "^2.2.0",
-    "react-native-maps": "1.10.0"
+    "react-native-view-more-text": "^2.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

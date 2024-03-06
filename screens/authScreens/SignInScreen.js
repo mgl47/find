@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextInput } from "react-native-paper";
 import colors from "../../components/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -17,8 +17,13 @@ import Animated, {
 const SignInScreen = () => {
   //   const [text, setText] = useState("");
   const [user, setUser] = useState({ email: "", password: "" });
+  const[firstMount,setFirstMount]=useState(true)
   const [showPassword, setShowPassword] = useState(false);
   const [onPassRecovery, setOnPassRecovery] = useState(false);
+useEffect(() => {
+ setFirstMount(false)
+}, [])
+
   return (
     <View style={{ padding: 10, backgroundColor: colors.background }}>
       <TextInput
@@ -33,8 +38,8 @@ const SignInScreen = () => {
 
       {!onPassRecovery && (
         <Animated.View
-          entering={SlideInUp.duration(400)}
-          exiting={SlideOutUp.duration(1000)}
+          entering={firstMount?null:SlideInUp.duration(400)}
+          exiting={firstMount?null:SlideOutUp.duration(1000)}
           style={{}}
         >
           <TextInput
@@ -57,8 +62,8 @@ const SignInScreen = () => {
       )}
       {!onPassRecovery && (
         <Animated.View
-          entering={SlideInRight.duration(500)}
-          exiting={SlideOutRight.duration(500)}
+          entering={firstMount?null:SlideInRight.duration(500)}
+          exiting={firstMount?null:SlideOutRight.duration(500)}
         >
           <TouchableOpacity
             onPress={() => setOnPassRecovery(!onPassRecovery)}
@@ -79,8 +84,8 @@ const SignInScreen = () => {
       )}
       {onPassRecovery && (
         <Animated.View
-          entering={SlideInRight.duration(500)}
-          exiting={SlideOutRight.duration(500)}
+          entering={firstMount?null:SlideInRight.duration(500)}
+          exiting={firstMount?null:SlideOutRight.duration(500)}
         >
           <TouchableOpacity
             onPress={() => setOnPassRecovery(!onPassRecovery)}
@@ -122,8 +127,8 @@ const SignInScreen = () => {
         />
         
         <Animated.Text
-           entering={SlideInRight.duration(500)}
-           exiting={SlideOutRight.duration(500)}
+           entering={firstMount?null:SlideInRight.duration(500)}
+           exiting={firstMount?null:SlideOutRight.duration(500)}
           style={{
             color: colors.white,
             marginLeft: 5,
