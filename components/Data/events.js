@@ -1,14 +1,23 @@
 export const trendingEvents = [
   {
     id: 1,
-    valid:true,
-    prices: [
+    valid: true,
+    tickets: [
       {
+        description: "Um bilhete",
         id: 1,
         amount: 3000,
+        type:"Promo"
       },
-      { id: 2, amount: 5000 },
-      { id: 3, amount: 10000 },
+      {
+        id: 2,
+        amount: 5000,
+        description: "Um bilhete fila da frente e uma garrafa das fas sfa ",
+        type:"Normal"
+
+      },
+      { id: 3, amount: 10000, description: "Um bilhete Vip e duas garrafas" ,        type:"Vip"
+    },
     ],
     artists: [
       {
@@ -182,13 +191,12 @@ export const recommendedEvents = [
       displayName: "Linha d'Água",
       uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
 
-      address:{
+      address: {
         city: "Praia",
-        zone:"Prainha",
+        zone: "Prainha",
         lat: 14.904463,
         long: -23.517431,
       },
-     
     },
 
     photos: [
@@ -222,13 +230,12 @@ export const recommendedEvents = [
       displayName: "Auditório Nacional",
       uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
 
-      address:{
+      address: {
         city: "Praia",
-        zone:"Achadda Santo António",
+        zone: "Achadda Santo António",
         lat: 14.904463,
         long: -23.517431,
       },
-     
     },
     photos: [
       {
@@ -261,14 +268,14 @@ export const recommendedEvents = [
       displayName: "Parque 5 de Julho",
       uri: "https://scontent.fopo3-1.fna.fbcdn.net/v/t39.30808-6/277743931_5688317584517425_7404246851532435527_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=efb6e6&_nc_eui2=AeFGFWlGhsBPmPONu3bpvGXlxpbOmYh47GfGls6ZiHjsZxGoeLMmWAVQG4b3UZxX3_hUt7KcemVPYfNEf-vx5y0q&_nc_ohc=sTcHo3xDP8UAX9KWrYs&_nc_ht=scontent.fopo3-1.fna&oh=00_AfDHNQvMtUnyuQb03LTtA5Ky7F2P1wN9ezkbp-GxZsI3NA&oe=65E95566",
 
-      address:{
+      address: {
         city: "Praia",
-        zone:"Achadda Santo António",
+        zone: "Achadda Santo António",
         lat: 14.904463,
         long: -23.517431,
       },
-     
-    },    photos: [
+    },
+    photos: [
       {
         id: 1,
         uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",

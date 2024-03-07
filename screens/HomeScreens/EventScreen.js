@@ -1,4 +1,5 @@
 import {
+  Button,
   Dimensions,
   FlatList,
   Image,
@@ -11,8 +12,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeIn, SlideOutUp } from "react-native-reanimated";
-import React, { useState } from "react";
+import Animated, {
+  FadeIn,
+  SlideInDown,
+  SlideOutDown,
+  SlideOutUp,
+} from "react-native-reanimated";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import colors from "../../components/colors";
 import {
   MaterialCommunityIcons,
@@ -28,12 +34,20 @@ import { TouchableWithoutFeedback } from "react-native";
 import * as ScreenOrientation from "expo-screen-orientation";
 import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
-import { venue } from "../../components/Data/venue";
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
 import { Chip } from "react-native-paper";
+import { GiftModal, PurchaseModal } from "../../components/screensComponents/CompEventScreen";
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
   const videoRef = React.useRef(null);
+  const [purchaseModalUp, setPurchaseModalUp] = useState(false);
+  const [GiftModalUp, setGiftModalUp] = useState(false);
+
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
@@ -41,13 +55,29 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
-
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
 
   const [interested, setInterested] = useState(false);
-  const [going,setGoing]=useState(false)
+  const [going, setGoing] = useState(false);
+
+  const bottomSheetModalRef = useRef(null);
+  const bottomSheetModalRef2 = useRef(null);
+
+  const handlePurchaseSheet = useCallback(() => {
+
+    setPurchaseModalUp(true);
+
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleGiftSheet = useCallback(() => {
+
+    setGiftModalUp(true);
+
+    bottomSheetModalRef2.current?.present();
+  }, []);
+
   const renderViewMore = (onPress) => {
     return (
       <TouchableOpacity style={styles.more} onPress={onPress}>
@@ -282,7 +312,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     textAlign: "right",
                   }}
                 >
-                  {Event?.prices?.length > 1 ? "apartir de " : ""}
+                  {Event?.tickets?.length > 1 ? "apartir de " : ""}
                 </Text>
                 <Text
                   style={{
@@ -293,7 +323,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     // marginLeft: 5,
                   }}
                 >
-                  cve {Event?.prices[0]?.amount}
+                  cve {Event?.tickets[0]?.amount}
                 </Text>
               </View>
             </View>
@@ -341,22 +371,22 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               icon={() => (
                 <MaterialCommunityIcons
                   name="calendar-heart"
-                  color={interested?colors.white: colors.black}
+                  color={interested ? colors.white : colors.black}
                   size={20}
                 />
               )}
-              textStyle={
-                {
-                  color:interested?colors.white:  colors.black,
-                }
-              }
+              textStyle={{
+                color: interested ? colors.white : colors.black,
+              }}
               style={{
-                backgroundColor:interested?colors.primary: colors.white,
+                backgroundColor: interested ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 20,
               }}
-              onPress={() => {setInterested(!interested),setGoing(false)}}
+              onPress={() => {
+                setInterested(!interested), setGoing(false);
+              }}
             >
               Interressado
             </Chip>
@@ -366,20 +396,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Ionicons
                   name="ticket-outline"
                   size={20}
-                  color={going?colors.white: colors.black}
+                  color={going ? colors.white : colors.black}
                 />
               )}
-              textStyle={
-                {
-                  color:going?colors.white:  colors.black,
-                }
-              }
+              textStyle={{
+                color: going ? colors.white : colors.black,
+              }}
               style={{
-                backgroundColor:going?colors.primary: colors.white,
+                backgroundColor: going ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 borderRadius: 20,
               }}
-              onPress={() => {setGoing(!going),setInterested(false)}}
+              onPress={() => {
+                setGoing(!going), setInterested(false);
+              }}
             >
               Vou
             </Chip>
@@ -606,18 +636,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <FontAwesome5
-                      name="walking"
-                      size={20}
-                      color={colors.primary}
-                    />
-                    <Text style={{fontSize:22,color:colors.black2}}> | </Text>
-                    <MaterialCommunityIcons
-                      name="car"
-                      size={25}
-                      color={colors.primary}
-                    />
-                  </View>
+                <FontAwesome5 name="walking" size={20} color={colors.primary} />
+                <Text style={{ fontSize: 22, color: colors.black2 }}> | </Text>
+                <MaterialCommunityIcons
+                  name="car"
+                  size={25}
+                  color={colors.primary}
+                />
+              </View>
             </TouchableOpacity>
             {/* <View style={styles.separator} /> */}
             {/* <TouchableOpacity
@@ -736,8 +762,34 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           <View style={{ marginBottom: 100 }} />
         </View>
       </ScrollView>
-      {!inFullscreen && (
-        <View
+      <PurchaseModal
+        bottomSheetModalRef={bottomSheetModalRef}
+        setPurchaseModalUp={setPurchaseModalUp}
+        Event={Event}
+      />
+        <GiftModal
+        bottomSheetModalRef2={bottomSheetModalRef2}
+        setGiftModalUp={setGiftModalUp}
+        Event={Event}
+      />
+      {/* <BottomSheetModalProvider >
+        <BottomSheetModal
+        // style={{backgroundColor:}}
+          ref={bottomSheetModalRef}
+          index={1}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}
+          onDismiss={()=>setPurchaseModalUp(false)}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            <Text>Awesome 🎉</Text>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider> */}
+      {!inFullscreen && !purchaseModalUp &&!GiftModalUp&& (
+        <Animated.View
+          entering={SlideInDown}
+          exiting={SlideOutDown}
           style={{
             justifyContent: "space-around",
             width: "100%",
@@ -757,6 +809,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         >
           <TouchableOpacity
+            onPress={handleGiftSheet}
             style={{
               width: 150,
               height: 40,
@@ -791,9 +844,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <Feather name="gift" size={24} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
-            // onPress={() =>
-
-            // }
+            onPress={handlePurchaseSheet}
             style={{
               width: 150,
               height: 40,
@@ -825,7 +876,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             </Text>
             <Ionicons name="ticket-outline" size={24} color={colors.white} />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
       )}
     </>
   );

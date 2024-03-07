@@ -16,7 +16,7 @@ const SignUpScreen = () => {
       <TextInput
         style={{ marginBottom: 5 }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background }}
+        contentStyle={{ backgroundColor: colors.background ,fontWeight:"500"}}
         label="Nome de usuário (único)"
         activeUnderlineColor={colors.primary}
         value={user?.userName}
@@ -25,7 +25,7 @@ const SignUpScreen = () => {
       <TextInput
         style={{ marginBottom: 5 }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background }}
+        contentStyle={{ backgroundColor: colors.background ,fontWeight:"500"}}
         label="Email"
         activeUnderlineColor={colors.primary}
         value={user?.email}
@@ -34,7 +34,7 @@ const SignUpScreen = () => {
       <TextInput
         style={{ marginBottom: 5, backgroundColor: colors.background }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background }}
+        contentStyle={{ backgroundColor: colors.background,fontWeight:"500" }}
         right={
           <TextInput.Icon
             onPress={() => setShowPassword(!showPassword)}
@@ -50,7 +50,7 @@ const SignUpScreen = () => {
       <TextInput
         style={{ marginBottom: 30, backgroundColor: colors.background }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background }}
+        contentStyle={{ backgroundColor: colors.background ,fontWeight:"500"}}
         right={
           <TextInput.Icon
             onPress={() => setShowRepPassword(!showRepPassword)}

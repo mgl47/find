@@ -248,7 +248,7 @@ export default function HomeScreen({ navigation }) {
                   title="Workshop de fotografia"
                   date="Domingo, 29 Mai - 14h00"
                   venue={{
-                    displayName: "Praça Alexandre Abluquerque",
+                    displayName: "Praça Alexandre Albuquerque",
                     city: "Praia",
                   }}
                   image={{
@@ -286,16 +286,14 @@ export default function HomeScreen({ navigation }) {
       </View>
       <Modal animationType="slide" visible={calendarModalVisible}>
         <Screen style={{ backgroundColor: colors.background }}>
-         
           <View
             style={{
               flexDirection: "row",
               // backgroundColor: "red",
               width: "100%",
               alignItems: "center",
-              justifyContent:"center",
+              justifyContent: "center",
               marginBottom: 10,
-
             }}
           >
             <Text
@@ -304,7 +302,7 @@ export default function HomeScreen({ navigation }) {
                 alignSelf: "center",
                 fontSize: 22,
                 // left:1,
-                color:colors.black2,
+                color: colors.black2,
 
                 fontWeight: "500",
               }}
@@ -312,28 +310,27 @@ export default function HomeScreen({ navigation }) {
               Calendário
             </Text>
             {/* <FontAwesome5 name="user-circle" size={40} color={colors.black2} /> */}
-        
+
             <TouchableOpacity
-            onPress={() => setCalendarModalVisible(false)}
-            style={{
-              padding: 10,
-              right: 10,
-              // alignSelf: "flex-end",
-              position:"absolute",
-              marginBottom: 10,
-              
-            }}
-          >
-            <Text
+              onPress={() => setCalendarModalVisible(false)}
               style={{
-                color: colors.primary,
-                fontSize: 16,
-                fontWeight: "600",
+                padding: 10,
+                right: 10,
+                // alignSelf: "flex-end",
+                position: "absolute",
+                marginBottom: 10,
               }}
             >
-              Cancelar
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+              >
+                Cancelar
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             style={{
@@ -347,9 +344,6 @@ export default function HomeScreen({ navigation }) {
               onDayPress={(day) => {
                 setSelectedDay(day.dateString);
               }}
-
-
-              
               theme={{
                 textSectionTitleColor: "#b6c1cd",
                 selectedDayBackgroundColor: colors.primary,
@@ -357,12 +351,9 @@ export default function HomeScreen({ navigation }) {
                 textMonthFontWeight: "500",
                 textDayFontWeight: "500",
                 todayTextColor: colors.primary,
-//  textDayHeaderFontWeight:"500",
-// textDayHeaderFontSize:14,
+                //  textDayHeaderFontWeight:"500",
+                // textDayHeaderFontSize:14,
 
-
-                
-                
                 // textDisabledColor: "#d9e",
               }}
               markedDates={{
@@ -375,7 +366,7 @@ export default function HomeScreen({ navigation }) {
             />
           </View>
           <FlatList
-            data={recommendedEvents.slice(1,3).reverse()}
+            data={recommendedEvents.slice(1, 3).reverse()}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={<View style={{ marginTop: 10 }} />}

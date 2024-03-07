@@ -17,19 +17,19 @@ import Animated, {
 const SignInScreen = () => {
   //   const [text, setText] = useState("");
   const [user, setUser] = useState({ email: "", password: "" });
-  const[firstMount,setFirstMount]=useState(true)
+  const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [onPassRecovery, setOnPassRecovery] = useState(false);
-useEffect(() => {
- setFirstMount(false)
-}, [])
+  useEffect(() => {
+    setFirstMount(false);
+  }, []);
 
   return (
     <View style={{ padding: 10, backgroundColor: colors.background }}>
       <TextInput
         style={{ marginBottom: 5 }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background }}
+        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Nome de usuário ou Email"
         activeUnderlineColor={colors.primary}
         value={user?.email}
@@ -38,14 +38,17 @@ useEffect(() => {
 
       {!onPassRecovery && (
         <Animated.View
-          entering={firstMount?null:SlideInUp.duration(400)}
-          exiting={firstMount?null:SlideOutUp.duration(1000)}
+          entering={firstMount ? null : SlideInUp.duration(400)}
+          exiting={firstMount ? null : SlideOutUp.duration(1000)}
           style={{}}
         >
           <TextInput
             style={{ marginBottom: 20, backgroundColor: colors.background }}
             underlineStyle={{ backgroundColor: colors.primary }}
-            contentStyle={{ backgroundColor: colors.background }}
+            contentStyle={{
+              backgroundColor: colors.background,
+              fontWeight: "500",
+            }}
             label="Palavra Passe"
             activeUnderlineColor={colors.primary}
             right={
@@ -62,8 +65,8 @@ useEffect(() => {
       )}
       {!onPassRecovery && (
         <Animated.View
-          entering={firstMount?null:SlideInRight.duration(500)}
-          exiting={firstMount?null:SlideOutRight.duration(500)}
+          entering={firstMount ? null : SlideInRight.duration(500)}
+          exiting={firstMount ? null : SlideOutRight.duration(500)}
         >
           <TouchableOpacity
             onPress={() => setOnPassRecovery(!onPassRecovery)}
@@ -84,12 +87,12 @@ useEffect(() => {
       )}
       {onPassRecovery && (
         <Animated.View
-          entering={firstMount?null:SlideInRight.duration(500)}
-          exiting={firstMount?null:SlideOutRight.duration(500)}
+          entering={firstMount ? null : SlideInRight.duration(500)}
+          exiting={firstMount ? null : SlideOutRight.duration(500)}
         >
           <TouchableOpacity
             onPress={() => setOnPassRecovery(!onPassRecovery)}
-            style={{ alignSelf: "flex-end", marginBottom: 20,marginTop:15, }}
+            style={{ alignSelf: "flex-end", marginBottom: 20, marginTop: 15 }}
           >
             <Text
               style={{
@@ -125,10 +128,10 @@ useEffect(() => {
           size={24}
           color={colors.white}
         />
-        
+
         <Animated.Text
-           entering={firstMount?null:SlideInRight.duration(500)}
-           exiting={firstMount?null:SlideOutRight.duration(500)}
+          entering={firstMount ? null : SlideInRight.duration(500)}
+          exiting={firstMount ? null : SlideOutRight.duration(500)}
           style={{
             color: colors.white,
             marginLeft: 5,
@@ -136,7 +139,7 @@ useEffect(() => {
             fontWeight: "500",
           }}
         >
-          {!onPassRecovery?"Entrar":"Recuperar"}
+          {!onPassRecovery ? "Entrar" : "Recuperar"}
         </Animated.Text>
       </TouchableOpacity>
     </View>

@@ -6,6 +6,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(find) to access your camera",
+          "microphonePermission": "Allow $(find) to access your microphone",
+          "recordAudioAndroid": true
+
+        }
+      ]
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
