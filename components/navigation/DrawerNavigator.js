@@ -168,7 +168,7 @@ export function DrawerContent(props) {
     </Screen>
   );
 }
-const sideMenuDisabledScreens = ["event"];
+const sideMenuDisabledScreens = ["home","notification","chats"];
 
 const DrawerNavigator = () => {
   return (
@@ -197,7 +197,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "Login";
-          if (sideMenuDisabledScreens.includes(routeName))
+          if (!sideMenuDisabledScreens.includes(routeName))
             return { swipeEnabled: false };
         }}
         name="Event"

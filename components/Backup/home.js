@@ -115,7 +115,8 @@ export default function HomeScreen({ navigation }) {
         user={user}
         navigation={navigation}
         mainScreen
-        onPressSearch={() => setShowSearch(true)}
+        onPressSearch={() => navigation.navigate("search")}
+        // onPressSearch={() => setShowSearch(true)}
         onPressCalendar={() => setCalendarModalVisible(true)}
       />
 
@@ -178,11 +179,23 @@ export default function HomeScreen({ navigation }) {
         </Animated.View>
       )}
       <View style={styles.container}>
+        <View
+          style={{
+            width: "100%",
+            height: 1,
+            backgroundColor: colors.white,
+            shadowOffset: { width: 0.5, height: 0.5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            elevation: 2,
+            marginBottom: 5,
+          }}
+        />
         <FlatList
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <>
-              <FlatList
+              {/* <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={categories}
@@ -214,9 +227,9 @@ export default function HomeScreen({ navigation }) {
                     </Chip>
                   );
                 }}
-              />
+              /> */}
 
-              <Text style={styles.headerText}>Trending in your area</Text>
+              <Text style={styles.headerText}>Lugares que sa pega</Text>
 
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -243,7 +256,7 @@ export default function HomeScreen({ navigation }) {
                   );
                 }}
               />
-              <Text style={styles.headerText}>Upcoming Event</Text>
+              <Text style={styles.headerText}>Bu próximo evento</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
                 // onPress={() => navigation.navigate("event")}
@@ -267,7 +280,7 @@ export default function HomeScreen({ navigation }) {
                   }}
                 />
               </TouchableOpacity>
-              <Text style={styles.headerText}>Recommended for you</Text>
+              <Text style={styles.headerText}>Pa bó</Text>
               <FlatList
                 data={recommendedEvents}
                 showsVerticalScrollIndicator={false}

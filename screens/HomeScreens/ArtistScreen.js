@@ -191,7 +191,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     backgroundColor: !liked ? colors.primary : colors.white,
                     // paddingHorizontal: 2,
                     marginRight: 10,
-                    borderRadius: 20,
+                    borderRadius: 12,
                   }}
                   onPress={() => console.log("Pressed")}
                 >
@@ -216,7 +216,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     backgroundColor: colors.white,
                     // paddingHorizontal: 2,
                     marginHorizontal: 10,
-                    borderRadius: 20,
+                    borderRadius: 12,
                   }}
                   onPress={() => console.log("Pressed")}
                 >

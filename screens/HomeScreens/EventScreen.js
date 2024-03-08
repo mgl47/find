@@ -40,7 +40,10 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { Chip } from "react-native-paper";
-import { GiftModal, PurchaseModal } from "../../components/screensComponents/CompEventScreen";
+import {
+  GiftModal,
+  PurchaseModal,
+} from "../../components/screensComponents/CompEventScreen";
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
@@ -66,13 +69,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const bottomSheetModalRef2 = useRef(null);
 
   const handlePurchaseSheet = useCallback(() => {
-
     setPurchaseModalUp(true);
 
     bottomSheetModalRef.current?.present();
   }, []);
   const handleGiftSheet = useCallback(() => {
-
     setGiftModalUp(true);
 
     bottomSheetModalRef2.current?.present();
@@ -191,14 +192,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <FlatList
           showsHorizontalScrollIndicator={false}
           pagingEnabled
+          scrollEnabled={Event?.videos?.length>0||Event?.photos?.length>1}
           horizontal
           data={Event?.photos}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => setMuted(!muted)}
-            >
+            Event?.videos?.length > 0 ? (
               <VideoPlayer
                 fullscreen={{
                   inFullscreen: inFullscreen,
@@ -229,11 +228,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   exitMute: () => setIsMute(false),
                   isMute: isMute,
                 }}
-                // style={{
-                //   height: inFullscreen ? height : 270,
-                //   width: inFullscreen ? "90%" : width,
-                // }}
-
                 style={{
                   videoBackgroundColor: "black",
                   height: inFullscreen ? width : 270,
@@ -242,7 +236,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 videoProps={{
                   ref: videoRef,
                   source: {
-                    uri: Event?.video?.uri,
+                    uri: Event?.videos[0]?.uri,
                   },
 
                   // source: require("../assets/rolling.mp4"),
@@ -253,7 +247,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   isLooping: true,
                 }}
               />
-            </TouchableOpacity>
+            ) : null
           }
           renderItem={({ item }) => {
             {
@@ -343,19 +337,19 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               width: "100%",
               flexDirection: "row",
               alignItems: "center",
-              marginTop: 1,
+              marginTop: 2,
               right: 5,
               // justifyContent: "center",
             }}
           >
             <MaterialCommunityIcons
               name="lightning-bolt-outline"
-              size={24}
+              size={22}
               color={colors.primary}
             />
             <Text
               style={{
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: "500",
                 // width: "70%",
                 color: colors.darkGrey,
@@ -382,7 +376,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 backgroundColor: interested ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
-                borderRadius: 20,
+                borderRadius: 12,
               }}
               onPress={() => {
                 setInterested(!interested), setGoing(false);
@@ -405,7 +399,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 backgroundColor: going ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
-                borderRadius: 20,
+                borderRadius: 12,
               }}
               onPress={() => {
                 setGoing(!going), setInterested(false);
@@ -431,7 +425,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 backgroundColor: colors.white,
                 // paddingHorizontal: 2,
                 marginHorizontal: 10,
-                borderRadius: 20,
+                borderRadius: 12,
               }}
               onPress={() => console.log("Pressed")}
             >
@@ -767,7 +761,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         setPurchaseModalUp={setPurchaseModalUp}
         Event={Event}
       />
-        <GiftModal
+      <GiftModal
         bottomSheetModalRef2={bottomSheetModalRef2}
         setGiftModalUp={setGiftModalUp}
         Event={Event}
@@ -786,7 +780,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider> */}
-      {!inFullscreen && !purchaseModalUp &&!GiftModalUp&& (
+      {!inFullscreen && !purchaseModalUp && !GiftModalUp && (
         <Animated.View
           entering={SlideInDown}
           exiting={SlideOutDown}
