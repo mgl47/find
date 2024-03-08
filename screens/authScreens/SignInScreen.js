@@ -14,26 +14,77 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
+import axios from "axios";
+import BlockModal from "../../components/screensComponents/BlockModal";
+import { useAuth } from "../../components/hooks/useAuth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const SignInScreen = () => {
-  //   const [text, setText] = useState("");
-  const [user, setUser] = useState({ email: "", password: "" });
+  const { user, SetUser } = useAuth();
+  const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [onPassRecovery, setOnPassRecovery] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [firstAttempt, setFirstAttempt] = useState(true);
+  const [errorMsg, setErrorMsg] = useState("");
   useEffect(() => {
     setFirstMount(false);
   }, []);
+  const url = process.env.EXPO_PUBLIC_API_URL;
+  const validated = person.email && person.password;
+
+  const signIn = async () => {
+    setErrorMsg("");
+
+    setFirstAttempt(false);
+    setLoading(true);
+    try {
+      if (validated) {
+        const response = await axios.post(
+          `${url}/auth/login`,
+          {
+            username: person.email,
+            password: person.password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // console.log(response.data.user);
+        SetUser(response.data.user);
+        await AsyncStorage.setItem("headerToken", response.data.token);
+        const jsonValue = JSON.stringify(response.data.user);
+        await AsyncStorage.setItem("user", jsonValue);
+        JSON.parse(jsonValue);
+        
+      }
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.data);
+        setErrorMsg(error.response.data.msg);
+      } else {
+        console.log(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={{ padding: 10, backgroundColor: colors.background }}>
+      <BlockModal active={loading} />
       <TextInput
+        error={!firstAttempt && !person.email}
         style={{ marginBottom: 5 }}
         underlineStyle={{ backgroundColor: colors.primary }}
         contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Nome de usuário ou Email"
         activeUnderlineColor={colors.primary}
-        value={user?.email}
-        onChangeText={(text) => setUser({ ...user, email: text })}
+        value={person?.email}
+        onChangeText={(text) => setPerson({ ...person, email: text })}
       />
 
       {!onPassRecovery && (
@@ -43,6 +94,7 @@ const SignInScreen = () => {
           style={{}}
         >
           <TextInput
+            error={!firstAttempt && !person.password}
             style={{ marginBottom: 20, backgroundColor: colors.background }}
             underlineStyle={{ backgroundColor: colors.primary }}
             contentStyle={{
@@ -58,8 +110,9 @@ const SignInScreen = () => {
               />
             }
             secureTextEntry={!showPassword}
-            value={user?.password}
-            onChangeText={(text) => setUser({ ...user, password: text })}
+            value={person?.password}
+            onChangeText={(text) => setPerson({ ...person, password: text })}
+            onSubmitEditing={validated ? signIn : null}
           />
         </Animated.View>
       )}
@@ -107,41 +160,55 @@ const SignInScreen = () => {
           </TouchableOpacity>
         </Animated.View>
       )}
-      <TouchableOpacity
-        style={{
-          alignSelf: "center",
-          flexDirection: "row",
-          height: 50,
-          width: "90%",
-          backgroundColor: colors.primary,
-          borderRadius: 10,
-          alignItems: "center",
-          justifyContent: "center",
-          shadowOffset: { width: 0.5, height: 0.5 },
-          shadowOpacity: 0.3,
-          shadowRadius: 1,
-          elevation: 2,
-        }}
-      >
-        <MaterialCommunityIcons
-          name="account-outline"
-          size={24}
-          color={colors.white}
-        />
-
-        <Animated.Text
-          entering={firstMount ? null : SlideInRight.duration(500)}
-          exiting={firstMount ? null : SlideOutRight.duration(500)}
+      <View>
+        <Text
           style={{
-            color: colors.white,
-            marginLeft: 5,
-            fontSize: 17,
-            fontWeight: "500",
+            position: "absolute",
+            color: "#b00000",
+            left: 15,
+            top: -52,
           }}
         >
-          {!onPassRecovery ? "Entrar" : "Recuperar"}
-        </Animated.Text>
-      </TouchableOpacity>
+          {errorMsg}
+        </Text>
+        <TouchableOpacity
+          disabled={!validated}
+          onPress={signIn}
+          style={{
+            alignSelf: "center",
+            flexDirection: "row",
+            height: 50,
+            width: "90%",
+            backgroundColor: colors.primary,
+            borderRadius: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowOffset: { width: 0.5, height: 0.5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            elevation: 2,
+          }}
+        >
+          <MaterialCommunityIcons
+            name="account-outline"
+            size={24}
+            color={colors.white}
+          />
+
+          <Animated.Text
+            entering={firstMount ? null : SlideInRight.duration(500)}
+            exiting={firstMount ? null : SlideOutRight.duration(500)}
+            style={{
+              color: colors.white,
+              marginLeft: 5,
+              fontSize: 17,
+              fontWeight: "500",
+            }}
+          >
+            {!onPassRecovery ? "Entrar" : "Recuperar"}
+          </Animated.Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

@@ -420,7 +420,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontWeight: "500",
                   // width: "80%",
                   color: colors.primary,
-                  // marginLeft: 5,
+                   marginLeft: 5,
                   marginTop: 15,
                   //   marginBottom: 5,
                 }}
@@ -433,7 +433,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontWeight: "500",
                   // width: "80%",
                   color: colors.black2,
-                  // marginLeft: 5,
+                  marginLeft: 5,
                   marginTop: 5,
                   marginBottom: 5,
                 }}

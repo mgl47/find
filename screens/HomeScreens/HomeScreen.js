@@ -8,7 +8,7 @@ import {
   TouchableOpacityBase,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Screen from "../../components/Screen";
 import {
   recommendedEvents,
@@ -33,13 +33,14 @@ import Animated, {
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import AppTextInput from "../../components/AppTextInput";
 import { Calendar, LocaleConfig } from "react-native-calendars";
+import { useAuth } from "../../components/hooks/useAuth";
 
 export default function HomeScreen({ navigation }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState("");
-
+  console.log(process.env.EXPO_PUBLIC_API_URL);
   const [user, setUser] = useState(false);
   LocaleConfig.locales["pt"] = {
     monthNames: [
@@ -97,14 +98,26 @@ export default function HomeScreen({ navigation }) {
     today: "hoje",
   };
   LocaleConfig.defaultLocale = "pt";
+  const { test, AuthBottomSheet } = useAuth();
+  const [AuthModalUp, setAuthModalUp] = useState(false);
 
+  const bottomSheetModalRef = useRef(null);
+
+  const handleAuthSheet = useCallback(() => {
+    setAuthModalUp(true);
+
+    bottomSheetModalRef.current?.present();
+  }, []);
+  console.log(test);
   return (
     <Screen>
       <MainHeader
         user={user}
         navigation={navigation}
         mainScreen
-        onPressSearch={() => setShowSearch(true)}
+        onPressSearch={() => navigation.navigate("search")}
+
+        // onPressSearch={() => setShowSearch(true)}
         onPressCalendar={() => setCalendarModalVisible(true)}
       />
 
@@ -171,7 +184,7 @@ export default function HomeScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <>
-              <FlatList
+              {/* <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={categories}
@@ -197,15 +210,16 @@ export default function HomeScreen({ navigation }) {
                       // background={{ color: colors.description }}
                       // icon="information"
                       // onPress={() => console.log("Pressed")}
-                      onPress={() => {}}
+                      onPress={handleAuthSheet}
                     >
                       {item.label}
                     </Chip>
                   );
                 }}
-              />
+              /> */}
+              <View style={{marginTop:10}}/>
 
-              <Text style={styles.headerText}>Trending in your area</Text>
+              <Text style={styles.headerText}>Lugares que sa pega</Text>
 
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -232,7 +246,7 @@ export default function HomeScreen({ navigation }) {
                   );
                 }}
               />
-              <Text style={styles.headerText}>Upcoming Event</Text>
+              <Text style={styles.headerText}>Bu próximo evento</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
                 // onPress={() => navigation.navigate("event")}
@@ -256,7 +270,7 @@ export default function HomeScreen({ navigation }) {
                   }}
                 />
               </TouchableOpacity>
-              <Text style={styles.headerText}>Recommended for you</Text>
+              <Text style={styles.headerText}>Pa bó</Text>
               <FlatList
                 data={recommendedEvents}
                 showsVerticalScrollIndicator={false}
@@ -391,6 +405,10 @@ export default function HomeScreen({ navigation }) {
           />
         </Screen>
       </Modal>
+      <AuthBottomSheet
+        bottomSheetModalRef={bottomSheetModalRef}
+        setAuthModalUp={setAuthModalUp}
+      />
     </Screen>
   );
 }
@@ -415,3 +433,5 @@ const styles = StyleSheet.create({
     paddingLeft: 40,
   },
 });
+
+

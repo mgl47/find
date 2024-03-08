@@ -6,13 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import colors from "../colors";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SignInScreen from "../../screens/authScreens/SignInScreen";
 import SignUpScreen from "../../screens/authScreens/SignUpScreen";
 import Screen from "../Screen";
+import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
+import { useAuth } from "../hooks/useAuth";
 
 const Tab = createMaterialTopTabNavigator();
 const MainHeader = ({
@@ -21,13 +23,25 @@ const MainHeader = ({
   mainScreen,
   onPressSearch,
   onPressCalendar,
-  user,
+
 }) => {
+  const [AuthModalUp, setAuthModalUp] = useState(false);
+
+  const bottomSheetModalRef = useRef(null);
+
+  const handleAuthSheet = useCallback(() => {
+    setAuthModalUp(true);
+
+    bottomSheetModalRef.current?.present();
+  }, []);
+
   const [showModal, setShowModal] = useState(false);
+  const{user}=useAuth()
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => (user ? navigation.openDrawer() : setShowModal(true))}
+        // onPress={handleAuthSheet}
         style={{ position: "absolute", left: 20, bottom: 3 }}
       >
         {!user ? (
@@ -90,6 +104,10 @@ const MainHeader = ({
           </TouchableOpacity>
         </View>
       )}
+      <AuthBottomSheet
+        bottomSheetModalRef={bottomSheetModalRef}
+        setAuthModalUp={setAuthModalUp}
+      />
       <Modal
         // style={{ backgroundColor: colors.background }}
         animationType="slide"
@@ -99,7 +117,6 @@ const MainHeader = ({
           style={{
             backgroundColor: colors.white,
             flex: 0,
-         
           }}
         ></Screen>
         <View

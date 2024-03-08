@@ -7,14 +7,18 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import StackNavigator from "./components/navigation/StackNavigator";
+
 // export const Drawer = createDrawerNavigator();
 import DrawerNavigator, {
   Drawer,
 } from "./components/navigation/DrawerNavigator";
+import { AuthProvider } from "./components/hooks/useAuth";
 export default function App() {
   return (
+    
     <PaperProvider>
       <NavigationContainer theme={DefaultTheme}>
+        <AuthProvider>
         <StatusBar
           barStyle={
             // Platform.OS === "ios"
@@ -28,7 +32,7 @@ export default function App() {
           translucent={true}
         />
         {/* <StackNavigator /> */}
-        <DrawerNavigator />
+        <DrawerNavigator /></AuthProvider>
       </NavigationContainer>
     </PaperProvider>
   );

@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -214,8 +215,24 @@ export const PurchaseModal = ({
 
 export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   // const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["35%", "55%"], []);
+  const snapPoints = useMemo(() => ["35%", "55%","75%"], []);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   const handleSheetChanges = useCallback((index) => {
     console.log("handleSheetChanges", index);
   }, []);
@@ -223,7 +240,8 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   const [selectedUser, setSelectedUser] = useState("");
   const [advance, setAdvance] = useState(false);
   const[firstRender,setFirstRender]=useState(true)
-
+  const jk=Keyboard.isVisible()
+console.log(jk);
   useEffect(()=>{
     setFirstRender(false)
   },[])
@@ -232,7 +250,7 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
       <BottomSheetModal
         // style={{backgroundColor:}}
         ref={bottomSheetModalRef2}
-        index={advance ? 1 : 0}
+        index={keyboardVisible?2:advance ? 1 : 0}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
@@ -484,7 +502,7 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => setAdvance(true)}
+                onPress={() => {Keyboard.dismiss(),setAdvance(true)}}
                 style={{
                   marginTop: 20,
                   width: 150,

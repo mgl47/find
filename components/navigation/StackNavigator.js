@@ -50,7 +50,9 @@ function StackNavigator() {
           headerTitle: "Notification",
         })}
       />
-      <Stack.Screen name="search" component={SearchScreen} />
+      <Stack.Screen options={{
+        presentation:"transparentModal"
+      }} name="search" component={SearchScreen} />
 
       <Stack.Screen name="event" component={EventScreen} />
       <Stack.Screen name="artist" component={ArtistScreen} />
