@@ -6,7 +6,7 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
-import Screen from "../Screen";
+import Screen from "../Screen2";
 import SignInScreen from "../../screens/authScreens/SignInScreen";
 import SignUpScreen from "../../screens/authScreens/SignUpScreen";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";

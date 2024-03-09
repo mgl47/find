@@ -1,5 +1,6 @@
 import {
   FlatList,
+  Image,
   Modal,
   StyleSheet,
   Text,
@@ -30,7 +31,11 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
-import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Entypo,
+  FontAwesome5,
+} from "@expo/vector-icons";
 import AppTextInput from "../../components/AppTextInput";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { useAuth } from "../../components/hooks/useAuth";
@@ -40,7 +45,7 @@ export default function HomeScreen({ navigation }) {
   const [searchText, setSearchText] = useState("");
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState("");
-  console.log(process.env.EXPO_PUBLIC_API_URL);
+
   const [user, setUser] = useState(false);
   LocaleConfig.locales["pt"] = {
     monthNames: [
@@ -108,76 +113,84 @@ export default function HomeScreen({ navigation }) {
 
     bottomSheetModalRef.current?.present();
   }, []);
-  console.log(test);
+
   return (
     <Screen>
-      <MainHeader
-        user={user}
-        navigation={navigation}
-        mainScreen
-        onPressSearch={() => navigation.navigate("search")}
-        // onPressSearch={() => setShowSearch(true)}
-        onPressCalendar={() => setCalendarModalVisible(true)}
-      />
-
-      {showSearch && (
-        <Animated.View
-          entering={SlideInRight.duration(250)}
-          exiting={SlideOutRight.duration(250)}
-          style={{
-            width: "100%",
-            position: "absolute",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexDirection: "row",
-
-            zIndex: 1,
-            padding: 5,
-            top: -8,
-            height: 50,
-          }}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => (!user ? navigation.openDrawer() : setShowModal(true))}
+          // onPress={handleAuthSheet}
+          style={{ position: "absolute", left: 20, bottom: 3 }}
         >
-          <View style={{ flexDirection: "row", width: "90%" }}>
-            <MaterialCommunityIcons
-              style={{ position: "absolute", zIndex: 1, left: 10, top: 8 }}
-              name="magnify"
-              size={25}
-              color="black"
-            />
+          {!user ? (
+            <Image
+              source={{
+                uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+              }}
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 50,
+                // marginLeft: 20,
+                // position: "absolute",
+              }}
 
-            <TextInput
-              value={searchText}
-              onChangeText={setSearchText}
-              onSubmitEditing={() => navigation.navigate("search", searchText)}
-              returnKeyType="search"
-              autoFocus
-              style={styles.search}
+              // resizeMode="contain"
             />
-          </View>
+          ) : (
+            <FontAwesome5 name="user-circle" size={38} color={colors.black} />
+          )}
+        </TouchableOpacity>
+
+        <Image
+          source={require("../../assets/logos/logo1.png")}
+          style={{ width: 100, flex: 1, marginBottom: 5 }}
+          resizeMode="contain"
+        />
+
+        <View style={{ position: "absolute", right: 10, flexDirection: "row" }}>
           <TouchableOpacity
-            onPress={() => {
-              setShowSearch(false), setSearchText("");
-            }}
+            onPress={() => setCalendarModalVisible(true)}
             style={{
-              right: 5,
-              height: 40,
-              width: 30,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: colors.white,
               borderRadius: 50,
+              padding: 5,
+              marginRight: 5,
             }}
-            activeOpacity={1}
           >
-            <Entypo name="cross" size={27} color={colors.black2} />
-            {/* <MaterialCommunityIcons
-              name="close"
-              size={27}
-              color={colors.primary}
-            /> */}
+            <Entypo name="location" size={24} color="black" />
           </TouchableOpacity>
-        </Animated.View>
-      )}
+          <TouchableOpacity
+            onPress={() => setCalendarModalVisible(true)}
+            style={{
+              borderRadius: 50,
+              padding: 5,
+              marginRight: 5,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="calendar-month"
+              size={26}
+              color={colors.black}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              borderRadius: 50,
+              padding: 5,
+              // backgroundColor: colors.grey,
+            }}
+            onPress={() => navigation.navigate("search")}
+          >
+            {/* <MaterialCommunityIcons
+              name="magnify"
+              size={26}
+              color={colors.black}
+            /> */}
+            <Entypo name="magnifying-glass" size={25} color={colors.black} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <View style={styles.container}>
         <View
           style={{
@@ -229,7 +242,7 @@ export default function HomeScreen({ navigation }) {
                 }}
               /> */}
 
-              <Text style={styles.headerText}>Lugares que sa pega</Text>
+              <Text style={styles.headerText}>Em alta</Text>
 
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -245,7 +258,7 @@ export default function HomeScreen({ navigation }) {
                         shadowOpacity: 1,
                         shadowRadius: 1,
                         elevation: 3,
-                        marginVertical: 10,
+                        marginVertical: 5,
                       }}
                       onPress={() =>
                         item.valid ? navigation.navigate("event", item) : null
@@ -352,7 +365,7 @@ export default function HomeScreen({ navigation }) {
                   fontWeight: "600",
                 }}
               >
-                Cancelar
+                Voltar
               </Text>
             </TouchableOpacity>
           </View>
@@ -428,9 +441,17 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
     backgroundColor: colors.background,
   },
+  headerContainer: {
+    backgroundColor: colors.white,
+
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 42,
+  },
   headerText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 19,
+    fontWeight: "500",
     // padding: 5,
     left: 20,
     // marginVertical: 5,

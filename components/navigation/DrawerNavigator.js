@@ -4,7 +4,12 @@ import {
   createDrawerNavigator,
 } from "@react-navigation/drawer";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import { MaterialCommunityIcons, Octicons, Entypo } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Octicons,
+  Entypo,
+  Ionicons,
+} from "@expo/vector-icons";
 
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import React from "react";
@@ -27,7 +32,7 @@ export function DrawerContent(props) {
   const navigation = useNavigation();
 
   return (
-    <Screen style={{}}>
+    <Screen style={{ backgroundColor: colors.background }}>
       <View
         style={{
           flexDirection: "row",
@@ -64,103 +69,107 @@ export function DrawerContent(props) {
       >
         Erickson
       </Text>
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: "400",
+          marginLeft: 20,          // marginTop: 10,
+          // paddingBottom: 5,
+        }}
+      >
+        @veiga.erickson
+      </Text>
       <DrawerContentScrollView
         {...props}
-        contentContainerStyle={{ paddingTop: 5 }}
+        contentContainerStyle={{
+          paddingTop: 5,
+          backgroundColor: colors.background,
+        }}
       >
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="account-outline"
-              color={color}
-              size={35}
+              color={colors.black}
+              size={33}
             />
           )}
-          label="Profile"
+          label="Perfil"
           labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: 18,
+            fontWeight: "500",
             right: 20,
-            // color: colors.primary,
+            color: colors.black,
           }}
-          onPress={() => navigation.navigate("event")}
+          onPress={() => navigation.navigate("profile")}
         />
+        {/* <View style={styles.separator} /> */}
         <DrawerItem
-          style={{}}
+          style={{left:2}}
           icon={({ color, size }) => (
-            <MaterialCommunityIcons
-              name="ticket-confirmation-outline"
-              color={color}
-              size={35}
-            />
+            <Ionicons name="ticket-outline" size={30} color={colors.black} />
           )}
-          label="My tickets"
+          label="Meus Bilhetes"
           labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: 18,
+            fontWeight: "500",
             right: 20,
-            // color: colors.primary,
+            color: colors.black,
           }}
           onPress={() => {}}
         />
+        {/* <View style={styles.separator} /> */}
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="calendar-heart"
-              color={color}
+              color={colors.black}
               size={35}
             />
           )}
-          label="Interested"
+          label="Interessado"
           labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: 18,
+            fontWeight: "500",
             right: 20,
-            // color: colors.primary,
+            color: colors.black,
           }}
           onPress={() => {}}
         />
-        <DrawerItem
+        {/* <View style={styles.separator} /> */}
+        {/* <DrawerItem
           style={{}}
           icon={({ color, size }) => (
-            <Entypo name="location" size={35} color="black" />
+            <Octicons name="gear" size={32} color={colors.black} />
           )}
-          label="Venues"
+          
+          label="Defi"
           labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: 18,
+            fontWeight: "500",
             right: 20,
-            // color: colors.primary,
+            color: colors.black2,
           }}
           onPress={() => {}}
-        />
+        /> */}
+        {/* <View style={styles.separator} /> */}
         <DrawerItem
-          style={{}}
+          style={{left:2}}
           icon={({ color, size }) => (
-            <Octicons name="gear" size={35} color={color} />
+            <MaterialCommunityIcons
+              name="logout"
+              size={33}
+              color={colors.black}
+            />
           )}
-          label="Settings"
+          label="Sair"
           labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
+            fontSize: 18,
+            fontWeight: "500",
             right: 20,
-            // color: colors.primary,
-          }}
-          onPress={() => {}}
-        />
-        <DrawerItem
-          style={{}}
-          icon={({ color, size }) => (
-            <MaterialCommunityIcons name="logout" size={35} color={color} />
-          )}
-          label="Log Out"
-          labelStyle={{
-            fontSize: 17,
-            fontWeight: "600",
-            right: 20,
-            // color: colors.primary,
+            color: colors.black,
           }}
           onPress={() => {}}
         />
@@ -168,7 +177,7 @@ export function DrawerContent(props) {
     </Screen>
   );
 }
-const sideMenuDisabledScreens = ["home","notification","chats"];
+const sideMenuDisabledScreens = ["home", "notification", "chats"];
 
 const DrawerNavigator = () => {
   return (
@@ -209,4 +218,6 @@ const DrawerNavigator = () => {
 
 export default DrawerNavigator;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  separator: { width: "95%", height: 1, backgroundColor: colors.grey },
+});

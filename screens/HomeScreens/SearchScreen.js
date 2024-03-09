@@ -20,7 +20,7 @@ import React, {
   useState,
 } from "react";
 import Header from "../../components/navigation/Header";
-import Screen from "../../components/Screen";
+import Screen from "../../components/Screen2";
 import Svg, { Path, Defs, ClipPath, Image as SvgImage } from "react-native-svg";
 import { RNHoleView } from "react-native-hole-view";
 import BigTicket from "../../components/tickets/BigTicket";
@@ -83,12 +83,7 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
           zIndex: 2,
         }}
       >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={{ marginLeft: 20 }}
-        >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
-        </TouchableOpacity>
+      
         <Animated.View
           entering={SlideInRight.duration(500)}
           exiting={SlideOutRight.duration(250)}
@@ -106,13 +101,13 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
           <View
             style={{
               flexDirection: "row",
-              width: "85%",
+              width: "80%",
             }}
           >
-            <MaterialCommunityIcons
-              style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
-              name="magnify"
-              size={20}
+            <Entypo
+              style={{ position: "absolute", zIndex: 1, left: 10, top: 12 }}
+              name="magnifying-glass"
+              size={19}
               color={colors.description}
             />
 
@@ -125,7 +120,7 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
               placeholderTextColor={colors.description}
               returnKeyType="search"
               autoFocus
-              style={[styles.search, { width: inSearch ? "93%" : "100%" }]}
+              style={[styles.search, { width:  "100%" }]}
             />
             {searchText && (
               <TouchableOpacity
@@ -148,7 +143,37 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
             )}
           </View>
         </Animated.View>
-
+        <Animated.View
+          style={{
+            padding: 10,
+            right: 10,
+            // alignSelf: "flex-end",
+            position: "absolute",
+            // marginBottom: 10,
+            zIndex: 2,
+          }}
+          entering={SlideInRight.duration(570)}
+        >
+          <TouchableOpacity
+            onPress={
+              inSearch
+                ? () => {
+                    setInSearch(false), setSearchText(""), Keyboard.dismiss();
+                  }
+                : () => navigation.goBack()
+            }
+          >
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Voltar
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
         <View
           style={{
             width: "100%",
@@ -163,22 +188,6 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
             elevation: 2,
           }}
         />
-        {inSearch && (
-          <Animated.View
-            
-            style={{ zIndex: 2, position: "absolute", right: 10 }}
-            entering={SlideInRight}
-            exiting={SlideOutRight}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                setInSearch(false), setSearchText(""), Keyboard.dismiss();
-              }}
-            >
-              <Entypo name="cross" size={24} color="black" />
-            </TouchableOpacity>
-          </Animated.View>
-        )}
       </View>
 
       <View
@@ -313,7 +322,11 @@ const SearchScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Tab
                   // titleStyle={{ color: colors.primary }}
 
-                  indicatorStyle={{ backgroundColor: colors.primary }}
+                  indicatorStyle={{
+                    backgroundColor: colors.primary,
+                    height: 2,
+                    width: "33%",
+                  }}
                   value={index}
                   onChange={setIndex}
                   // dense
@@ -435,7 +448,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light2,
     borderRadius: 30,
     paddingLeft: 35,
-    paddingRight: 35,
+    paddingRight: 30,
   },
   headerText: {
     fontSize: 19,

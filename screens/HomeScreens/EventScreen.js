@@ -432,7 +432,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               Partilhar
             </Chip>
           </View>
-          <View style={styles.separator} />
+          <View style={[styles.separator, { marginVertical: 10 }]} />
           <View>
             <ViewMoreText
               numberOfLines={6}
@@ -443,7 +443,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <Text style={{ fontSize: 15 }}>{Event?.description}</Text>
             </ViewMoreText>
           </View>
-          <View style={[styles.separator, { marginTop: 15 }]} />
+          <View style={[styles.separator, { marginTop: 20,marginBottom:5 }]} />
           <View
             style={{
               flexDirection: "row",

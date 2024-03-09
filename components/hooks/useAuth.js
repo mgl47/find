@@ -18,7 +18,7 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import SignInScreen from "../../screens/authScreens/SignInScreen";
 import SignUpScreen from "../../screens/authScreens/SignUpScreen";
 import colors from "../colors";
-import Screen from "../Screen";
+import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();

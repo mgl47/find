@@ -236,7 +236,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                   onPress={() => console.log("Pressed")}
                 >
-                  Favorito
+                  Seguindo
                 </Chip>
 
                 <Chip

@@ -33,6 +33,7 @@ import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
 import { artist } from "../../components/Data/artist";
+import SmallCard from "../../components/cards/SmallCard";
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
@@ -195,7 +196,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                   onPress={() => console.log("Pressed")}
                 >
-                  Favorito
+                  Seguindo
                 </Chip>
 
                 <Chip
@@ -320,54 +321,71 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
+              activeOpacity={0.8}
               style={{
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 12,
-                backgroundColor: colors.white,
-                shadowOffset: { width: 1, height: 1 },
+                shadowOffset: { width: 0.5, height: 0.5 },
                 shadowOpacity: 0.3,
                 shadowRadius: 1,
-                elevation: 1,
-                bottom: 50,
-                width: "95%",
-                alignSelf: "center",
+                elevation: 2,
+                padding: 10,
               }}
+              // onPress={() => navigation.navigate("event", item)}
             >
-              <Text
-                style={{
-                  color: colors.black,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 15,
-                }}
-              >
-                {item?.date}
-              </Text>
-              <Text
-                style={{
-                  color: colors.primary,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 16,
-                }}
-              >
-                {item?.title}
-              </Text>
-
-              <Text
-                style={{
-                  color: colors.black2,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 15,
-                }}
-              >
-                {item?.promoter}
-              </Text>
+              <SmallCard {...item} />
             </TouchableOpacity>
           );
         }}
+        // renderItem={({ item }) => {
+        //   return (
+        //     <TouchableOpacity
+        //       style={{
+        //         borderRadius: 10,
+        //         padding: 10,
+        //         marginBottom: 12,
+        //         backgroundColor: colors.white,
+        //         shadowOffset: { width: 1, height: 1 },
+        //         shadowOpacity: 0.3,
+        //         shadowRadius: 1,
+        //         elevation: 1,
+        //         bottom: 50,
+        //         width: "95%",
+        //         alignSelf: "center",
+        //       }}
+        //     >
+        //       <Text
+        //         style={{
+        //           color: colors.black,
+        //           marginBottom: 3,
+        //           fontWeight: "500",
+        //           fontSize: 15,
+        //         }}
+        //       >
+        //         {item?.date}
+        //       </Text>
+        //       <Text
+        //         style={{
+        //           color: colors.primary,
+        //           marginBottom: 3,
+        //           fontWeight: "500",
+        //           fontSize: 16,
+        //         }}
+        //       >
+        //         {item?.title}
+        //       </Text>
+
+        //       <Text
+        //         style={{
+        //           color: colors.black2,
+        //           marginBottom: 3,
+        //           fontWeight: "500",
+        //           fontSize: 15,
+        //         }}
+        //       >
+        //         {item?.promoter}
+        //       </Text>
+        //     </TouchableOpacity>
+        //   );
+        // }}
       />
     </>
   );

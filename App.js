@@ -13,28 +13,32 @@ import DrawerNavigator, {
   Drawer,
 } from "./components/navigation/DrawerNavigator";
 import { AuthProvider } from "./components/hooks/useAuth";
+
+
 export default function App() {
   return (
-    
-    <PaperProvider>
-      <NavigationContainer theme={DefaultTheme}>
-        <AuthProvider>
-        <StatusBar
-          barStyle={
-            // Platform.OS === "ios"
-            //   ? "default"
-            //   : darkMode
-            //   ? "light-content"
-            //   : "dark-content"
-            "light-content"
-          }
-          backgroundColor={"transparent"}
-          translucent={true}
-        />
-        {/* <StackNavigator /> */}
-        <DrawerNavigator /></AuthProvider>
-      </NavigationContainer>
-    </PaperProvider>
+    <SafeAreaProvider>
+      <PaperProvider>
+        <NavigationContainer theme={DefaultTheme}>
+          <AuthProvider>
+            <StatusBar
+              barStyle={
+                // Platform.OS === "ios"
+                //   ? "default"
+                //   : darkMode
+                //   ? "light-content"
+                //   : "dark-content"
+                "light-content"
+              }
+              backgroundColor={"transparent"}
+              translucent={true}
+            />
+            {/* <StackNavigator /> */}
+            <DrawerNavigator />
+          </AuthProvider>
+        </NavigationContainer>
+      </PaperProvider>
+    </SafeAreaProvider>
   );
 }
 

@@ -12,14 +12,36 @@ export const artist = {
     {
       id: 1,
       title: "Rolling Loud Cv: Edição 2024",
+      venue: {
+        displayName: "Kebra Cabana",
+        city: "Praia",
+      },
       date: "Quarta, 06-08 Jul - 15:00",
       promoter: "Sigue Sabura",
+      photos: [
+        {
+          id: 1,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      
+      ],
     },
     {
       id: 2,
       title: "Sun7ven",
+      venue: {
+        displayName: "Linha d'Água",
+        city: "Praia",
+      },
       date: "Sexta, 27 Mai - 16:30",
       promoter: "Linha d'Água",
+      photos: [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1635861496491-4fd2cb740dfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=704&q=80",
+        },
+      
+      ],
     },
   ],
 };

@@ -12,7 +12,7 @@ import colors from "../colors";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import SignInScreen from "../../screens/authScreens/SignInScreen";
 import SignUpScreen from "../../screens/authScreens/SignUpScreen";
-import Screen from "../Screen";
+import Screen from "../Screen2";
 import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
 import { useAuth } from "../hooks/useAuth";
 
