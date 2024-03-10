@@ -1,22 +1,15 @@
 import {
   FlatList,
-  Image,
-  Modal,
+
   StyleSheet,
   Text,
-  TextInput,
+
   TouchableOpacity,
-  TouchableOpacityBase,
+
   View,
 } from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import Screen from "../../components/Screen2";
+import React from "react";
+
 import {
   recommendedEvents,
   trendingEvents,
@@ -24,104 +17,19 @@ import {
 import MediumCard from "../../components/cards/MediumCard";
 import BigCard from "../../components/cards/BigCard";
 import SmallCard from "../../components/cards/SmallCard";
-import MainHeader from "../../components/navigation/MainHeader";
-import { Chip } from "react-native-paper";
-import { categories } from "../../components/Data/categories";
+
 import colors from "../../components/colors";
-import Animated, {
-  FadeInRight,
-  FadeOutLeft,
-  SlideInLeft,
-  SlideInRight,
-  SlideOutLeft,
-  SlideOutRight,
-  SlideOutUp,
-} from "react-native-reanimated";
+
 import {
   MaterialCommunityIcons,
   Entypo,
   FontAwesome5,
 } from "@expo/vector-icons";
-import AppTextInput from "../../components/AppTextInput";
-import { Calendar, LocaleConfig } from "react-native-calendars";
+
 import { useAuth } from "../../components/hooks/useAuth";
-import {
-  CalendarModal,
-  VenuesModal,
-} from "../../components/screensComponents/CompHomeScreen";
 
 export default function HomeScreen({ navigation }) {
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchText, setSearchText] = useState("");
-  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
-  const [venueModalVisible, setVenueModalVisible] = useState(false);
-  const [user, setUser] = useState(false);
-  LocaleConfig.locales["pt"] = {
-    monthNames: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ],
-    monthNames: [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ],
-    monthNamesShort: [
-      "Jan.",
-      "Fev.",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul.",
-      "Ago",
-      "Set.",
-      "Out.",
-      "Nov.",
-      "Dez.",
-    ],
-    dayNames: [
-      "Domingo",
-      "Segunda",
-      "Terça",
-      "Quarta",
-      "Quinta",
-      "Sexta",
-      "Sábado",
-    ],
-    dayNamesShort: ["Dom.", "Seg.", "Ter.", "Qua.", "Qui.", "Sex.", "Sab."],
-    today: "hoje",
-  };
-  LocaleConfig.defaultLocale = "pt";
-  const { test, AuthBottomSheet } = useAuth();
-  const [AuthModalUp, setAuthModalUp] = useState(false);
-
-  const bottomSheetModalRef = useRef(null);
-
-  const handleAuthSheet = useCallback(() => {
-    setAuthModalUp(true);
-
-    bottomSheetModalRef.current?.present();
-  }, []);
+  const {} = useAuth();
 
   return (
     <>
@@ -148,8 +56,11 @@ export default function HomeScreen({ navigation }) {
                         elevation: 3,
                         marginVertical: 5,
                       }}
+                      // onPress={() =>
+                      //   item.valid ? navigation.navigate("event", item) : null
+                      // }
                       onPress={() =>
-                        item.valid ? navigation.navigate("event", item) : null
+                    navigation.navigate("event", item) 
                       }
                     >
                       <MediumCard {...item} />
@@ -209,11 +120,6 @@ export default function HomeScreen({ navigation }) {
           }
         />
       </View>
-
-      <AuthBottomSheet
-        bottomSheetModalRef={bottomSheetModalRef}
-        setAuthModalUp={setAuthModalUp}
-      />
     </>
   );
 }

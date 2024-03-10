@@ -35,6 +35,8 @@ const Stack = createStackNavigator();
 function StackNavigator() {
   const navigation = useNavigation();
   const { user, authLoading } = useAuth();
+
+  const invisibleHeaders = ["event", "artist", "venue"];
   return (
     <Stack.Navigator
       screenOptions={({ route }) => ({
@@ -50,14 +52,16 @@ function StackNavigator() {
         // headerShown: false,
         headerTitleAlign: "center",
         headerStyle: { backgroundColor: "transparent" },
-        headerBackgroundContainerStyle: {
-          backgroundColor: colors.white,
-          shadowOffset: { width: 0.5, height: 0.5 },
-          elevation: 2,
+        headerBackgroundContainerStyle: !invisibleHeaders?.includes(route.name)
+          ? {
+              backgroundColor: colors.white,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              elevation: 2,
 
-          shadowOpacity: 0.3,
-          shadowRadius: 1,
-        },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+            }
+          : {},
       })}
     >
       <Stack.Screen
@@ -85,33 +89,33 @@ function StackNavigator() {
                   }}
                 />
               ) : (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("auth");
-                  }}
-                  style={{
-                    padding: 10,
-                    // right: 10,
-                    // alignSelf: "flex-end",
-                    // position: "absolute",
-                    // marginBottom: 10,
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontSize: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Entrar
-                  </Text>
-                </TouchableOpacity>
-                // <FontAwesome5
-                //   name="user-circle"
-                //   size={30}
-                //   color={colors.black}
-                // />
+                // <TouchableOpacity
+                //   onPress={() => {
+                //     navigation.navigate("auth");
+                //   }}
+                //   style={{
+                //     padding: 10,
+                //     // right: 10,
+                //     // alignSelf: "flex-end",
+                //     // position: "absolute",
+                //     // marginBottom: 10,
+                //   }}
+                // >
+                //   <Text
+                //     style={{
+                //       color: colors.primary,
+                //       fontSize: 16,
+                //       fontWeight: "600",
+                //     }}
+                //   >
+                //     Entrar
+                //   </Text>
+                // </TouchableOpacity>
+                <MaterialCommunityIcons
+                  name="account-outline"
+                  size={35}
+                  color={colors.darkSeparator}
+                />
               )}
             </TouchableOpacity>
           ),
@@ -119,7 +123,7 @@ function StackNavigator() {
           headerTitle: () => (
             <Image
               source={require("../../assets/logos/logo1.png")}
-              style={{ width: 35, height: 35 }}
+              style={{ width: 35, height: 35, bottom: 3 }}
               resizeMode="contain"
             />
           ),
@@ -136,7 +140,7 @@ function StackNavigator() {
                   marginRight: 5,
                 }}
               >
-                <Entypo name="location" size={24} color="black" />
+                <Entypo name="location" size={24} color={colors.darkSeparator} />
               </TouchableOpacity>
               <TouchableOpacity
                 // onPress={() => setCalendarModalVisible(true)}
@@ -151,7 +155,7 @@ function StackNavigator() {
                 <MaterialCommunityIcons
                   name="calendar-month"
                   size={26}
-                  color={colors.black}
+                  color={colors.darkSeparator}
                 />
               </TouchableOpacity>
               <TouchableOpacity
@@ -170,7 +174,7 @@ function StackNavigator() {
                 <Entypo
                   name="magnifying-glass"
                   size={25}
-                  color={colors.black}
+                  color={colors.darkSeparator}
                 />
               </TouchableOpacity>
             </View>

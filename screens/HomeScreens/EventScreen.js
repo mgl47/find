@@ -52,11 +52,15 @@ import {
 } from "../../components/screensComponents/CompEventScreen";
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
+  const [firstMount, setFirstMount] = useState(true);
+  useEffect(() => {
+    setFirstMount(false);
+  }, []);
+
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
   const [GiftModalUp, setGiftModalUp] = useState(false);
-
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
@@ -144,6 +148,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontSize: 17,
               fontWeight: "500",
               // top: 40,
+              // width:"100%",
               color: colors.black,
             }}
           >
@@ -771,7 +776,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       </BottomSheetModalProvider> */}
       {!inFullscreen && !purchaseModalUp && !GiftModalUp && (
         <Animated.View
-          entering={SlideInDown}
+          entering={!firstMount && SlideInDown}
           exiting={SlideOutDown}
           style={{
             justifyContent: "space-around",

@@ -1,7 +1,6 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import MainHeader from "../components/navigation/MainHeader";
-import Screen from "../components/Screen2";
+
 import colors from "../components/colors";
 const ChatsScreen = ({ navigation }) => {
   return (

@@ -174,6 +174,34 @@ export const trendingEvents = [
         long: -23.517431,
       },
     },
+    tickets: [
+      {
+        description: "Um bilhete",
+        id: 1,
+        amount: 3000,
+        type: "Promo",
+      },
+      {
+        id: 2,
+        amount: 5000,
+        description: "Um bilhete fila da frente e uma garrafa das fas sfa ",
+        type: "Normal",
+      },
+      {
+        id: 3,
+        amount: 10000,
+        description: "Um bilhete Vip e duas garrafas",
+        type: "Vip",
+      },
+    ],
+    artists: [
+      {
+        id: 5,
+        displayName: "Mc Tranka Fulha",
+        avatar:
+          "https://1.bp.blogspot.com/-lOah8Alvdy4/XzbI483ZTNI/AAAAAAAAMGw/kmNbP-E09h8_5PnkEf0m7GjFGdGqDq_DACLcBGAsYHQ/w1200-h630-p-k-no-nu/mc%2Btranka%2Bfulha%2Bportugues%2Bdfd.jpg",
+      },
+    ],
     photos: [
       {
         id: 1,
@@ -202,6 +230,41 @@ export const trendingEvents = [
     title: "Starladder Major 2022",
     date: "Fri, 27-29 Mai - 4:00 pm",
     city: "Berlin",
+    tickets: [
+      {
+        description: "Um bilhete",
+        id: 1,
+        amount: 3000,
+        type: "Promo",
+      },
+      {
+        id: 2,
+        amount: 5000,
+        description: "Um bilhete fila da frente e uma garrafa das fas sfa ",
+        type: "Normal",
+      },
+      {
+        id: 3,
+        amount: 10000,
+        description: "Um bilhete Vip e duas garrafas",
+        type: "Vip",
+      },
+    ],
+    artists: [
+      {
+        id: 3,
+        displayName: "Mc Prego Prego",
+        avatar:
+          "https://locomc.com/pt/wp-content/uploads/sites/2/2023/06/PregoPrego-carousel-Image.jpg",
+      },
+
+      {
+        id: 5,
+        displayName: "Mc Tranka Fulha",
+        avatar:
+          "https://1.bp.blogspot.com/-lOah8Alvdy4/XzbI483ZTNI/AAAAAAAAMGw/kmNbP-E09h8_5PnkEf0m7GjFGdGqDq_DACLcBGAsYHQ/w1200-h630-p-k-no-nu/mc%2Btranka%2Bfulha%2Bportugues%2Bdfd.jpg",
+      },
+    ],
     photos: [
       {
         id: 1,
@@ -230,6 +293,40 @@ export const trendingEvents = [
     title: "Color Content",
     date: "Qui, 14 Jul - 10h00",
     city: "Wroclaw",
+    tickets: [
+      {
+        description: "Um bilhete",
+        id: 1,
+        amount: 3000,
+        type: "Promo",
+      },
+      {
+        id: 2,
+        amount: 5000,
+        description: "Um bilhete fila da frente e uma garrafa das fas sfa ",
+        type: "Normal",
+      },
+      {
+        id: 3,
+        amount: 10000,
+        description: "Um bilhete Vip e duas garrafas",
+        type: "Vip",
+      },
+    ],
+    artists: [
+      {
+        id: 4,
+        displayName: "Neyna",
+        avatar:
+          "https://universalmusic.pt/wp-content/uploads/sites/55/2022/04/Neyna.jpg",
+      },
+      {
+        id: 1,
+        displayName: "Djodje",
+        avatar:
+          "https://pbs.twimg.com/profile_images/1288603170957152258/_IhZqJmE_400x400.jpg",
+      },
+    ],
     photos: [
       {
         id: 1,

@@ -45,8 +45,11 @@ import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 import { categories } from "../../components/Data/categories";
 import { newEvents, recommendedEvents } from "../../components/Data/events";
+import { artist } from "../../components/Data/artist";
+
 import SmallCard from "../../components/cards/SmallCard";
 import MediumCard from "../../components/cards/MediumCard";
+import { markers } from "../../components/Data/markers";
 const SearchScreen2 = ({
   navigation,
   navigation: { goBack, canGoBack },
@@ -56,7 +59,7 @@ const SearchScreen2 = ({
   const [searchText, setSearchText] = useState(text);
   const [firstMount, setFirstMount] = useState(true);
   const [inSearch, setInSearch] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(1);
 
   useEffect(() => {
@@ -277,37 +280,111 @@ const SearchScreen2 = ({
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
         />
       )}
-      {!category && !loading && index == 0 && (
+      {!category && !loading && (
         <Animated.FlatList
+          style={{
+            width: index != 0 ? 0 : "",
+            height: index != 0 ? 0 : "",
+            position: index != 0 ? "absolute" : "relative",
+          }}
           // entering={index == 0 ?SlideInRight:SlideInLeft}
           // exiting={SlideOutLeft}
-          data={recommendedEvents.slice(1, 3).reverse()}
+          data={artist}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={<View style={{ marginTop: 5 }} />}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <View
                 style={{
                   shadowOffset: { width: 0.5, height: 0.5 },
                   shadowOpacity: 0.3,
                   shadowRadius: 1,
                   elevation: 2,
-                  padding: 10,
                 }}
-                onPress={() => navigation.navigate("event", item)}
               >
-                <SmallCard {...item} />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => navigation.navigate("artist")}
+                  style={[
+                    styles.card,
+                    {
+                      shadowOffset: { width: 1, height: 1 },
+                      shadowOpacity: 1,
+                      shadowRadius: 1,
+                      elevation: 3,
+                    },
+                  ]}
+                >
+                  <Image
+                    source={{
+                      uri: item?.avatar,
+                    }}
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 50,
+
+                      // marginLeft: 20,
+                      // position: "absolute",
+                    }}
+
+                    // resizeMode="contain"
+                  />
+                  <View
+                    style={{ alignItems: "center", marginLeft: 10, bottom: 5 }}
+                  >
+                    <Text numberOfLines={2} style={[styles.displayName]}>
+                      {item?.displayName}
+                    </Text>
+                    <Text numberOfLines={2} style={[styles.userName]}>
+                      @{item?.username}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      // navigation.goBack();
+                    }}
+                    style={{
+                      padding: 2,
+                      left: 10,
+                      borderColor: colors.primary,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 14,
+                        fontWeight: "600",
+                        bottom: 11,
+                      }}
+                    >
+                      Seguir
+                    </Text>
+                  </TouchableOpacity>
+
+                  <Entypo
+                    style={{ position: "absolute", right: 10 }}
+                    name="chevron-right"
+                    size={25}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
         />
       )}
-      {!category && !loading && index == 1 && (
+      {!category && !loading && (
         <>
           <Animated.FlatList
+             style={{
+              width: index != 1 ? 0 : "",
+              height: index != 1 ? 0 : "",
+              position: index != 1 ? "absolute" : "relative",
+            }}
+          
             //  entering={index == 0 ? SlideInRight : SlideInLeft}
             // exiting={index == 0? SlideOutRight : SlideOutLeft}
             contentContainerStyle={{ alignItems: "center" }}
@@ -340,30 +417,127 @@ const SearchScreen2 = ({
           />
         </>
       )}
-      {!category && !loading && index == 2 && (
+      {!category && !loading&& (
         <Animated.FlatList
+        style={{
+          width: index != 2 ? 0 : "",
+          height: index != 2 ? 0 : "",
+          position: index != 2 ? "absolute" : "relative",
+        }}
           // entering={SlideInRight}
           // exiting={SlideOutRight}
           //   style={{ zIndex: 0 }}
-          data={recommendedEvents.slice(2, 3).reverse()}
+          data={markers}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={<View style={{ marginTop: 5 }} />}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity
-                activeOpacity={0.8}
+              <View
                 style={{
+                  padding: 10,
+                  borderBottomRightRadius: 10,
+                  borderBottomLeftRadius: 10,
                   shadowOffset: { width: 0.5, height: 0.5 },
                   shadowOpacity: 0.3,
                   shadowRadius: 1,
                   elevation: 2,
-                  padding: 10,
                 }}
-                onPress={() => navigation.navigate("event", item)}
               >
-                <SmallCard {...item} />
-              </TouchableOpacity>
+                <View
+                  style={{
+                    backgroundColor: colors.white,
+                    borderRadius: 10,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("venue");
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      alignItems: "center",
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Image
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 50,
+                          marginRight: 10,
+                          borderWidth: 0.1,
+                        }}
+                        source={{
+                          uri: item?.uri,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                        }}
+                      >
+                        {item?.displayName}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => {
+                          // navigation.goBack();
+                        }}
+                        style={{
+                          padding: 2,
+                          paddingHorizontal: 5,
+                          left: 10,
+                          borderRadius: 5,
+                          borderWidth: 1,
+                          borderColor: colors.primary,
+                          // alignSelf: "flex-end",
+                          // position: "absolute",
+                          // marginBottom: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: colors.primary,
+                            fontSize: 14,
+                            fontWeight: "600",
+                          }}
+                        >
+                          Seguir
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Entypo
+                      name="chevron-right"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                  {item?.description && <View style={styles.separator} />}
+                  {item?.description && (
+                    <View style={{ padding: 10 }}>
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: "500",
+                          color: colors.darkGrey,
+                        }}
+                      >
+                        {item?.description}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -391,5 +565,38 @@ const styles = StyleSheet.create({
     zIndex: 2,
     left: 20,
     marginVertical: 10,
+  },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+
+    marginBottom: 10,
+    padding: 10,
+    // height: 95,
+    backgroundColor: colors.white,
+    overflow: "hidden",
+    width: "95%",
+    alignSelf: "center",
+
+    borderRadius: 10,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 1,
+    // shadowRadius: 1,
+    // elevation: 3,
+  },
+  displayName: {
+    alignSelf: "flex-start",
+    fontSize: 17,
+    fontWeight: "600",
+    color: colors.black2,
+
+    // marginVertical: 5,
+  },
+  userName: {
+    fontSize: 13,
+    alignSelf: "flex-start",
+    color: colors.darkGrey,
+    fontWeight: "600",
+    top: 2,
   },
 });

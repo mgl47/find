@@ -8,7 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   BottomSheetModal,
   BottomSheetView,
@@ -48,11 +54,11 @@ export const PurchaseModal = ({
   }, []);
   const [searchText, setSearchText] = useState("");
   const [selectedUser, setSelectedUser] = useState(false);
-  const[firstRender,setFirstRender]=useState(true)
+  const [firstRender, setFirstRender] = useState(true);
 
-  useEffect(()=>{
-    setFirstRender(false)
-  },[])
+  useEffect(() => {
+    setFirstRender(false);
+  }, []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -67,7 +73,7 @@ export const PurchaseModal = ({
       >
         <BottomSheetView style={styles.contentContainer}>
           <Animated.FlatList
-            entering={firstRender?null:SlideInRight}
+            entering={firstRender ? null : SlideInRight}
             data={Event?.tickets}
             keyExtractor={(item) => item?.id}
             ListHeaderComponent={<View style={{ marginBottom: 10 }} />}
@@ -215,16 +221,16 @@ export const PurchaseModal = ({
 
 export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   // const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["35%", "55%","75%"], []);
+  const snapPoints = useMemo(() => ["35%", "55%", "75%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
+      "keyboardDidShow",
       () => setKeyboardVisible(true)
     );
     const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
+      "keyboardDidHide",
       () => setKeyboardVisible(false)
     );
 
@@ -239,18 +245,19 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   const [searchText, setSearchText] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [advance, setAdvance] = useState(false);
-  const[firstRender,setFirstRender]=useState(true)
-  const jk=Keyboard.isVisible()
-console.log(jk);
-  useEffect(()=>{
-    setFirstRender(false)
-  },[])
+  const [firstRender, setFirstRender] = useState(true);
+  const jk = Keyboard.isVisible();
+  console.log(jk);
+  useEffect(() => {
+    setFirstRender(false);
+  }, []);
   return (
-    <BottomSheetModalProvider>
+    <BottomSheetModalProvider >
       <BottomSheetModal
+      
         // style={{backgroundColor:}}
         ref={bottomSheetModalRef2}
-        index={keyboardVisible?2:advance ? 1 : 0}
+        index={keyboardVisible ? 2 : advance ? 1 : 0}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
@@ -260,7 +267,7 @@ console.log(jk);
         <BottomSheetView style={styles.contentContainer}>
           {advance ? (
             <Animated.FlatList
-              entering={firstRender?null:SlideInRight}
+              entering={firstRender ? null : SlideInRight}
               exiting={SlideOutRight}
               data={Event?.tickets}
               keyExtractor={(item) => item?.id}
@@ -297,14 +304,14 @@ console.log(jk);
                   </TouchableOpacity>
 
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Feather name="gift" size={20} color={colors.black} />
+                    <Feather name="gift" size={20} color={colors.black} />
 
                     <Text
                       style={{
                         fontWeight: "500",
                         fontSize: 15,
                         marginRight: 20,
-                        marginLeft:5,
+                        marginLeft: 5,
                         color: colors.primary,
                       }}
                     >
@@ -451,7 +458,7 @@ console.log(jk);
             />
           ) : (
             <Animated.View
-              entering={firstRender?null:SlideInLeft}
+              entering={firstRender ? null : SlideInLeft}
               exiting={SlideOutLeft}
               style={{ alignItems: "center" }}
             >
@@ -463,7 +470,9 @@ console.log(jk);
                 // autoFocus
                 style={styles.search}
               />
-              <Text style={{color:colors.darkGrey,bottom:10}}>1 resultado encontrado</Text>
+              <Text style={{ color: colors.darkGrey, bottom: 10 }}>
+                1 resultado encontrado
+              </Text>
               <View
                 activeOpacity={0.5}
                 style={{
@@ -502,7 +511,9 @@ console.log(jk);
                 </View>
               </View>
               <TouchableOpacity
-                onPress={() => {Keyboard.dismiss(),setAdvance(true)}}
+                onPress={() => {
+                  Keyboard.dismiss(), setAdvance(true);
+                }}
                 style={{
                   marginTop: 20,
                   width: 150,
@@ -552,6 +563,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    
     // alignItems: "center",
     backgroundColor: colors.background,
   },

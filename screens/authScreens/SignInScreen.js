@@ -100,6 +100,7 @@ const SignInScreen = () => {
       <TextInput
         error={!firstAttempt && !person.email}
         style={{ marginBottom: 5 }}
+        autoFocus
         underlineStyle={{ backgroundColor: colors.primary }}
         contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Nome de usuário ou Email"

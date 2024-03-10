@@ -257,7 +257,6 @@ const SearchScreen = ({
                     <Animated.Text
                       style={styles.headerText}
                       exiting={SlideOutLeft.duration(500)}
-
                     >
                       Vistos recentementes
                     </Animated.Text>
@@ -291,8 +290,7 @@ const SearchScreen = ({
                 )}
               </View>
               <Animated.FlatList
-                                    exiting={SlideOutLeft.duration(500)}
-
+                exiting={SlideOutLeft.duration(500)}
                 // entering={index == 0 ?SlideInRight:SlideInLeft}
                 // exiting={SlideOutLeft}
                 // data={recommendedEvents.slice().reverse()}

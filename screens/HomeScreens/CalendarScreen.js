@@ -48,6 +48,62 @@ import Screen from "../../components/Screen";
 const { height, width } = Dimensions.get("window");
 
 const CalendarScreen = () => {
+  LocaleConfig.locales["pt"] = {
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNames: [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ],
+    monthNamesShort: [
+      "Jan.",
+      "Fev.",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul.",
+      "Ago",
+      "Set.",
+      "Out.",
+      "Nov.",
+      "Dez.",
+    ],
+    dayNames: [
+      "Domingo",
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+    ],
+    dayNamesShort: ["Dom.", "Seg.", "Ter.", "Qua.", "Qui.", "Sex.", "Sab."],
+    today: "hoje",
+  };
+  LocaleConfig.defaultLocale = "pt";
   const navigation = useNavigation();
 
   const [selectedDay, setSelectedDay] = useState("");
@@ -79,7 +135,7 @@ const CalendarScreen = () => {
             shadowOpacity: 0.3,
             shadowRadius: 1,
             elevation: 2,
-          marginTop:5
+            marginTop: 5,
           }}
         >
           <Calendar

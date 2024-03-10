@@ -32,11 +32,13 @@ import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
-import { artist } from "../../components/Data/artist";
+import { artist as arti } from "../../components/Data/artist";
 import SmallCard from "../../components/cards/SmallCard";
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
+  const[artist,setArtist]=useState(arti[0])
+
   const videoRef = React.useRef(null);
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
@@ -47,7 +49,6 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
-
   const [liked, setLiked] = useState(false);
   const renderViewMore = (onPress) => {
     return (
