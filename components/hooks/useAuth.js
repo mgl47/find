@@ -25,16 +25,17 @@ const AuthContext = createContext();
 const Tab = createMaterialTopTabNavigator();
 
 export const AuthProvider = ({ children }) => {
-  const [user, SetUser] = useState("");
-  const [headerToken, setHeaderToken] = useState("");
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
 
+  const [headerToken, setHeaderToken] = useState("");
 
   const getUser = async () => {
     try {
       const tokenValue = await AsyncStorage.getItem("headerToken");
       const userValue = await AsyncStorage.getItem("user");
       if (tokenValue !== null) {
-        SetUser(JSON.parse(userValue));
+        setUser(JSON.parse(userValue));
         setHeaderToken(tokenValue);
       }
     } catch (e) {
@@ -151,9 +152,11 @@ export const AuthProvider = ({ children }) => {
       AuthBottomSheet,
       headerToken,
       user,
-      SetUser,
+      setUser: setUser,
+      authLoading,
+      setAuthLoading,
     }),
-    [, user, SetUser]
+    [, user, authLoading]
   );
 
   return (

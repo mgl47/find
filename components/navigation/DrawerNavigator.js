@@ -11,7 +11,14 @@ import {
   Ionicons,
 } from "@expo/vector-icons";
 
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React from "react";
 import {
   Avatar,
@@ -23,12 +30,15 @@ import {
 } from "react-native-paper";
 import StackNavigator from "./StackNavigator";
 import Screen from "../Screen";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 import colors from "../colors";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "../hooks/useAuth";
 
 export const Drawer = createDrawerNavigator();
 
 export function DrawerContent(props) {
+  const { user, setUser } = useAuth();
   const navigation = useNavigation();
 
   return (
@@ -73,7 +83,7 @@ export function DrawerContent(props) {
         style={{
           fontSize: 14,
           fontWeight: "400",
-          marginLeft: 20,          // marginTop: 10,
+          marginLeft: 20, // marginTop: 10,
           // paddingBottom: 5,
         }}
       >
@@ -106,7 +116,7 @@ export function DrawerContent(props) {
         />
         {/* <View style={styles.separator} /> */}
         <DrawerItem
-          style={{left:2}}
+          style={{ left: 2 }}
           icon={({ color, size }) => (
             <Ionicons name="ticket-outline" size={30} color={colors.black} />
           )}
@@ -136,27 +146,11 @@ export function DrawerContent(props) {
             right: 20,
             color: colors.black,
           }}
-          onPress={() => {}}
+          onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
         />
-        {/* <View style={styles.separator} /> */}
-        {/* <DrawerItem
-          style={{}}
-          icon={({ color, size }) => (
-            <Octicons name="gear" size={32} color={colors.black} />
-          )}
-          
-          label="Defi"
-          labelStyle={{
-            fontSize: 18,
-            fontWeight: "500",
-            right: 20,
-            color: colors.black2,
-          }}
-          onPress={() => {}}
-        /> */}
-        {/* <View style={styles.separator} /> */}
+
         <DrawerItem
-          style={{left:2}}
+          style={{ left: 2 }}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="logout"
@@ -171,7 +165,29 @@ export function DrawerContent(props) {
             right: 20,
             color: colors.black,
           }}
-          onPress={() => {}}
+          onPress={() => {
+            Alert.alert(
+              "Terminar Sessão",
+              "Tem certeza que deseja terminar a sua sessão?",
+              [
+                { text: "Não", onPress: () => null },
+                {
+                  style: "destructive",
+                  text: "Sim",
+
+                  onPress: async () => {
+                    try {
+                      await AsyncStorage.removeItem("user");
+                      setUser(null);
+                      navigation.dispatch(DrawerActions.closeDrawer());
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  },
+                },
+              ]
+            );
+          }}
         />
       </DrawerContentScrollView>
     </Screen>
@@ -180,6 +196,8 @@ export function DrawerContent(props) {
 const sideMenuDisabledScreens = ["home", "notification", "chats"];
 
 const DrawerNavigator = () => {
+  const { user } = useAuth();
+
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -206,7 +224,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "Login";
-          if (!sideMenuDisabledScreens.includes(routeName))
+          if (!sideMenuDisabledScreens.includes(routeName) || !user)
             return { swipeEnabled: false };
         }}
         name="Event"

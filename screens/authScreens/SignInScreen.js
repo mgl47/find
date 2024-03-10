@@ -1,6 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { TextInput } from "react-native-paper";
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { ActivityIndicator, TextInput } from "react-native-paper";
 import colors from "../../components/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Animated, {
@@ -18,9 +24,12 @@ import axios from "axios";
 import BlockModal from "../../components/screensComponents/BlockModal";
 import { useAuth } from "../../components/hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
 const SignInScreen = () => {
-  const { user, SetUser } = useAuth();
+  const navigation = useNavigation();
+
+  const { user, setUser, setAuthLoading } = useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -35,10 +44,14 @@ const SignInScreen = () => {
   const validated = person.email && person.password;
 
   const signIn = async () => {
+    Keyboard.dismiss();
     setErrorMsg("");
 
     setFirstAttempt(false);
     setLoading(true);
+    await new Promise((resolve, reject) => {
+      setTimeout(resolve, 1500);
+    });
     try {
       if (validated) {
         const response = await axios.post(
@@ -54,12 +67,15 @@ const SignInScreen = () => {
           }
         );
         // console.log(response.data.user);
-        SetUser(response.data.user);
+        setUser(response.data.user);
+        navigation.goBack();
         await AsyncStorage.setItem("headerToken", response.data.token);
         const jsonValue = JSON.stringify(response.data.user);
         await AsyncStorage.setItem("user", jsonValue);
         JSON.parse(jsonValue);
-        
+        navigation.openDrawer() 
+
+        // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
     } catch (error) {
       if (error.response) {
@@ -73,6 +89,11 @@ const SignInScreen = () => {
     }
   };
 
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     header: () => <ActivityIndicator color={colors.primary} />,
+  //   });
+  // }, [loading,]);
   return (
     <View style={{ padding: 10, backgroundColor: colors.background }}>
       <BlockModal active={loading} />
@@ -187,6 +208,7 @@ const SignInScreen = () => {
             shadowOpacity: 0.3,
             shadowRadius: 1,
             elevation: 2,
+            marginBottom: 15,
           }}
         >
           <MaterialCommunityIcons
@@ -208,6 +230,7 @@ const SignInScreen = () => {
             {!onPassRecovery ? "Entrar" : "Recuperar"}
           </Animated.Text>
         </TouchableOpacity>
+        {loading && <ActivityIndicator color={colors.primary} />}
       </View>
     </View>
   );

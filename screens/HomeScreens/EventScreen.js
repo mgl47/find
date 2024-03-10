@@ -168,7 +168,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
- 
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}

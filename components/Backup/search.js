@@ -170,7 +170,7 @@ const SearchScreen = ({
                 // onSubmitEditing={() => navigation.navigate("search", searchText)}
                 onSubmitEditing={getResults}
                 // placeholder="encontre artistas, eventos ou lugares"
-                placeholder="artistas, eventos ou lugares"
+                placeholder=" artistas, eventos ou lugares"
                 placeholderTextColor={colors.description}
                 returnKeyType="search"
                 autoFocus

@@ -13,6 +13,9 @@ import SearchScreen from "../../screens/HomeScreens/SearchScreen";
 import ArtistScreen from "../../screens/HomeScreens/ArtistScreen";
 import VenueScreen from "../../screens/HomeScreens/VenueScreen";
 import ProfileScreen from "../../screens/authScreens/ProfileScreen";
+import AuthScreens from "../../screens/authScreens/AuthScreens";
+import { ActivityIndicator } from "react-native-paper";
+
 import colors from "../colors";
 import {
   MaterialCommunityIcons,
@@ -24,37 +27,38 @@ import VenueExploreScreen from "../../screens/HomeScreens/VenueExploreScreen";
 import CalendarScreen from "../../screens/HomeScreens/CalendarScreen";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useAuth } from "../hooks/useAuth";
+import SearchScreen2 from "../../screens/HomeScreens/SearchScreen2";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
 
 function StackNavigator() {
   const navigation = useNavigation();
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   return (
     <Stack.Navigator
-    // screenOptions={({ route }) => ({
-    //   headerLeft: () => (
-    //     <TouchableOpacity
-    //       onPress={() => navigation.goBack()}
-    //       style={{ left: 20 }}
-    //     >
-    //       <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
-    //     </TouchableOpacity>
-    //   ),
+      screenOptions={({ route }) => ({
+        // headerLeft: () => (
+        //   <TouchableOpacity
+        //     onPress={() => navigation.goBack()}
+        //     style={{ left: 20 }}
+        //   >
+        //     <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
+        //   </TouchableOpacity>
+        // ),
 
-    //   // headerShown: false,
-    //   headerTitleAlign: "center",
-    //   headerStyle: { backgroundColor: "transparent" },
-    //   headerBackgroundContainerStyle: {
-    //     backgroundColor: colors.white,
-    //     shadowOffset: { width: 0.5, height: 0.5 },
-    //     elevation: 2,
+        // headerShown: false,
+        headerTitleAlign: "center",
+        headerStyle: { backgroundColor: "transparent" },
+        headerBackgroundContainerStyle: {
+          backgroundColor: colors.white,
+          shadowOffset: { width: 0.5, height: 0.5 },
+          elevation: 2,
 
-    //     shadowOpacity: 0.3,
-    //     shadowRadius: 1,
-    //   },
-    // })}
+          shadowOpacity: 0.3,
+          shadowRadius: 1,
+        },
+      })}
     >
       <Stack.Screen
         name="home"
@@ -62,7 +66,9 @@ function StackNavigator() {
         options={({ route }) => ({
           headerLeft: () => (
             <TouchableOpacity
-              onPress={() => navigation.openDrawer()}
+              onPress={() =>
+                user ? navigation.openDrawer() : navigation.navigate("auth")
+              }
               // onPress={handleAuthSheet}
               style={{ left: 20, bottom: 1 }}
             >
@@ -79,19 +85,41 @@ function StackNavigator() {
                   }}
                 />
               ) : (
-                <FontAwesome5
-                  name="user-circle"
-                  size={30}
-                  color={colors.black}
-                />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("auth");
+                  }}
+                  style={{
+                    padding: 10,
+                    // right: 10,
+                    // alignSelf: "flex-end",
+                    // position: "absolute",
+                    // marginBottom: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Entrar
+                  </Text>
+                </TouchableOpacity>
+                // <FontAwesome5
+                //   name="user-circle"
+                //   size={30}
+                //   color={colors.black}
+                // />
               )}
             </TouchableOpacity>
           ),
-          headerTitleAlign:"center",
+          headerTitleAlign: "center",
           headerTitle: () => (
             <Image
               source={require("../../assets/logos/logo1.png")}
-              style={{ width: 35, height: 35,  }}
+              style={{ width: 35, height: 35 }}
               resizeMode="contain"
             />
           ),
@@ -152,10 +180,56 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           presentation: "transparentModal",
+          title: "Conta",
+
+          headerRight: () => (
+            <TouchableOpacity
+              // onPress={() => {
+              //   navigation.goBack();
+              // }}
+              onPress={() => {
+                navigation.navigate("home");
+              }}
+              style={{
+                padding: 10,
+                right: 10,
+                // alignSelf: "flex-end",
+                position: "absolute",
+                // marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+              >
+                Sair
+              </Text>
+            </TouchableOpacity>
+          ),
+          headerLeft: () => null,
+          // headerTitle: () =>  ( authLoading==true? <ActivityIndicator color={colors.primary} />:"")
+        }}
+        name="auth"
+        component={AuthScreens}
+      />
+      <Stack.Screen
+        options={{
+          presentation: "transparentModal",
           headerShown: true,
         }}
         name="search"
         component={SearchScreen}
+      />
+      <Stack.Screen
+        options={{
+          presentation: "transparentModal",
+          headerShown: true,
+        }}
+        name="search2"
+        component={SearchScreen2}
       />
 
       <Stack.Screen

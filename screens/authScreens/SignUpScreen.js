@@ -7,10 +7,13 @@ import BlockModal from "../../components/screensComponents/BlockModal";
 import axios from "axios";
 import { useAuth } from "../../components/hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 const SignUpScreen = () => {
+  const navigation = useNavigation();
+
   const url = process.env.EXPO_PUBLIC_API_URL;
-  const { SetUser } = useAuth();
+  const { setUser } = useAuth();
 
   const [person, setPerson] = useState({
     username: "",
@@ -68,8 +71,10 @@ const SignUpScreen = () => {
           }
         );
 
-        SetUser(response.data.user);
+        setUser(response.data.user);
         await AsyncStorage.setItem("headerToken", response.data.token);
+        navigation.openDrawer() 
+
       }
     } catch (error) {
       if (error.response) {
