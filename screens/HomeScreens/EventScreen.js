@@ -18,7 +18,13 @@ import Animated, {
   SlideOutDown,
   SlideOutUp,
 } from "react-native-reanimated";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import colors from "../../components/colors";
 import {
   MaterialCommunityIcons,
@@ -105,7 +111,47 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       </TouchableOpacity>
     );
   };
-
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () =>
+        !inFullscreen ? (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              left: 20,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={28}
+              color={scrolling ? colors.black : colors.white}
+              style={{
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+              }}
+            />
+          </TouchableOpacity>
+        ) : null,
+      headerRight: () => null,
+      // headerTransparent: scrolling ? false : true,
+      headerTitle: () =>
+        scrolling ? (
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 17,
+              fontWeight: "500",
+              // top: 40,
+              color: colors.black,
+            }}
+          >
+            {Event?.title}
+          </Text>
+        ) : null,
+    });
+  }, [scrolling, inFullscreen]);
   return (
     <>
       {scrolling && (
@@ -122,66 +168,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
-      {!inFullscreen && (
-        <View
-          style={[
-            styles.headerContainer,
-            {
-              zIndex: 2,
-              justifyContent: "space-between",
-            },
-          ]}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.back}
-          >
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={28}
-              color={scrolling ? colors.black : colors.white}
-            />
-          </TouchableOpacity>
-          {scrolling && (
-            <View style={{ width: "66%" }}>
-              <Text
-                numberOfLines={1}
-                style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  top: 40,
-                  color: colors.black,
-                }}
-              >
-                {Event?.title}
-              </Text>
-            </View>
-          )}
-          <View style={styles.share_like}>
-            {/* <TouchableOpacity
-              // onPress={() => }
-              style={styles.share}
-            >
-              <MaterialIcons
-                name="ios-share"
-                size={25}
-                color={scrolling ? colors.black : colors.white}
-              />
-            </TouchableOpacity> */}
-            {/* <TouchableOpacity
-              onPress={() => setLiked(!liked)}
-              style={styles.like}
-            >
-              <MaterialCommunityIcons
-                name={liked ? "cards-heart" : "cards-heart-outline"}
-                size={28}
-                color={scrolling ? colors.black : colors.white}
-              />
-            </TouchableOpacity> */}
-          </View>
-        </View>
-      )}
-      {/* </SafeAreaView> */}
+ 
       <ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -192,7 +179,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <FlatList
           showsHorizontalScrollIndicator={false}
           pagingEnabled
-          scrollEnabled={Event?.videos?.length>0||Event?.photos?.length>1}
+          scrollEnabled={Event?.videos?.length > 0 || Event?.photos?.length > 1}
           horizontal
           data={Event?.photos}
           keyExtractor={(item) => item.id}
@@ -443,7 +430,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <Text style={{ fontSize: 15 }}>{Event?.description}</Text>
             </ViewMoreText>
           </View>
-          <View style={[styles.separator, { marginTop: 20,marginBottom:5 }]} />
+          <View
+            style={[styles.separator, { marginTop: 20, marginBottom: 5 }]}
+          />
           <View
             style={{
               flexDirection: "row",

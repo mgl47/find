@@ -65,70 +65,69 @@ const CalendarScreen = () => {
   //   setLoading(false);
   // };
   return (
-    <Animated.View
-      style={{ flex: 1, backgroundColor: colors.background, marginTop: 5 }}
+    <Animated.FlatList
       entering={SlideInDown}
       exiting={SlideOutDown}
-    >
-      <FlatList
-        data={recommendedEvents.slice(1, 3).reverse()}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={
-          <View
+      style={{ flex: 1, backgroundColor: colors.background }}
+      data={recommendedEvents.slice(1, 3).reverse()}
+      showsVerticalScrollIndicator={false}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={
+        <View
+          style={{
+            shadowOffset: { width: 0.5, height: 0.5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            elevation: 2,
+          marginTop:5
+          }}
+        >
+          <Calendar
+            onDayPress={(day) => {
+              setSelectedDay(day.dateString);
+            }}
+            theme={{
+              textSectionTitleColor: "#b6c1cd",
+              selectedDayBackgroundColor: colors.primary,
+              selectedDayTextColor: "#ffffff",
+              textMonthFontWeight: "500",
+              textDayFontWeight: "500",
+              todayTextColor: colors.primary,
+              arrowColor: colors.primary,
+              //  textDayHeaderFontWeight:"500",
+              // textDayHeaderFontSize:14,
+
+              // textDisabledColor: "#d9e",
+            }}
+            markedDates={{
+              [selectedDay]: {
+                selected: true,
+                disableTouchEvent: true,
+                selectedDotColor: "orange",
+              },
+            }}
+          />
+        </View>
+      }
+      renderItem={({ item }) => {
+        return (
+          <TouchableOpacity
+            activeOpacity={0.8}
             style={{
               shadowOffset: { width: 0.5, height: 0.5 },
               shadowOpacity: 0.3,
               shadowRadius: 1,
               elevation: 2,
+              padding: 10,
             }}
+            // onPress={() => navigation.navigate("event", item)}
           >
-            <Calendar
-              onDayPress={(day) => {
-                setSelectedDay(day.dateString);
-              }}
-              theme={{
-                textSectionTitleColor: "#b6c1cd",
-                selectedDayBackgroundColor: colors.primary,
-                selectedDayTextColor: "#ffffff",
-                textMonthFontWeight: "500",
-                textDayFontWeight: "500",
-                todayTextColor: colors.primary,
-                //  textDayHeaderFontWeight:"500",
-                // textDayHeaderFontSize:14,
-
-                // textDisabledColor: "#d9e",
-              }}
-              markedDates={{
-                [selectedDay]: {
-                  selected: true,
-                  disableTouchEvent: true,
-                  selectedDotColor: "orange",
-                },
-              }}
-            />
-          </View>
-        }
-        renderItem={({ item }) => {
-          return (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
-                padding: 10,
-              }}
-              // onPress={() => navigation.navigate("event", item)}
-            >
-              <SmallCard {...item} />
-            </TouchableOpacity>
-          );
-        }}
-        ListFooterComponent={<View style={{ marginBottom: 200 }} />}
-      />
-    </Animated.View>
+            <SmallCard {...item} />
+          </TouchableOpacity>
+        );
+      }}
+      ListFooterComponent={<View style={{ marginBottom: 200 }} />}
+    />
   );
 };
 

@@ -33,28 +33,28 @@ function StackNavigator() {
   const { user } = useAuth();
   return (
     <Stack.Navigator
-    // screenOptions={({ route }) => ({
-    //   headerLeft: () => (
-    //     <TouchableOpacity
-    //       onPress={() => navigation.goBack()}
-    //       style={{ left: 20 }}
-    //     >
-    //       <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
-    //     </TouchableOpacity>
-    //   ),
+      screenOptions={({ route }) => ({
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{ left: 20 }}
+          >
+            <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
+          </TouchableOpacity>
+        ),
 
-    //   // headerShown: false,
-    //   headerTitleAlign: "center",
-    //   headerStyle: { backgroundColor: "transparent" },
-    //   headerBackgroundContainerStyle: {
-    //     backgroundColor: colors.white,
-    //     shadowOffset: { width: 0.5, height: 0.5 },
-    //     elevation: 2,
+        // headerShown: false,
+        headerTitleAlign: "center",
+        headerStyle: { backgroundColor: "transparent" },
+        headerBackgroundContainerStyle: {
+          backgroundColor: colors.white,
+          shadowOffset: { width: 0.5, height: 0.5 },
+          elevation: 2,
 
-    //     shadowOpacity: 0.3,
-    //     shadowRadius: 1,
-    //   },
-    // })}
+          shadowOpacity: 0.3,
+          shadowRadius: 1,
+        },
+      })}
     >
       <Stack.Screen
         name="home"
@@ -87,11 +87,10 @@ function StackNavigator() {
               )}
             </TouchableOpacity>
           ),
-          headerTitleAlign:"center",
           headerTitle: () => (
             <Image
               source={require("../../assets/logos/logo1.png")}
-              style={{ width: 35, height: 35,  }}
+              style={{ width: 35, height: 35, flex: 1, marginBottom: 5 }}
               resizeMode="contain"
             />
           ),
@@ -161,24 +160,13 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           headerTransparent: true,
+
         }}
         name="event"
         component={EventScreen}
       />
-      <Stack.Screen
-        options={{
-          headerTransparent: true,
-        }}
-        name="artist"
-        component={ArtistScreen}
-      />
-      <Stack.Screen
-        options={{
-          headerTransparent: true,
-        }}
-        name="venue"
-        component={VenueScreen}
-      />
+      <Stack.Screen name="artist" component={ArtistScreen} />
+      <Stack.Screen name="venue" component={VenueScreen} />
       <Stack.Screen
         options={{
           headerRight: () => (

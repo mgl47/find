@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import React, { useCallback, useRef, useState } from "react";
-import Screen from "../../components/Screen";
+import Screen from "../../components/Screen2";
 import {
   recommendedEvents,
   trendingEvents,
@@ -39,13 +39,16 @@ import {
 import AppTextInput from "../../components/AppTextInput";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { useAuth } from "../../components/hooks/useAuth";
+import {
+  CalendarModal,
+  VenuesModal,
+} from "../../components/screensComponents/CompHomeScreen";
 
 export default function HomeScreen({ navigation }) {
   const [showSearch, setShowSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("");
-
+  const [venueModalVisible, setVenueModalVisible] = useState(false);
   const [user, setUser] = useState(false);
   LocaleConfig.locales["pt"] = {
     monthNames: [
@@ -115,7 +118,7 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   return (
-    <Screen>
+    <Screen style={{backgroundColor:"white"}}> 
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => (!user ? navigation.openDrawer() : setShowModal(true))}
@@ -150,7 +153,9 @@ export default function HomeScreen({ navigation }) {
 
         <View style={{ position: "absolute", right: 10, flexDirection: "row" }}>
           <TouchableOpacity
-            onPress={() => setCalendarModalVisible(true)}
+            // onPress={() => setVenueModalVisible(true)}
+            onPress={() => navigation.navigate("venuesExplorer")}
+
             style={{
               borderRadius: 50,
               padding: 5,
@@ -160,7 +165,11 @@ export default function HomeScreen({ navigation }) {
             <Entypo name="location" size={24} color="black" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => setCalendarModalVisible(true)}
+            // onPress={() => setCalendarModalVisible(true)}
+
+            onPress={() => navigation.navigate("calendar")}
+
+
             style={{
               borderRadius: 50,
               padding: 5,
@@ -321,113 +330,15 @@ export default function HomeScreen({ navigation }) {
           }
         />
       </View>
-      <Modal animationType="slide" visible={calendarModalVisible}>
-        <Screen style={{ backgroundColor: colors.background }}>
-          <View
-            style={{
-              flexDirection: "row",
-              // backgroundColor: "red",
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 10,
-            }}
-          >
-            <Text
-              style={{
-                // position: "absolute",
-                alignSelf: "center",
-                fontSize: 22,
-                // left:1,
-                color: colors.black2,
+      <CalendarModal
+        setCalendarModalVisible={setCalendarModalVisible}
+        calendarModalVisible={calendarModalVisible}
+      />
 
-                fontWeight: "500",
-              }}
-            >
-              Calendário
-            </Text>
-            {/* <FontAwesome5 name="user-circle" size={40} color={colors.black2} /> */}
-
-            <TouchableOpacity
-              onPress={() => setCalendarModalVisible(false)}
-              style={{
-                padding: 10,
-                right: 10,
-                // alignSelf: "flex-end",
-                position: "absolute",
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 16,
-                  fontWeight: "600",
-                }}
-              >
-                Voltar
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-            }}
-          >
-            <Calendar
-              onDayPress={(day) => {
-                setSelectedDay(day.dateString);
-              }}
-              theme={{
-                textSectionTitleColor: "#b6c1cd",
-                selectedDayBackgroundColor: colors.primary,
-                selectedDayTextColor: "#ffffff",
-                textMonthFontWeight: "500",
-                textDayFontWeight: "500",
-                todayTextColor: colors.primary,
-                //  textDayHeaderFontWeight:"500",
-                // textDayHeaderFontSize:14,
-
-                // textDisabledColor: "#d9e",
-              }}
-              markedDates={{
-                [selectedDay]: {
-                  selected: true,
-                  disableTouchEvent: true,
-                  selectedDotColor: "orange",
-                },
-              }}
-            />
-          </View>
-          <FlatList
-            data={recommendedEvents.slice(1, 3).reverse()}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => item.id}
-            ListHeaderComponent={<View style={{ marginTop: 10 }} />}
-            renderItem={({ item }) => {
-              return (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={{
-                    shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 1,
-                    elevation: 2,
-                    padding: 10,
-                  }}
-                  // onPress={() => navigation.navigate("event", item)}
-                >
-                  <SmallCard {...item} />
-                </TouchableOpacity>
-              );
-            }}
-            ListFooterComponent={<View style={{ marginBottom: 50 }} />}
-          />
-        </Screen>
-      </Modal>
+      <VenuesModal
+        venueModalVisible={venueModalVisible}
+        setVenueModalVisible={setVenueModalVisible}
+      />
       <AuthBottomSheet
         bottomSheetModalRef={bottomSheetModalRef}
         setAuthModalUp={setAuthModalUp}

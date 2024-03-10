@@ -6,13 +6,11 @@ import colors from "../components/colors";
 
 const NotificationScreen = ({ navigation }) => {
   return (
-    <Screen>
       <View style={{ backgroundColor: colors.background, flex: 1 }}>
-      <MainHeader navigation={navigation} title={"Notifications"} />
 
         <Button title="dafds" onPress={() => navigation.navigate("event")} />
       </View>
-    </Screen>
+
   );
 };
 

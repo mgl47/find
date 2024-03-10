@@ -1,39 +1,40 @@
 export const categories = [
   {
-    label: "Music",
+    label: "Música",
     id: 1,
   },
   {
-    label: "Food",
-    id: 2,
-  },
-  {
-    label: "Dance",
+    label: "Dança",
     id: 3,
   },
+  {
+    label: "Comida",
+    id: 2,
+  },
+
   {
     label: "Social",
     id: 4,
   },
   {
-    label: "Shows",
+    label: "Concerto",
     id: 5,
   },
   {
-    label: "Sports",
+    label: "Desporto",
     id: 6,
   },
   {
-    label: "Art",
+    label: "Arte",
     id: 7,
   },
-  {
-    label: "Esports",
-    id: 8,
-  },
+  // {
+  //   label: "Esports",
+  //   id: 8,
+  // },
 
   {
-    label: "Education",
+    label: "Educação",
     id: 9,
   },
 ];

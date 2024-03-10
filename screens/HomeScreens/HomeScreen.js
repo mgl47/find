@@ -9,7 +9,13 @@ import {
   TouchableOpacityBase,
   View,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import Screen from "../../components/Screen2";
 import {
   recommendedEvents,
@@ -118,140 +124,13 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   return (
-    <Screen style={{backgroundColor:"white"}}> 
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          onPress={() => (!user ? navigation.openDrawer() : setShowModal(true))}
-          // onPress={handleAuthSheet}
-          style={{ position: "absolute", left: 20, bottom: 3 }}
-        >
-          {!user ? (
-            <Image
-              source={{
-                uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-              }}
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 50,
-                // marginLeft: 20,
-                // position: "absolute",
-              }}
-
-              // resizeMode="contain"
-            />
-          ) : (
-            <FontAwesome5 name="user-circle" size={38} color={colors.black} />
-          )}
-        </TouchableOpacity>
-
-        <Image
-          source={require("../../assets/logos/logo1.png")}
-          style={{ width: 100, flex: 1, marginBottom: 5 }}
-          resizeMode="contain"
-        />
-
-        <View style={{ position: "absolute", right: 10, flexDirection: "row" }}>
-          <TouchableOpacity
-            // onPress={() => setVenueModalVisible(true)}
-            onPress={() => navigation.navigate("venuesExplorer")}
-
-            style={{
-              borderRadius: 50,
-              padding: 5,
-              marginRight: 5,
-            }}
-          >
-            <Entypo name="location" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            // onPress={() => setCalendarModalVisible(true)}
-
-            onPress={() => navigation.navigate("calendar")}
-
-
-            style={{
-              borderRadius: 50,
-              padding: 5,
-              marginRight: 5,
-            }}
-          >
-            <MaterialCommunityIcons
-              name="calendar-month"
-              size={26}
-              color={colors.black}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              borderRadius: 50,
-              padding: 5,
-              // backgroundColor: colors.grey,
-            }}
-            onPress={() => navigation.navigate("search")}
-          >
-            {/* <MaterialCommunityIcons
-              name="magnify"
-              size={26}
-              color={colors.black}
-            /> */}
-            <Entypo name="magnifying-glass" size={25} color={colors.black} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <>
       <View style={styles.container}>
-        <View
-          style={{
-            width: "100%",
-            height: 1,
-            backgroundColor: colors.white,
-            shadowOffset: { width: 0.5, height: 0.5 },
-            shadowOpacity: 0.3,
-            shadowRadius: 1,
-            elevation: 2,
-            marginBottom: 5,
-          }}
-        />
         <FlatList
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <>
-              {/* <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={categories}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
-                  return (
-                    <Chip
-                      elevation={1}
-                      textStyle={
-                        {
-                          // color: colors.white,
-                        }
-                      }
-                      style={{
-                        margin: 2,
-                        backgroundColor: colors.white,
-                        // paddingHorizontal: 2,
-                        marginVertical: 10,
-                        marginHorizontal: 3,
-                        marginBottom: 10,
-                        borderRadius: 20,
-                      }}
-                      // background={{ color: colors.description }}
-                      // icon="information"
-                      // onPress={() => console.log("Pressed")}
-                      onPress={handleAuthSheet}
-                    >
-                      {item.label}
-                    </Chip>
-                  );
-                }}
-              /> */}
-
-              <Text style={styles.headerText}>Em alta</Text>
+              <Text style={[styles.headerText, { marginTop: 5 }]}>Em alta</Text>
 
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -330,20 +209,12 @@ export default function HomeScreen({ navigation }) {
           }
         />
       </View>
-      <CalendarModal
-        setCalendarModalVisible={setCalendarModalVisible}
-        calendarModalVisible={calendarModalVisible}
-      />
 
-      <VenuesModal
-        venueModalVisible={venueModalVisible}
-        setVenueModalVisible={setVenueModalVisible}
-      />
       <AuthBottomSheet
         bottomSheetModalRef={bottomSheetModalRef}
         setAuthModalUp={setAuthModalUp}
       />
-    </Screen>
+    </>
   );
 }
 

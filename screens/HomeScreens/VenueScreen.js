@@ -90,6 +90,46 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   useEffect(() => {
     console.log(categoryIndex);
   }, [categoryIndex]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{
+            left: 20,
+          }}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={28}
+            color={scrolling ? colors.black : colors.white}
+            style={{
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+          />
+        </TouchableOpacity>
+      ),
+      headerRight: () => null,
+
+      headerTitle: () =>
+        scrolling ? (
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 18,
+              fontWeight: "500",
+              color: colors.black,
+            }}
+          >
+            {venue?.displayName}
+          </Text>
+        ) : null,
+    });
+  }, [scrolling]);
   return (
     <>
       {scrolling && (
@@ -106,42 +146,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
-      <View
-        style={[
-          styles.headerContainer,
-          {
-            zIndex: 2,
-            justifyContent: "space-between",
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.back}
-        >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={28}
-            color={scrolling ? colors.black : colors.white}
-          />
-        </TouchableOpacity>
-        {scrolling && (
-          <View style={{ width: "66%" }}>
-            <Text
-              numberOfLines={1}
-              style={{
-                fontSize: 19,
-                fontWeight: "500",
-                top: 40,
-                color: colors.black,
-              }}
-            >
-              {venue?.displayName}
-            </Text>
-          </View>
-        )}
-        <View style={styles.share_like}></View>
-      </View>
+     
     
       <FlatList
         data={venue?.upcomingEvents}
