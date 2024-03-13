@@ -42,7 +42,7 @@ import {
       bottomSheetModalRef.current?.present();
     }, []);
     const handleSheetChanges = useCallback((index) => {
-      console.log('handleSheetChanges', index);
+      // console.log('handleSheetChanges', index);
     }, []);
     useEffect(() => {
       (async () => {

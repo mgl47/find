@@ -474,6 +474,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </View>
         </View>
         <FlatList
+        style={{backgroundColor:colors.background}}
           horizontal
           showsHorizontalScrollIndicator={false}
           data={Event?.artists}
@@ -876,7 +877,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     flex: 1,
-    // backgroundColor: colors.white,
+    backgroundColor: colors.background,
   },
   headerContainer: {
     position: "absolute",

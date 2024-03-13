@@ -140,6 +140,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         bounces={false}
         data={artist?.upcomingEvents}
         keyExtractor={(item) => item?.id}
+        style={{backgroundColor:colors.background}}
         ListHeaderComponent={
           <>
             <TouchableOpacity activeOpacity={0.9}>
@@ -331,6 +332,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 shadowRadius: 1,
                 elevation: 2,
                 padding: 10,
+                bottom: 50,
+
               }}
               // onPress={() => navigation.navigate("event", item)}
             >
@@ -401,7 +404,7 @@ const styles = StyleSheet.create({
     padding: 10,
     flex: 1,
     bottom: 50,
-    // backgroundColor: colors.white,
+     backgroundColor: colors.background,
   },
   headerContainer: {
     position: "absolute",

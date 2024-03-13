@@ -601,15 +601,15 @@ export const newEvents = [
     artistas: [
       {
         id: 8,
-        displayName: "Elida Almeida",
+        displayName: "Élida Almeida",
         avatar: "https://via.placeholder.com/150",
       },
     ],
     going: 40,
-    title: "Show Acústico de Elida Almeida",
+    title: "Show Acústico de Élida Almeida",
     date: "Sáb, 10 Out - 19h30",
     description:
-      "Desfrute de uma noite intimista com a aclamada cantora cabo-verdiana Elida Almeida. Este show acústico proporcionará uma experiência única, onde você poderá apreciar a voz e as músicas de Elida em um ambiente tranquilo e envolvente.",
+      "Desfrute de uma noite intimista com a aclamada cantora cabo-verdiana Élida Almeida. Este show acústico proporcionará uma experiência única, onde você poderá apreciar a voz e as músicas de Élida em um ambiente tranquilo e envolvente.",
     city: "Mindelo",
     videos: {
       id: 4,

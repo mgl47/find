@@ -21,7 +21,7 @@ import React, {
   useState,
 } from "react";
 
-import colors from "../../components/colors";
+import colors from "../../../components/colors";
 
 import { Tab, Text as Text2, TabView } from "@rneui/themed";
 
@@ -43,10 +43,10 @@ import Animated, {
 } from "react-native-reanimated";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
-import { categories } from "../../components/Data/categories";
-import { newEvents, recommendedEvents } from "../../components/Data/events";
-import SmallCard from "../../components/cards/SmallCard";
-import MediumCard from "../../components/cards/MediumCard";
+import { categories } from "../../../components/Data/categories";
+import { newEvents, recommendedEvents } from "../../../components/Data/events";
+import SmallCard from "../../../components/cards/SmallCard";
+import MediumCard from "../../../components/cards/MediumCard";
 const SearchScreen = ({
   navigation,
   navigation: { goBack, canGoBack },

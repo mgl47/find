@@ -183,7 +183,7 @@ export function VenuesModal({ venueModalVisible, setVenueModalVisible }) {
       setTimeout(resolve, 500);
     });
     setVenueDetails(item);
-    console.log(item);
+    // console.log(item);
 
     setLoading(false);
   };

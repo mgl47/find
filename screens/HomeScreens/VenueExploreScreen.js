@@ -37,7 +37,7 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
-import { Chip } from "react-native-paper";
+import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import { recommendedEvents } from "../../components/Data/events";
@@ -63,9 +63,10 @@ const VenueExploreScreen = () => {
     longitudeDelta: 0.0421,
   });
   const getResults = async (item) => {
+    // setVenueDetails(null)
     setLoading(true);
     await new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
+      setTimeout(resolve,700);
     });
     setVenueDetails(item);
     console.log(item);
@@ -207,8 +208,23 @@ const VenueExploreScreen = () => {
                 })}
               </MapView>
             </View>
+            {loading && (
+              <Animated.View
+                style={{
+                  // position: "absolute",
+                  alignSelf: "center",
+                  // top: 10,
+                  // zIndex: 2,
+                  marginVertical: 20,
+                }}
+                // entering={SlideInUp.duration(300)}
+                // exiting={SlideOutUp.duration(300)}
+              >
+                <ActivityIndicator animating={true} color={colors.primary} />
+              </Animated.View>
+            )}
 
-            {venueDetails && tabIndex == 0 && (
+            {venueDetails && tabIndex == 0 && !loading && (
               <View
                 style={{
                   backgroundColor: colors.white,
@@ -284,7 +300,7 @@ const VenueExploreScreen = () => {
                           fontWeight: "600",
                         }}
                       >
-                       {tabIndex==1?"Seguindo": "Seguir"}
+                        {tabIndex == 1 ? "Seguindo" : "Seguir"}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -314,7 +330,7 @@ const VenueExploreScreen = () => {
           </>
         }
         renderItem={({ item }) => {
-          return !venueDetails || tabIndex == 1 ? (
+          return !loading &&!venueDetails || tabIndex == 1? (
             <View
               style={{
                 padding: 10,
@@ -376,11 +392,11 @@ const VenueExploreScreen = () => {
                       }}
                       style={{
                         padding: 2,
-                        paddingHorizontal:tabIndex==1?5:0,
+                        paddingHorizontal: tabIndex == 1 ? 5 : 0,
                         left: 10,
-                        borderRadius:tabIndex==1?5:0,
-                        borderWidth:tabIndex==1?1:0,
-                        borderColor:colors.primary
+                        borderRadius: tabIndex == 1 ? 5 : 0,
+                        borderWidth: tabIndex == 1 ? 1 : 0,
+                        borderColor: colors.primary,
                         // alignSelf: "flex-end",
                         // position: "absolute",
                         // marginBottom: 10,
@@ -393,7 +409,7 @@ const VenueExploreScreen = () => {
                           fontWeight: "600",
                         }}
                       >
-                       {tabIndex==1?"Seguindo": "Seguir"}
+                        {tabIndex == 1 ? "Seguindo" : "Seguir"}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -420,7 +436,8 @@ const VenueExploreScreen = () => {
                 )}
               </View>
             </View>
-          ) : (
+          ) :
+          !loading && (
             <TouchableOpacity
               activeOpacity={0.8}
               style={{

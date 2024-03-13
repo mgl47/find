@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import EventScreen from "../../screens/HomeScreens/EventScreen";
 import TabNavigator from "./TabNavigator";
-import SearchScreen from "../../screens/HomeScreens/SearchScreen";
+import SearchScreen from "../../screens/HomeScreens/ExploreScreens/SearchScreen";
 import ArtistScreen from "../../screens/HomeScreens/ArtistScreen";
 import VenueScreen from "../../screens/HomeScreens/VenueScreen";
 import ProfileScreen from "../../screens/authScreens/ProfileScreen";
@@ -21,13 +21,15 @@ import {
   MaterialCommunityIcons,
   Entypo,
   FontAwesome5,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import VenueExploreScreen from "../../screens/HomeScreens/VenueExploreScreen";
-import CalendarScreen from "../../screens/HomeScreens/CalendarScreen";
+import CalendarScreen from "../../screens/HomeScreens/ExploreScreens/CalendarScreen";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useAuth } from "../hooks/useAuth";
 import SearchScreen2 from "../../screens/HomeScreens/SearchScreen2";
+import ExploreScreens from "../../screens/HomeScreens/ExploreScreens/ExploreScreens";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -35,7 +37,7 @@ const Stack = createStackNavigator();
 function StackNavigator() {
   const navigation = useNavigation();
   const { user, authLoading } = useAuth();
-
+  const fromHome = true;
   const invisibleHeaders = ["event", "artist", "venue"];
   return (
     <Stack.Navigator
@@ -114,7 +116,7 @@ function StackNavigator() {
                 <MaterialCommunityIcons
                   name="account-outline"
                   size={35}
-                  color={colors.darkSeparator}
+                  color={colors.darkGrey}
                 />
               )}
             </TouchableOpacity>
@@ -126,59 +128,127 @@ function StackNavigator() {
               style={{ width: 35, height: 35, bottom: 3 }}
               resizeMode="contain"
             />
+
+            // <TouchableOpacity
+            //   onPress={() => navigation.navigate("search", fromHome)}
+            //   style={{
+            //     flex: 1,
+            //     flexDirection: "row",
+            //     borderRadius: 20,
+            //     backgroundColor: colors.lightGrey,
+            //     // height: 30,
+            //     alignItems: "center",
+            //     paddingHorizontal: 10,
+
+            //     // left: 10,
+            //     width: "100%",
+            //     bottom:2,
+            //     right:10,
+            //     // left: 40,
+            //   }}
+            // >
+            //   {/* <Entypo
+            //     style={{ zIndex: 1, marginLeft: 10 }}
+            //     name="magnifying-glass"
+            //     size={19}
+            //     color={colors.description}
+            //   />
+            //   <Text style={{ marginLeft: 10, color: colors.description }}>
+            //     artistas, eventos ou lugares
+            //   </Text> */}
+
+            //   {/* <TextInput
+            //     // onSubmitEditing={() => navigation.navigate("search", searchText)}
+            //     onPressIn={() => navigation.navigate("search")}
+            //     // placeholder="encontre artistas, eventos ou lugares"
+            //     placeholder=" artistas, eventos ou lugares"
+            //     placeholderTextColor={colors.description}
+            //     returnKeyType="search"
+            //     // autoFocus={firstMount ? true : false}
+            //     style={[styles.search, { width: "100%" }]}
+            //   /> */}
+            // </TouchableOpacity>
           ),
           headerRight: () => (
-            <View
-              style={{ position: "absolute", right: 10, flexDirection: "row" }}
+            <TouchableOpacity
+              style={{
+                borderRadius: 50,
+                padding: 5,
+                right: 10,
+                // backgroundColor: colors.grey,
+              }}
+              onPress={() => navigation.navigate("search")}
             >
-              <TouchableOpacity
-                // onPress={() => setVenueModalVisible(true)}
-                onPress={() => navigation.navigate("venuesExplorer")}
-                style={{
-                  borderRadius: 50,
-                  padding: 5,
-                  marginRight: 5,
-                }}
-              >
-                <Entypo name="location" size={24} color={colors.darkSeparator} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                // onPress={() => setCalendarModalVisible(true)}
+              <MaterialIcons
+                name="manage-search"
+                size={35}
+                color={colors.darkSeparator}
+              />
 
-                onPress={() => navigation.navigate("calendar")}
-                style={{
-                  borderRadius: 50,
-                  padding: 5,
-                  marginRight: 5,
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="calendar-month"
-                  size={26}
-                  color={colors.darkSeparator}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  borderRadius: 50,
-                  padding: 5,
-                  // backgroundColor: colors.grey,
-                }}
-                onPress={() => navigation.navigate("search")}
-              >
-                {/* <MaterialCommunityIcons
-              name="magnify"
-              size={26}
-              color={colors.black}
-            /> */}
-                <Entypo
-                  name="magnifying-glass"
-                  size={25}
-                  color={colors.darkSeparator}
-                />
-              </TouchableOpacity>
-            </View>
+              {/*
+              <Entypo
+                name="magnifying-glass"
+                size={25}
+                color={colors.darkSeparator}
+              /> */}
+            </TouchableOpacity>
           ),
+          // <View
+          //   style={{ position: "absolute", right: 10, flexDirection: "row" }}
+          // >
+          //   {/* <TouchableOpacity
+          //     // onPress={() => setVenueModalVisible(true)}
+          //     onPress={() => navigation.navigate("venuesExplorer")}
+          //     style={{
+          //       borderRadius: 50,
+          //       padding: 5,
+          //       marginRight: 5,
+          //     }}
+          //   >
+          //     <Entypo
+          //       name="location"
+          //       size={24}
+          //       color={colors.darkSeparator}
+          //     />
+          //   </TouchableOpacity> */}
+          //   {/* <TouchableOpacity
+          //     // onPress={() => setCalendarModalVisible(true)}
+
+          //     onPress={() => navigation.navigate("calendar")}
+          //     style={{
+          //       borderRadius: 50,
+          //       padding: 5,
+          //       marginRight: 5,
+          //     }}
+          //   >
+          //     <MaterialCommunityIcons
+          //       name="calendar-month"
+          //       size={26}
+          //       color={colors.darkSeparator}
+          //     />
+          //   </TouchableOpacity> */}
+          //   <TouchableOpacity
+          //     style={{
+          //       borderRadius: 50,
+          //       padding: 5,
+          //       // backgroundColor: colors.grey,
+          //     }}
+          //     onPress={() => navigation.navigate("search")}
+          //   >
+          //     <MaterialIcons
+          //       name="manage-search"
+          //       size={35}
+          //       color={colors.darkSeparator}
+          //     />
+
+          //     {/*
+          //     <Entypo
+          //       name="magnifying-glass"
+          //       size={25}
+          //       color={colors.darkSeparator}
+          //     /> */}
+          //   </TouchableOpacity>
+          // </View>
         })}
       />
       <Stack.Screen
@@ -225,8 +295,9 @@ function StackNavigator() {
           headerShown: true,
         }}
         name="search"
-        component={SearchScreen}
+        component={ExploreScreens}
       />
+
       <Stack.Screen
         options={{
           presentation: "transparentModal",
@@ -286,21 +357,22 @@ function StackNavigator() {
               </Text>
             </TouchableOpacity>
           ),
-          headerLeft: () => (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", left: 20 }}
-            >
-              <TouchableOpacity onPress={() => navigation.navigate("calendar")}>
-                <Entypo name="chevron-right" size={30} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          ),
+          // headerLeft: () => (
+          //   <View
+          //     style={{ flexDirection: "row", alignItems: "center", left: 20 }}
+          //   >
+          //     <TouchableOpacity onPress={() => navigation.navigate("calendar")}>
+          //       <Entypo name="chevron-right" size={30} color={colors.primary} />
+          //     </TouchableOpacity>
+          //   </View>
+          // ),
+          headerLeft: () => null,
           title: "Lugares",
           headerShown: true,
           presentation: "transparentModal",
         }}
         name="venuesExplorer"
-        component={VenueExploreScreen}
+        component={ExploreScreens}
       />
       <Stack.Screen
         options={{
@@ -372,7 +444,7 @@ function StackNavigator() {
 export default StackNavigator;
 const styles = StyleSheet.create({
   search: {
-    height: 40,
+    height: 10,
     width: "90%",
     backgroundColor: colors.light2,
     borderRadius: 30,

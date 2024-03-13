@@ -37,10 +37,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [venue, setVenue] = useState(venues[0]);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
-  // const handleScroll = (event) => {
-  //   setScrolling(event.nativeEvent.contentOffset.y > 200);
-  //   console.log(event.nativeEvent.contentOffset.y);
-  // };
+
   const [scrollingPos, setScrollingPos] = useState(0);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
@@ -85,11 +82,9 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     // Divide the horizontal offset by the width of the view to see which page is visible
     let pageNum = Math.floor(contentOffset.x / viewSize.width);
     setCategoryIndex(pageNum);
-    console.log(categoryIndex);
+
   }
-  useEffect(() => {
-    console.log(categoryIndex);
-  }, [categoryIndex]);
+
   return (
     <>
       {scrolling && (
@@ -415,7 +410,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           </>
         }
         renderItem={({ item, index }) => {
-          // console.log(index);
+
           return (
             <TouchableOpacity
               style={{

@@ -41,7 +41,7 @@ import {
     const [searchText, setSearchText] = useState("");
     const [calendarModalVisible, setCalendarModalVisible] = useState(false);
     const [selectedDay, setSelectedDay] = useState("");
-    console.log(process.env.EXPO_PUBLIC_API_URL);
+
     const [user, setUser] = useState(false);
     LocaleConfig.locales["pt"] = {
       monthNames: [
@@ -109,7 +109,7 @@ import {
   
       bottomSheetModalRef.current?.present();
     }, []);
-    console.log(test);
+
     return (
       <Screen>
         {/* <MainHeader

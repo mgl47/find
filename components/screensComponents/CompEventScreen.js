@@ -50,7 +50,7 @@ export const PurchaseModal = ({
   // const[purchaseModalUp,setPurchaseModalUp]=useState(false)
 
   const handleSheetChanges = useCallback((index) => {
-    console.log("handleSheetChanges", index);
+
   }, []);
   const [searchText, setSearchText] = useState("");
   const [selectedUser, setSelectedUser] = useState(false);
@@ -240,14 +240,14 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
     };
   }, []);
   const handleSheetChanges = useCallback((index) => {
-    console.log("handleSheetChanges", index);
+
   }, []);
   const [searchText, setSearchText] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [advance, setAdvance] = useState(false);
   const [firstRender, setFirstRender] = useState(true);
-  const jk = Keyboard.isVisible();
-  console.log(jk);
+
+
   useEffect(() => {
     setFirstRender(false);
   }, []);

@@ -40,11 +40,11 @@ import Animated, {
 import { Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
-import { recommendedEvents } from "../../components/Data/events";
-import colors from "../../components/colors";
-import { markers } from "../../components/Data/markers";
-import SmallCard from "../../components/cards/SmallCard";
-import Screen from "../../components/Screen";
+import { recommendedEvents } from "../../../components/Data/events";
+import colors from "../../../components/colors";
+import { markers } from "../../../components/Data/markers";
+import SmallCard from "../../../components/cards/SmallCard";
+import Screen from "../../../components/Screen";
 const { height, width } = Dimensions.get("window");
 
 const CalendarScreen = () => {

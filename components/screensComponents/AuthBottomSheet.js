@@ -19,7 +19,6 @@ const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
   // const[purch aseModalUp,setAuthModalUp]=useState(false)
 
   const handleSheetChanges = useCallback((index) => {
-    console.log("handleSheetChanges", index);
   }, []);
   return (
     <BottomSheetModalProvider>

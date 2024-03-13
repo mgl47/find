@@ -42,7 +42,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [scrolling, setScrolling] = useState(false);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 120);
-    console.log(event.nativeEvent.contentOffset.y);
+
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);

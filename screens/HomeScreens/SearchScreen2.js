@@ -235,6 +235,8 @@ const SearchScreen2 = ({
           value={index}
           onChange={setIndex}
           // dense
+
+          style={{ marginVertical: 5 }}
           disableIndicator
           titleStyle={(active) => ({
             color: active ? colors.primary : colors.darkGrey,
@@ -242,9 +244,126 @@ const SearchScreen2 = ({
             fontWeight: "500",
           })}
         >
-          <Tab.Item>Artistas</Tab.Item>
-          <Tab.Item>{"Eventos"}</Tab.Item>
-          <Tab.Item>{"Lugares"}</Tab.Item>
+          <Tab.Item
+            icon={(active) => (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  left: 10,
+                  backgroundColor: active ? colors.primary : colors.darkGrey,
+                  // padding: 5 ,
+                  borderRadius: 30,
+                  // position: "absolute",
+                  height: 20,
+                  width: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize: 12,
+                    fontWeight: "500",
+                  }}
+                >
+                  {artist?.length}
+                </Text>
+              </View>
+            )}
+            title={"Artistas"}
+            iconPosition="right"
+          />
+          {/* <Tab.Item>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={{
+                  color: colors.darkGrey,
+                  fontSize: 14,
+                  fontWeight: "500",
+                }}
+              >
+                Artistas
+              </Text>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  left: 5,
+                  backgroundColor: colors.darkGrey,
+                  padding: 3,
+                  borderRadius: 30,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize: 12,
+                    fontWeight: "500",
+                  }}
+                >
+                  {artist?.length}
+                </Text>
+              </View>
+            </View>
+          </Tab.Item> */}
+          <Tab.Item
+            icon={(active) => (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  left: 10,
+                  backgroundColor: active ? colors.primary : colors.darkGrey,
+                  // padding: 5 ,
+                  borderRadius: 30,
+                  // position: "absolute",
+                  height: 20,
+                  width: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize: 12,
+                    fontWeight: "500",
+                  }}
+                >
+                  {newEvents?.length}
+                </Text>
+              </View>
+            )}
+            title={"Eventos"}
+            iconPosition="right"
+          />
+          <Tab.Item
+            icon={(active) => (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  left: 10,
+                  backgroundColor: active ? colors.primary : colors.darkGrey,
+                  // padding: 5 ,
+                  borderRadius: 30,
+                  // position: "absolute",
+                  height: 20,
+                  width: 20,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize: 12,
+                    fontWeight: "500",
+                  }}
+                >
+                  {markers?.length}
+                </Text>
+              </View>
+            )}
+            title={"Lugares"}
+            iconPosition="right"
+          />
         </Tab>
       )}
       {category && !loading && (
@@ -379,12 +498,11 @@ const SearchScreen2 = ({
       {!category && !loading && (
         <>
           <Animated.FlatList
-             style={{
+            style={{
               width: index != 1 ? 0 : "",
               height: index != 1 ? 0 : "",
               position: index != 1 ? "absolute" : "relative",
             }}
-          
             //  entering={index == 0 ? SlideInRight : SlideInLeft}
             // exiting={index == 0? SlideOutRight : SlideOutLeft}
             contentContainerStyle={{ alignItems: "center" }}
@@ -417,13 +535,13 @@ const SearchScreen2 = ({
           />
         </>
       )}
-      {!category && !loading&& (
+      {!category && !loading && (
         <Animated.FlatList
-        style={{
-          width: index != 2 ? 0 : "",
-          height: index != 2 ? 0 : "",
-          position: index != 2 ? "absolute" : "relative",
-        }}
+          style={{
+            width: index != 2 ? 0 : "",
+            height: index != 2 ? 0 : "",
+            position: index != 2 ? "absolute" : "relative",
+          }}
           // entering={SlideInRight}
           // exiting={SlideOutRight}
           //   style={{ zIndex: 0 }}

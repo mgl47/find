@@ -3,7 +3,7 @@ import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 function SmallCard({ title, date, photos, venue, city }) {
-  console.log(title?.length);
+
   return (
     <View style={styles.card}>
       <Image style={styles.image} source={{ uri: photos[0]?.uri }} />

@@ -35,7 +35,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   const [venue, setVenue] = useState(venues[0]);
 
-
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
   // const handleScroll = (event) => {
@@ -85,11 +84,11 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     // Divide the horizontal offset by the width of the view to see which page is visible
     let pageNum = Math.floor(contentOffset.x / viewSize.width);
     setCategoryIndex(pageNum);
-    console.log(categoryIndex);
+    // console.log(categoryIndex);
   }
-  useEffect(() => {
-    console.log(categoryIndex);
-  }, [categoryIndex]);
+  // useEffect(() => {
+  //   // console.log(categoryIndex);
+  // }, [categoryIndex]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -146,8 +145,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
-     
-    
+
       <FlatList
         data={venue?.upcomingEvents}
         keyExtractor={(item) => item?.id}
@@ -159,19 +157,19 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         ListHeaderComponent={
           <>
             <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "500",
-          marginBottom: 5,
-          color: colors.white,
-          position: "absolute",
-          top: 230,
-          zIndex:2,
-          marginLeft: 10,
-        }}
-      >
-        {venue?.displayName}
-      </Text>
+              style={{
+                fontSize: 20,
+                fontWeight: "500",
+                marginBottom: 5,
+                color: colors.white,
+                position: "absolute",
+                top: 230,
+                zIndex: 2,
+                marginLeft: 10,
+              }}
+            >
+              {venue?.displayName}
+            </Text>
             <FlatList
               showsHorizontalScrollIndicator={false}
               pagingEnabled
@@ -425,7 +423,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontWeight: "500",
                   // width: "80%",
                   color: colors.primary,
-                   marginLeft: 5,
+                  marginLeft: 5,
                   marginTop: 15,
                   //   marginBottom: 5,
                 }}
@@ -454,6 +452,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             </View>
           </>
         }
+        style={{ backgroundColor: colors.background }}
         renderItem={({ item, index }) => {
           // console.log(index);
           return (
@@ -517,7 +516,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     flex: 1,
-    // backgroundColor: colors.white,
+    backgroundColor: colors.background,
   },
   headerContainer: {
     position: "absolute",
