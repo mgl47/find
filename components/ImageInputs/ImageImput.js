@@ -4,18 +4,18 @@ import {
   View,
   Image,
   TouchableWithoutFeedback,
+  Dimensions,
 } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-// import { manipulateAsync } from "expo-image-manipulator";
 
 import Screen from "../Screen";
 import { Alert } from "react-native";
-// import { showMessage } from "react-native-flash-message";
 import colors from "../colors";
+// import { showMessage } from "react-native-flash-message";
+const { width, height } = Dimensions.get("window");
 
 function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
-  // const { dd, height, darkMode } = useDesign();
   // useEffect(() => {
   //     requestPermission();
   //   }, []);
@@ -65,6 +65,7 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
         onChangeImage(selectedUris[0]);
       }
     } catch (error) {
+      console.log(error);
       // showMessage({
       //   message: "Erro ao carregar a foto!",
       //   type: "warning",
@@ -81,10 +82,10 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
         style={[
           styles.container,
           {
-            // height: height * 0.24,
+            height: height * 0.24,
 
-            // width: width * 0.88,
-          
+            width: width * 0.88,
+
             backgroundColor: colors.light2,
             borderColor: colors.description,
           },
@@ -110,17 +111,17 @@ export default ImageImput;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.light2,
-    borderRadius: 15,
+    borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    marginVertical: 15,
+    margin: 10,
     overflow: "hidden",
     borderWidth: 0.3,
   },
   photos: {
     // alignSelf: "center",
-    dd: "100%",
+    width: "100%",
     height: "100%",
 
     //  borderRadius: 20,

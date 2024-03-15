@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 
 import {
   Switch,
   View,
   StyleSheet,
-  TextInput,
   KeyboardAvoidingView,
   ScrollView,
   Alert,
@@ -27,11 +32,17 @@ import {
   FontAwesome5,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { v4 as uuidv4 } from "uuid";
+import uuid from "react-native-uuid";
 
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colors from "../../components/colors";
 import ImageImputList from "../../components/ImageInputs/ImageImputList";
+import { TextInput } from "react-native-paper";
+import {
+  EditTicketsSheet,
+  TicketsSheet,
+  VenueSelector,
+} from "../../components/screensComponents/CompAddingScreen";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -61,9 +72,32 @@ import ImageImputList from "../../components/ImageInputs/ImageImputList";
 // import axios from "axios";
 
 function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
-  //   const { user, token } = useAuth();
+  const [ticketsSheetup, setTicketsSheetup] = useState(false);
+  const [editTicketsSheetup, setEditTicketsSheetup] = useState(false);
 
-  // const url = "http://192.168.1.10:8000";
+  const ticketsSheetRef = useRef(null);
+  const editTicketSheeRef = useRef(null);
+  const [tickets, setTickets] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState("");
+  const handleTicketSheet = useCallback(() => {
+    setTicketsSheetup(true);
+
+    ticketsSheetRef.current?.present();
+    // setSelectedTicket("");
+  }, [selectedTicket]);
+  const handleEditTicketSheet = useCallback((ticket, index) => {
+    setEditTicketsSheetup(true);
+    setSelectedTicket({ ticket, index });
+    editTicketSheeRef.current?.present();
+    // setSelectedTicket("");
+  }, []);
+
+  const deleteTicket = (ticket) => {
+    const updatedTickets = tickets?.filter((item) => item.id != ticket.id);
+    setTickets(updatedTickets);
+  };
+  const [venueModal, setVenueModal] = useState(false);
+  const [venue, setVenue] = useState(false);
 
   const [marker, setMarker] = useState(null);
 
@@ -74,20 +108,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     { label: "play", value: "play" },
     { label: "swag", value: "swag" },
   ];
-  const Condition = ["Novo", "Usado"];
   //---------error messages
   const [phoneError1, setPhoneError1] = useState(false);
   const [phoneError2, setPhoneError2] = useState(false);
-
   const [category, setCategory] = useState("");
-  const [sub, setSub] = useState("");
-  const [subType, setSubType] = useState("");
-  const [subType2, setSubType2] = useState("");
-  const [subType3, setSubType3] = useState("");
-  const [subType4, setSubType4] = useState("");
-  const [subType5, setSubType5] = useState("");
-  const [subType6, setSubType6] = useState("");
-  const [subType7, setSubType7] = useState("");
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -101,19 +126,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
   const [price, setPrice] = useState(0);
   const [priceError, setPriceError] = useState(true);
-  const [showPrice, setShowPrice] = useState(false);
-  const [negociable, setNegociable] = useState(false);
-  const [island, setIsland] = useState("");
 
-  const [city, setCity] = useState("");
   const [showZone, setShowZone] = useState(false);
 
-  const [zone, setZone] = useState("");
-
   const [addPhone, setAddPhone] = useState(false);
-  const [addEmail, setAddEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [blockModal, setBlockModal] = useState(false);
+
   useEffect(() => {
     if (loading) {
       setBlockModal(true);
@@ -123,18 +142,20 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   }, [loading]);
 
   const inputRef1 = useRef(null);
-
   const handleAdd = (uris) => {
+    console.log(uris?.length);
+
     if (imageUris.length + uris.length <= 7) {
       setImageUris([...imageUris, ...uris]); // Update to handle array of URIs
     } else {
-      showMessage({
-        message: "Cannot add more than 7 images",
-        type: "warning",
-        floating: true,
-        animationDuration: 400,
-        backgroundColor: colors.secondary,
-      });
+      console.log("Cannot add more than 7 images");
+      // showMessage({
+      //   message: "Cannot add more than 7 images",
+      //   type: "warning",
+      //   floating: true,
+      //   animationDuration: 400,
+      //   backgroundColor: colors.secondary,
+      // });
     }
   };
   const handleRemove = (uri) => {
@@ -292,29 +313,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     }
   };
   // console.log(imageUris.length);
-  function validateEmail(text) {
-    // Regular expression to match email format
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setIsValid(regex.test(text));
-    setEmail(text);
-  }
-
-  const handleTitle = (inputValue) => {
-    if (inputValue.length < 5) {
-      setTitleError(true);
-    } else {
-      setTitleError("");
-    }
-    setTitle(inputValue);
-  };
-  const handleDescription = (inputValue) => {
-    if (inputValue.length < 10) {
-      setDescriptionError(true);
-    } else {
-      setDescriptionError("");
-    }
-    setDescription(inputValue);
-  };
 
   const handlePhoneNumberChange1 = (inputValue) => {
     if (
@@ -399,12 +397,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
   return (
     <KeyboardAwareScrollView
-      style={{ flex: 1 }}
+      // style={{ flex: 1 }}
       enableOnAndroid={true}
-      // contentContainerStyle={[
-      //   styles.container,
-      //   { backgroundColor: colors.light },
-      // ]}
+      contentContainerStyle={[
+        styles.container,
+
+        // { backgroundColor: colors.light },
+      ]}
       extraScrollHeight={100}
       keyboardShouldPersistTaps={"handled"}
     >
@@ -418,7 +417,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         <Text style={styles.errorMessage}>Escolha de 1 a 7 fotos!</Text>
       ) : null}
 
-      <TextInput
+      {/* <TextInput
         textColor={colors.black}
         placeholderTextColor={colors.description}
         backgroundColor={colors.light2}
@@ -429,22 +428,315 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         padding={15}
         maxLength={100}
         onSubmitEditing={() => inputRef1.current.focus()}
+      /> */}
+      <TextInput
+        error={!title}
+        style={{ marginBottom: 5 }}
+        // autoFocus
+        underlineStyle={{ backgroundColor: colors.primary }}
+        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        label="título"
+        activeUnderlineColor={colors.primary}
+        value={title}
+        cursorColor={colors.primary}
+        // onChangeText={(text) => setPerson({ ...person, email: text })}
+        onChangeText={setTitle}
       />
 
       <TextInput
-        style={[styles.imput, { color: colors.black }]}
-        placeholderTextColor={colors.description}
-        backgroundColor={colors.light2}
-        placeholder={"Descrição"}
-        numberOfLines={5}
-        maxLength={2000}
+        error={!title}
+        style={{ marginBottom: 20, backgroundColor: colors.background }}
+        // autoFocus
+        underlineStyle={{ backgroundColor: colors.primary }}
+        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        label="descrição"
+        activeUnderlineColor={colors.primary}
+        value={description}
         multiline
-        width={"90%"}
-        ref={inputRef1}
-        onChangeText={handleDescription}
+        cursorColor={colors.primary}
+        // onChangeText={(text) => setPerson({ ...person, email: text })}
+        onChangeText={setDescription}
       />
 
-      <View>
+      <View style={[styles.switchContainer]}>
+        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+          Evento Gratuito
+        </Text>
+        <Switch
+          trackColor={{
+            true: colors.primary,
+          }}
+          thumbColor={colors.white}
+          style={styles.switch}
+          value={showZone}
+          onValueChange={(newValue) => setShowZone(newValue)}
+        />
+      </View>
+      {tickets?.length > 0 && (
+        <Text
+          style={{
+            fontSize: 19,
+            color: colors.darkSeparator,
+            fontWeight: "500",
+            marginLeft: 20,
+            // marginRight: 10,
+            marginBottom: 10,
+          }}
+        >
+          Bilhetes
+        </Text>
+      )}
+      {tickets?.map((item, index) => {
+        return (
+          <>
+            <View
+              activeOpacity={0.5}
+              style={{
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+                width: "100%",
+              }}
+              // onPress={() => navigation.navigate("event", item)}
+            >
+              <View style={styles.card}>
+                <View
+                  style={{
+                    width: "70%",
+                    // backgroundColor: colors.light2,
+                    padding: 10,
+                  }}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text numberOfLines={2} style={[styles.price]}>
+                      cve {item?.price}
+                    </Text>
+                    <Text numberOfLines={2} style={[styles.priceType]}>
+                      {item?.type}
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        // position: "absolute",
+                        // right: 5,
+                        marginLeft: 20,
+                      }}
+                    >
+                      <Text
+                        numberOfLines={2}
+                        style={{
+                          fontSize: 15,
+                          color: colors.black2,
+                          marginRight: 5,
+                        }}
+                      >
+                        Qtd:
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={{ fontSize: 15, color: colors.darkSeparator }}
+                      >
+                        {item?.amount}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.description}>{item?.description}</Text>
+                </View>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                alignSelf: "flex-end",
+                paddingRight: 15,
+                marginBottom: 5,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => handleEditTicketSheet(item, index)}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: colors.primary,
+                    fontWeight: "500",
+                    marginRight: 10,
+                  }}
+                >
+                  Editar
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteTicket(item)}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: colors.primary,
+                    fontWeight: "500",
+                  }}
+                >
+                  Apagar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        );
+      })}
+      <View style={[styles.switchContainer]}>
+        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+          Adicionar Bilhetes
+        </Text>
+        <TouchableOpacity style={styles.switch} onPress={handleTicketSheet}>
+          <Ionicons
+            name={"add-circle-outline"}
+            size={40}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.sparator} />
+      {!venue && (
+        <View style={[styles.switchContainer]}>
+          <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+            Selecionar Local
+          </Text>
+          <TouchableOpacity
+            style={styles.switch}
+            onPress={() => setVenueModal(true)}
+          >
+            <Ionicons
+              name={"add-circle-outline"}
+              size={40}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {venue && (
+        <>
+          <Text
+            style={{
+              fontSize: 19,
+              color: colors.darkSeparator,
+              fontWeight: "500",
+              marginLeft: 20,
+              // marginRight: 10,
+              marginBottom: 10,
+            }}
+          >
+            Local
+          </Text>
+          <View
+            style={{
+              // padding: 10,
+              borderBottomRightRadius: 10,
+              borderBottomLeftRadius: 10,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+              marginVertical: 7,
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: colors.white,
+                borderRadius: 10,
+                // padding: 5,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  {
+                    setVenueModal(true);
+                  }
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: 10,
+                  alignItems: "center",
+                  padding: 2,
+                  // marginBottom: 5,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  {venue?.uri && (
+                    <Image
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 50,
+                        borderWidth: 0.1,
+                      }}
+                      source={{
+                        uri: venue?.uri,
+                      }}
+                    />
+                  )}
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      marginLeft: 10,
+                    }}
+                  >
+                    {venue?.displayName}
+                  </Text>
+                </View>
+
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    right: 10,
+                    padding: 3,
+                    fontWeight: "600",
+                    paddingHorizontal: (venue?.id == venue?.id) == 1 ? 5 : 0,
+                    borderRadius: (venue?.id == venue?.id) == 1 ? 5 : 0,
+                    borderWidth: (venue?.id == venue?.id) == 1 ? 1 : 0,
+                    borderColor: colors.primary,
+                  }}
+                >
+                  Alterar
+                </Text>
+              </TouchableOpacity>
+              {venue?.description && <View style={styles.separator} />}
+              {venue?.description && (
+                <View style={{ padding: 10 }}>
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "500",
+                      color: colors.darkGrey,
+                    }}
+                  >
+                    {venue?.description}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </>
+      )}
+      <VenueSelector
+        venueModal={venueModal}
+        setVenueModal={setVenueModal}
+        setVenue={setVenue}
+        venue={venue}
+      />
+
+      {/* <View>
         <TextInput
           textColor={colors.black}
           placeholderTextColor={colors.description}
@@ -457,7 +749,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           width={"60%"}
           padding={15}
         />
-        {/* )} */}
         {priceError ? (
           <Text
             style={{
@@ -471,8 +762,8 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             Insira um preço válido
           </Text>
         ) : null}
-      </View>
-
+      </View> */}
+      {/* 
       <View style={[styles.home, { backgroundColor: colors.light2 }]}>
         <FontAwesome
           name={"phone"}
@@ -500,7 +791,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           value={addPhone}
           onValueChange={(newValue) => setAddPhone(newValue)}
         />
-      </View>
+      </View> */}
 
       {addPhone && (
         <>
@@ -666,6 +957,23 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         // presentationStyle="formSheet"
         transparent
       ></Modal>
+
+      <TicketsSheet
+        setTicketsSheetup={setTicketsSheetup}
+        ticketsSheetRef={ticketsSheetRef}
+        tickets={tickets}
+        edit={selectedTicket}
+        selectedTicket={selectedTicket}
+        setTickets={setTickets}
+      />
+      <EditTicketsSheet
+        setEditTicketsSheetup={setEditTicketsSheetup}
+        editTicketSheeRef={editTicketSheeRef}
+        tickets={tickets}
+        setSelectedTicket={setSelectedTicket}
+        selectedTicket={selectedTicket}
+        setTickets={setTickets}
+      />
     </KeyboardAwareScrollView>
   );
 }
@@ -675,6 +983,8 @@ export default EventAddingScreen;
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: colors.light,
+    padding: 10,
+    flex: 1,
   },
 
   imput: {
@@ -694,5 +1004,70 @@ const styles = StyleSheet.create({
     width: 200,
     height: 150,
     borderRadius: 20,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    height: 40,
+    width: "100%",
+    // backgroundColor: colors.light2,
+    alignItems: "center",
+    // paddingHorizontal: 20,
+
+    //padding: 10,
+  },
+  switch: {
+    position: "absolute",
+
+    right: 20,
+  },
+  switchText: {
+    fontSize: 17,
+    fontWeight: "500",
+    alignSelf: "center",
+    left: 10,
+  },
+  card: {
+    flexDirection: "row",
+    marginBottom: 10,
+    padding: 10,
+
+    // height: 95,
+    backgroundColor: colors.white,
+    overflow: "hidden",
+    width: "95%",
+    alignSelf: "center",
+
+    borderRadius: 10,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 1,
+    // shadowRadius: 1,
+    // elevation: 3,
+  },
+
+  price: {
+    alignSelf: "flex-start",
+    fontSize: 21,
+    fontWeight: "600",
+    color: colors.primary,
+    lineHeight: 30,
+    // width: "65%",
+    // marginBottom: 5,
+  },
+  priceType: {
+    alignSelf: "flex-start",
+    fontSize: 15,
+    fontWeight: "600",
+    color: colors.description2,
+    lineHeight: 30,
+    // width: "65%",
+    marginLeft: 20,
+  },
+  separator: {
+    width: "95%",
+    height: 1,
+    backgroundColor: colors.grey,
+    marginVertical: 5,
+    alignSelf: "center",
   },
 });
