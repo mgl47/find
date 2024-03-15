@@ -1,5 +1,7 @@
 import {
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -25,6 +27,8 @@ import BlockModal from "../../components/screensComponents/BlockModal";
 import { useAuth } from "../../components/hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { ScrollView } from "react-native-gesture-handler";
 
 const SignInScreen = () => {
   const navigation = useNavigation();
@@ -73,7 +77,7 @@ const SignInScreen = () => {
         const jsonValue = JSON.stringify(response.data.user);
         await AsyncStorage.setItem("user", jsonValue);
         JSON.parse(jsonValue);
-        navigation.openDrawer() 
+        navigation.openDrawer();
 
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
@@ -95,12 +99,21 @@ const SignInScreen = () => {
   //   });
   // }, [loading,]);
   return (
-    <View style={{ padding: 10, backgroundColor: colors.background }}>
+    <KeyboardAwareScrollView
+    
+      // behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{
+        padding: 10,
+        backgroundColor: colors.background,
+        flex: 1,
+        marginBottom: 300,
+      }}
+    >
       <BlockModal active={loading} />
       <TextInput
         error={!firstAttempt && !person.email}
         style={{ marginBottom: 5 }}
-        autoFocus
+        // autoFocus
         underlineStyle={{ backgroundColor: colors.primary }}
         contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Nome de usuário ou Email"
@@ -233,7 +246,7 @@ const SignInScreen = () => {
         </TouchableOpacity>
         {loading && <ActivityIndicator color={colors.primary} />}
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 

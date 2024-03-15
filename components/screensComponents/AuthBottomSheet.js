@@ -1,9 +1,20 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { useCallback, useMemo } from "react";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BottomSheetModal,
   BottomSheetView,
   BottomSheetModalProvider,
+  BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import Screen from "../Screen2";
@@ -11,79 +22,49 @@ import SignInScreen from "../../screens/authScreens/SignInScreen";
 import SignUpScreen from "../../screens/authScreens/SignUpScreen";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import colors from "../colors";
+import Animated, { SlideInDown } from "react-native-reanimated";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const Tab = createMaterialTopTabNavigator();
 const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const snapPoints = useMemo(() => ["60", "90%"], []);
 
-  // const[purch aseModalUp,setAuthModalUp]=useState(false)
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  const handleSheetChanges = useCallback((index) => {
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, []);
+  const handleSheetChanges = useCallback((index) => {}, []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
         ref={bottomSheetModalRef}
-        index={1}
+        index={keyboardVisible ? 1 : 0}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
           setAuthModalUp(false);
         }}
       >
-        <BottomSheetView style={styles.contentContainer}>
-          <Screen
-            style={{
-              backgroundColor: colors.white,
-              flex: 0,
-            }}
-          ></Screen>
-          <View
-            style={{
-              flexDirection: "row",
-              backgroundColor: colors.white,
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-
-              height: 50,
-
-              // padding: 5,
-              // marginBottom: 10,
-            }}
-          >
-            {/* <Text
-              style={{
-                // position: "absolute",
-                alignSelf: "center",
-                fontSize: 22,
-                // left:1,
-                color:colors.primary,
-
-                fontWeight: "500",
-              }}
-            >
-              Conta
-            </Text> */}
-            <FontAwesome5 name="user-circle" size={40} color={colors.black2} />
-            <TouchableOpacity
-              onPress={() => setShowModal(false)}
-              style={{ padding: 10, right: 5, position: "absolute" }}
-            >
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 15,
-                  fontWeight: "600",
-                }}
-              >
-                Cancelar
-              </Text>
-            </TouchableOpacity>
-          </View>
+        {/* <BottomSheetView style={styles.contentContainer}> */}
+        <BottomSheetScrollView contentContainerStyle={{ flex: 1 }}>
+          {/* <View style={{ flex: 1 }}> */}
           <Tab.Navigator
             screenOptions={{
               tabBarActiveTintColor: colors.primary,
+
               tabBarInactiveTintColor: colors.darkGrey,
               tabBarIndicatorContainerStyle: {
                 backgroundColor: colors.background,
@@ -96,13 +77,16 @@ const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
               tabBarIndicatorStyle: {
                 width: "40%",
                 left: "5%",
+                backgroundColor: colors.primary,
               },
             }}
           >
             <Tab.Screen name="Entrar" component={SignInScreen} />
             <Tab.Screen name="Criar Conta" component={SignUpScreen} />
           </Tab.Navigator>
-        </BottomSheetView>
+          {/* </View> */}
+          {/* </BottomSheetView> */}
+        </BottomSheetScrollView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );

@@ -8,6 +8,8 @@ import axios from "axios";
 import { useAuth } from "../../components/hooks/useAuth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
+import { ScrollView } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -89,7 +91,7 @@ const SignUpScreen = () => {
   };
 
   return (
-    <View style={{ padding: 10 }}>
+    <KeyboardAwareScrollView style={{ padding: 10 ,flex:1 ,backgroundColor:colors.background,marginBottom:200}}>
       <BlockModal active={loading} />
 
       <TextInput
@@ -152,7 +154,7 @@ const SignUpScreen = () => {
         onSubmitEditing={validated ? signUp : null}
         autoCapitalize="none"
       />
-      <View>
+      <View >
         <Text
           style={{
             position: "absolute",
@@ -198,7 +200,7 @@ const SignUpScreen = () => {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 

@@ -37,7 +37,7 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
 } from "react-native-reanimated";
-import { Chip } from "react-native-paper";
+import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
 import { recommendedEvents } from "../../../components/Data/events";
@@ -110,16 +110,67 @@ const CalendarScreen = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // const getResults = async (item) => {
-  //   setLoading(true);
-  //   await new Promise((resolve, reject) => {
-  //     setTimeout(resolve, 500);
-  //   });
-  //   setVenueDetails(item);
-  //   console.log(item);
+  const getResults = async (day) => {
+    setSelectedDay(day.dateString);
 
-  //   setLoading(false);
-  // };
+    setLoading(true);
+    await new Promise((resolve, reject) => {
+      setTimeout(resolve, 700);
+    });
+
+    setLoading(false);
+  };
+
+  const calDays = [
+    {
+      id: "Fgsbgafsgdbsg",
+      date: new Date("2024-03-14"),
+    },
+    {
+      id: "safasf",
+      date: new Date("2024-03-16"),
+    },
+    {
+      id: "safasf",
+      date: new Date("2024-03-17"),
+    },
+    {
+      id: "safasf",
+      date: new Date("2024-03-21"),
+    },
+    {
+      id: "safasf",
+      date: new Date("2024-03-21"),
+    },
+    {
+      id: "safasf",
+      date: new Date("2024-03-23"),
+    },
+  ];
+
+  const formateDate = (date) => {
+    return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? "0" : ""}${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
+  };
+
+  const filteredDays = calDays.map((item) => {
+    const formattedDate = formateDate(item?.date);
+    return {
+      [formattedDate]: {
+        marked: true,
+        selected: selectedDay == formattedDate,
+        dotColor: colors.primary,
+        selectedColor: colors.primary,
+      },
+    };
+  });
+
+  const markedDatesData = filteredDays.reduce((acc, curr) => {
+    return { ...acc, ...curr };
+  }, {});
+  console.log(filteredDays.length);
+
   return (
     <Animated.FlatList
       entering={SlideInDown}
@@ -139,9 +190,10 @@ const CalendarScreen = () => {
           }}
         >
           <Calendar
-            onDayPress={(day) => {
-              setSelectedDay(day.dateString);
-            }}
+            // onDayPress={(day) => {
+            //   setSelectedDay(day.dateString);
+            // }}
+            onDayPress={getResults}
             theme={{
               textSectionTitleColor: "#b6c1cd",
               selectedDayBackgroundColor: colors.primary,
@@ -155,18 +207,55 @@ const CalendarScreen = () => {
 
               // textDisabledColor: "#d9e",
             }}
+            // markedDates={{
+            //   [selectedDay]: {
+            //     selected: true,
+            //     disableTouchEvent: true,
+            //     selectedDotColor: "orange",
+            //   },
+            // }}
             markedDates={{
               [selectedDay]: {
                 selected: true,
                 disableTouchEvent: true,
-                selectedDotColor: "orange",
+                // selectedDotColor: "orange",s
               },
+              ...markedDatesData,
+
+              // "2024-03-21": {
+              //   disabled: false,
+              //   marked: true,
+              //   selected: selectedDay == "2024-03-21",
+
+              //   dotColor: colors.primary,
+              //   selectedColor: colors.primary,
+              // },
+              // "2024-03-22": { marked: true, dotColor: colors.primary },
+              // "2024-03-23": {
+              //   marked: true,
+              //   dotColor: colors.primary,
+              // },
             }}
           />
+          {loading && (
+            <Animated.View
+              style={{
+                // position: "absolute",
+                alignSelf: "center",
+                // top: 10,
+                // zIndex: 2,
+                marginVertical: 20,
+              }}
+              // entering={SlideInUp.duration(300)}
+              // exiting={SlideOutUp.duration(300)}
+            >
+              <ActivityIndicator animating={true} color={colors.primary} />
+            </Animated.View>
+          )}
         </View>
       }
       renderItem={({ item }) => {
-        return (
+        return !loading ? (
           <TouchableOpacity
             activeOpacity={0.8}
             style={{
@@ -180,7 +269,7 @@ const CalendarScreen = () => {
           >
             <SmallCard {...item} />
           </TouchableOpacity>
-        );
+        ) : null;
       }}
       ListFooterComponent={<View style={{ marginBottom: 200 }} />}
     />

@@ -1,14 +1,11 @@
 import {
   FlatList,
-
   StyleSheet,
   Text,
-
   TouchableOpacity,
-
   View,
 } from "react-native";
-import React from "react";
+import React, { useCallback, useRef, useState } from "react";
 
 import {
   recommendedEvents,
@@ -27,10 +24,17 @@ import {
 } from "@expo/vector-icons";
 
 import { useAuth } from "../../components/hooks/useAuth";
+import AuthBottomSheet from "../../components/screensComponents/AuthBottomSheet";
 
 export default function HomeScreen({ navigation }) {
-  const {} = useAuth();
+  const {setAuthModalUp} = useAuth();
+  const bottomSheetModalRef = useRef(null);
 
+  const handleAuthSheet = useCallback(() => {
+    setAuthModalUp(true);
+
+    bottomSheetModalRef.current?.present();
+  }, []);
   return (
     <>
       <View style={styles.container}>
@@ -38,7 +42,7 @@ export default function HomeScreen({ navigation }) {
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <>
-              <Text style={[styles.headerText, { marginTop: 5 }]}>Em alta</Text>
+              {/* <Text style={[styles.headerText, { marginTop: 5 }]}>Em alta</Text> */}
 
               <FlatList
                 showsHorizontalScrollIndicator={false}
@@ -59,9 +63,7 @@ export default function HomeScreen({ navigation }) {
                       // onPress={() =>
                       //   item.valid ? navigation.navigate("event", item) : null
                       // }
-                      onPress={() =>
-                    navigation.navigate("event", item) 
-                      }
+                      onPress={() => navigation.navigate("event", item)}
                     >
                       <MediumCard {...item} />
                     </TouchableOpacity>
@@ -71,7 +73,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.headerText}>Bu próximo evento</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
-                // onPress={() => navigation.navigate("event")}
+                onPress={handleAuthSheet}
                 style={{
                   shadowOffset: { width: 1, height: 1 },
                   shadowOpacity: 1,
@@ -108,7 +110,7 @@ export default function HomeScreen({ navigation }) {
                         elevation: 2,
                         padding: 10,
                       }}
-                      // onPress={() => navigation.navigate("event", item)}
+                      onPress={() => navigation.navigate("addEvent", item)}
                     >
                       <SmallCard {...item} />
                     </TouchableOpacity>
@@ -118,6 +120,11 @@ export default function HomeScreen({ navigation }) {
               />
             </>
           }
+        />
+        <AuthBottomSheet
+          bottomSheetModalRef={bottomSheetModalRef}
+          setAuthModalUp={setAuthModalUp}
+        
         />
       </View>
     </>

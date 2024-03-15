@@ -275,17 +275,30 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 // marginBottom: 0,
               }}
             >
-              <Text
+              <View
                 style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  width: "70%",
-                  color: colors.darkGrey,
-                  marginBottom: 3,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginBottom: 7,
                 }}
               >
-                {Event?.venue?.displayName}, {Event?.venue?.city}
-              </Text>
+                <Entypo
+                  name="location"
+                  size={15}
+                  color={colors.darkSeparator}
+                />
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "500",
+                    width: "70%",
+                    color: colors.darkSeparator,
+                    marginLeft: 5,
+                  }}
+                >
+                  {Event?.venue?.displayName}, {Event?.venue?.city}
+                </Text>
+              </View>
 
               <View style={{ position: "absolute", right: 0 }}>
                 <Text
@@ -314,23 +327,37 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               </View>
             </View>
           </View>
-          <Text
+          <View
             style={{
-              fontSize: 15,
-              fontWeight: "500",
-              // width: "80%",
-              color: colors.primary,
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 3,
             }}
           >
-            {Event?.date}
-          </Text>
+            <MaterialCommunityIcons
+              name="calendar-month"
+              size={15}
+              color={colors.darkSeparator}
+            />
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "500",
+                // width: "80%",
+                color: colors.primary,
+                marginLeft: 5,
+              }}
+            >
+              {Event?.date}
+            </Text>
+          </View>
           <View
             style={{
               width: "100%",
               flexDirection: "row",
               alignItems: "center",
               marginTop: 2,
-              right: 5,
+              right: 3,
               // justifyContent: "center",
             }}
           >
@@ -447,8 +474,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           >
             <Text
               style={{
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: "500",
+                left: 10,
                 // width: "80%",
                 color: colors.primary,
                 // marginLeft: 5,
@@ -474,7 +502,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </View>
         </View>
         <FlatList
-        style={{backgroundColor:colors.background}}
+          style={{ backgroundColor: colors.background }}
           horizontal
           showsHorizontalScrollIndicator={false}
           data={Event?.artists}
@@ -515,8 +543,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           {/* <View style={styles.separator} /> */}
           <Text
             style={{
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: "500",
+              left: 10,
 
               color: colors.primary,
 
@@ -664,15 +693,15 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </View>
           <Text
             style={{
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: "500",
-
+              left: 10,
               color: colors.primary,
 
               marginVertical: 10,
             }}
           >
-            Promotor
+            Organizado por
           </Text>
           <View
             style={{

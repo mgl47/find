@@ -7,15 +7,18 @@ import NotificationScreen from "../../screens/NotificationScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
 import colors from "../colors";
 import { Platform } from "react-native";
+import { useAuth } from "../hooks/useAuth";
 // import StackNavigator from "./StackNavigator";
 
 const Tab = createMaterialBottomTabNavigator();
 
 const TabNavigator = () => {
+  const { AuthModalUp } = useAuth();
   return (
     <Tab.Navigator
       keyboardHidesNavigationBar={true}
       // activeColor="#f0edf6"
+
       initialRouteName="Home"
       // inactiveColor="#3e2465"
       barStyle={{
@@ -23,6 +26,7 @@ const TabNavigator = () => {
         borderTopWidth: 0.2,
         borderColor: colors.grey,
         marginBottom: Platform.OS == "ios" ? -30 : -10,
+        display: AuthModalUp ? "none" : "flex",
         //         marginBottom: -10,
       }}
       backBehavior="initialRoute"

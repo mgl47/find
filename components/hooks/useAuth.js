@@ -5,16 +5,24 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
-
-import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
-
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+} from "@gorhom/bottom-sheet";
+import SignInScreen from "../../screens/authScreens/SignInScreen";
+import SignUpScreen from "../../screens/authScreens/SignUpScreen";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Animated, { SlideInDown } from "react-native-reanimated";
+import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 
 import colors from "../colors";
 import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
 
 const AuthContext = createContext();
 const Tab = createMaterialTopTabNavigator();
@@ -42,14 +50,18 @@ export const AuthProvider = ({ children }) => {
     getUser();
   }, []);
 
+  const [AuthModalUp, setAuthModalUp] = useState(false);
+
   const memoedValue = useMemo(
     () => ({
       headerToken,
       user,
       setUser: setUser,
       authLoading,
+      setAuthModalUp,
+      AuthModalUp
     }),
-    [, user, authLoading]
+    [, user, authLoading,AuthModalUp]
   );
 
   return (

@@ -30,6 +30,7 @@ import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useAuth } from "../hooks/useAuth";
 import SearchScreen2 from "../../screens/HomeScreens/SearchScreen2";
 import ExploreScreens from "../../screens/HomeScreens/ExploreScreens/ExploreScreens";
+import EventAddingScreen from "../../screens/OrgScreens/EventAddingScreen";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -116,7 +117,7 @@ function StackNavigator() {
                 <MaterialCommunityIcons
                   name="account-outline"
                   size={35}
-                  color={colors.darkGrey}
+                  color={colors.darkSeparator}
                 />
               )}
             </TouchableOpacity>
@@ -403,24 +404,24 @@ function StackNavigator() {
               </Text>
             </TouchableOpacity>
           ),
-          headerLeft: () => (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", left: 20 }}
-            >
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.canGoBack("venuesExplorer")
-                    ? navigation.goBack("venuesExplorer")
-                    : navigation.navigate("venuesExplorer")
-                }
-              >
-                <Entypo name="chevron-left" size={30} color={colors.primary} />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate("search")}>
-                <Entypo name="chevron-right" size={30} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          ),
+          // headerLeft: () => (
+          //   <View
+          //     style={{ flexDirection: "row", alignItems: "center", left: 20 }}
+          //   >
+          //     <TouchableOpacity
+          //       onPress={() =>
+          //         navigation.canGoBack("venuesExplorer")
+          //           ? navigation.goBack("venuesExplorer")
+          //           : navigation.navigate("venuesExplorer")
+          //       }
+          //     >
+          //       <Entypo name="chevron-left" size={30} color={colors.primary} />
+          //     </TouchableOpacity>
+          //     <TouchableOpacity onPress={() => navigation.navigate("search")}>
+          //       <Entypo name="chevron-right" size={30} color={colors.primary} />
+          //     </TouchableOpacity>
+          //   </View>
+          // ),
           title: "Calendário",
           headerShown: true,
           presentation: "transparentModal",
@@ -436,6 +437,28 @@ function StackNavigator() {
         }}
         name="profile"
         component={ProfileScreen}
+      />
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "Criar Evento",
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                left: 20,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={28}
+                color={colors.black}
+              />
+            </TouchableOpacity>
+          ),
+        }}
+        name="addEvent"
+        component={EventAddingScreen}
       />
     </Stack.Navigator>
   );
