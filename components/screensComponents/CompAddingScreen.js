@@ -49,9 +49,121 @@ import Animated, { SlideInDown } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
 import Screen from "../Screen";
+import { Calendar } from "react-native-calendars";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 const { height, width } = Dimensions.get("window");
 
 const Tab = createMaterialTopTabNavigator();
+
+export const DateSelector = ({
+  calendarModal,
+  setCalendarModal,
+  setDates,
+  dates,
+}) => {
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [selectedDay, setSelectedDay] = useState("");
+  const showDatePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    hideDatePicker();
+  };
+  const addDate = async (day) => {
+    const date = day.dateString;
+    setSelectedDay(day.dateString);
+    // setLoading(true);
+    await new Promise((resolve, reject) => {
+      setTimeout(resolve, 300);
+    });
+    setTimePickerVisibility(true)
+
+    // setLoading(false);
+  };
+  return (
+    <Modal animationType="slide" visible={calendarModal} style={{ flex: 1 }}>
+      {/* <Screen /> */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          //   backgroundColor:colors.white,
+          marginHorizontal: 20,
+          marginTop: 40,
+          marginBottom: 10,
+        }}
+      >
+        <Text
+          style={{
+            color: colors.darkSeparator,
+            fontSize: 18,
+            fontWeight: "600",
+          }}
+        >
+          Selecionar Data
+        </Text>
+        <TouchableOpacity
+          style={{
+            // left: 8,
+            alignSelf: "flex-end",
+            // padding: 10,
+          }}
+          onPress={() => setCalendarModal(false)}
+        >
+          <Text
+            style={{
+              color: colors.primary,
+              fontSize: 16,
+              fontWeight: "600",
+            }}
+          >
+            Voltar
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <Calendar
+        // onDayPress={(day) => {
+        //   setSelectedDay(day.dateString);
+        // }}
+        onDayPress={addDate}
+        theme={{
+          textSectionTitleColor: "#b6c1cd",
+          selectedDayBackgroundColor: colors.primary,
+          selectedDayTextColor: "#ffffff",
+          textMonthFontWeight: "500",
+          textDayFontWeight: "500",
+          todayTextColor: colors.primary,
+          arrowColor: colors.primary,
+          //  textDayHeaderFontWeight:"500",
+          // textDayHeaderFontSize:14,
+
+          // textDisabledColor: "#d9e",
+        }}
+        markedDates={{
+          [selectedDay]: {
+            selected: true,
+            disableTouchEvent: true,
+            selectedDotColor: "orange",
+          },
+        }}
+      />
+      <DateTimePickerModal
+        isVisible={isTimePickerVisible}
+        mode="datetime"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
+    </Modal>
+  );
+};
 export const TicketsSheet = ({
   tickets,
   setTickets,
@@ -254,8 +366,6 @@ export const EditTicketsSheet = ({
     selectedTicket?.ticket?.description
   );
   const [type, setType] = useState(selectedTicket?.ticket?.type);
-
-  console.log(selectedTicket?.ticket?.amount);
 
   const editTicket = () => {
     // Check if selectedTicket is defined and has a valid index
@@ -683,9 +793,9 @@ export const VenueSelector = ({
                   style={{ marginBottom: 5 }}
                   // autoFocus
                   underlineStyle={{ backgroundColor: colors.primary }}
-                //   contentStyle={{ borderRadius: 20 }}
+                  //   contentStyle={{ borderRadius: 20 }}
                   mode="outlined"
-                  outlineStyle={{borderRadius:15}}
+                  outlineStyle={{ borderRadius: 15 }}
                   activeOutlineColor={colors.primary}
                   label="pesquisar"
                   activeUnderlineColor={colors.primary}
@@ -1046,6 +1156,158 @@ export const VenueSelector = ({
   );
 };
 
+export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
+  // const bottomSheetModalRef = useRef(null);
+  const snapPoints = useMemo(() => ["55%", "75%"], []);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+  const handleSheetChanges = useCallback((index) => {}, []);
+  const [searchText, setSearchText] = useState("");
+
+  const addUser = () => {
+    const newUser = {
+      displayName: "Erickson",
+      username: "veiga.erickson",
+      id: uuid.v4(),
+      type: type,
+    };
+    let tempUsers = [...users];
+    tempUsers.push(newUser);
+
+    setUsers(tempUsers);
+
+    userSheetModalRef.current.close();
+  };
+
+  return (
+    <BottomSheetModalProvider>
+      <BottomSheetModal
+        // style={{backgroundColor:}}
+        ref={userSheetModalRef}
+        index={keyboardVisible ? 1 : 0}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <View style={{ padding: 10 }}>
+            <TextInput
+              // error={!searchText}
+              style={{ marginBottom: 10 }}
+              // autoFocus
+              underlineStyle={{ backgroundColor: colors.primary }}
+              // contentStyle={{
+              //   backgroundColor: colors.background,
+              //   fontWeight: "500",
+              // }}
+              mode="outlined"
+              placeholder="Pesquise por um usuário"
+              activeOutlineColor={colors.primary}
+              label="Nome"
+              activeUnderlineColor={colors.primary}
+              returnKeyType="search"
+              value={searchText}
+              cursorColor={colors.primary}
+              // onChangeText={(text) => setPerson({ ...person, email: text })}
+              onChangeText={setSearchText}
+            />
+            <Text style={{ color: colors.darkGrey, alignSelf: "center" }}>
+              1 resultado encontrado
+            </Text>
+            <TouchableOpacity
+              onPress={addUser}
+              activeOpacity={0.5}
+              style={{
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+                width: "100%",
+              }}
+              // onPress={() => navigation.navigate("event", item)}
+            >
+              <View style={styles.userCard}>
+                <Image
+                  source={{
+                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                  }}
+                  style={{
+                    width: 70,
+                    height: 70,
+                    borderRadius: 50,
+
+                    // marginLeft: 20,
+                    // position: "absolute",
+                  }}
+
+                  // resizeMode="contain"
+                />
+                <View style={{ alignItems: "center", marginLeft: 10 }}>
+                  <Text numberOfLines={2} style={[styles.displayName]}>
+                    Erickson{" "}
+                  </Text>
+                  <Text numberOfLines={2} style={[styles.userName]}>
+                    veiga.erickson{" "}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
+              onPress={() => {
+                Keyboard.dismiss(), setAdvance(true);
+              }}
+              style={{
+                marginTop: 20,
+                width: 150,
+                height: 40,
+                backgroundColor: colors.primary, // position: "absolute",
+                zIndex: 1,
+                // top: 10,
+                // left: 10,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 3,
+                shadowColor: colors.dark,
+                flexDirection: "row",
+                alignSelf: "center",
+              }}
+              activeOpacity={0.5}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: colors.white,
+                  fontWeight: "500",
+                  marginRight: 10,
+                }}
+              >
+                Avançar
+              </Text>
+            </TouchableOpacity> */}
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
+  );
+};
 const styles = StyleSheet.create({
   sheetContainer: {
     flex: 1,
@@ -1080,5 +1342,47 @@ const styles = StyleSheet.create({
     backgroundColor: colors.grey,
     marginBottom: 2,
     alignSelf: "center",
+  },
+  userCard: {
+    flexDirection: "row",
+    marginBottom: 10,
+    padding: 10,
+
+    // height: 95,
+    backgroundColor: colors.white,
+    overflow: "hidden",
+    width: "95%",
+    alignSelf: "center",
+
+    borderRadius: 10,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 1,
+    // shadowRadius: 1,
+    // elevation: 3,
+  },
+  userName: {
+    fontSize: 14,
+    alignSelf: "flex-start",
+    color: colors.description,
+    fontWeight: "600",
+  },
+  userSearch: {
+    height: 40,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: colors.white,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 15,
+    // paddingLeft: 40,
+  },
+  displayName: {
+    alignSelf: "flex-start",
+    fontSize: 19,
+    fontWeight: "600",
+    color: colors.primary,
+    marginTop: 10,
+    marginVertical: 5,
   },
 });

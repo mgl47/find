@@ -39,10 +39,13 @@ import colors from "../../components/colors";
 import ImageImputList from "../../components/ImageInputs/ImageImputList";
 import { TextInput } from "react-native-paper";
 import {
+  DateSelector,
   EditTicketsSheet,
   TicketsSheet,
+  UserSelector,
   VenueSelector,
 } from "../../components/screensComponents/CompAddingScreen";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -74,9 +77,68 @@ import {
 function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [ticketsSheetup, setTicketsSheetup] = useState(false);
   const [editTicketsSheetup, setEditTicketsSheetup] = useState(false);
+  const [userModalUp, setUserModalUp] = useState(false);
+  const [dates, setDates] = useState([]);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const handleConfirm = (selectedDate) => {
+    // console.warn("A date has been picked: ", date);
+    const month = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dec",
+    ];
+    const weekday = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+    // const dateDay = dates[0]?.getDate();
+    // const dateWeekDay = dates[0]?.getDay();
+    // const dateMonth = dates[0]?.getMonth();
+
+    const hour = selectedDate?.getHours();
+    const minutes = selectedDate?.getMinutes();
+
+    const dateDay = selectedDate?.getDate();
+    const dateWeekDay = selectedDate?.getDay();
+    const dateMonth = selectedDate?.getMonth();
+
+    const date = {
+      date: selectedDate,
+      hour: `${hour < 10 ? "0" + hour : hour}:${
+        minutes < 10 ? "0" + minutes : minutes
+      }`,
+      displayDate:
+        dates?.length > 0
+          ? `${weekday[dateWeekDay]}, ${
+              dates[0]?.displayDate.split(" ")[1] + "-" + dateDay
+            } ${month[dateMonth]}`
+          : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+
+      calendarDate: `${selectedDate.getFullYear()}-${
+        selectedDate.getMonth() + 1 < 10 ? "0" : ""
+      }${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`,
+    };
+    setShowTimePicker(false);
+    let newDates = dates;
+    newDates.push(date);
+    setDates(dates);
+  };
+  console.log(dates);
+  // console.log(dates[0]?.displayDate.split(" ")[1]);
 
   const ticketsSheetRef = useRef(null);
   const editTicketSheeRef = useRef(null);
+  const artSheetModalRef = useRef(null);
+  const orgSheetModalRef = useRef(null);
+
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState("");
   const handleTicketSheet = useCallback(() => {
@@ -91,6 +153,15 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     editTicketSheeRef.current?.present();
     // setSelectedTicket("");
   }, []);
+  const handleOrgSheet = useCallback(() => {
+    orgSheetModalRef.current?.present();
+  }, []);
+  const handleArtSheet = useCallback(() => {
+    artSheetModalRef.current?.present();
+  }, []);
+
+  const [artists, setArtists] = useState([]);
+  const [organizers, setOrganizers] = useState([]);
 
   const deleteTicket = (ticket) => {
     const updatedTickets = tickets?.filter((item) => item.id != ticket.id);
@@ -127,7 +198,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [price, setPrice] = useState(0);
   const [priceError, setPriceError] = useState(true);
 
-  const [showZone, setShowZone] = useState(false);
+  const [freeEvent, setFreeEvent] = useState(false);
 
   const [addPhone, setAddPhone] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -397,7 +468,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
   return (
     <KeyboardAwareScrollView
-      // style={{ flex: 1 }}
+      style={{ flex: 1 }}
       enableOnAndroid={true}
       contentContainerStyle={[
         styles.container,
@@ -417,26 +488,21 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         <Text style={styles.errorMessage}>Escolha de 1 a 7 fotos!</Text>
       ) : null}
 
-      {/* <TextInput
-        textColor={colors.black}
-        placeholderTextColor={colors.description}
-        backgroundColor={colors.light2}
-        placeholder={"Título"}
-        onChangeText={handleTitle}
-        returnKeyType="done"
-        width={"90%"}
-        padding={15}
-        maxLength={100}
-        onSubmitEditing={() => inputRef1.current.focus()}
-      /> */}
       <TextInput
         error={!title}
-        style={{ marginBottom: 5 }}
+        style={{ marginBottom: 10 }}
         // autoFocus
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        // contentStyle={{
+        //   backgroundColor: colors.background,
+        //   fontWeight: "500",
+        // }}
+        mode="outlined"
+        activeOutlineColor={colors.primary}
         label="título"
         activeUnderlineColor={colors.primary}
+        // defaultValue={String(selectedTicket?.ticket?.price)}
+
         value={title}
         cursorColor={colors.primary}
         // onChangeText={(text) => setPerson({ ...person, email: text })}
@@ -444,11 +510,12 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       />
 
       <TextInput
-        error={!title}
-        style={{ marginBottom: 20, backgroundColor: colors.background }}
-        // autoFocus
+        error={!description}
+        style={{ marginBottom: 5 }}
+        mode="outlined"
+        activeOutlineColor={colors.primary}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="descrição"
         activeUnderlineColor={colors.primary}
         value={description}
@@ -457,6 +524,69 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         // onChangeText={(text) => setPerson({ ...person, email: text })}
         onChangeText={setDescription}
       />
+      <View style={[styles.switchContainer]}>
+        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+          Adicionar Datas
+        </Text>
+        <TouchableOpacity
+          style={styles.switch}
+          onPress={() => setShowTimePicker(true)}
+        >
+          <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <DateTimePickerModal
+        isVisible={showTimePicker}
+        mode="datetime"
+        onConfirm={handleConfirm}
+        onCancel={() => setShowTimePicker(false)}
+        minimumDate={dates[dates?.length - 1]?.date || new Date()}
+      />
+
+      {dates?.map((date) => (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginHorizontal: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.darkSeparator,
+              fontSize: 15,
+              right: 10,
+              padding: 3,
+              fontWeight: "600",
+            }}
+          >
+            {date?.displayDate + " às " + date?.hour}
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              setDates(dates?.filter((item) => item?.date != date?.date))
+            }
+          >
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 14,
+                right: 10,
+                padding: 3,
+                fontWeight: "600",
+              }}
+            >
+              apagar
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ))}
 
       <View style={[styles.switchContainer]}>
         <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
@@ -468,11 +598,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           }}
           thumbColor={colors.white}
           style={styles.switch}
-          value={showZone}
-          onValueChange={(newValue) => setShowZone(newValue)}
+          value={freeEvent}
+          onValueChange={(newValue) => setFreeEvent(newValue)}
         />
       </View>
-      {tickets?.length > 0 && (
+      {!freeEvent && tickets?.length > 0 && (
         <Text
           style={{
             fontSize: 19,
@@ -486,117 +616,122 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           Bilhetes
         </Text>
       )}
-      {tickets?.map((item, index) => {
-        return (
-          <>
-            <View
-              activeOpacity={0.5}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
-                width: "100%",
-              }}
-              // onPress={() => navigation.navigate("event", item)}
-            >
-              <View style={styles.card}>
-                <View
-                  style={{
-                    width: "70%",
-                    // backgroundColor: colors.light2,
-                    padding: 10,
-                  }}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text numberOfLines={2} style={[styles.price]}>
-                      cve {item?.price}
-                    </Text>
-                    <Text numberOfLines={2} style={[styles.priceType]}>
-                      {item?.type}
-                    </Text>
+      {!freeEvent &&
+        tickets?.map((item, index) => {
+          return (
+            <>
+              <View
+                activeOpacity={0.5}
+                style={{
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 1,
+                  elevation: 2,
+                  width: "100%",
+                }}
+                // onPress={() => navigation.navigate("event", item)}
+              >
+                <View style={styles.card}>
+                  <View
+                    style={{
+                      width: "70%",
+                      // backgroundColor: colors.light2,
+                      padding: 10,
+                    }}
+                  >
                     <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        // position: "absolute",
-                        // right: 5,
-                        marginLeft: 20,
-                      }}
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      <Text
-                        numberOfLines={2}
+                      <Text numberOfLines={2} style={[styles.price]}>
+                        cve {item?.price}
+                      </Text>
+                      <Text numberOfLines={2} style={[styles.priceType]}>
+                        {item?.type}
+                      </Text>
+                      <View
                         style={{
-                          fontSize: 15,
-                          color: colors.black2,
-                          marginRight: 5,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          // position: "absolute",
+                          // right: 5,
+                          marginLeft: 20,
                         }}
                       >
-                        Qtd:
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={{ fontSize: 15, color: colors.darkSeparator }}
-                      >
-                        {item?.amount}
-                      </Text>
+                        <Text
+                          numberOfLines={2}
+                          style={{
+                            fontSize: 15,
+                            color: colors.black2,
+                            marginRight: 5,
+                          }}
+                        >
+                          Qtd:
+                        </Text>
+                        <Text
+                          numberOfLines={2}
+                          style={{ fontSize: 15, color: colors.darkSeparator }}
+                        >
+                          {item?.amount}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
 
-                  <Text style={styles.description}>{item?.description}</Text>
+                    <Text style={styles.description}>{item?.description}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                alignSelf: "flex-end",
-                paddingRight: 15,
-                marginBottom: 5,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => handleEditTicketSheet(item, index)}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  alignSelf: "flex-end",
+                  paddingRight: 15,
+                  marginBottom: 5,
+                }}
               >
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.primary,
-                    fontWeight: "500",
-                    marginRight: 10,
-                  }}
+                <TouchableOpacity
+                  onPress={() => handleEditTicketSheet(item, index)}
                 >
-                  Editar
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => deleteTicket(item)}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.primary,
-                    fontWeight: "500",
-                  }}
-                >
-                  Apagar
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        );
-      })}
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Adicionar Bilhetes
-        </Text>
-        <TouchableOpacity style={styles.switch} onPress={handleTicketSheet}>
-          <Ionicons
-            name={"add-circle-outline"}
-            size={40}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.primary,
+                      fontWeight: "500",
+                      marginRight: 10,
+                    }}
+                  >
+                    Editar
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteTicket(item)}>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: colors.primary,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Apagar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          );
+        })}
+      {!freeEvent && (
+        <View style={[styles.switchContainer]}>
+          <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+            Adicionar Bilhetes
+          </Text>
+          <TouchableOpacity style={styles.switch} onPress={handleTicketSheet}>
+            <Ionicons
+              name={"add-circle-outline"}
+              size={30}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.sparator} />
       {!venue && (
         <View style={[styles.switchContainer]}>
@@ -609,7 +744,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           >
             <Ionicons
               name={"add-circle-outline"}
-              size={40}
+              size={30}
               color={colors.primary}
             />
           </TouchableOpacity>
@@ -734,6 +869,128 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         setVenueModal={setVenueModal}
         setVenue={setVenue}
         venue={venue}
+      />
+
+      <View style={[styles.switchContainer]}>
+        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+          Adicionar Artistas
+        </Text>
+        <TouchableOpacity style={styles.switch} onPress={handleArtSheet}>
+          <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+      <View>
+        <FlatList
+          // style={{  height: 300 }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={artists}
+          keyExtractor={(item) => item?.id}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  padding: 5,
+                  alignItems: "center",
+                  // justifyContent: "center",
+                }}
+                onPress={() => navigation.navigate("artist", item)}
+              >
+                <Image
+                  style={{
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    marginBottom: 2,
+                    borderWidth: 0.009,
+                  }}
+                  source={{
+                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                  }}
+                />
+                <Text
+                  style={{
+                    width: item?.displayName?.length > 15 ? 100 : null,
+                    textAlign: "center",
+                  }}
+                >
+                  {item?.displayName}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
+      <UserSelector
+        type={"artist"}
+        users={artists}
+        setUsers={setArtists}
+        userSheetModalRef={artSheetModalRef}
+      />
+
+      <View style={[styles.switchContainer]}>
+        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+          Adicionar Organizadores
+        </Text>
+        <TouchableOpacity style={styles.switch} onPress={handleOrgSheet}>
+          <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+      <View>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={organizers}
+          keyExtractor={(item) => item?.id}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity
+                style={{
+                  padding: 5,
+                  alignItems: "center",
+                  // justifyContent: "center",
+                }}
+                onPress={() => navigation.navigate("artist", item)}
+              >
+                <Image
+                  style={{
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    marginBottom: 2,
+                    borderWidth: 0.009,
+                  }}
+                  source={{
+                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                  }}
+                />
+                <Text
+                  style={{
+                    width: item?.displayName?.length > 15 ? 100 : null,
+                    textAlign: "center",
+                  }}
+                >
+                  {item?.displayName}
+                </Text>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
+
+      <UserSelector
+        type={"organizer"}
+        users={organizers}
+        setUsers={setOrganizers}
+        userSheetModalRef={orgSheetModalRef}
       />
 
       {/* <View>
@@ -984,7 +1241,7 @@ const styles = StyleSheet.create({
   container: {
     // backgroundColor: colors.light,
     padding: 10,
-    flex: 1,
+    // flex: 1,
   },
 
   imput: {
@@ -1007,8 +1264,8 @@ const styles = StyleSheet.create({
   },
   switchContainer: {
     flexDirection: "row",
-    marginBottom: 10,
-    height: 40,
+    marginVertical: 15,
+    // height: 40,
     width: "100%",
     // backgroundColor: colors.light2,
     alignItems: "center",
