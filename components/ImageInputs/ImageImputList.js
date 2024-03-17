@@ -1,15 +1,37 @@
 import React, { useRef } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import ImageImput from "./ImageImput";
 import { ScrollView } from "react-native";
 
-function ImageImputList({ imageUris = [], onRemoveImage, onAddImage }) {
+function ImageImputList({
+  imageUris = [],
+  onRemoveImage,
+  onAddImage,
+  handleImageScroll,
+  setScrollIndex,
+}) {
   const scrollView = useRef();
 
+  function handleOnScroll(event) {
+    setScrollIndex(
+      event.nativeEvent.contentOffset.x / Dimensions.get("window").width
+    );
+    //calculate screenIndex by contentOffset and screen width
+    console.log(
+      "currentScreenIndex",
+      parseInt(
+        event.nativeEvent.contentOffset.x / Dimensions.get("window").width
+      )
+    );
+  }
+  // console.log(scrollView.current.index);
   return (
     <ScrollView
+      // onScroll={(e) => handleImageScroll(e)}
+      // scrollEventThrottle={16}
       ref={scrollView}
       horizontal
+      pagingEnabled
       onContentSizeChange={() => scrollView.current.scrollToEnd()}
     >
       <View style={styles.container}>
@@ -34,6 +56,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   image: {
-    marginRight: 10,
+    // marginRight: 10,
   },
 });

@@ -121,12 +121,13 @@ export default function HomeScreen({ navigation }) {
             </>
           }
         />
-        <AuthBottomSheet
+    
+      </View>
+      <AuthBottomSheet
           bottomSheetModalRef={bottomSheetModalRef}
           setAuthModalUp={setAuthModalUp}
         
         />
-      </View>
     </>
   );
 }

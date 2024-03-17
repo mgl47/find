@@ -75,8 +75,7 @@ const SignUpScreen = () => {
 
         setUser(response.data.user);
         await AsyncStorage.setItem("headerToken", response.data.token);
-        navigation.openDrawer() 
-
+        navigation.openDrawer();
       }
     } catch (error) {
       if (error.response) {
@@ -91,14 +90,24 @@ const SignUpScreen = () => {
   };
 
   return (
-    <KeyboardAwareScrollView style={{ padding: 10 ,flex:1 ,backgroundColor:colors.background,marginBottom:200}}>
+    <KeyboardAwareScrollView
+      style={{
+        padding: 10,
+        flex: 1,
+        backgroundColor: colors.background,
+        // marginBottom: 200,
+      }}
+    >
       <BlockModal active={loading} />
 
       <TextInput
         error={!isUsernameValid}
-        style={{ marginBottom: 5 }}
+        style={{ marginBottom: 10 }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        mode="outlined"
+        outlineColor={colors.primary}
+        activeOutlineColor={colors.primary}
+        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Nome de usuário (único)"
         activeUnderlineColor={colors.primary}
         value={person?.username}
@@ -107,9 +116,12 @@ const SignUpScreen = () => {
       />
       <TextInput
         error={!isEmailValid}
-        style={{ marginBottom: 5 }}
+        style={{ marginBottom: 10 }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        mode="outlined"
+        activeOutlineColor={colors.primary}
+        outlineColor={colors.primary}
+        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         label="Email"
         activeUnderlineColor={colors.primary}
         value={person?.email}
@@ -119,9 +131,12 @@ const SignUpScreen = () => {
         // onChangeText={(text) => setUser({ ...user, email: text })}
       />
       <TextInput
-        style={{ marginBottom: 5, backgroundColor: colors.background }}
+        style={{ marginBottom: 10, backgroundColor: colors.background }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        mode="outlined"
+        outlineColor={colors.primary}
+        activeOutlineColor={colors.primary}
+        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         right={
           <TextInput.Icon
             onPress={() => setShowPassword(!showPassword)}
@@ -137,9 +152,13 @@ const SignUpScreen = () => {
       />
       <TextInput
         error={!isPasswordValid}
-        style={{ marginBottom: 30, backgroundColor: colors.background }}
+        mode="outlined"
+        outlineColor={colors.primary}
+        activeOutlineColor={colors.primary}
+        style={{ marginBottom: 20, backgroundColor: colors.background }}
+        // style={{ marginBottom: 30, backgroundColor: colors.background }}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
         right={
           <TextInput.Icon
             onPress={() => setShowRepPassword(!showRepPassword)}
@@ -154,7 +173,7 @@ const SignUpScreen = () => {
         onSubmitEditing={validated ? signUp : null}
         autoCapitalize="none"
       />
-      <View >
+      <View>
         <Text
           style={{
             position: "absolute",

@@ -10,10 +10,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(find) to access your camera",
-          "microphonePermission": "Allow $(find) to access your microphone",
-          "recordAudioAndroid": true
-
+          "cameraPermission": "Permita $(find) ter acesso a sua câmera!"
         }
       ]
     ],
@@ -22,9 +19,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

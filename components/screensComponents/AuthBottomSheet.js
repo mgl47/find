@@ -27,7 +27,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 
 const Tab = createMaterialTopTabNavigator();
 const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
-  const snapPoints = useMemo(() => ["60", "90%"], []);
+  const snapPoints = useMemo(() => ["60", "80%"], []);
 
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -51,42 +51,53 @@ const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
     <BottomSheetModalProvider>
       <BottomSheetModal
         ref={bottomSheetModalRef}
-        index={keyboardVisible ? 1 : 0}
+        // index={keyboardVisible ? 1 : 0}
+        index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
           setAuthModalUp(false);
         }}
       >
-        {/* <BottomSheetView style={styles.contentContainer}> */}
-        <BottomSheetScrollView contentContainerStyle={{ flex: 1 }}>
-          {/* <View style={{ flex: 1 }}> */}
-          <Tab.Navigator
-            screenOptions={{
-              tabBarActiveTintColor: colors.primary,
+         <KeyboardAwareScrollView
+        contentContainerStyle={{ flex: 1 }}
+          style={{
+            padding: 10,
+            flex: 1,
+            backgroundColor: colors.background,
+            // marginBottom: 200,
+          }}
+        >
+          {/* <BottomSheetView style={styles.contentContainer}> */}
+          <BottomSheetScrollView contentContainerStyle={{ flex: 1 }}>
+            {/* <View style={{ flex: 1 }}> */}
+            <Tab.Navigator
+              screenOptions={{
+                tabBarActiveTintColor: colors.primary,
 
-              tabBarInactiveTintColor: colors.darkGrey,
-              tabBarIndicatorContainerStyle: {
-                backgroundColor: colors.background,
-              },
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 14,
-                color: colors.black2,
-              },
-              tabBarIndicatorStyle: {
-                width: "40%",
-                left: "5%",
-                backgroundColor: colors.primary,
-              },
-            }}
-          >
-            <Tab.Screen name="Entrar" component={SignInScreen} />
-            <Tab.Screen name="Criar Conta" component={SignUpScreen} />
-          </Tab.Navigator>
-          {/* </View> */}
-          {/* </BottomSheetView> */}
-        </BottomSheetScrollView>
+                tabBarInactiveTintColor: colors.darkGrey,
+                tabBarIndicatorContainerStyle: {
+                  backgroundColor: colors.background,
+                },
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 14,
+                  color: colors.black2,
+                },
+                tabBarIndicatorStyle: {
+                  width: "40%",
+                  left: "5%",
+                  backgroundColor: colors.primary,
+                },
+              }}
+            >
+              <Tab.Screen name="Entrar" component={SignInScreen} />
+              <Tab.Screen name="Criar Conta" component={SignUpScreen} />
+            </Tab.Navigator>
+            {/* </View> */}
+            {/* </BottomSheetView> */}
+          </BottomSheetScrollView>
+        </KeyboardAwareScrollView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );

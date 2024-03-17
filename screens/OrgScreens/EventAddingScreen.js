@@ -21,6 +21,7 @@ import {
   Platform,
   FlatList,
   Modal,
+  Dimensions,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -46,6 +47,7 @@ import {
   VenueSelector,
 } from "../../components/screensComponents/CompAddingScreen";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import VideoInputList from "../../components/ImageInputs/VideoInputList";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -110,17 +112,52 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     const dateWeekDay = selectedDate?.getDay();
     const dateMonth = selectedDate?.getMonth();
 
+    // const date = {
+    //   date: selectedDate,
+    //   hour: `${hour < 10 ? "0" + hour : hour}:${
+    //     minutes < 10 ? "0" + minutes : minutes
+    //   }`,
+    //   displayDate:
+    //     dates?.length > 0
+    //       ? `${weekday[dateWeekDay]}, ${
+    //           dates[0]?.displayDate.split(" ")[1] + "-" + dateDay
+    //         } ${month[dateMonth]}`
+    //       : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+
+    //   calendarDate: `${selectedDate.getFullYear()}-${
+    //     selectedDate.getMonth() + 1 < 10 ? "0" : ""
+    //   }${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`,
+    // };
+
     const date = {
+      id: uuid.v4(),
       date: selectedDate,
       hour: `${hour < 10 ? "0" + hour : hour}:${
         minutes < 10 ? "0" + minutes : minutes
       }`,
-      displayDate:
+
+      fullDisplayDate:
         dates?.length > 0
-          ? `${weekday[dateWeekDay]}, ${
-              dates[0]?.displayDate.split(" ")[1] + "-" + dateDay
-            } ${month[dateMonth]}`
+          ? `${dates[0]?.displayDate.split(",")[0]},${
+              dates[0]?.displayDate.split(" ")[2] != month[dateMonth]
+                ? " " + dates[0]?.displayDate.split(" ")[1]
+                : ""
+            } ${
+              dates[0]?.displayDate.split(" ")[2] != month[dateMonth]
+                ? dates[0]?.displayDate.split(" ")[2] +
+                  " - " +
+                  dateDay +
+                  " " +
+                  month[dateMonth]
+                : dates[0]?.displayDate.split(" ")[1] +
+                  "-" +
+                  dateDay +
+                  " " +
+                  month[dateMonth]
+            }`
           : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+
+      displayDate: `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
 
       calendarDate: `${selectedDate.getFullYear()}-${
         selectedDate.getMonth() + 1 < 10 ? "0" : ""
@@ -131,7 +168,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     newDates.push(date);
     setDates(dates);
   };
-  console.log(dates);
+  // console.log(dates);
   // console.log(dates[0]?.displayDate.split(" ")[1]);
 
   const ticketsSheetRef = useRef(null);
@@ -141,17 +178,16 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState("");
-  const handleTicketSheet = useCallback(() => {
-    setTicketsSheetup(true);
-
+  const handleTicketSheet = useCallback((ticket, index) => {
+    // setTicketsSheetup(true);
+    setSelectedTicket({ ticket, index });
     ticketsSheetRef.current?.present();
     // setSelectedTicket("");
-  }, [selectedTicket]);
+  }, []);
   const handleEditTicketSheet = useCallback((ticket, index) => {
-    setEditTicketsSheetup(true);
     setSelectedTicket({ ticket, index });
+
     editTicketSheeRef.current?.present();
-    // setSelectedTicket("");
   }, []);
   const handleOrgSheet = useCallback(() => {
     orgSheetModalRef.current?.present();
@@ -194,7 +230,9 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [phone1, setPhone1] = useState(0);
   const [phone2, setPhone2] = useState([]);
   const [imageUris, setImageUris] = useState([]);
-
+  const [imageScrollIndex, setImageScrollIndex] = useState(0);
+  const [videoUris, setVideoUris] = useState([]);
+  const [videoScrollIndex, setVideoScrollIndex] = useState(0);
   const [price, setPrice] = useState(0);
   const [priceError, setPriceError] = useState(true);
 
@@ -211,22 +249,44 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       setBlockModal(false);
     }
   }, [loading]);
-
   const inputRef1 = useRef(null);
-  const handleAdd = (uris) => {
-    console.log(uris?.length);
-
-    if (imageUris.length + uris.length <= 7) {
-      setImageUris([...imageUris, ...uris]); // Update to handle array of URIs
+  const handleAddVideo = (uris) => {
+    if (videoUris.length < 2) {
+      setVideoUris([...videoUris, uris]); // Update to handle array of URIs
     } else {
-      console.log("Cannot add more than 7 images");
-      // showMessage({
-      //   message: "Cannot add more than 7 images",
-      //   type: "warning",
-      //   floating: true,
-      //   animationDuration: 400,
-      //   backgroundColor: colors.secondary,
-      // });
+      showMessage({
+        message: "Cannot add more than 7 images",
+        type: "warning",
+        floating: true,
+        animationDuration: 400,
+        backgroundColor: colors.secondary,
+      });
+    }
+  };
+  function handleOnScroll(event) {
+    //calculate screenIndex by contentOffset and screen width
+    console.log(
+      "currentScreenIndex",
+      parseInt(
+        event.nativeEvent.contentOffset.x / Dimensions.get("window").width
+      )
+    );
+  }
+
+  const handleRemoveVideo = (uri) => {
+    setVideoUris(videoUris.filter((videoUri) => videoUri !== uri));
+  };
+  const handleAdd = (uris) => {
+    if (imageUris.length < 10) {
+      setImageUris([...imageUris, uris]); // Update to handle array of URIs
+    } else {
+      showMessage({
+        message: "Cannot add more than 7 images",
+        type: "warning",
+        floating: true,
+        animationDuration: 400,
+        backgroundColor: colors.secondary,
+      });
     }
   };
   const handleRemove = (uri) => {
@@ -467,533 +527,764 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const phoneWifi = "172.20.10.8";
 
   return (
-    <KeyboardAwareScrollView
-      style={{ flex: 1 }}
-      enableOnAndroid={true}
-      contentContainerStyle={[
-        styles.container,
-
-        // { backgroundColor: colors.light },
-      ]}
-      extraScrollHeight={100}
-      keyboardShouldPersistTaps={"handled"}
-    >
-      <ImageImputList
-        imageUris={imageUris}
-        onAddImage={handleAdd}
-        onRemoveImage={handleRemove}
-      />
-
-      {imageUris.length < 1 ? (
-        <Text style={styles.errorMessage}>Escolha de 1 a 7 fotos!</Text>
-      ) : null}
-
-      <TextInput
-        error={!title}
-        style={{ marginBottom: 10 }}
-        // autoFocus
-        underlineStyle={{ backgroundColor: colors.primary }}
-        // contentStyle={{
-        //   backgroundColor: colors.background,
-        //   fontWeight: "500",
-        // }}
-        mode="outlined"
-        activeOutlineColor={colors.primary}
-        label="título"
-        activeUnderlineColor={colors.primary}
-        // defaultValue={String(selectedTicket?.ticket?.price)}
-
-        value={title}
-        cursorColor={colors.primary}
-        // onChangeText={(text) => setPerson({ ...person, email: text })}
-        onChangeText={setTitle}
-      />
-
-      <TextInput
-        error={!description}
-        style={{ marginBottom: 5 }}
-        mode="outlined"
-        activeOutlineColor={colors.primary}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-        label="descrição"
-        activeUnderlineColor={colors.primary}
-        value={description}
-        multiline
-        cursorColor={colors.primary}
-        // onChangeText={(text) => setPerson({ ...person, email: text })}
-        onChangeText={setDescription}
-      />
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Adicionar Datas
-        </Text>
-        <TouchableOpacity
-          style={styles.switch}
-          onPress={() => setShowTimePicker(true)}
-        >
-          <Ionicons
-            name={"add-circle-outline"}
-            size={30}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <DateTimePickerModal
-        isVisible={showTimePicker}
-        mode="datetime"
-        onConfirm={handleConfirm}
-        onCancel={() => setShowTimePicker(false)}
-        minimumDate={dates[dates?.length - 1]?.date || new Date()}
-      />
-
-      {dates?.map((date) => (
+    <>
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        enableOnAndroid={true}
+        contentContainerStyle={
+          [
+            // styles.container,
+            // { backgroundColor: colors.light },
+          ]
+        }
+        extraScrollHeight={100}
+        keyboardShouldPersistTaps={"handled"}
+      >
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            marginHorizontal: 10,
+            marginHorizontal: 20,
           }}
         >
           <Text
-            style={{
-              color: colors.darkSeparator,
-              fontSize: 15,
-              right: 10,
-              padding: 3,
-              fontWeight: "600",
-            }}
+            style={[
+              styles.switchText,
+              {
+                color: colors.darkSeparator,
+                marginVertical: 10,
+                alignSelf: "flex-start",
+              },
+            ]}
           >
-            {date?.displayDate + " às " + date?.hour}
+            Vídeos
           </Text>
-          <TouchableOpacity
-            onPress={() =>
-              setDates(dates?.filter((item) => item?.date != date?.date))
-            }
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: colors.primary,
+                marginVertical: 10,
+                alignSelf: "flex-start",
+              },
+            ]}
           >
+            {`${videoUris?.length} de 2 adicionados`}
+          </Text>
+        </View>
+        <VideoInputList
+          videoUris={videoUris}
+          onAddVideo={handleAddVideo}
+          onRemoveVideo={handleRemoveVideo}
+        />
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginHorizontal: 20,
+          }}
+        >
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: colors.darkSeparator,
+                marginVertical: 10,
+                alignSelf: "flex-start",
+              },
+            ]}
+          >
+            Fotos
+          </Text>
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: colors.primary,
+                marginVertical: 10,
+                alignSelf: "flex-start",
+              },
+            ]}
+          >
+            {`${imageUris?.length} de 10 adicionados`}
+          </Text>
+        </View>
+
+        <ImageImputList
+          // handleImageScroll={handleImageScroll}
+          imageUris={imageUris}
+          onAddImage={handleAdd}
+          onRemoveImage={handleRemove}
+        />
+
+        <View style={styles.container}>
+          <TextInput
+            error={!title}
+            style={{ marginBottom: 10, backgroundColor: colors.background }}
+            // autoFocus
+            underlineStyle={{ backgroundColor: colors.primary }}
+            // contentStyle={{
+            //   backgroundColor: colors.background,
+            //   fontWeight: "500",
+            // }}
+            mode="outlined"
+            activeOutlineColor={colors.primary}
+            label="título"
+            activeUnderlineColor={colors.primary}
+            // defaultValue={String(selectedTicket?.ticket?.price)}
+
+            value={title}
+            cursorColor={colors.primary}
+            // onChangeText={(text) => setPerson({ ...person, email: text })}
+            onChangeText={setTitle}
+          />
+
+          <TextInput
+            error={!description}
+            style={{ marginBottom: 10, backgroundColor: colors.background }}
+            underlineStyle={{ backgroundColor: colors.primary }}
+            mode="outlined"
+            outlineColor={colors.primary}
+            activeOutlineColor={colors.primary}
+            activeUnderlineColor={colors.primary}
+            label="descrição"
+            value={description}
+            multiline
+            cursorColor={colors.primary}
+            // onChangeText={(text) => setPerson({ ...person, email: text })}
+            onChangeText={setDescription}
+          />
+          <View style={styles.separator} />
+
+          <DateTimePickerModal
+            // isDarkModeEnabled={true}
+            isVisible={showTimePicker}
+            mode="datetime"
+            onConfirm={handleConfirm}
+            onCancel={() => setShowTimePicker(false)}
+            // display="inline"
+            display="inline"
+            locale="Pt"
+            minimumDate={dates[dates?.length - 1]?.date || new Date()}
+          />
+          {dates?.length > 0 && (
             <Text
               style={{
+                fontSize: 19,
                 color: colors.primary,
-                fontSize: 14,
-                right: 10,
-                padding: 3,
-                fontWeight: "600",
+                fontWeight: "500",
+                marginLeft: 20,
+                // marginRight: 10,
+                marginBottom: 10,
               }}
             >
-              apagar
+              Datas
             </Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Evento Gratuito
-        </Text>
-        <Switch
-          trackColor={{
-            true: colors.primary,
-          }}
-          thumbColor={colors.white}
-          style={styles.switch}
-          value={freeEvent}
-          onValueChange={(newValue) => setFreeEvent(newValue)}
-        />
-      </View>
-      {!freeEvent && tickets?.length > 0 && (
-        <Text
-          style={{
-            fontSize: 19,
-            color: colors.darkSeparator,
-            fontWeight: "500",
-            marginLeft: 20,
-            // marginRight: 10,
-            marginBottom: 10,
-          }}
-        >
-          Bilhetes
-        </Text>
-      )}
-      {!freeEvent &&
-        tickets?.map((item, index) => {
-          return (
-            <>
-              <View
-                activeOpacity={0.5}
-                style={{
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 1,
-                  elevation: 2,
-                  width: "100%",
-                }}
-                // onPress={() => navigation.navigate("event", item)}
-              >
-                <View style={styles.card}>
-                  <View
-                    style={{
-                      width: "70%",
-                      // backgroundColor: colors.light2,
-                      padding: 10,
-                    }}
-                  >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <Text numberOfLines={2} style={[styles.price]}>
-                        cve {item?.price}
-                      </Text>
-                      <Text numberOfLines={2} style={[styles.priceType]}>
-                        {item?.type}
-                      </Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          // position: "absolute",
-                          // right: 5,
-                          marginLeft: 20,
-                        }}
-                      >
-                        <Text
-                          numberOfLines={2}
-                          style={{
-                            fontSize: 15,
-                            color: colors.black2,
-                            marginRight: 5,
-                          }}
-                        >
-                          Qtd:
-                        </Text>
-                        <Text
-                          numberOfLines={2}
-                          style={{ fontSize: 15, color: colors.darkSeparator }}
-                        >
-                          {item?.amount}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <Text style={styles.description}>{item?.description}</Text>
-                  </View>
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  alignSelf: "flex-end",
-                  paddingRight: 15,
-                  marginBottom: 5,
-                }}
-              >
-                <TouchableOpacity
-                  onPress={() => handleEditTicketSheet(item, index)}
-                >
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.primary,
-                      fontWeight: "500",
-                      marginRight: 10,
-                    }}
-                  >
-                    Editar
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => deleteTicket(item)}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: colors.primary,
-                      fontWeight: "500",
-                    }}
-                  >
-                    Apagar
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          );
-        })}
-      {!freeEvent && (
-        <View style={[styles.switchContainer]}>
-          <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-            Adicionar Bilhetes
-          </Text>
-          <TouchableOpacity style={styles.switch} onPress={handleTicketSheet}>
-            <Ionicons
-              name={"add-circle-outline"}
-              size={30}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-      <View style={styles.sparator} />
-      {!venue && (
-        <View style={[styles.switchContainer]}>
-          <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-            Selecionar Local
-          </Text>
-          <TouchableOpacity
-            style={styles.switch}
-            onPress={() => setVenueModal(true)}
-          >
-            <Ionicons
-              name={"add-circle-outline"}
-              size={30}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {venue && (
-        <>
-          <Text
-            style={{
-              fontSize: 19,
-              color: colors.darkSeparator,
-              fontWeight: "500",
-              marginLeft: 20,
-              // marginRight: 10,
-              marginBottom: 10,
-            }}
-          >
-            Local
-          </Text>
-          <View
-            style={{
-              // padding: 10,
-              borderBottomRightRadius: 10,
-              borderBottomLeftRadius: 10,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-              marginVertical: 7,
-            }}
-          >
+          )}
+          {dates?.map((date) => (
             <View
+              key={date.id}
               style={{
-                backgroundColor: colors.white,
-                borderRadius: 10,
-                // padding: 5,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                // marginHorizontal: 10,
               }}
             >
-              <TouchableOpacity
-                onPress={() => {
-                  {
-                    setVenueModal(true);
-                  }
-                }}
+              <Text
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: 10,
-                  alignItems: "center",
-                  padding: 2,
-                  // marginBottom: 5,
+                  color: colors.darkSeparator,
+                  fontSize: 15,
+                  left: 10,
+                  // padding: 3,
+                  fontWeight: "600",
                 }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  {venue?.uri && (
-                    <Image
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 50,
-                        borderWidth: 0.1,
-                      }}
-                      source={{
-                        uri: venue?.uri,
-                      }}
-                    />
-                  )}
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "500",
-                      marginLeft: 10,
-                    }}
-                  >
-                    {venue?.displayName}
-                  </Text>
-                </View>
-
+                {date?.displayDate + " às " + date?.hour}
+              </Text>
+              <TouchableOpacity
+                onPress={() =>
+                  setDates(dates?.filter((item) => item?.date != date?.date))
+                }
+              >
                 <Text
                   style={{
                     color: colors.primary,
                     fontSize: 14,
-                    right: 10,
+                    // right: 10,
                     padding: 3,
                     fontWeight: "600",
-                    paddingHorizontal: (venue?.id == venue?.id) == 1 ? 5 : 0,
-                    borderRadius: (venue?.id == venue?.id) == 1 ? 5 : 0,
-                    borderWidth: (venue?.id == venue?.id) == 1 ? 1 : 0,
-                    borderColor: colors.primary,
                   }}
                 >
-                  Alterar
+                  apagar
                 </Text>
               </TouchableOpacity>
-              {venue?.description && <View style={styles.separator} />}
-              {venue?.description && (
-                <View style={{ padding: 10 }}>
-                  <Text
+            </View>
+          ))}
+
+          {dates?.length > 1 && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+
+                marginHorizontal: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.description2,
+                  fontSize: 15,
+                  right: 10,
+                  padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                Data completo:
+              </Text>
+              <Text
+                style={{
+                  color: colors.darkSeparator,
+                  fontSize: 15,
+                  right: 10,
+                  padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                {dates[dates?.length - 1]?.fullDisplayDate +
+                  " às " +
+                  dates[0]?.hour}
+              </Text>
+            </View>
+          )}
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+              Adicionar Data
+            </Text>
+            <TouchableOpacity
+              style={styles.switch}
+              onPress={() => setShowTimePicker(true)}
+            >
+              {/* <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          /> */}
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 14,
+                  left: 20,
+                  padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                Adicionar
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.separator} />
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+              Evento Gratuito
+            </Text>
+            <Switch
+              trackColor={{
+                true: colors.primary,
+              }}
+              thumbColor={colors.white}
+              style={styles.switch}
+              value={freeEvent}
+              onValueChange={(newValue) => setFreeEvent(newValue)}
+            />
+          </View>
+          {!freeEvent && tickets?.length > 0 && (
+            <Text
+              style={{
+                fontSize: 19,
+                color: colors.primary,
+                fontWeight: "500",
+                marginLeft: 20,
+                // marginRight: 10,
+                marginBottom: 10,
+              }}
+            >
+              Bilhetes
+            </Text>
+          )}
+          {!freeEvent &&
+            tickets?.map((item, index) => {
+              return (
+                <View key={item?.id}>
+                  <View
+                    activeOpacity={0.5}
                     style={{
-                      fontSize: 13,
-                      fontWeight: "500",
-                      color: colors.darkGrey,
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 1,
+                      elevation: 2,
+                      width: "100%",
+                    }}
+                    // onPress={() => navigation.navigate("event", item)}
+                  >
+                    <View style={styles.card}>
+                      <View
+                        style={{
+                          width: "70%",
+                          // backgroundColor: colors.light2,
+                          padding: 10,
+                        }}
+                      >
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <Text numberOfLines={2} style={[styles.price]}>
+                            cve {item?.price}
+                          </Text>
+                          <Text numberOfLines={2} style={[styles.priceType]}>
+                            {item?.category}
+                          </Text>
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              // position: "absolute",
+                              // right: 5,
+                              marginLeft: 20,
+                            }}
+                          >
+                            <Text
+                              numberOfLines={2}
+                              style={{
+                                fontSize: 15,
+                                color: colors.black2,
+                                marginRight: 5,
+                              }}
+                            >
+                              Qtd:
+                            </Text>
+                            <Text
+                              numberOfLines={2}
+                              style={{
+                                fontSize: 15,
+                                color: colors.darkSeparator,
+                              }}
+                            >
+                              {item?.amount}
+                            </Text>
+                          </View>
+                        </View>
+
+                        <Text style={styles.description}>
+                          {item?.description}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      fontSize: 15,
+                      color: colors.darkSeparator,
+                      position: "absolute",
+                      bottom: 10,
+                      left: 30,
                     }}
                   >
-                    {venue?.description}
+                    {item?.dates?.length > 1
+                      ? `${item?.dates?.length} dias`
+                      : item?.dates[0]?.displayDate}
                   </Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      alignSelf: "flex-end",
+                      paddingRight: 15,
+                      marginBottom: 5,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPressIn={() =>
+                        setSelectedTicket({ ticket: item, index })
+                      }
+                      onPress={() => handleEditTicketSheet(item, index)}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          color: colors.primary,
+                          fontWeight: "500",
+                          marginRight: 10,
+                        }}
+                      >
+                        Editar
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => deleteTicket(item)}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          color: colors.primary,
+                          fontWeight: "500",
+                        }}
+                      >
+                        Apagar
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              )}
+              );
+            })}
+          {!freeEvent && (
+            <View style={[styles.switchContainer]}>
+              <Text
+                style={[styles.switchText, { color: colors.darkSeparator }]}
+              >
+                Adicionar Bilhete
+              </Text>
+              <TouchableOpacity
+                style={styles.switch}
+                onPress={handleTicketSheet}
+              >
+                {/* <Ionicons
+              name={"add-circle-outline"}
+              size={30}
+              color={colors.primary}
+            /> */}
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    left: 20,
+                    padding: 3,
+                    fontWeight: "600",
+                  }}
+                >
+                  Adicionar
+                </Text>
+              </TouchableOpacity>
             </View>
+          )}
+          <View style={styles.separator} />
+          {!venue && (
+            <View style={[styles.switchContainer]}>
+              <Text
+                style={[styles.switchText, { color: colors.darkSeparator }]}
+              >
+                Selecionar Local
+              </Text>
+              <TouchableOpacity
+                style={styles.switch}
+                onPress={() => setVenueModal(true)}
+              >
+                <Ionicons
+                  name={"add-circle-outline"}
+                  size={30}
+                  color={colors.primary}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {venue && (
+            <>
+              <Text
+                style={{
+                  fontSize: 19,
+                  color: colors.primary,
+                  fontWeight: "500",
+                  marginLeft: 20,
+                  // marginRight: 10,
+                  marginBottom: 10,
+                }}
+              >
+                Local
+              </Text>
+              <View
+                style={{
+                  // padding: 10,
+                  borderBottomRightRadius: 10,
+                  borderBottomLeftRadius: 10,
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 1,
+                  elevation: 2,
+                  marginVertical: 7,
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: colors.white,
+                    borderRadius: 10,
+                    // padding: 5,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      {
+                        setVenueModal(true);
+                      }
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      alignItems: "center",
+                      padding: 2,
+                      // marginBottom: 5,
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      {venue?.uri && (
+                        <Image
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 50,
+                            borderWidth: 0.1,
+                          }}
+                          source={{
+                            uri: venue?.uri,
+                          }}
+                        />
+                      )}
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                          marginLeft: 10,
+                        }}
+                      >
+                        {venue?.displayName}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{
+                        color: colors.primary,
+                        fontSize: 14,
+                        right: 10,
+                        padding: 3,
+                        fontWeight: "600",
+                        paddingHorizontal:
+                          (venue?.id == venue?.id) == 1 ? 5 : 0,
+                        borderRadius: (venue?.id == venue?.id) == 1 ? 5 : 0,
+                        borderWidth: (venue?.id == venue?.id) == 1 ? 1 : 0,
+                        borderColor: colors.primary,
+                      }}
+                    >
+                      Alterar
+                    </Text>
+                  </TouchableOpacity>
+                  {venue?.description && (
+                    <View
+                      style={{
+                        width: "95%",
+                        height: 1,
+                        backgroundColor: colors.grey,
+                        marginVertical: 5,
+                        alignSelf: "center",
+                      }}
+                    />
+                  )}
+                  {venue?.description && (
+                    <View style={{ padding: 10 }}>
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: "500",
+                          color: colors.darkGrey,
+                        }}
+                      >
+                        {venue?.description}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </>
+          )}
+          <VenueSelector
+            venueModal={venueModal}
+            setVenueModal={setVenueModal}
+            setVenue={setVenue}
+            venue={venue}
+          />
+          <View style={styles.separator} />
+
+          {artists?.length > 0 && (
+            <Text
+              style={{
+                fontSize: 19,
+                color: colors.primary,
+                fontWeight: "500",
+                marginLeft: 20,
+                // marginRight: 10,
+                marginBottom: 10,
+              }}
+            >
+              Artistas
+            </Text>
+          )}
+          <View>
+            <FlatList
+              // style={{  height: 300 }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={artists}
+              keyExtractor={(item) => item?.id}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      padding: 5,
+                      alignItems: "center",
+                      // justifyContent: "center",
+                    }}
+                    onPress={() => navigation.navigate("artist", item)}
+                  >
+                    <Image
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderRadius: 50,
+                        marginBottom: 2,
+                        borderWidth: 0.009,
+                      }}
+                      source={{
+                        uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                      }}
+                    />
+                    <Text
+                      style={{
+                        width: item?.displayName?.length > 15 ? 100 : null,
+                        textAlign: "center",
+                      }}
+                    >
+                      {item?.displayName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
-        </>
-      )}
-      <VenueSelector
-        venueModal={venueModal}
-        setVenueModal={setVenueModal}
-        setVenue={setVenue}
-        venue={venue}
-      />
-
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Adicionar Artistas
-        </Text>
-        <TouchableOpacity style={styles.switch} onPress={handleArtSheet}>
-          <Ionicons
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+              Adicionar Artista
+            </Text>
+            <TouchableOpacity style={styles.switch} onPress={handleArtSheet}>
+              {/* <Ionicons
             name={"add-circle-outline"}
             size={30}
             color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <FlatList
-          // style={{  height: 300 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={artists}
-          keyExtractor={(item) => item?.id}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
+          /> */}
+              <Text
                 style={{
-                  padding: 5,
-                  alignItems: "center",
-                  // justifyContent: "center",
+                  color: colors.primary,
+                  fontSize: 14,
+                  left: 20,
+                  padding: 3,
+                  fontWeight: "600",
                 }}
-                onPress={() => navigation.navigate("artist", item)}
               >
-                <Image
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 50,
-                    marginBottom: 2,
-                    borderWidth: 0.009,
-                  }}
-                  source={{
-                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                  }}
-                />
-                <Text
-                  style={{
-                    width: item?.displayName?.length > 15 ? 100 : null,
-                    textAlign: "center",
-                  }}
-                >
-                  {item?.displayName}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
-      <UserSelector
-        type={"artist"}
-        users={artists}
-        setUsers={setArtists}
-        userSheetModalRef={artSheetModalRef}
-      />
+                Adicionar
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.separator} />
+          {organizers?.length > 0 && (
+            <Text
+              style={{
+                fontSize: 19,
+                color: colors.primary,
+                fontWeight: "500",
+                marginLeft: 20,
+                // marginRight: 10,
+                marginBottom: 10,
+              }}
+            >
+              Organizadores
+            </Text>
+          )}
 
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Adicionar Organizadores
-        </Text>
-        <TouchableOpacity style={styles.switch} onPress={handleOrgSheet}>
-          <Ionicons
+          <View>
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={organizers}
+              keyExtractor={(item) => item?.id}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    style={{
+                      padding: 5,
+                      alignItems: "center",
+                      // justifyContent: "center",
+                    }}
+                    onPress={() => navigation.navigate("artist", item)}
+                  >
+                    <Image
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderRadius: 50,
+                        marginBottom: 2,
+                        borderWidth: 0.009,
+                      }}
+                      source={{
+                        uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                      }}
+                    />
+                    <Text
+                      style={{
+                        width: item?.displayName?.length > 15 ? 100 : null,
+                        textAlign: "center",
+                      }}
+                    >
+                      {item?.displayName}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
+              Adicionar Organizador
+            </Text>
+            <TouchableOpacity style={styles.switch} onPress={handleOrgSheet}>
+              {/* <Ionicons
             name={"add-circle-outline"}
             size={30}
             color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={organizers}
-          keyExtractor={(item) => item?.id}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
+          /> */}
+              <Text
                 style={{
-                  padding: 5,
-                  alignItems: "center",
-                  // justifyContent: "center",
+                  color: colors.primary,
+                  fontSize: 14,
+                  left: 20,
+                  padding: 3,
+                  fontWeight: "600",
                 }}
-                onPress={() => navigation.navigate("artist", item)}
               >
-                <Image
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 50,
-                    marginBottom: 2,
-                    borderWidth: 0.009,
-                  }}
-                  source={{
-                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                  }}
-                />
-                <Text
-                  style={{
-                    width: item?.displayName?.length > 15 ? 100 : null,
-                    textAlign: "center",
-                  }}
-                >
-                  {item?.displayName}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+                Adicionar
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.separator} />
 
-      <UserSelector
-        type={"organizer"}
-        users={organizers}
-        setUsers={setOrganizers}
-        userSheetModalRef={orgSheetModalRef}
-      />
-
-      {/* <View>
+          {/* <View>
         <TextInput
           textColor={colors.black}
           placeholderTextColor={colors.description}
@@ -1020,7 +1311,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           </Text>
         ) : null}
       </View> */}
-      {/* 
+          {/* 
       <View style={[styles.home, { backgroundColor: colors.light2 }]}>
         <FontAwesome
           name={"phone"}
@@ -1050,142 +1341,142 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         />
       </View> */}
 
-      {addPhone && (
-        <>
-          <View style={styles.phones}>
-            <TextInput
-              textColor={colors.black}
-              placeholderTextColor={colors.description}
-              backgroundColor={colors.light2}
-              placeholder={"Número de telefone"}
-              keyboardType={"phone-pad"}
-              returnKeyType="done"
-              onChangeText={handlePhoneNumberChange1}
-              value={String(phone1)}
-              maxLength={7}
-              width={"60%"}
-              padding={15}
-            />
-            <Dropdown
-              style={styles.dropdown}
-              containerStyle={[
-                styles.dropdownContainer,
-                {
-                  borderColor: colors.grey,
-                  backgroundColor: colors.light2,
-                },
-              ]}
-              placeholderStyle={[
-                styles.placeholderStyle,
-                {
-                  color: colors.darkGrey,
-                },
-              ]}
-              selectedTextStyle={[
-                styles.selectedTextStyle,
-                { color: colors.darkGrey },
-              ]}
-              itemTextStyle={[
-                styles.itemTextStyle,
-                {
-                  color: colors.black,
-                },
-              ]}
-              activeColor={colors.grey}
-              data={Operadoras}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="Operadora"
-              value={operadora1}
-              onChange={(item) => {
-                setOperadora1(item.value);
-              }}
-            />
-          </View>
-          {phoneError1 && (
-            <Text style={styles.errorMessage}>
-              Insira um número de telefone válido
-            </Text>
-          )}
-          <View style={styles.phones}>
-            <TextInput
-              textColor={colors.black}
-              placeholderTextColor={colors.description}
-              backgroundColor={colors.light2}
-              placeholder={"2° número de telefone"}
-              keyboardType={"phone-pad"}
-              returnKeyType="done"
-              onChangeText={handlePhoneNumberChange2}
-              // value={phone2}
-              maxLength={7}
-              width={"60%"}
-              padding={15}
-            />
+          {addPhone && (
+            <>
+              <View style={styles.phones}>
+                <TextInput
+                  textColor={colors.black}
+                  placeholderTextColor={colors.description}
+                  backgroundColor={colors.light2}
+                  placeholder={"Número de telefone"}
+                  keyboardType={"phone-pad"}
+                  returnKeyType="done"
+                  onChangeText={handlePhoneNumberChange1}
+                  value={String(phone1)}
+                  maxLength={7}
+                  width={"60%"}
+                  padding={15}
+                />
+                <Dropdown
+                  style={styles.dropdown}
+                  containerStyle={[
+                    styles.dropdownContainer,
+                    {
+                      borderColor: colors.grey,
+                      backgroundColor: colors.light2,
+                    },
+                  ]}
+                  placeholderStyle={[
+                    styles.placeholderStyle,
+                    {
+                      color: colors.darkGrey,
+                    },
+                  ]}
+                  selectedTextStyle={[
+                    styles.selectedTextStyle,
+                    { color: colors.darkGrey },
+                  ]}
+                  itemTextStyle={[
+                    styles.itemTextStyle,
+                    {
+                      color: colors.black,
+                    },
+                  ]}
+                  activeColor={colors.grey}
+                  data={Operadoras}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder="Operadora"
+                  value={operadora1}
+                  onChange={(item) => {
+                    setOperadora1(item.value);
+                  }}
+                />
+              </View>
+              {phoneError1 && (
+                <Text style={styles.errorMessage}>
+                  Insira um número de telefone válido
+                </Text>
+              )}
+              <View style={styles.phones}>
+                <TextInput
+                  textColor={colors.black}
+                  placeholderTextColor={colors.description}
+                  backgroundColor={colors.light2}
+                  placeholder={"2° número de telefone"}
+                  keyboardType={"phone-pad"}
+                  returnKeyType="done"
+                  onChangeText={handlePhoneNumberChange2}
+                  // value={phone2}
+                  maxLength={7}
+                  width={"60%"}
+                  padding={15}
+                />
 
-            <Dropdown
-              style={styles.dropdown}
-              containerStyle={[
-                styles.dropdownContainer,
-                {
-                  borderColor: colors.grey,
-                  backgroundColor: colors.light2,
-                },
-              ]}
-              placeholderStyle={[
-                styles.placeholderStyle,
-                {
-                  color: colors.darkGrey,
-                },
-              ]}
-              selectedTextStyle={[
-                styles.selectedTextStyle,
-                { color: colors.darkGrey },
-              ]}
-              itemTextStyle={[
-                styles.itemTextStyle,
-                {
-                  color: colors.black,
-                },
-              ]}
-              data={Operadoras}
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="Operadora"
-              value={operadora2}
-              onChange={(item) => {
-                setOperadora2(item.value);
-              }}
-            />
-          </View>
-          {phoneError2 && (
-            <Text style={styles.errorMessage}>
-              {" "}
-              Insira um número de telefone válido
-            </Text>
+                <Dropdown
+                  style={styles.dropdown}
+                  containerStyle={[
+                    styles.dropdownContainer,
+                    {
+                      borderColor: colors.grey,
+                      backgroundColor: colors.light2,
+                    },
+                  ]}
+                  placeholderStyle={[
+                    styles.placeholderStyle,
+                    {
+                      color: colors.darkGrey,
+                    },
+                  ]}
+                  selectedTextStyle={[
+                    styles.selectedTextStyle,
+                    { color: colors.darkGrey },
+                  ]}
+                  itemTextStyle={[
+                    styles.itemTextStyle,
+                    {
+                      color: colors.black,
+                    },
+                  ]}
+                  data={Operadoras}
+                  maxHeight={300}
+                  labelField="label"
+                  valueField="value"
+                  placeholder="Operadora"
+                  value={operadora2}
+                  onChange={(item) => {
+                    setOperadora2(item.value);
+                  }}
+                />
+              </View>
+              {phoneError2 && (
+                <Text style={styles.errorMessage}>
+                  {" "}
+                  Insira um número de telefone válido
+                </Text>
+              )}
+            </>
           )}
-        </>
-      )}
 
-      <View>
-        {loading && (
-          <View
-            style={{
-              flex: 1,
-              position: "absolute",
-              justifyContent: "center",
-              alignItems: "center",
-              alignSelf: "center",
-              backgroundColor: "transparent",
-              zIndex: 1,
-              top: 10,
-            }}
-          >
-            <ActivityIndicator color={colors.secondary} />
-          </View>
-        )}
-        {/* <AppButton
+          <View>
+            {loading && (
+              <View
+                style={{
+                  flex: 1,
+                  position: "absolute",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  alignSelf: "center",
+                  backgroundColor: "transparent",
+                  zIndex: 1,
+                  top: 10,
+                }}
+              >
+                <ActivityIndicator color={colors.secondary} />
+              </View>
+            )}
+            {/* <AppButton
                   alignSelf={"center"}
                   marginTop={50}
                   marginBottom={100}
@@ -1206,8 +1497,22 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
                   // onPress={() => addToMongo(reloadMarket)}
                 /> */}
-      </View>
+          </View>
+        </View>
+      </KeyboardAwareScrollView>
 
+      <UserSelector
+        type={"artist"}
+        users={artists}
+        setUsers={setArtists}
+        userSheetModalRef={artSheetModalRef}
+      />
+      <UserSelector
+        type={"organizer"}
+        users={organizers}
+        setUsers={setOrganizers}
+        userSheetModalRef={orgSheetModalRef}
+      />
       <Modal
         visible={blockModal}
         animationType="slide"
@@ -1216,22 +1521,23 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       ></Modal>
 
       <TicketsSheet
-        setTicketsSheetup={setTicketsSheetup}
+        // setTicketsSheetup={setTicketsSheetup}
+        dates={dates}
         ticketsSheetRef={ticketsSheetRef}
         tickets={tickets}
-        edit={selectedTicket}
-        selectedTicket={selectedTicket}
+  
         setTickets={setTickets}
       />
       <EditTicketsSheet
-        setEditTicketsSheetup={setEditTicketsSheetup}
+        // setEditTicketsSheetup={setEditTicketsSheetup}
+        dates={dates}
         editTicketSheeRef={editTicketSheeRef}
         tickets={tickets}
         setSelectedTicket={setSelectedTicket}
         selectedTicket={selectedTicket}
         setTickets={setTickets}
       />
-    </KeyboardAwareScrollView>
+    </>
   );
 }
 
@@ -1246,7 +1552,7 @@ const styles = StyleSheet.create({
 
   imput: {
     backgroundColor: colors.light2,
-    borderRadius: 15,
+    // borderRadius: 15,
     alignSelf: "center",
     // width: 0,
     padding: 15,
@@ -1279,7 +1585,7 @@ const styles = StyleSheet.create({
     right: 20,
   },
   switchText: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "500",
     alignSelf: "center",
     left: 10,
@@ -1321,9 +1627,9 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   separator: {
-    width: "95%",
+    width: "100%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.primary,
     marginVertical: 5,
     alignSelf: "center",
   },

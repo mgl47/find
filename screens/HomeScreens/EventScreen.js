@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   Platform,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -65,10 +66,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
   const [scrollingPos, setScrollingPos] = useState(0);
+  const [mediaIndex, setMediaIndex] = useState(0);
   const handleScroll = (event) => {
-    setScrolling(event.nativeEvent.contentOffset.y > 200);
+    setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
+  
+  function handleMediaScroll(event) {
+    setMediaIndex(
+      parseInt(
+        event.nativeEvent.contentOffset.x / Dimensions.get("window").width
+      ).toFixed()
+    );
+  }
+
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
 
@@ -130,16 +141,98 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               size={28}
               color={scrolling ? colors.black : colors.white}
               style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
+                shadowOffset: !scrolling ? { width: 0.5, height: 0.5 } : {},
+                shadowOpacity: !scrolling ? 0.3 : 0,
+                shadowRadius: !scrolling ? 1 : 0,
+                elevation: !scrolling ? 2 : 0,
               }}
             />
           </TouchableOpacity>
         ) : null,
-      headerRight: () => null,
-      // headerTransparent: scrolling ? false : true,
+      headerRight: () =>
+        // !inFullscreen && (
+        //   <View
+        //     style={{
+        //       flexDirection: "row",
+        //       alignItems: "center",
+        //       // zIndex: 3,
+        //       // position: "absolute",
+        //       right: 10,
+        //       // opacity: indexVisible ? 0 : 1,
+        //       // top: height * 0.33,
+        //       // top: height * 0.05,
+        //       shadowOffset: !scrolling ? { width: 0.5, height: 0.5 } : {},
+        //       shadowOpacity: !scrolling ? 0.3 : 0,
+        //       shadowRadius: !scrolling ? 1 : 0,
+        //       elevation: !scrolling ? 2 : 0,
+        //     }}
+        //   >
+        //     <MaterialIcons
+        //       style={{
+        //         right: 30,
+        //         // shadowOffset: { width: 0.5, height: 0.5 },
+        //         // shadowOpacity: 0.3,
+        //         // shadowRadius: 1,
+        //         // elevation: 2,
+        //         position: "absolute",
+        //       }}
+        //       name="photo-library"
+        //       size={20}
+        //       color={scrolling ? colors.black : colors.white}
+        //     />
+        //     <Text
+        //       style={{
+        //         color: scrolling ? colors.black : colors.white,
+        //         fontSize: 14,
+        //         fontWeight: "600",
+        //       }}
+        //     >
+        //       {Number(mediaIndex) + 1 + "/" + Number(Event?.photos?.length + 1)}
+        //     </Text>
+        //   </View>
+        // ),
+        !inFullscreen &&
+        !scrolling && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              // zIndex: 3,
+              // position: "absolute",
+              right: 10,
+              // opacity: indexVisible ? 0 : 1,
+              // top: height * 0.33,
+              // top: height * 0.05,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+          >
+            <MaterialIcons
+              style={{
+                right: 30,
+                // shadowOffset: { width: 0.5, height: 0.5 },
+                // shadowOpacity: 0.3,
+                // shadowRadius: 1,
+                // elevation: 2,
+                position: "absolute",
+              }}
+              name="photo-library"
+              size={20}
+              color={scrolling ? colors.black : colors.white}
+            />
+            <Text
+              style={{
+                color: scrolling ? colors.black : colors.white,
+                fontSize: 14,
+                fontWeight: "600",
+              }}
+            >
+              {Number(mediaIndex) + 1 + "/" + Number(Event?.photos?.length + 1)}
+            </Text>
+          </View>
+        ),
       headerTitle: () =>
         scrolling ? (
           <Text
@@ -156,7 +249,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </Text>
         ) : null,
     });
-  }, [scrolling, inFullscreen]);
+  }, [scrolling, inFullscreen, mediaIndex]);
   return (
     <>
       {scrolling && (
@@ -184,68 +277,81 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <FlatList
           showsHorizontalScrollIndicator={false}
           pagingEnabled
+          onScroll={(e) => handleMediaScroll(e)}
           scrollEnabled={Event?.videos?.length > 0 || Event?.photos?.length > 1}
           horizontal
           data={Event?.photos}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
-              <VideoPlayer
-                fullscreen={{
-                  inFullscreen: inFullscreen,
-                  enterFullscreen: async () => {
-                    setInFullsreen(true);
+              // <TouchableOpacity
+              //   style={{ flex: 1, backgroundColor: "red", zIndex: 2 }}
+              //   onPress={() => console.log("dasfas")}
+              // >
+              <Pressable
+                onPress={() => console.log("Pressed")}
+                onPressOut={() => console.log("Released")}
+              >
+                <VideoPlayer
+                  // playbackCallback={()=>console.log("fdasfsdgafdsF")}
+                  autoHidePlayer={false}
+                  fullscreen={{
+                    inFullscreen: inFullscreen,
+                    enterFullscreen: async () => {
+                      setInFullsreen(true);
 
-                    // setStatusBarHidden(true, "fade");
-                    await ScreenOrientation.lockAsync(
-                      ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
-                    );
+                      // setStatusBarHidden(true, "fade");
+                      await ScreenOrientation.lockAsync(
+                        ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+                      );
 
-                    videoRef.current.setStatusAsync({
-                      shouldPlay: true,
-                    });
-                  },
-                  exitFullscreen: async () => {
-                    // setStatusBarHidden(false, "fade");
+                      videoRef.current.setStatusAsync({
+                        shouldPlay: true,
+                      });
+                    },
+                    exitFullscreen: async () => {
+                      // setStatusBarHidden(false, "fade");
 
-                    await ScreenOrientation.lockAsync(
-                      ScreenOrientation.OrientationLock.PORTRAIT_UP
-                    );
-                    setInFullsreen(false);
-                  },
-                }}
-                mute={{
-                  visible: true,
-                  enterMute: () => setIsMute(true),
-                  exitMute: () => setIsMute(false),
-                  isMute: isMute,
-                }}
-                style={{
-                  videoBackgroundColor: "black",
-                  height: inFullscreen ? width : 270,
-                  width: inFullscreen ? height : initialWidth,
-                }}
-                videoProps={{
-                  ref: videoRef,
-                  source: {
-                    uri: Event?.videos[0]?.uri,
-                  },
+                      await ScreenOrientation.lockAsync(
+                        ScreenOrientation.OrientationLock.PORTRAIT_UP
+                      );
+                      setInFullsreen(false);
+                    },
+                  }}
+                  mute={{
+                    visible: true,
+                    enterMute: () => setIsMute(true),
+                    exitMute: () => setIsMute(false),
+                    isMute: isMute,
+                  }}
+                  style={{
+                    videoBackgroundColor: "black",
+                    height: inFullscreen ? width : height * 0.37,
+                    width: inFullscreen ? height : initialWidth,
+                  }}
+                  videoProps={{
+                    ref: videoRef,
+                    source: {
+                      uri: Event?.videos[0]?.uri,
+                    },
 
-                  // source: require("../assets/rolling.mp4"),
-                  resizeMode: inFullscreen ? "contain" : "cover",
-                  // useNativeControls
-                  isMuted: isMute,
-                  shouldPlay: true,
-                  isLooping: true,
-                }}
-              />
-            ) : null
+                    // source: require("../assets/rolling.mp4"),
+                    resizeMode: inFullscreen ? "contain" : "cover",
+                    // useNativeControls
+                    isMuted: isMute,
+                    shouldPlay: true,
+                    isLooping: true,
+                  }}
+                />
+              </Pressable>
+            ) : // </TouchableOpacity>
+            null
           }
           renderItem={({ item }) => {
             {
               return !inFullscreen ? (
                 <Image
-                  style={{ width: initialWidth, height: 270 }}
+                  style={{ width: initialWidth, height: height * 0.37 }}
                   source={{ uri: item?.uri }}
                   blurRadius={scrollingPos}
                 />

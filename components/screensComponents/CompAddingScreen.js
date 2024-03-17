@@ -38,7 +38,7 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 
-import { ActivityIndicator, Chip } from "react-native-paper";
+import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 
 import { markers } from "../../components/Data/markers";
 
@@ -56,133 +56,71 @@ const { height, width } = Dimensions.get("window");
 
 const Tab = createMaterialTopTabNavigator();
 
-export const DateSelector = ({
-  calendarModal,
-  setCalendarModal,
-  setDates,
-  dates,
-}) => {
-  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("");
-  const showDatePicker = () => {
-    setTimePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setTimePickerVisibility(false);
-  };
-
-  const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
-    hideDatePicker();
-  };
-  const addDate = async (day) => {
-    const date = day.dateString;
-    setSelectedDay(day.dateString);
-    // setLoading(true);
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 300);
-    });
-    setTimePickerVisibility(true)
-
-    // setLoading(false);
-  };
-  return (
-    <Modal animationType="slide" visible={calendarModal} style={{ flex: 1 }}>
-      {/* <Screen /> */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          //   backgroundColor:colors.white,
-          marginHorizontal: 20,
-          marginTop: 40,
-          marginBottom: 10,
-        }}
-      >
-        <Text
-          style={{
-            color: colors.darkSeparator,
-            fontSize: 18,
-            fontWeight: "600",
-          }}
-        >
-          Selecionar Data
-        </Text>
-        <TouchableOpacity
-          style={{
-            // left: 8,
-            alignSelf: "flex-end",
-            // padding: 10,
-          }}
-          onPress={() => setCalendarModal(false)}
-        >
-          <Text
-            style={{
-              color: colors.primary,
-              fontSize: 16,
-              fontWeight: "600",
-            }}
-          >
-            Voltar
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <Calendar
-        // onDayPress={(day) => {
-        //   setSelectedDay(day.dateString);
-        // }}
-        onDayPress={addDate}
-        theme={{
-          textSectionTitleColor: "#b6c1cd",
-          selectedDayBackgroundColor: colors.primary,
-          selectedDayTextColor: "#ffffff",
-          textMonthFontWeight: "500",
-          textDayFontWeight: "500",
-          todayTextColor: colors.primary,
-          arrowColor: colors.primary,
-          //  textDayHeaderFontWeight:"500",
-          // textDayHeaderFontSize:14,
-
-          // textDisabledColor: "#d9e",
-        }}
-        markedDates={{
-          [selectedDay]: {
-            selected: true,
-            disableTouchEvent: true,
-            selectedDotColor: "orange",
-          },
-        }}
-      />
-      <DateTimePickerModal
-        isVisible={isTimePickerVisible}
-        mode="datetime"
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-      />
-    </Modal>
-  );
-};
 export const TicketsSheet = ({
   tickets,
   setTickets,
   ticketsSheetRef,
-  setTicketsSheetup,
+
+  dates,
 }) => {
-  const snapPoints = useMemo(() => ["60", "90%"], []);
+  const snapPoints = useMemo(() => ["70%", "90%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   //   const [selectedTicket, setSelectedTicket] = useState(edit);
   // const [tickets, setTickets] = useState([]);
+
   const [price, setPrice] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [type, setType] = useState("");
+  const [category, setCategory] = useState("");
+  const [ticketDates, setTicketDates] = useState([]);
 
-  //   const [price, setPrice] = useState("");
-  //   const [amount, setAmount] = useState("");
-  //   const [description, setDescription] = useState("");
-  //   const [type, setType] = useState("");
+  // console.log(selectedTicket);
+
+  const clear = () => {
+    setDescription("");
+    setCategory("");
+    setAmount("");
+    setPrice("");
+    setTicketDates([]);
+  };
+
+  const addDate = (date) => {
+    let dates = [...ticketDates];
+
+    // console.log(dates);
+    if (dates?.includes(date)) {
+      setTicketDates(dates?.filter((item) => item != date));
+      return null;
+    }
+
+    dates.push(date);
+
+    setTicketDates(dates);
+    // return date?.displayDate;
+    // console.log(ticketDates);
+  };
+  const addTicket = async () => {
+    // let tempTickets = [...tickets];
+    let tempTickets = [...tickets];
+
+    tempTickets.push({
+      price: Number(price),
+      amount: Number(amount),
+      description,
+      category: category,
+      id: uuid.v4(),
+      dates: ticketDates,
+    });
+
+    // await new Promise((resolve) =>
+    //   setTimeout(() => resolve(ticketsSheetRef.current.close()), 100)
+    // );
+    setTickets(tempTickets);
+
+    ticketsSheetRef.current.close();
+
+    clear();
+  };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -201,39 +139,71 @@ export const TicketsSheet = ({
   }, []);
   const handleSheetChanges = useCallback((index) => {}, []);
 
-  const addTicket = () => {
-    let tempTickets = [...tickets];
-    tempTickets.push({
-      price: Number(price),
-      amount: Number(amount),
-      description,
-      type,
-      id: uuid.v4(),
-    });
-    setTicketsSheetup(false);
-    setTickets(tempTickets);
-    setDescription("");
-    setType("");
-    setAmount("");
-    setPrice("");
-    ticketsSheetRef.current.close();
-  };
-
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
         ref={ticketsSheetRef}
-        index={keyboardVisible ? 1 : 0}
+        // index={keyboardVisible ? 1 : 0}
+        index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
-        onDismiss={() => {
-          setTicketsSheetup(false);
-        }}
+        onDismiss={clear}
       >
-        <BottomSheetScrollView contentContainerStyle={{ flex: 1, padding: 10 }}>
+        <BottomSheetScrollView
+          contentContainerStyle={{
+            flex: 1,
+            padding: 10,
+            backgroundColor: colors.background,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                fontWeight: "500",
+                // alignSelf: "center",
+                left: 10,
+              }}
+            >
+              Adicionar Bilhete
+            </Text>
+            <TouchableOpacity onPress={() => ticketsSheetRef.current.close()}>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+              >
+                Sair
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text
+            style={[
+              styles.switchText,
+              {
+                color: colors.primary,
+                marginVertical: 10,
+                alignSelf: "flex-end",
+                fontWeight: "500",
+              },
+            ]}
+          >
+            {`${tickets?.length} ${
+              tickets?.length > 1 ? "adicionados" : "adicionado"
+            }`}
+          </Text>
           <TextInput
             error={!price}
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
             // contentStyle={{
@@ -245,37 +215,37 @@ export const TicketsSheet = ({
             label="preço"
             activeUnderlineColor={colors.primary}
             // defaultValue={String(selectedTicket?.ticket?.price)}
-
+            keyboardType="number-pad"
             value={price}
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setPrice}
           />
           <TextInput
-            error={!type}
-            style={{ marginBottom: 5 }}
+            error={!category}
+            style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
             // contentStyle={{
             //   backgroundColor: colors.background,
             //   fontWeight: "500",
             // }}
-            placeholder="promo, normal, VIP, 2 dias,..."
+            placeholder="Promo, Normal, VIP, 2 dias,..."
             // placeholderTextColor={'blue'}
-            label="tipo"
+            label="categoria"
             mode="outlined"
             activeOutlineColor={colors.primary}
             underlineColor={colors.primary}
             outlineColor={colors.primary}
             activeUnderlineColor={colors.primary}
-            value={type}
+            value={category}
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
-            onChangeText={setType}
+            onChangeText={setCategory}
           />
           <TextInput
             error={!description}
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
             // contentStyle={{
@@ -296,13 +266,14 @@ export const TicketsSheet = ({
 
           <TextInput
             error={!amount}
-            style={{ marginBottom: 5 }}
+            style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
             // contentStyle={{
             //   backgroundColor: colors.background,
             //   fontWeight: "500",
             // }}
+            keyboardType="number-pad"
             mode="outlined"
             activeOutlineColor={colors.primary}
             label="Quantidade"
@@ -312,6 +283,44 @@ export const TicketsSheet = ({
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setAmount}
           />
+          {dates?.map((date) => (
+            <View
+              key={date.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                // marginHorizontal: 10,
+                marginVertical: 2,
+
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.darkSeparator,
+                  fontSize: 15,
+                  left: 10,
+                  // padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                {date?.displayDate + " às " + date?.hour}
+              </Text>
+              <TouchableOpacity onPress={() => addDate(date)}>
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    // right: 10,
+                    padding: 3,
+                    fontWeight: "600",
+                  }}
+                >
+                  {ticketDates?.includes(date) ? "Remover" : "Selecionar"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
           <TouchableOpacity
             onPress={addTicket}
             style={{
@@ -352,21 +361,53 @@ export const EditTicketsSheet = ({
   tickets,
   setTickets,
   editTicketSheeRef,
-  setEditTicketsSheetup,
+  dates,
   setSelectedTicket,
   selectedTicket,
 }) => {
-  const snapPoints = useMemo(() => ["60", "90%"], []);
+  const snapPoints = useMemo(() => ["70%", "90%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   //   const [selectedTicket, setSelectedTicket] = useState(edit);
   // const [tickets, setTickets] = useState([]);
-  const [price, setPrice] = useState(selectedTicket?.ticket?.price);
-  const [amount, setAmount] = useState(selectedTicket?.ticket?.amount);
-  const [description, setDescription] = useState(
-    selectedTicket?.ticket?.description
-  );
-  const [type, setType] = useState(selectedTicket?.ticket?.type);
+  const [ticketDates, setTicketDates] = useState([]);
 
+  const [price, setPrice] = useState("");
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+
+  useEffect(() => {
+    // if (selectedTicket!=undefined) {
+    setAmount(String(selectedTicket?.ticket?.amount));
+    setPrice(String(selectedTicket?.ticket?.price));
+    setCategory(selectedTicket?.ticket?.category);
+    setTicketDates(selectedTicket?.ticket?.dates);
+    setDescription(selectedTicket?.ticket?.description);
+    // }
+  }, [selectedTicket]);
+  // const clear = () => {
+  //   setDescription("");
+  //   setType("");
+  //   setAmount("");
+  //   setPrice("");
+  //   setTicketDates([]);
+  // };
+  const addDate = (date) => {
+    let dates = [...ticketDates];
+
+    // console.log(dates);
+    if (dates?.includes(date)) {
+      setTicketDates(dates?.filter((item) => item != date));
+      return null;
+    }
+
+    dates.push(date);
+
+    setTicketDates(dates);
+    // return date?.displayDate;
+    // console.log(ticketDates);
+  };
+  console.log(ticketDates);
   const editTicket = () => {
     // Check if selectedTicket is defined and has a valid index
     if (selectedTicket && selectedTicket.index !== undefined) {
@@ -377,20 +418,17 @@ export const EditTicketsSheet = ({
       if (updatedTickets[selectedTicket?.index]) {
         updatedTickets[selectedTicket?.index] = {
           ...updatedTickets[selectedTicket?.index], // Copy the existing ticket object
-          price: price,
+          price: Number(price),
           description: description,
-          amount: amount,
+          amount: Number(amount),
           id: setSelectedTicket?.ticket?.id,
-          type: type,
+          category: category,
+          dates:ticketDates
         };
       }
 
-      // Use setTickets to update the state with the new array
       setTickets(updatedTickets);
-      //   setDescription("");
-      //   setType("");
-      //   setAmount("");
-      //   setPrice("");
+      // clear();
       editTicketSheeRef.current.close();
     }
   };
@@ -419,9 +457,7 @@ export const EditTicketsSheet = ({
         index={keyboardVisible ? 1 : 0}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
-        onDismiss={() => {
-          setEditTicketsSheetup(false);
-        }}
+        // onDismiss={clear}
       >
         <BottomSheetScrollView contentContainerStyle={{ flex: 1, padding: 10 }}>
           <TextInput
@@ -446,7 +482,7 @@ export const EditTicketsSheet = ({
             onChangeText={setPrice}
           />
           <TextInput
-            error={!type}
+            error={!category}
             style={{ marginBottom: 5 }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
@@ -454,21 +490,23 @@ export const EditTicketsSheet = ({
             //   backgroundColor: colors.background,
             //   fontWeight: "500",
             // }}
-            placeholder="promo, normal, VIP, 2 dias,..."
+            placeholder="Promo, Normal, VIP, 2 dias,..."
             // placeholderTextColor={'blue'}
-            label="tipo"
+            label="categoria"
             mode="outlined"
             defaultValue={
-              selectedTicket?.ticket?.type ? selectedTicket?.ticket?.type : ""
+              selectedTicket?.ticket?.category
+                ? selectedTicket?.ticket?.category
+                : ""
             }
             activeOutlineColor={colors.primary}
             underlineColor={colors.primary}
             outlineColor={colors.primary}
             activeUnderlineColor={colors.primary}
-            value={type}
+            value={category}
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
-            onChangeText={setType}
+            onChangeText={setCategory}
           />
           <TextInput
             error={!description}
@@ -511,6 +549,43 @@ export const EditTicketsSheet = ({
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setAmount}
           />
+          {dates?.map((date) => (
+            <View
+              key={date.id}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                // marginHorizontal: 10,
+                marginVertical: 2,
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.darkSeparator,
+                  fontSize: 15,
+                  left: 10,
+                  // padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                {date?.displayDate + " às " + date?.hour}
+              </Text>
+              <TouchableOpacity onPress={() => addDate(date)}>
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    // right: 10,
+                    padding: 3,
+                    fontWeight: "600",
+                  }}
+                >
+                  {ticketDates?.includes(date) ? "Remover" : "Selecionar"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))}
           <TouchableOpacity
             onPress={editTicket}
             style={{
@@ -538,7 +613,7 @@ export const EditTicketsSheet = ({
                 fontWeight: "500",
               }}
             >
-              Gurdar
+              Guardar
             </Text>
           </TouchableOpacity>
         </BottomSheetScrollView>
@@ -599,50 +674,49 @@ export const VenueSelector = ({
   return (
     <Modal animationType="slide" visible={venueModal} style={{ flex: 1 }}>
       {/* <Screen /> */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          //   backgroundColor:colors.white,
-          marginHorizontal: 20,
-          marginTop: 40,
-          marginBottom: 10,
-        }}
-      >
-        <Text
+      <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
+        <View
           style={{
-            color: colors.darkSeparator,
-            fontSize: 18,
-            fontWeight: "600",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            //   backgroundColor:colors.white,
+            marginHorizontal: 20,
+            marginTop: 40,
+            marginBottom: 10,
           }}
-        >
-          Selecionar Local
-        </Text>
-        <TouchableOpacity
-          style={{
-            // left: 8,
-            alignSelf: "flex-end",
-            // padding: 10,
-          }}
-          onPress={() => setVenueModal(false)}
         >
           <Text
             style={{
-              color: colors.primary,
-              fontSize: 16,
+              color: colors.darkSeparator,
+              fontSize: 18,
               fontWeight: "600",
             }}
           >
-            Voltar
+            Selecionar Local
           </Text>
-        </TouchableOpacity>
-      </View>
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ backgroundColor: "red", flex: 1 }}
-      >
+          <TouchableOpacity
+            style={{
+              // left: 8,
+              alignSelf: "flex-end",
+              // padding: 10,
+            }}
+            onPress={() => setVenueModal(false)}
+          >
+            <Text
+              style={{
+                color: colors.primary,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Voltar
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <FlatList
-          style={{ backgroundColor: colors.background, padding: 10 }}
+          style={{ backgroundColor: colors.background }}
           data={searchResult ? searchResult : markers}
           // data={venueDetails ? recommendedEvents.slice(1, 3).reverse() : markers}
           showsVerticalScrollIndicator={false}
@@ -762,294 +836,326 @@ export const VenueSelector = ({
                     })}
                 </MapView>
               </View>
-              <TouchableOpacity
-                onPress={() =>
-                  onAddNewVenue
-                    ? (setNewVenue(""), setOnAddNewVenue(false))
-                    : setOnAddNewVenue(true)
-                }
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  // padding: 10,
-                  alignItems: "center",
-                  alignSelf: "flex-end",
-                }}
-              >
-                <Text
+              <View style={{ padding: 10 }}>
+                <View
                   style={{
-                    color: colors.primary,
-                    fontSize: 14,
-                    fontWeight: "600",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginHorizontal: 10,
+                    marginBottom: 10,
                   }}
                 >
-                  {onAddNewVenue ? "Cancelar" : "Adicionar novo local"}
-                </Text>
-              </TouchableOpacity>
-              {!onAddNewVenue && (
-                <TextInput
-                  //   error={!amount}
-                  style={{ marginBottom: 5 }}
-                  // autoFocus
-                  underlineStyle={{ backgroundColor: colors.primary }}
-                  //   contentStyle={{ borderRadius: 20 }}
-                  mode="outlined"
-                  outlineStyle={{ borderRadius: 15 }}
-                  activeOutlineColor={colors.primary}
-                  label="pesquisar"
-                  activeUnderlineColor={colors.primary}
-                  value={search}
-                  cursorColor={colors.primary}
-                  onSubmitEditing={getResults}
-                  onChangeText={setSearch}
-                />
-              )}
-              {onAddNewVenue && (
-                <>
-                  <TextInput
-                    //   error={!amount}
-                    style={{ marginBottom: 5 }}
-                    // autoFocus
-                    underlineStyle={{ backgroundColor: colors.primary }}
-                    contentStyle={{}}
-                    mode="outlined"
-                    activeOutlineColor={colors.primary}
-                    label="Nome"
-                    activeUnderlineColor={colors.primary}
-                    value={newVenue?.displayName}
-                    cursorColor={colors.primary}
-                    onSubmitEditing={getResults}
-                    onChangeText={(text) =>
-                      setNewVenue({ ...newVenue, displayName: text })
-                    }
-                  />
-                  <TextInput
-                    //   error={!amount}
-                    style={{ marginBottom: 5 }}
-                    // autoFocus
-                    underlineStyle={{ backgroundColor: colors.primary }}
-                    contentStyle={{}}
-                    mode="outlined"
-                    activeOutlineColor={colors.primary}
-                    label="Descrição"
-                    activeUnderlineColor={colors.primary}
-                    value={newVenue?.description}
-                    cursorColor={colors.primary}
-                    onSubmitEditing={getResults}
-                    onChangeText={(text) =>
-                      setNewVenue({ ...newVenue, description: text })
-                    }
-                  />
-                  <TextInput
-                    //   error={!amount}
-                    style={{ marginBottom: 5 }}
-                    // autoFocus
-                    underlineStyle={{ backgroundColor: colors.primary }}
-                    contentStyle={{}}
-                    mode="outlined"
-                    activeOutlineColor={colors.primary}
-                    label="Cidade"
-                    activeUnderlineColor={colors.primary}
-                    value={newVenue?.address?.city}
-                    cursorColor={colors.primary}
-                    onSubmitEditing={getResults}
-                    onChangeText={(text) =>
-                      setNewVenue({
-                        ...newVenue,
-                        address: { ...newVenue.address, city: text },
-                      })
-                    }
-                    // setNewVenue(prevState => ({
-                    //     ...prevState,
-                    //     address: {
-                    //       ...prevState.address,
-                    //       city: text
-                    //     }
-                    //   }));
-                  />
-                  <TextInput
-                    //   error={!amount}
-                    style={{ marginBottom: 5 }}
-                    // autoFocus
-                    underlineStyle={{ backgroundColor: colors.primary }}
-                    contentStyle={{}}
-                    mode="outlined"
-                    activeOutlineColor={colors.primary}
-                    label="Zona"
-                    activeUnderlineColor={colors.primary}
-                    value={newVenue?.address?.zone}
-                    cursorColor={colors.primary}
-                    onSubmitEditing={getResults}
-                    onChangeText={(text) =>
-                      setNewVenue({
-                        ...newVenue,
-                        address: { ...newVenue.address, zone: text },
-                      })
-                    }
-                  />
-                  <TouchableOpacity
-                    onPress={addVenue}
+                  <Text
                     style={{
-                      alignSelf: "center",
+                      color:
+                        newMarker != 0 ? colors.darkSeparator : colors.darkRed,
+                      fontSize: 15,
+                      fontWeight: "500",
+                      opacity: onAddNewVenue ? 1 : 0,
+                    }}
+                  >
+                    Adicione um ponto no mapa
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      onAddNewVenue
+                        ? (setNewVenue(""), setOnAddNewVenue(false))
+                        : setOnAddNewVenue(true)
+                    }
+                    style={{
                       flexDirection: "row",
-                      height: 50,
-                      width: "90%",
-                      backgroundColor: colors.primary,
-                      borderRadius: 10,
                       alignItems: "center",
-                      justifyContent: "center",
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 1,
-                      elevation: 2,
-                      marginBottom: 15,
-                      marginTop: 10,
+                      justifyContent: "space-between",
+                      // padding: 10,
+                      alignItems: "center",
+                      alignSelf: "flex-end",
                     }}
                   >
                     <Text
                       style={{
-                        color: colors.white,
-                        marginLeft: 5,
-                        fontSize: 17,
-                        fontWeight: "500",
+                        color: colors.primary,
+                        fontSize: 14,
+                        fontWeight: "600",
                       }}
                     >
-                      Adicionar
+                      {onAddNewVenue ? "Cancelar" : "Adicionar novo local"}
                     </Text>
                   </TouchableOpacity>
-                </>
-              )}
+                </View>
 
-              {loading && (
-                <Animated.View
-                  style={{
-                    // position: "absolute",
-                    alignSelf: "center",
-                    // top: 10,
-                    // zIndex: 2,
-                    marginVertical: 20,
-                  }}
-                  // entering={SlideInUp.duration(300)}
-                  // exiting={SlideOutUp.duration(300)}
-                >
-                  <ActivityIndicator animating={true} color={colors.primary} />
-                </Animated.View>
-              )}
-              {addedNewVenue && (
-                <View
-                  style={{
-                    // padding: 10,
-                    borderBottomRightRadius: 10,
-                    borderBottomLeftRadius: 10,
-                    shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 1,
-                    elevation: 2,
-                    marginVertical: 7,
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: colors.white,
-                      borderRadius: 10,
-                      padding: 5,
-                    }}
-                  >
+                {!onAddNewVenue && (
+                  <TextInput
+                    //   error={!amount}
+                    style={{ marginBottom: 5 }}
+                    // autoFocus
+                    underlineStyle={{ backgroundColor: colors.primary }}
+                    //   contentStyle={{ borderRadius: 20 }}
+                    outlineColor={colors.primary}
+                    mode="outlined"
+                    outlineStyle={{ borderRadius: 10 }}
+                    activeOutlineColor={colors.primary}
+                    label="pesquisar"
+                    activeUnderlineColor={colors.primary}
+                    value={search}
+                    cursorColor={colors.primary}
+                    onSubmitEditing={getResults}
+                    onChangeText={setSearch}
+                  />
+                )}
+                {onAddNewVenue && (
+                  <>
+                    <TextInput
+                      //   error={!amount}
+                      style={{ marginBottom: 5 }}
+                      // autoFocus
+                      underlineStyle={{ backgroundColor: colors.primary }}
+                      contentStyle={{}}
+                      outlineColor={colors.primary}
+                      mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      label="Nome"
+                      activeUnderlineColor={colors.primary}
+                      value={newVenue?.displayName}
+                      cursorColor={colors.primary}
+                      onSubmitEditing={getResults}
+                      onChangeText={(text) =>
+                        setNewVenue({ ...newVenue, displayName: text })
+                      }
+                    />
+                    <TextInput
+                      //   error={!amount}
+                      style={{ marginBottom: 5 }}
+                      // autoFocus
+                      underlineStyle={{ backgroundColor: colors.primary }}
+                      contentStyle={{}}
+                      outlineColor={colors.primary}
+                      mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      label="Descrição"
+                      activeUnderlineColor={colors.primary}
+                      value={newVenue?.description}
+                      cursorColor={colors.primary}
+                      onSubmitEditing={getResults}
+                      onChangeText={(text) =>
+                        setNewVenue({ ...newVenue, description: text })
+                      }
+                    />
+                    <TextInput
+                      //   error={!amount}
+                      style={{ marginBottom: 5 }}
+                      // autoFocus
+                      underlineStyle={{ backgroundColor: colors.primary }}
+                      contentStyle={{}}
+                      outlineColor={colors.primary}
+                      mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      label="Cidade"
+                      activeUnderlineColor={colors.primary}
+                      value={newVenue?.address?.city}
+                      cursorColor={colors.primary}
+                      onSubmitEditing={getResults}
+                      onChangeText={(text) =>
+                        setNewVenue({
+                          ...newVenue,
+                          address: { ...newVenue.address, city: text },
+                        })
+                      }
+                      // setNewVenue(prevState => ({
+                      //     ...prevState,
+                      //     address: {
+                      //       ...prevState.address,
+                      //       city: text
+                      //     }
+                      //   }));
+                    />
+                    <TextInput
+                      //   error={!amount}
+                      style={{ marginBottom: 5 }}
+                      // autoFocus
+                      underlineStyle={{ backgroundColor: colors.primary }}
+                      contentStyle={{}}
+                      outlineColor={colors.primary}
+                      mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      label="Zona"
+                      activeUnderlineColor={colors.primary}
+                      value={newVenue?.address?.zone}
+                      cursorColor={colors.primary}
+                      onSubmitEditing={getResults}
+                      onChangeText={(text) =>
+                        setNewVenue({
+                          ...newVenue,
+                          address: { ...newVenue.address, zone: text },
+                        })
+                      }
+                    />
                     <TouchableOpacity
-                      onPress={() => {
-                        {
-                          setVenue(addedNewVenue), setVenueModal(false);
-                        }
-                      }}
+                      onPress={addVenue}
                       style={{
+                        alignSelf: "center",
                         flexDirection: "row",
+                        height: 50,
+                        width: "90%",
+                        backgroundColor: colors.primary,
+                        borderRadius: 10,
                         alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: 10,
-                        alignItems: "center",
-                        padding: 2,
-                        // marginBottom: addedNewVenue?.description ? 5 : 0,
+                        justifyContent: "center",
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 1,
+                        elevation: 2,
+                        marginBottom: 15,
+                        marginTop: 10,
                       }}
                     >
-                      <View
+                      <Text
+                        style={{
+                          color: colors.white,
+                          marginLeft: 5,
+                          fontSize: 17,
+                          fontWeight: "500",
+                        }}
+                      >
+                        Adicionar
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+
+                {loading && (
+                  <Animated.View
+                    style={{
+                      // position: "absolute",
+                      alignSelf: "center",
+                      // top: 10,
+                      // zIndex: 2,
+                      marginVertical: 20,
+                    }}
+                    // entering={SlideInUp.duration(300)}
+                    // exiting={SlideOutUp.duration(300)}
+                  >
+                    <ActivityIndicator
+                      animating={true}
+                      color={colors.primary}
+                    />
+                  </Animated.View>
+                )}
+                {addedNewVenue && (
+                  <View
+                    style={{
+                      // padding: 10,
+                      borderBottomRightRadius: 10,
+                      borderBottomLeftRadius: 10,
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 1,
+                      elevation: 2,
+                      marginVertical: 7,
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor: colors.white,
+                        borderRadius: 10,
+                        padding: 5,
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          {
+                            setVenue(addedNewVenue), setVenueModal(false);
+                          }
+                        }}
                         style={{
                           flexDirection: "row",
                           alignItems: "center",
-                          padding: 5,
+                          justifyContent: "space-between",
+                          padding: 10,
+                          alignItems: "center",
+                          padding: 2,
+                          // marginBottom: addedNewVenue?.description ? 5 : 0,
                         }}
                       >
-                        {addedNewVenue?.uri && (
-                          <Image
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            padding: 5,
+                          }}
+                        >
+                          {addedNewVenue?.uri && (
+                            <Image
+                              style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 50,
+                                borderWidth: 0.1,
+                              }}
+                              source={{
+                                uri: addedNewVenue?.uri,
+                              }}
+                            />
+                          )}
+                          <Text
                             style={{
-                              width: 40,
-                              height: 40,
-                              borderRadius: 50,
-                              borderWidth: 0.1,
+                              fontSize: 15,
+                              fontWeight: "500",
+                              marginLeft: 10,
                             }}
-                            source={{
-                              uri: addedNewVenue?.uri,
-                            }}
-                          />
-                        )}
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            fontWeight: "500",
-                            marginLeft: 10,
-                          }}
-                        >
-                          {addedNewVenue?.displayName}
-                        </Text>
-                      </View>
+                          >
+                            {addedNewVenue?.displayName}
+                          </Text>
+                        </View>
 
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 14,
-                          right: 10,
-                          padding: 3,
-                          fontWeight: "600",
-                          paddingHorizontal:
-                            (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
-                          borderRadius:
-                            (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
-                          borderWidth:
-                            (venue?.id == addedNewVenue?.id) == 1 ? 1 : 0,
-                          borderColor: colors.primary,
-                        }}
-                      >
-                        {venue?.id == addedNewVenue?.id
-                          ? "Selecionado"
-                          : "Selecionar"}
-                      </Text>
-                    </TouchableOpacity>
-                    {addedNewVenue?.description && (
-                      <View style={styles.separator} />
-                    )}
-                    {addedNewVenue?.description && (
-                      <View style={{ padding: 10 }}>
                         <Text
                           style={{
-                            fontSize: 13,
-                            fontWeight: "500",
-                            color: colors.darkGrey,
+                            color: colors.primary,
+                            fontSize: 14,
+                            right: 10,
+                            padding: 3,
+                            fontWeight: "600",
+                            paddingHorizontal:
+                              (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
+                            borderRadius:
+                              (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
+                            borderWidth:
+                              (venue?.id == addedNewVenue?.id) == 1 ? 1 : 0,
+                            borderColor: colors.primary,
                           }}
                         >
-                          {addedNewVenue?.description}
+                          {venue?.id == addedNewVenue?.id
+                            ? "Selecionado"
+                            : "Selecionar"}
                         </Text>
-                      </View>
-                    )}
+                      </TouchableOpacity>
+                      {addedNewVenue?.description && (
+                        <View style={styles.separator} />
+                      )}
+                      {addedNewVenue?.description && (
+                        <View style={{ padding: 10 }}>
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              fontWeight: "500",
+                              color: colors.darkGrey,
+                            }}
+                          >
+                            {addedNewVenue?.description}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                </View>
-              )}
+                )}
+              </View>
             </>
           }
           renderItem={({ item }) => {
             return !loading && !onAddNewVenue ? (
               <View
                 style={{
-                  // padding: 10,
+                  padding: 10,
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
                   shadowOffset: { width: 0.5, height: 0.5 },
@@ -1179,19 +1285,22 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
   const handleSheetChanges = useCallback((index) => {}, []);
   const [searchText, setSearchText] = useState("");
 
-  const addUser = () => {
+  const addUser = async () => {
     const newUser = {
       displayName: "Erickson",
       username: "veiga.erickson",
       id: uuid.v4(),
       type: type,
     };
+    // userSheetModalRef.current.close();
+
     let tempUsers = [...users];
     tempUsers.push(newUser);
 
     setUsers(tempUsers);
-
-    userSheetModalRef.current.close();
+    // await new Promise((resolve) =>
+    //   setTimeout(() => resolve(userSheetModalRef.current.close()), 100)
+    // );
   };
 
   return (
@@ -1199,12 +1308,47 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
       <BottomSheetModal
         // style={{backgroundColor:}}
         ref={userSheetModalRef}
-        index={keyboardVisible ? 1 : 0}
+        // index={keyboardVisible ? 1 : 0}
+        index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
       >
         <BottomSheetView style={styles.contentContainer}>
           <View style={{ padding: 10 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontWeight: "500",
+                  // alignSelf: "center",
+                  left: 10,
+                }}
+              >
+                {type == "artist"
+                  ? "Adicionar Artista"
+                  : "Adicionar Organizador"}
+              </Text>
+              <TouchableOpacity
+                onPress={() => userSheetModalRef.current.close()}
+              >
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 16,
+                    fontWeight: "600",
+                  }}
+                >
+                  Sair
+                </Text>
+              </TouchableOpacity>
+            </View>
             <TextInput
               // error={!searchText}
               style={{ marginBottom: 10 }}
@@ -1214,6 +1358,7 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
               //   backgroundColor: colors.background,
               //   fontWeight: "500",
               // }}
+              outlineColor={colors.primary}
               mode="outlined"
               placeholder="Pesquise por um usuário"
               activeOutlineColor={colors.primary}
@@ -1225,7 +1370,13 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
               // onChangeText={(text) => setPerson({ ...person, email: text })}
               onChangeText={setSearchText}
             />
-            <Text style={{ color: colors.darkGrey, alignSelf: "center" }}>
+            <Text
+              style={{
+                color: colors.darkGrey,
+                alignSelf: "center",
+                marginBottom: 5,
+              }}
+            >
               1 resultado encontrado
             </Text>
             <TouchableOpacity
@@ -1266,6 +1417,21 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                 </View>
               </View>
             </TouchableOpacity>
+            <Text
+              style={[
+                styles.switchText,
+                {
+                  color: colors.primary,
+                  marginVertical: 10,
+                  alignSelf: "flex-end",
+                  fontWeight: "500",
+                },
+              ]}
+            >
+              {`${users?.length} ${
+                users?.length > 1 ? "adicionados" : "adicionado"
+              }`}
+            </Text>
             {/* <TouchableOpacity
               onPress={() => {
                 Keyboard.dismiss(), setAdvance(true);
@@ -1302,6 +1468,50 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                 Avançar
               </Text>
             </TouchableOpacity> */}
+            <View>
+              <FlatList
+                // style={{ width: "100%" }}
+                // numColumns={5}
+
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={users}
+                keyExtractor={(item) => item?.id}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity
+                      style={{
+                        padding: 5,
+                        alignItems: "center",
+                        // justifyContent: "center",
+                      }}
+                      onPress={() => navigation.navigate("artist", item)}
+                    >
+                      <Image
+                        style={{
+                          height: 60,
+                          width: 60,
+                          borderRadius: 50,
+                          marginBottom: 2,
+                          borderWidth: 0.009,
+                        }}
+                        source={{
+                          uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                        }}
+                      />
+                      <Text
+                        style={{
+                          width: item?.displayName?.length > 15 ? 100 : null,
+                          textAlign: "center",
+                        }}
+                      >
+                        {item?.displayName}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
           </View>
         </BottomSheetView>
       </BottomSheetModal>

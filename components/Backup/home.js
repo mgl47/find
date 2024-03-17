@@ -118,7 +118,7 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   return (
-    <Screen style={{backgroundColor:"white"}}> 
+    <Screen style={{ backgroundColor: "white" }}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => (!user ? navigation.openDrawer() : setShowModal(true))}
@@ -155,7 +155,6 @@ export default function HomeScreen({ navigation }) {
           <TouchableOpacity
             // onPress={() => setVenueModalVisible(true)}
             onPress={() => navigation.navigate("venuesExplorer")}
-
             style={{
               borderRadius: 50,
               padding: 5,
@@ -168,8 +167,6 @@ export default function HomeScreen({ navigation }) {
             // onPress={() => setCalendarModalVisible(true)}
 
             onPress={() => navigation.navigate("calendar")}
-
-
             style={{
               borderRadius: 50,
               padding: 5,
@@ -330,19 +327,7 @@ export default function HomeScreen({ navigation }) {
           }
         />
       </View>
-      <CalendarModal
-        setCalendarModalVisible={setCalendarModalVisible}
-        calendarModalVisible={calendarModalVisible}
-      />
 
-      <VenuesModal
-        venueModalVisible={venueModalVisible}
-        setVenueModalVisible={setVenueModalVisible}
-      />
-      <AuthBottomSheet
-        bottomSheetModalRef={bottomSheetModalRef}
-        setAuthModalUp={setAuthModalUp}
-      />
     </Screen>
   );
 }

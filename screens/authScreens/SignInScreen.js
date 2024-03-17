@@ -100,22 +100,25 @@ const SignInScreen = () => {
   // }, [loading,]);
   return (
     <KeyboardAwareScrollView
-    
-      // behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{
         padding: 10,
         backgroundColor: colors.background,
         flex: 1,
-        marginBottom: 300,
+        // marginBottom: 300,
       }}
     >
+    {/* <View> */}
       <BlockModal active={loading} />
       <TextInput
         error={!firstAttempt && !person.email}
         style={{ marginBottom: 5 }}
         // autoFocus
+        mode="outlined"
+        activeOutlineColor={colors.primary}
         underlineStyle={{ backgroundColor: colors.primary }}
-        contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+        outlineColor={colors.primary}
+        // contentStyle={{  fontWeight: "500",borderColor:"red" }}
         label="Nome de usuário ou Email"
         activeUnderlineColor={colors.primary}
         value={person?.email}
@@ -132,10 +135,9 @@ const SignInScreen = () => {
             error={!firstAttempt && !person.password}
             style={{ marginBottom: 20, backgroundColor: colors.background }}
             underlineStyle={{ backgroundColor: colors.primary }}
-            contentStyle={{
-              backgroundColor: colors.background,
-              fontWeight: "500",
-            }}
+            mode="outlined"
+            outlineColor={colors.primary}
+            activeOutlineColor={colors.primary}
             label="Palavra Passe"
             activeUnderlineColor={colors.primary}
             right={
@@ -247,6 +249,7 @@ const SignInScreen = () => {
         {loading && <ActivityIndicator color={colors.primary} />}
       </View>
     </KeyboardAwareScrollView>
+
   );
 };
 

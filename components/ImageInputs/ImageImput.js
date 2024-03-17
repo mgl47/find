@@ -5,8 +5,13 @@ import {
   Image,
   TouchableWithoutFeedback,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  Ionicons,
+  FontAwesome6,
+} from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
 import Screen from "../Screen";
@@ -77,32 +82,55 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handlePress}>
-      <View
-        style={[
-          styles.container,
-          {
-            height: height * 0.24,
+    <View
+      style={[
+        styles.container,
+        {
+          height: height * 0.3,
 
-            width: width * 0.88,
+          width: width,
 
-            backgroundColor: colors.light2,
-            borderColor: colors.description,
-          },
-          { ...otherprops },
-        ]}
-      >
-        {!imageUri && (
+          backgroundColor: colors.light2,
+          borderColor: colors.description,
+        },
+        { ...otherprops },
+      ]}
+    >
+      {!imageUri && (
+        <TouchableOpacity onPress={handlePress}>
           <Ionicons
             name={"add-circle-outline"}
             size={40}
-            color={colors.secondary}
+            color={colors.primary}
             style={styles.icon}
           />
-        )}
-        {imageUri && <Image style={styles.photos} source={{ uri: imageUri }} />}
-      </View>
-    </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      )}
+      {imageUri && (
+        <>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              zIndex: 1,
+              top: 10,
+              right: 10,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+              backgroundColor: colors.black,
+              borderRadius: 50,
+              padding: 10,
+            }}
+            onPress={handlePress}
+          >
+            <FontAwesome6 name="trash-can" size={18} color={colors.white} />
+          </TouchableOpacity>
+
+          <Image style={styles.photos} source={{ uri: imageUri }} />
+        </>
+      )}
+    </View>
   );
 }
 
@@ -111,13 +139,13 @@ export default ImageImput;
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.light2,
-    borderRadius: 10,
+    // borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    margin: 10,
+    // margin: 10,
     overflow: "hidden",
-    borderWidth: 0.3,
+    // borderWidth: 0.3,
   },
   photos: {
     // alignSelf: "center",
