@@ -112,6 +112,7 @@ export const trendingEvents = [
     ],
     going: 74,
     title: "Rolling Loud Cv: Edição 2024",
+    dates:[],
     date: "Qua, 06-08 Jul - 15h00",
     description:
       "Prepare-se para experimentar a fusão definitiva de música, cultura e emoção no Rolling Loud CV 2024! Junte-se a nós para um fim de semana inesquecível de performances sem parar dos artistas mais quentes do hip-hop, rap e além. Dos cabeças de cartaz icônicos aos talentos emergentes, nossa programação promete eletrizar cada momento. Mergulhe nos ritmos pulsantes, na atmosfera vibrante e na energia incomparável enquanto transformamos Cabo Verde no epicentro da cena musical global. Garanta seu lugar agora e faça parte da história sendo feita no Rolling Loud CV 2024!",

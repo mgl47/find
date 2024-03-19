@@ -24,7 +24,6 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import VenueExploreScreen from "../../screens/HomeScreens/VenueExploreScreen";
 import CalendarScreen from "../../screens/HomeScreens/ExploreScreens/CalendarScreen";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useAuth } from "../hooks/useAuth";

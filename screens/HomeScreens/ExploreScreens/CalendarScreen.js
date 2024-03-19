@@ -40,7 +40,7 @@ import Animated, {
 import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
-import { recommendedEvents } from "../../../components/Data/events";
+import { recommendedEvents } from "../../../components/Data/stockEvents";
 import colors from "../../../components/colors";
 import { markers } from "../../../components/Data/markers";
 import SmallCard from "../../../components/cards/SmallCard";

@@ -32,8 +32,8 @@ import { Chip } from "react-native-paper";
 import { ImageBackground } from "react-native";
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
-
-  const [venue, setVenue] = useState(venues[0]);
+const item=route.params
+  const [venue, setVenue] = useState(item);
 
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);

@@ -31,7 +31,7 @@ import Animated, {
 import VenuesExplorer from "./VenuesExplorer";
 import SearchScreen from "./SearchScreen";
 import CalendarScreen from "./CalendarScreen";
-import { recommendedEvents } from "../../../components/Data/events";
+import { recommendedEvents } from "../../../components/Data/stockEvents";
 
 // import FavVenues from "../VenuesScreens/FavVenues";
 const Tab = createMaterialTopTabNavigator();

@@ -9,7 +9,13 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   BottomSheetModal,
   BottomSheetView,
@@ -24,11 +30,12 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import colors from "../colors";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useAuth } from "../hooks/useAuth";
 
 const Tab = createMaterialTopTabNavigator();
-const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
-  const snapPoints = useMemo(() => ["60", "80%"], []);
-
+const AuthBottomSheet = ({ Event, authSheetRef, setAuthModalUp }) => {
+  // const{authSheetRef}=useAuth()
+  const snapPoints = useMemo(() => ["60", "85%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -50,17 +57,17 @@ const AuthBottomSheet = ({ Event, bottomSheetModalRef, setAuthModalUp }) => {
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
-        ref={bottomSheetModalRef}
+        ref={authSheetRef}
         // index={keyboardVisible ? 1 : 0}
         index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setAuthModalUp(false);
+          Keyboard.dismiss(), setAuthModalUp(false);
         }}
       >
-         <KeyboardAwareScrollView
-        contentContainerStyle={{ flex: 1 }}
+        <KeyboardAwareScrollView
+          contentContainerStyle={{ flex: 1 }}
           style={{
             padding: 10,
             flex: 1,

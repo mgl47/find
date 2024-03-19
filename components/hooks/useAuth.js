@@ -13,8 +13,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
-import SignInScreen from "../../screens/authScreens/SignInScreen";
-import SignUpScreen from "../../screens/authScreens/SignUpScreen";
+
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
@@ -30,6 +29,7 @@ const Tab = createMaterialTopTabNavigator();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const  authSheetRef=useRef(null)
 
   const [headerToken, setHeaderToken] = useState("");
 
@@ -59,9 +59,10 @@ export const AuthProvider = ({ children }) => {
       setUser: setUser,
       authLoading,
       setAuthModalUp,
-      AuthModalUp
+      AuthModalUp,
+      authSheetRef
     }),
-    [, user, authLoading,AuthModalUp]
+    [, user, authLoading,AuthModalUp,authSheetRef]
   );
 
   return (

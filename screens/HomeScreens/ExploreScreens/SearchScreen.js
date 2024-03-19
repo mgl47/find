@@ -44,7 +44,7 @@ import Animated, {
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 import { categories } from "../../../components/Data/categories";
-import { newEvents, recommendedEvents } from "../../../components/Data/events";
+import { newEvents, recommendedEvents } from "../../../components/Data/stockEvents";
 import SmallCard from "../../../components/cards/SmallCard";
 import MediumCard from "../../../components/cards/MediumCard";
 const SearchScreen = ({

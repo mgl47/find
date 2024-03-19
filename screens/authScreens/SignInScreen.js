@@ -33,7 +33,7 @@ import { ScrollView } from "react-native-gesture-handler";
 const SignInScreen = () => {
   const navigation = useNavigation();
 
-  const { user, setUser, setAuthLoading } = useAuth();
+  const { user, setUser, setAuthLoading,authSheetRef } = useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +72,8 @@ const SignInScreen = () => {
         );
         // console.log(response.data.user);
         setUser(response.data.user);
-        navigation.goBack();
+        // navigation.goBack();
+        // bottomSheetModalRef.current
         await AsyncStorage.setItem("headerToken", response.data.token);
         const jsonValue = JSON.stringify(response.data.user);
         await AsyncStorage.setItem("user", jsonValue);

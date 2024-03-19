@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   recommendedEvents,
   trendingEvents,
-} from "../../components/Data/events";
+} from "../../components/Data/stockEvents";
 import MediumCard from "../../components/cards/MediumCard";
 import BigCard from "../../components/cards/BigCard";
 import SmallCard from "../../components/cards/SmallCard";
@@ -29,13 +29,14 @@ import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 
 export default function HomeScreen({ navigation }) {
-  const { setAuthModalUp } = useAuth();
+  // const{authSheetRef}=useAuth()
+
+  const { setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
   const { events } = useData();
   const handleAuthSheet = useCallback(() => {
     setAuthModalUp(true);
-
-    bottomSheetModalRef.current?.present();
+    authSheetRef.current?.present();
   }, []);
 
   return (
@@ -78,7 +79,7 @@ export default function HomeScreen({ navigation }) {
               <Text style={styles.headerText}>Bu próximo evento</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={handleAuthSheet}
+                onPress={() => navigation?.navigate("event", trendingEvents[1])}
                 style={{
                   shadowOffset: { width: 1, height: 1 },
                   shadowOpacity: 1,
@@ -88,6 +89,17 @@ export default function HomeScreen({ navigation }) {
                 }}
               >
                 <BigCard
+                  title={trendingEvents[1]?.title}
+                  date={trendingEvents[1]?.date}
+                  venue={{
+                    displayName: trendingEvents[1]?.venue?.displayName,
+                    city: trendingEvents[1]?.venue?.city,
+                  }}
+                  image={{
+                    uri: trendingEvents[1]?.photos[0]?.uri,
+                  }}
+                />
+                {/* <BigCard
                   title="Workshop de fotografia"
                   date="Domingo, 29 Mai - 14h00"
                   venue={{
@@ -97,7 +109,7 @@ export default function HomeScreen({ navigation }) {
                   image={{
                     uri: "https://images.unsplash.com/photo-1553249067-9571db365b57?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
                   }}
-                />
+                /> */}
               </TouchableOpacity>
               <Text style={styles.headerText}>Pa bó</Text>
               <FlatList
@@ -128,7 +140,7 @@ export default function HomeScreen({ navigation }) {
         />
       </View>
       <AuthBottomSheet
-        bottomSheetModalRef={bottomSheetModalRef}
+        authSheetRef={authSheetRef}
         setAuthModalUp={setAuthModalUp}
       />
     </>

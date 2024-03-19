@@ -51,17 +51,18 @@ import Animated, {
 import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
-import { recommendedEvents } from "../../../components/Data/events";
+import { recommendedEvents } from "../../../components/Data/stockEvents";
 import { markers } from "../../../components/Data/markers";
 import SmallCard from "../../../components/cards/SmallCard";
 import colors from "../../../components/colors";
 import { Button } from "react-native";
 import { TouchableWithoutFeedback } from "react-native";
+import { useData } from "../../../components/hooks/useData";
 const { height, width } = Dimensions.get("window");
 
 const VenuesExplorer = () => {
   const navigation = useNavigation();
-
+const{venues}=useData()
   const mapViewRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -131,15 +132,15 @@ const VenuesExplorer = () => {
             style={[styles.map, {}]}
             showsUserLocation={true}
           >
-            {markers?.map((item) => {
+            {venues?.map((item) => {
               return (
                 <Marker
-                  key={item.id}
+                  key={item._id}
                   // onPress={handleMarkerPress}
                   onPress={async () => {
                     const newRegion = {
-                      latitude: item?.lat - 0.004,
-                      longitude: item?.long,
+                      latitude: item?.address?.lat - 0.004,
+                      longitude: item?.address?.long,
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.011,
                     };
@@ -151,8 +152,8 @@ const VenuesExplorer = () => {
                     getResults(item);
                   }}
                   coordinate={{
-                    latitude: item?.lat,
-                    longitude: item?.long,
+                    latitude: item?.address?.lat,
+                    longitude: item?.address?.long,
                   }}
                 >
                   <View
@@ -167,10 +168,18 @@ const VenuesExplorer = () => {
                         backgroundColor: colors.white,
                         borderWidth: 0.2,
                         borderColor: colors.darkGrey,
-                        padding: 5,
+                        padding: 3,
                         alignItems: "center",
                         justifyContent: "center",
-                        borderRadius: 10,
+                        borderRadius: 5,
+                        bottom:2
+                        // backgroundColor: colors.white,
+                        // borderWidth: 0.2,
+                        // borderColor: colors.darkGrey,
+                        // padding: 5,
+                        // alignItems: "center",
+                        // justifyContent: "center",
+                        // borderRadius: 10,
                       }}
                     >
                       <Text style={{ fontSize: 11, fontWeight: "500" }}>
@@ -178,15 +187,18 @@ const VenuesExplorer = () => {
                       </Text>
                     </View>
                     <Image
-                      resizeMode="contain"
+                      // resizeMode="contain"
                       style={{
                         height: item?.lat == region?.latitude ? 80 : 50,
                         width: item?.lat == region?.latitude ? 80 : 50,
-                        borderRadius: 10,
+                        // borderRadius: 10,
+                        borderRadius: 50,
+
                         borderWidth: 0.2,
-                        borderColor: colors.darkGrey,
+                        borderColor: colors.darkGrey                  ,      backgroundColor:colors.grey,
+
                       }}
-                      source={{ uri: item?.uri }}
+                      source={{ uri: item?.photos?.[0]?.uri }}
                     />
                   </View>
                 </Marker>
@@ -229,7 +241,7 @@ const VenuesExplorer = () => {
                     >
                       <TouchableOpacity
                         onPress={() => {
-                          navigation.navigate("venue");
+                          navigation.navigate("venue",venueDetails);
                         }}
                         style={{
                           flexDirection: "row",
@@ -256,7 +268,7 @@ const VenuesExplorer = () => {
                               borderWidth: 0.1,
                             }}
                             source={{
-                              uri: venueDetails?.uri,
+                              uri: venueDetails?.photos[0]?.uri,
                             }}
                           />
                           <Text
@@ -323,10 +335,10 @@ const VenuesExplorer = () => {
                         ? favVenues
                         : venueDetails
                         ? recommendedEvents.slice(1, 3).reverse()
-                        : markers
+                        : venues
                     }
                     showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item._id}
                     ListHeaderComponent={
                       <>
                         {loading && (
@@ -404,7 +416,7 @@ const VenuesExplorer = () => {
                           >
                             <TouchableOpacity
                               onPress={() => {
-                                navigation.navigate("venue");
+                                navigation.navigate("venue",item);
                               }}
                               style={{
                                 flexDirection: "row",
@@ -429,7 +441,7 @@ const VenuesExplorer = () => {
                                     borderWidth: 0.1,
                                   }}
                                   source={{
-                                    uri: item?.uri,
+                                    uri: item?.photos[0]?.uri,
                                   }}
                                 />
                                 <Text

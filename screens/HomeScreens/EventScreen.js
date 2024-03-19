@@ -262,13 +262,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
-              <Pressable
-                onPress={() => console.log("Pressed")}
-                onPressOut={() => console.log("Released")}
-              >
+           
                 <VideoPlayer
                   // playbackCallback={()=>console.log("fdasfsdgafdsF")}
-                  autoHidePlayer={false}
                   fullscreen={{
                     inFullscreen: inFullscreen,
                     enterFullscreen: async () => {
@@ -317,7 +313,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     isLooping: true,
                   }}
                 />
-              </Pressable>
             ) : // </TouchableOpacity>
             null
           }

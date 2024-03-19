@@ -29,16 +29,16 @@ const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
-  const [venues,setVenues]=useState([]);
+  const [venues, setVenues] = useState([]);
 
   //   const [headerToken, setHeaderToken] = useState("");
   const url = process.env.EXPO_PUBLIC_API_URL;
 
   const getEvents = async () => {
-    const result = await axios.get(`${url}/events/`);
+    const result = await axios.get(`${url}/events/`)
     // console.log(result?.data);
     setEvents(result?.data);
-  };
+  }
   const getVenues = async () => {
     const result = await axios.get(`${url}/venues/`);
     // console.log(result?.data);
@@ -46,14 +46,15 @@ export const DataProvider = ({ children }) => {
   };
   useEffect(() => {
     getEvents();
-    getVenues()
+    getVenues();
   }, []);
 
   const memoedValue = useMemo(
     () => ({
       events,
+      venues,
     }),
-    [events]
+    [events, venues]
   );
 
   return (
