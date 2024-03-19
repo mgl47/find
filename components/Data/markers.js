@@ -4,6 +4,7 @@ export const markers = [
     description:
       "Com uma bela vista sobre a praia de Quebra Canela, este é um ótimo local para um lanche e uma cerveja fresca. Comida boa e barata.",
 
+    city: "Praia",
     id: 1,
     lat: 14.904463,
     long: -23.517431,

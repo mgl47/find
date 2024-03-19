@@ -13,6 +13,7 @@ import DrawerNavigator, {
   Drawer,
 } from "./components/navigation/DrawerNavigator";
 import { AuthProvider } from "./components/hooks/useAuth";
+import { DataProvider } from "./components/hooks/useData";
 
 export default function App() {
   return (
@@ -26,8 +27,10 @@ export default function App() {
       <PaperProvider>
         <NavigationContainer theme={DefaultTheme}>
           <AuthProvider>
-            {/* <StackNavigator /> */}
-            <DrawerNavigator />
+            <DataProvider>
+              {/* <StackNavigator /> */}
+              <DrawerNavigator />
+            </DataProvider>
           </AuthProvider>
         </NavigationContainer>
       </PaperProvider>

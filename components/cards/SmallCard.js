@@ -2,15 +2,19 @@ import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-function SmallCard({ title, date, photos, venue, city }) {
-
+function SmallCard({ title, dates, photos, venue, city }) {
   return (
     <View style={styles.card}>
-      <Image style={styles.image} source={{ uri: photos[0]?.uri }} />
+      <Image style={styles.image} source={{ uri: photos[2]?.[0]?.uri }} />
       <View style={{ width: "100%" }}>
         <View style={{ padding: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={[styles.venue,{marginBottom:title?.length > 27 ? 7:3}]}>
+            <Text
+              style={[
+                styles.venue,
+                { marginBottom: title?.length > 27 ? 7 : 3 },
+              ]}
+            >
               {venue?.displayName}, {venue?.address?.city}
             </Text>
           </View>
@@ -33,7 +37,9 @@ function SmallCard({ title, date, photos, venue, city }) {
               size={18}
               color="black"
             />
-            <Text style={styles.date}>{date}</Text>
+            <Text style={styles.date}>
+              {dates?.[dates?.length - 1]?.displayDate}
+            </Text>
           </View>
 
           {/* <Text style={styles.interest}>{interest}</Text> */}
@@ -92,7 +98,7 @@ const styles = StyleSheet.create({
     color: colors.darkGrey,
     fontWeight: "500",
     marginLeft: 5,
-    top:1
+    top: 1,
     // lineHeight: 15,
   },
 

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Calendar, LocaleConfig } from "react-native-calendars";
 
@@ -45,9 +45,14 @@ import colors from "../../../components/colors";
 import { markers } from "../../../components/Data/markers";
 import SmallCard from "../../../components/cards/SmallCard";
 import Screen from "../../../components/Screen";
+import axios from "axios";
+import { useAuth } from "../../../components/hooks/useAuth";
+import { useData } from "../../../components/hooks/useData";
 const { height, width } = Dimensions.get("window");
 
 const CalendarScreen = () => {
+  const url = process.env.EXPO_PUBLIC_API_URL;
+
   LocaleConfig.locales["pt"] = {
     monthNames: [
       "Janeiro",
@@ -105,78 +110,52 @@ const CalendarScreen = () => {
   };
   LocaleConfig.defaultLocale = "pt";
   const navigation = useNavigation();
+  const { events } = useData();
 
   const [selectedDay, setSelectedDay] = useState("");
-
+  const [calendarEvents, setCalendarEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const getResults = async (day) => {
-    setSelectedDay(day.dateString);
+  let calDays = [];
+  let a = events?.map((item) =>
+    item?.dates?.forEach((item) => calDays.push(item?.calendarDate))
+  );
 
-    setLoading(true);
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 700);
-    });
-
-    setLoading(false);
-  };
-
-  const calDays = [
-    {
-      id: "Fgsbgafsgdbsg",
-      date: new Date("2024-03-14"),
-    },
-    {
-      id: "safasf",
-      date: new Date("2024-03-16"),
-    },
-    {
-      id: "safasf",
-      date: new Date("2024-03-17"),
-    },
-    {
-      id: "safasf",
-      date: new Date("2024-03-21"),
-    },
-    {
-      id: "safasf",
-      date: new Date("2024-03-21"),
-    },
-    {
-      id: "safasf",
-      date: new Date("2024-03-23"),
-    },
-  ];
-
-  const formateDate = (date) => {
-    return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? "0" : ""}${
-      date.getMonth() + 1
-    }-${date.getDate()}`;
-  };
-
-  const filteredDays = calDays.map((item) => {
-    const formattedDate = formateDate(item?.date);
+  const filteredDays = calDays?.map((item) => {
     return {
-      [formattedDate]: {
+      [item]: {
         marked: true,
-        selected: selectedDay == formattedDate,
+        selected: selectedDay == item,
         dotColor: colors.primary,
         selectedColor: colors.primary,
       },
     };
   });
-
-  const markedDatesData = filteredDays.reduce((acc, curr) => {
+  const markedDatesData = filteredDays?.reduce((acc, curr) => {
     return { ...acc, ...curr };
   }, {});
-  console.log(filteredDays.length);
 
+  const getCalendarEvents = async (day) => {
+    setLoading(true);
+    setSelectedDay(day.dateString);
+    let arr = [];
+    events?.filter((item) =>
+      item?.dates.forEach((item2) => {
+        if (item2?.calendarDate == day?.dateString) arr.push(item);
+      })
+    );
+    await new Promise((resolve, reject) => {
+      setTimeout(resolve, 500);
+    });
+    setCalendarEvents(arr);
+    setLoading(false);
+  };
   return (
     <Animated.FlatList
       entering={SlideInDown}
       exiting={SlideOutDown}
       style={{ flex: 1, backgroundColor: colors.background }}
-      data={recommendedEvents.slice(1, 3).reverse()}
+      data={calendarEvents}
       showsVerticalScrollIndicator={false}
       keyExtractor={(item) => item.id}
       ListHeaderComponent={
@@ -193,7 +172,7 @@ const CalendarScreen = () => {
             // onDayPress={(day) => {
             //   setSelectedDay(day.dateString);
             // }}
-            onDayPress={getResults}
+            onDayPress={getCalendarEvents}
             theme={{
               textSectionTitleColor: "#b6c1cd",
               selectedDayBackgroundColor: colors.primary,

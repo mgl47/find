@@ -13,14 +13,14 @@ function MediumCard({ title, date, photos, Category, city, venue }) {
     <ImageBackground
       style={styles.card}
       source={{
-        uri: photos[0]?.uri,
+        uri: photos[0]?.[0]?.uri,
       }}
     >
       <LinearGradient
         colors={["#00000000", "#000000"]}
         style={{ height: "100%", width: "100%" }}
       >
-        <View style={{ position: "absolute", bottom: 10 ,width:"100%"}}>
+        <View style={{ position: "absolute", bottom: 10, width: "100%" }}>
           <Text numberOfLines={2} style={styles.title}>
             {title}
           </Text>

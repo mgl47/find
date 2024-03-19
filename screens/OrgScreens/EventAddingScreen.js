@@ -48,6 +48,16 @@ import {
 } from "../../components/screensComponents/CompAddingScreen";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import VideoInputList from "../../components/ImageInputs/VideoInputList";
+import { storage } from "../../firebase";
+import {
+  deleteObject,
+  getDownloadURL,
+  listAll,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import axios from "axios";
+import { useAuth } from "../../components/hooks/useAuth";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -77,6 +87,8 @@ import VideoInputList from "../../components/ImageInputs/VideoInputList";
 // import axios from "axios";
 
 function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
+  const url = process.env.EXPO_PUBLIC_API_URL;
+  const { headerToken } = useAuth();
   const [ticketsSheetup, setTicketsSheetup] = useState(false);
   const [editTicketsSheetup, setEditTicketsSheetup] = useState(false);
   const [userModalUp, setUserModalUp] = useState(false);
@@ -111,23 +123,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     const dateDay = selectedDate?.getDate();
     const dateWeekDay = selectedDate?.getDay();
     const dateMonth = selectedDate?.getMonth();
-
-    // const date = {
-    //   date: selectedDate,
-    //   hour: `${hour < 10 ? "0" + hour : hour}:${
-    //     minutes < 10 ? "0" + minutes : minutes
-    //   }`,
-    //   displayDate:
-    //     dates?.length > 0
-    //       ? `${weekday[dateWeekDay]}, ${
-    //           dates[0]?.displayDate.split(" ")[1] + "-" + dateDay
-    //         } ${month[dateMonth]}`
-    //       : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
-
-    //   calendarDate: `${selectedDate.getFullYear()}-${
-    //     selectedDate.getMonth() + 1 < 10 ? "0" : ""
-    //   }${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`,
-    // };
 
     const date = {
       id: uuid.v4(),
@@ -241,7 +236,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [addPhone, setAddPhone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [blockModal, setBlockModal] = useState(false);
-
+  const uuidKey = uuid.v4();
   useEffect(() => {
     if (loading) {
       setBlockModal(true);
@@ -254,13 +249,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     if (videoUris.length < 2) {
       setVideoUris([...videoUris, uris]); // Update to handle array of URIs
     } else {
-      showMessage({
-        message: "Cannot add more than 7 images",
-        type: "warning",
-        floating: true,
-        animationDuration: 400,
-        backgroundColor: colors.secondary,
-      });
+      // showMessage({
+      //   message: "Cannot add more than 7 images",
+      //   type: "warning",
+      //   floating: true,
+      //   animationDuration: 400,
+      //   backgroundColor: colors.secondary,
+      // });
     }
   };
   function handleOnScroll(event) {
@@ -280,25 +275,26 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     if (imageUris.length < 10) {
       setImageUris([...imageUris, uris]); // Update to handle array of URIs
     } else {
-      showMessage({
-        message: "Cannot add more than 7 images",
-        type: "warning",
-        floating: true,
-        animationDuration: 400,
-        backgroundColor: colors.secondary,
-      });
+      // showMessage({
+      //   message: "Cannot add more than 7 images",
+      //   type: "warning",
+      //   floating: true,
+      //   animationDuration: 400,
+      //   backgroundColor: colors.secondary,
+      // });
     }
   };
   const handleRemove = (uri) => {
     setImageUris(imageUris.filter((imageUri) => imageUri !== uri));
   };
 
-  // let banner = []; // Initialize as an empty array
-  let photos = []; // Initialize as an empty array
-  let resizedPhotos = [];
-  let resizedThumb = [];
-  let resizedChatThumb = [];
-  let resizedSavingThumb = [];
+  let photos = [];
+  let videos = [];
+  let resized1 = [];
+  let resized2 = [];
+  let resized3 = [];
+  let resized4 = [];
+
   let resized1Photo = [];
   let resizedBannerURL = [];
   let resizedPhotosArray = [];
@@ -308,102 +304,83 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       // await new Promise((resolve) => setTimeout(resolve, 2000));
       for (let i = 0; i < imageUris.length; i++) {
         const fileName = imageUris[i].split("/").pop();
-        const resizedFileName = `${fileName.split(".")[0]}_1000x1000.${
+        const resized1Name = `${fileName.split(".")[0]}_1200x1200.${
           fileName.split(".")[1]
         }`;
-        const resizedThumbFileName = `${fileName.split(".")[0]}_600x600.${
+        const resized2Name = `${fileName.split(".")[0]}_900x900.${
           fileName.split(".")[1]
         }`;
-        const resizedChatThumbFileName = `${fileName.split(".")[0]}_100x100.${
+        const resized3Name = `${fileName.split(".")[0]}_400x400.${
           fileName.split(".")[1]
         }`;
-        const resizedSavingThumbFileName = `${fileName.split(".")[0]}_300x300.${
+        const resized4Name = `${fileName.split(".")[0]}_200x200.${
           fileName.split(".")[1]
         }`;
 
-        const resizedStorageRef = ref(
+        const resized1Storage = ref(
           storage,
-          `marketStorage/${uuidKey}/${resizedFileName}`
+          `events/${uuidKey}/photos/${resized1Name}`
         );
-        const resizedThumbStorageRef = ref(
+        const resized2Storage = ref(
           storage,
-          `marketStorage/${uuidKey}/${resizedThumbFileName}`
+          `events/${uuidKey}/photos/${resized2Name}`
         );
-        const resizedchatThumbStorageRef = ref(
+        const resized3Storage = ref(
           storage,
-          `marketStorage/${uuidKey}/${resizedChatThumbFileName}`
+          `events/${uuidKey}/photos/${resized3Name}`
         );
-        const resizedSavingThumbStorageRef = ref(
+        const resized4Storage = ref(
           storage,
-          `marketStorage/${uuidKey}/${resizedSavingThumbFileName}`
+          `events/${uuidKey}/photos/${resized4Name}`
         );
 
-        let resizedDownloadURL;
-        let resizedThumbDownloadURL;
-        let resizedChatThumbDownloadURL;
-        let resizedSavingThumbURL;
+        let resized1Url;
+        let resized2Url;
+        let resized3Url;
+        let resized4Url;
         try {
-          resizedDownloadURL = await getDownloadURL(resizedStorageRef);
-          resizedThumbDownloadURL = await getDownloadURL(
-            resizedThumbStorageRef
-          );
-          resizedChatThumbDownloadURL = await getDownloadURL(
-            resizedchatThumbStorageRef
-          );
-          resizedSavingThumbURL = await getDownloadURL(
-            resizedSavingThumbStorageRef
-          );
+          resized1Url = await getDownloadURL(resized1Storage);
+          resized2Url = await getDownloadURL(resized2Storage);
+          resized3Url = await getDownloadURL(resized3Storage);
+          resized4Url = await getDownloadURL(resized4Storage);
         } catch (error) {
           console.log(`Error retrieving URLs for image ${i}: ${error.message}`);
           // Use the resized image URL as a fallback
         }
 
-        resizedPhotos = [
-          ...resizedPhotos,
+        resized1 = [
+          ...resized1,
           {
             id: 1 + i,
-            uri: resizedDownloadURL,
+            uri: resized1Url,
           },
         ];
-        resizedThumb = [
-          ...resizedThumb,
+        resized2 = [
+          ...resized2,
           {
             id: 1 + i,
-            uri: resizedThumbDownloadURL,
+            uri: resized2Url,
           },
         ];
-        resizedChatThumb = [
-          ...resizedChatThumb,
+        resized3 = [
+          ...resized3,
           {
             id: 1 + i,
-            uri: resizedChatThumbDownloadURL,
+            uri: resized3Url,
           },
         ];
-        resizedSavingThumb = [
-          ...resizedSavingThumb,
+        resized4 = [
+          ...resized4,
           {
             id: 1 + i,
-            uri: resizedSavingThumbURL,
+            uri: resized4Url,
           },
         ];
-
-        // const listingDocRef = doc(db, "Market", uuidKey);
-        // const newData = {
-        //   photos: resizedPhotos, // Add the resized photos to the document data
-        //   // userId: user.uid,
-        // };
-        // await updateDoc(listingDocRef, newData);
-        // console.log("Resized photos updated successfully");
       }
+      photos = [resized1, resized3, resized3, resized4];
+      console.log(photos);
     } catch (error) {
       console.log(error);
-      //   showMessage({
-      //     message: "Houve um erro ao processar o seu anúncio!",
-      //     type: "info",
-      //     floating: "true",
-      //     animationDuration: 400,
-      //     backgroundColor: colors.secondary,
-      //   });
     }
   };
 
@@ -411,40 +388,221 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     try {
       for (let i = 0; i < imageUris.length; i++) {
         const fileName = imageUris[i].split("/").pop();
-        const storageRef = ref(storage, `marketStorage/${uuidKey}/${fileName}`);
-        console.log("photo filename");
-        //   await new Promise((resolve) => setTimeout(resolve, 1500));
+        const storageRef = ref(storage, `events/${uuidKey}/photos/${fileName}`);
         const blob = await fetch(imageUris[i]).then((response) =>
           response.blob()
         );
-        console.log("photo blob");
         // await new Promise((resolve) => setTimeout(resolve, 5000));
         const uploadTask = uploadBytesResumable(storageRef, blob);
-        console.log("photo uploaded");
+        // console.log("photo uploaded");
+        // const downloadURL = await new Promise((resolve, reject) => {
+        //   uploadTask.on("state_changed", null, reject, () => {
+        //     getDownloadURL(storageRef).then(resolve).catch(reject);
+        //   });
+        //   console.log("photo typeUrl");
+        // });
+
+        // photos = [...photos, { id: 1 + i, uri: downloadURL }];
+      }
+    } catch (error) {
+      console.log(error);
+      console.log("erro ao processarr");
+    }
+  };
+
+  const uploadVideos = async () => {
+    try {
+      for (let i = 0; i < videoUris.length; i++) {
+        const fileName = videoUris[i].split("/").pop();
+        const storageRef = ref(storage, `events/${uuidKey}/videos/${fileName}`);
+        const blob = await fetch(videoUris[i]).then((response) =>
+          response.blob()
+        );
+        // await new Promise((resolve) => setTimeout(resolve, 5000));
+        const uploadTask = uploadBytesResumable(storageRef, blob);
         const downloadURL = await new Promise((resolve, reject) => {
           uploadTask.on("state_changed", null, reject, () => {
             getDownloadURL(storageRef).then(resolve).catch(reject);
           });
-          console.log("photo typeUrl");
         });
 
-        photos = [...photos, { id: 1 + i, uri: downloadURL }];
-        console.log(`${i + 1} done`);
+        videos = [...videos, { id: 1 + i, uri: downloadURL }];
+        // console.log(videos);
       }
-      console.log("upload succ"); // You can use the downloadURL here if needed
     } catch (error) {
       console.log(error);
-      showMessage({
-        message: "Houve um erro ao processar o seu anúncio!",
-        type: "info",
-        floating: "true",
-        animationDuration: 400,
-        backgroundColor: colors.secondary,
-      });
+      console.log("erro ao processarr");
     }
   };
-  // console.log(imageUris.length);
+  const venues2 = {
+    id: 1,
+    displayName: "Kebra Cabana",
+    address: {
+      city: "Praia",
+      zone: "Quebra Canela",
+      lat: 14.904463,
+      long: -23.517431,
+    },
+    phone1: 9123456,
+    upcomingEvents: [
+      {
+        id: 2,
+        title: "Quinta Quentes",
+        date: "Quinta, 20 Mai - 22:00",
+        promoter: "Kebra Cabana",
+      },
+      {
+        id: 1,
+        title: "Rolling Loud Cv: Edição 2024",
+        date: "Quarta, 06-08 Jul - 15:00",
+        promoter: "Sigue Sabura",
+      },
+    ],
+    photos: [
+      {
+        id: 1,
+        uri: "https://scontent.fopo3-2.fna.fbcdn.net/v/t31.18172-8/13220730_1347686511913909_1118731680861521309_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=4dc865&_nc_eui2=AeHynjX1ye85plORdI-EY4s7-9foNdj7fU371-g12Pt9TWRIT-0ZBtFlguV4yzjJISh8S4V0Axsi1rxa25KNSVPM&_nc_ohc=vi-qKdNEL0EAX9tox6R&_nc_ht=scontent.fopo3-2.fna&oh=00_AfCQUJ24zOBjvG7fCHW1FcHxapBhxQ7GeTLNdU4aqBy2oQ&oe=660CA567",
+      },
+      {
+        id: 2,
+        uri: "https://lh5.googleusercontent.com/p/AF1QipNUHVeb6i6i0_73l32v7lM3cC1AX63xiZz4vnbd=s1600",
+      },
+      {
+        id: 3,
+        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfESMUWnwWeRqQ3LL4bVbdLlOgjF_dCNdtpU5yEWCUw&s",
+      },
+    ],
+    description:
+      "Com uma bela vista sobre a praia de Quebra Canela, este é um ótimo local para um lanche e uma cerveja fresca. Comida boa e barata.",
+  };
+  const addEvent = async () => {
+    setLoading(true);
+    try {
+      await uploadPhotos();
 
+      setLoading(false);
+      if (videoUris?.length > 0) {
+        try {
+          uploadVideos();
+        } catch (error) {}
+      }
+      await new Promise((resolve) => setTimeout(resolve, 8000));
+
+      await updatePhotos();
+      console.log(resized2);
+
+      const event = {
+        uuid: uuidKey,
+        active: true,
+
+        title: title,
+
+        description: description,
+        category: category,
+        dates,
+        clicks: 0,
+        photos,
+        videos,
+        organizers,
+        artists,
+        tickets,
+        venue,
+
+        // pushToken: token,
+        // userId: user.uid,
+      };
+
+      // if (resizedBannerURL && resized1Photo) {
+      const result = await axios.post(
+        `${url}/user/event/`,
+
+        event,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${headerToken}`,
+          },
+        }
+      );
+      console.log(result?.status);
+      // } else {
+      //   console.log("houve um erro");
+      // }
+    } catch (error) {
+      console.log(error);
+      listAll(ref(storage, `events/${uuid}/`))
+        .then((res) => {
+          res.prefixes.forEach((folderRef) => {});
+          res.items.forEach((itemRef) => {
+            deleteObject(itemRef);
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      console.log("houve um erro2");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  console.log(venue);
+ 
+   const addVenue = async () => {
+    setLoading(true);
+    try {
+
+      const result = await axios.post(
+        `${url}/user/venue/`,
+
+        venue,
+
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${headerToken}`,
+          },
+        }
+      );
+      console.log(result?.status);
+  
+    } catch (error) {
+      console.log(error);
+
+      console.log("houve um erro2");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // const addVenue = async () => {
+  //   setLoading(true);
+  //   try {
+
+  //     const result = await axios.post(
+  //       `${url}/user/venue/`,
+
+  //       venues2,
+
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${headerToken}`,
+  //         },
+  //       }
+  //     );
+  //     console.log(result?.status);
+  
+  //   } catch (error) {
+     
+  //     console.log("houve um erro2");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
   const handlePhoneNumberChange1 = (inputValue) => {
     if (
       (inputValue.length > 0 &&
@@ -1499,6 +1657,37 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 /> */}
           </View>
         </View>
+        <TouchableOpacity
+          // onPress={addEvent}
+          onPress={addVenue}
+          style={{
+            alignSelf: "center",
+            flexDirection: "row",
+            height: 50,
+            width: "90%",
+            backgroundColor: colors.primary,
+            borderRadius: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowOffset: { width: 0.5, height: 0.5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            elevation: 2,
+            marginTop: 5,
+            marginBottom: 15,
+          }}
+        >
+          <Text
+            style={{
+              color: colors.white,
+              marginLeft: 5,
+              fontSize: 17,
+              fontWeight: "500",
+            }}
+          >
+            Adicionar
+          </Text>
+        </TouchableOpacity>
       </KeyboardAwareScrollView>
 
       <UserSelector
@@ -1525,7 +1714,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         dates={dates}
         ticketsSheetRef={ticketsSheetRef}
         tickets={tickets}
-  
         setTickets={setTickets}
       />
       <EditTicketsSheet

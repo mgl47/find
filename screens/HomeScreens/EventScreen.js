@@ -57,7 +57,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   useEffect(() => {
     setFirstMount(false);
   }, []);
+  const isIPhoneWithNotch =
+    Platform.OS === 'ios' &&
+    (Dimensions.get('window').height === 852 ||Dimensions.get('window').height === 844 ||Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896||Dimensions.get('window').height === 926||Dimensions.get('window').height === 932 );
 
+  console.log(Dimensions.get('window').height);
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
@@ -71,7 +75,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
-  
+
   function handleMediaScroll(event) {
     setMediaIndex(
       parseInt(
@@ -150,47 +154,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </TouchableOpacity>
         ) : null,
       headerRight: () =>
-        // !inFullscreen && (
-        //   <View
-        //     style={{
-        //       flexDirection: "row",
-        //       alignItems: "center",
-        //       // zIndex: 3,
-        //       // position: "absolute",
-        //       right: 10,
-        //       // opacity: indexVisible ? 0 : 1,
-        //       // top: height * 0.33,
-        //       // top: height * 0.05,
-        //       shadowOffset: !scrolling ? { width: 0.5, height: 0.5 } : {},
-        //       shadowOpacity: !scrolling ? 0.3 : 0,
-        //       shadowRadius: !scrolling ? 1 : 0,
-        //       elevation: !scrolling ? 2 : 0,
-        //     }}
-        //   >
-        //     <MaterialIcons
-        //       style={{
-        //         right: 30,
-        //         // shadowOffset: { width: 0.5, height: 0.5 },
-        //         // shadowOpacity: 0.3,
-        //         // shadowRadius: 1,
-        //         // elevation: 2,
-        //         position: "absolute",
-        //       }}
-        //       name="photo-library"
-        //       size={20}
-        //       color={scrolling ? colors.black : colors.white}
-        //     />
-        //     <Text
-        //       style={{
-        //         color: scrolling ? colors.black : colors.white,
-        //         fontSize: 14,
-        //         fontWeight: "600",
-        //       }}
-        //     >
-        //       {Number(mediaIndex) + 1 + "/" + Number(Event?.photos?.length + 1)}
-        //     </Text>
-        //   </View>
-        // ),
+      
         !inFullscreen &&
         !scrolling && (
           <View
@@ -229,7 +193,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontWeight: "600",
               }}
             >
-              {Number(mediaIndex) + 1 + "/" + Number(Event?.photos?.length + 1)}
+              {Number(mediaIndex) +
+                1 +
+                "/" +
+                Number(
+                  Event?.videos?.length > 0
+                    ? Event?.photos?.[0]?.length + 1
+                    : Event?.photos?.[0]?.length
+                )}
             </Text>
           </View>
         ),
@@ -259,10 +230,15 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           exiting={SlideOutUp.duration(500)}
           style={{
             position: "absolute",
-            height: 90,
+            height: isIPhoneWithNotch?90:65,
             width: "100%",
             backgroundColor: colors.white,
             zIndex: 2,
+            shadowOffset: { width: 0.5, height: 0.5 },
+              elevation: 2,
+
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
           }}
         />
       )}
@@ -278,16 +254,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           showsHorizontalScrollIndicator={false}
           pagingEnabled
           onScroll={(e) => handleMediaScroll(e)}
-          scrollEnabled={Event?.videos?.length > 0 || Event?.photos?.length > 1}
+          scrollEnabled={
+            Event?.videos?.length > 0 || Event?.photos?.[0]?.length > 1
+          }
           horizontal
-          data={Event?.photos}
+          data={Event?.photos?.[1]}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
-              // <TouchableOpacity
-              //   style={{ flex: 1, backgroundColor: "red", zIndex: 2 }}
-              //   onPress={() => console.log("dasfas")}
-              // >
               <Pressable
                 onPress={() => console.log("Pressed")}
                 onPressOut={() => console.log("Released")}
@@ -402,7 +376,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     marginLeft: 5,
                   }}
                 >
-                  {Event?.venue?.displayName}, {Event?.venue?.city}
+                  {Event?.venue?.displayName}, {Event?.venue?.address?.city}
                 </Text>
               </View>
 
@@ -454,7 +428,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 marginLeft: 5,
               }}
             >
-              {Event?.date}
+              {Event?.dates[Event?.dates?.length - 1]?.displayDate}
             </Text>
           </View>
           <View
@@ -483,9 +457,37 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               {Event?.going} Pessoas vão!
             </Text>
           </View>
-          <View style={{ flexDirection: "row", marginVertical: 3 }}>
+          <View style={{ flexDirection: "row", marginVertical: 5 }}>
+            {/* <TouchableOpacity
+              onPress={() => {
+                setInterested(!interested), setGoing(false);
+              }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: interested ? colors.primary : colors.white,
+                // paddingHorizontal: 2,
+                marginRight: 10,
+                borderRadius: 12,
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+                padding:5
+              }}
+            >
+              <MaterialCommunityIcons
+                name="calendar-heart"
+                color={interested ? colors.white : colors.black}
+                size={20}
+              />
+              <Text style={{ color: interested ? colors.white : colors.black }}>
+                Interressado
+              </Text>
+            </TouchableOpacity> */}
             <Chip
               // elevated
+              
               elevation={1}
               icon={() => (
                 <MaterialCommunityIcons
@@ -625,11 +627,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Image
                   style={{
-                    height: 50,
-                    width: 50,
+                    height: 55,
+                    width: 55,
                     borderRadius: 50,
                     marginBottom: 2,
                     borderWidth: 0.009,
+                    backgroundColor: colors.darkGrey,
                   }}
                   source={{ uri: item?.avatar }}
                 />
@@ -809,7 +812,127 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           >
             Organizado por
           </Text>
-          <View
+
+          <FlatList
+            data={Event?.organizers}
+            horizontal={Event?.organizers?.length > 1}
+            keyExtractor={(item) => item?.id}
+            renderItem={({ item }) => {
+              return Event?.organizers?.length > 1 ? (
+                <TouchableOpacity
+                  style={{
+                    padding: 5,
+                    alignItems: "center",
+                    // justifyContent: "center",
+                  }}
+                  onPress={() => navigation.navigate("artist", item)}
+                >
+                  <Image
+                    style={{
+                      height: 65,
+                      width: 65,
+                      borderRadius: 20,
+                      marginBottom: 2,
+                      borderWidth: 0.009,
+                      backgroundColor: colors.darkGrey,
+                    }}
+                    source={{ uri: item?.avatar }}
+                  />
+                  <Text
+                    style={{
+                      width: item?.displayName?.length > 15 ? 100 : null,
+                      textAlign: "center",
+                      fontSize: 14,
+                      fontWeight: "500",
+                    }}
+                  >
+                    {item?.displayName}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: colors.white,
+
+                    borderRadius: 10,
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 1,
+                    elevation: 2,
+                  }}
+                >
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      alignItems: "center",
+
+                      // height: 50,
+                      // padding: 5,
+                    }}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Image
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 50,
+                          marginRight: 10,
+                          borderWidth: 0.1,
+                        }}
+                        source={{
+                          uri: item.avatar,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                          // color: colors.white,
+                        }}
+                      >
+                        {item.displayName}
+                      </Text>
+                    </View>
+                    <Entypo
+                      name="chevron-right"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                  <View style={[styles.separator, { width: "90%" }]} />
+
+                  <TouchableOpacity
+                    style={{
+                      padding: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      // marginVertical: 5,
+                    }}
+                  >
+                    <View>
+                      <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                        Telefonar
+                      </Text>
+                      <Text>{item.phone1}</Text>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="phone"
+                      size={25}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+          />
+          {/* <View
             style={{
               backgroundColor: colors.white,
 
@@ -881,7 +1004,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color={colors.primary}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
 
           <View style={{ marginBottom: 100 }} />
         </View>

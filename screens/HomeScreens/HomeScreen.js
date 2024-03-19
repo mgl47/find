@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   recommendedEvents,
@@ -25,16 +25,19 @@ import {
 
 import { useAuth } from "../../components/hooks/useAuth";
 import AuthBottomSheet from "../../components/screensComponents/AuthBottomSheet";
+import axios from "axios";
+import { useData } from "../../components/hooks/useData";
 
 export default function HomeScreen({ navigation }) {
-  const {setAuthModalUp} = useAuth();
+  const { setAuthModalUp } = useAuth();
   const bottomSheetModalRef = useRef(null);
-
+  const { events } = useData();
   const handleAuthSheet = useCallback(() => {
     setAuthModalUp(true);
 
     bottomSheetModalRef.current?.present();
   }, []);
+
   return (
     <>
       <View style={styles.container}>
@@ -47,8 +50,10 @@ export default function HomeScreen({ navigation }) {
               <FlatList
                 showsHorizontalScrollIndicator={false}
                 horizontal
-                data={trendingEvents}
-                keyExtractor={(item) => item.id}
+                // data={trendingEvents}
+                data={events}
+                keyExtractor={(item) => item.uuid}
+                // keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
                   return (
                     <TouchableOpacity
@@ -121,13 +126,11 @@ export default function HomeScreen({ navigation }) {
             </>
           }
         />
-    
       </View>
       <AuthBottomSheet
-          bottomSheetModalRef={bottomSheetModalRef}
-          setAuthModalUp={setAuthModalUp}
-        
-        />
+        bottomSheetModalRef={bottomSheetModalRef}
+        setAuthModalUp={setAuthModalUp}
+      />
     </>
   );
 }
