@@ -32,15 +32,15 @@ export const DataProvider = ({ children }) => {
   const [venues, setVenues] = useState([]);
 
   //   const [headerToken, setHeaderToken] = useState("");
-  const url = process.env.EXPO_PUBLIC_API_URL;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const getEvents = async () => {
-    const result = await axios.get(`${url}/events/`)
+    const result = await axios.get(`${apiUrl}/events/`);
     // console.log(result?.data);
     setEvents(result?.data);
-  }
+  };
   const getVenues = async () => {
-    const result = await axios.get(`${url}/venues/`);
+    const result = await axios.get(`${apiUrl}/venues/`);
     // console.log(result?.data);
     setVenues(result?.data);
   };
@@ -52,6 +52,8 @@ export const DataProvider = ({ children }) => {
   const memoedValue = useMemo(
     () => ({
       events,
+      getEvents,
+      apiUrl,
       venues,
     }),
     [events, venues]

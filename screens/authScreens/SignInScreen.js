@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
@@ -33,7 +34,7 @@ import { ScrollView } from "react-native-gesture-handler";
 const SignInScreen = () => {
   const navigation = useNavigation();
 
-  const { user, setUser, setAuthLoading,authSheetRef } = useAuth();
+  const { user, setUser, setHeaderToken, authSheetRef } = useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -72,16 +73,23 @@ const SignInScreen = () => {
         );
         // console.log(response.data.user);
         setUser(response.data.user);
+        setHeaderToken("Bearer " + response.data.token);
+
         // navigation.goBack();
         // bottomSheetModalRef.current
-        await AsyncStorage.setItem("headerToken", response.data.token);
+        await AsyncStorage.setItem(
+          "headerToken",
+          "Bearer " + response.data.token
+        );
         const jsonValue = JSON.stringify(response.data.user);
         await AsyncStorage.setItem("user", jsonValue);
         JSON.parse(jsonValue);
+        authSheetRef?.current?.close();
         navigation.openDrawer();
 
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
+      Keyboard.dismiss();
     } catch (error) {
       if (error.response) {
         console.log(error.response.data);
@@ -100,157 +108,159 @@ const SignInScreen = () => {
   //   });
   // }, [loading,]);
   return (
-    <KeyboardAwareScrollView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{
-        padding: 10,
-        backgroundColor: colors.background,
-        flex: 1,
-        // marginBottom: 300,
-      }}
-    >
-    {/* <View> */}
-      <BlockModal active={loading} />
-      <TextInput
-        error={!firstAttempt && !person.email}
-        style={{ marginBottom: 5 }}
-        // autoFocus
-        mode="outlined"
-        activeOutlineColor={colors.primary}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        outlineColor={colors.primary}
-        // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-        label="Nome de usuário ou Email"
-        activeUnderlineColor={colors.primary}
-        value={person?.email}
-        onChangeText={(text) => setPerson({ ...person, email: text })}
-      />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <KeyboardAwareScrollView
+        // keyboardShouldPersistTaps="never"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{
+          padding: 10,
+          backgroundColor: colors.background,
+          flex: 1,
+          // marginBottom: 300,
+        }}
+      >
+        {/* <View> */}
+        <BlockModal active={loading} />
+        <TextInput
+          error={!firstAttempt && !person.email}
+          style={{ marginBottom: 5, backgroundColor: colors.background }}
+          // autoFocus
+          mode="outlined"
+          activeOutlineColor={colors.primary}
+          underlineStyle={{ backgroundColor: colors.primary }}
+          outlineColor={colors.primary}
+          // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+          label="Nome de usuário ou Email"
+          activeUnderlineColor={colors.primary}
+          value={person?.email}
+          onChangeText={(text) => setPerson({ ...person, email: text })}
+        />
 
-      {!onPassRecovery && (
-        <Animated.View
-          entering={firstMount ? null : SlideInUp.duration(400)}
-          exiting={firstMount ? null : SlideOutUp.duration(1000)}
-          style={{}}
-        >
-          <TextInput
-            error={!firstAttempt && !person.password}
-            style={{ marginBottom: 20, backgroundColor: colors.background }}
-            underlineStyle={{ backgroundColor: colors.primary }}
-            mode="outlined"
-            outlineColor={colors.primary}
-            activeOutlineColor={colors.primary}
-            label="Palavra Passe"
-            activeUnderlineColor={colors.primary}
-            right={
-              <TextInput.Icon
-                onPress={() => setShowPassword(!showPassword)}
-                icon={showPassword ? "eye" : "eye-off"}
-              />
-            }
-            secureTextEntry={!showPassword}
-            value={person?.password}
-            onChangeText={(text) => setPerson({ ...person, password: text })}
-            onSubmitEditing={validated ? signIn : null}
-          />
-        </Animated.View>
-      )}
-      {!onPassRecovery && (
-        <Animated.View
-          entering={firstMount ? null : SlideInRight.duration(500)}
-          exiting={firstMount ? null : SlideOutRight.duration(500)}
-        >
-          <TouchableOpacity
-            onPress={() => setOnPassRecovery(!onPassRecovery)}
-            style={{ alignSelf: "flex-end", marginBottom: 20 }}
+        {!onPassRecovery && (
+          <Animated.View
+            entering={firstMount ? null : SlideInUp.duration(400)}
+            exiting={firstMount ? null : SlideOutUp.duration(1000)}
+            style={{}}
           >
-            <Text
-              style={{
-                color: colors.primary,
-                marginLeft: 5,
-                fontSize: 15,
-                fontWeight: "500",
-              }}
-            >
-              Esqueceu a palavra passe?
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-      {onPassRecovery && (
-        <Animated.View
-          entering={firstMount ? null : SlideInRight.duration(500)}
-          exiting={firstMount ? null : SlideOutRight.duration(500)}
-        >
-          <TouchableOpacity
-            onPress={() => setOnPassRecovery(!onPassRecovery)}
-            style={{ alignSelf: "flex-end", marginBottom: 20, marginTop: 15 }}
-          >
-            <Text
-              style={{
-                color: colors.primary,
-                marginLeft: 5,
-                fontSize: 15,
-                fontWeight: "500",
-              }}
-            >
-              Já tem uma conta?
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      )}
-      <View>
-        <Text
-          style={{
-            position: "absolute",
-            color: "#b00000",
-            left: 15,
-            top: -52,
-          }}
-        >
-          {errorMsg}
-        </Text>
-        <TouchableOpacity
-          disabled={!validated}
-          onPress={signIn}
-          style={{
-            alignSelf: "center",
-            flexDirection: "row",
-            height: 50,
-            width: "90%",
-            backgroundColor: colors.primary,
-            borderRadius: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowOffset: { width: 0.5, height: 0.5 },
-            shadowOpacity: 0.3,
-            shadowRadius: 1,
-            elevation: 2,
-            marginBottom: 15,
-          }}
-        >
-          <MaterialCommunityIcons
-            name="account-outline"
-            size={24}
-            color={colors.white}
-          />
-
-          <Animated.Text
+            <TextInput
+              error={!firstAttempt && !person.password}
+              style={{ marginBottom: 20, backgroundColor: colors.background }}
+              underlineStyle={{ backgroundColor: colors.primary }}
+              mode="outlined"
+              outlineColor={colors.primary}
+              activeOutlineColor={colors.primary}
+              label="Palavra Passe"
+              activeUnderlineColor={colors.primary}
+              right={
+                <TextInput.Icon
+                  onPress={() => setShowPassword(!showPassword)}
+                  icon={showPassword ? "eye" : "eye-off"}
+                />
+              }
+              secureTextEntry={!showPassword}
+              value={person?.password}
+              onChangeText={(text) => setPerson({ ...person, password: text })}
+              onSubmitEditing={validated ? signIn : null}
+            />
+          </Animated.View>
+        )}
+        {!onPassRecovery && (
+          <Animated.View
             entering={firstMount ? null : SlideInRight.duration(500)}
             exiting={firstMount ? null : SlideOutRight.duration(500)}
+          >
+            <TouchableOpacity
+              onPress={() => setOnPassRecovery(!onPassRecovery)}
+              style={{ alignSelf: "flex-end", marginBottom: 20 }}
+            >
+              <Text
+                style={{
+                  color: colors.primary,
+                  marginLeft: 5,
+                  fontSize: 15,
+                  fontWeight: "500",
+                }}
+              >
+                Esqueceu a palavra passe?
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+        {onPassRecovery && (
+          <Animated.View
+            entering={firstMount ? null : SlideInRight.duration(500)}
+            exiting={firstMount ? null : SlideOutRight.duration(500)}
+          >
+            <TouchableOpacity
+              onPress={() => setOnPassRecovery(!onPassRecovery)}
+              style={{ alignSelf: "flex-end", marginBottom: 20, marginTop: 15 }}
+            >
+              <Text
+                style={{
+                  color: colors.primary,
+                  marginLeft: 5,
+                  fontSize: 15,
+                  fontWeight: "500",
+                }}
+              >
+                Já tem uma conta?
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+        <View>
+          <Text
             style={{
-              color: colors.white,
-              marginLeft: 5,
-              fontSize: 17,
-              fontWeight: "500",
+              position: "absolute",
+              color: "#b00000",
+              left: 15,
+              top: -52,
             }}
           >
-            {!onPassRecovery ? "Entrar" : "Recuperar"}
-          </Animated.Text>
-        </TouchableOpacity>
-        {loading && <ActivityIndicator color={colors.primary} />}
-      </View>
-    </KeyboardAwareScrollView>
+            {errorMsg}
+          </Text>
+          <TouchableOpacity
+            disabled={!validated}
+            onPress={signIn}
+            style={{
+              alignSelf: "center",
+              flexDirection: "row",
+              height: 50,
+              width: "90%",
+              backgroundColor: colors.primary,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+              marginBottom: 15,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="account-outline"
+              size={24}
+              color={colors.white}
+            />
 
+            <Animated.Text
+              entering={firstMount ? null : SlideInRight.duration(500)}
+              exiting={firstMount ? null : SlideOutRight.duration(500)}
+              style={{
+                color: colors.white,
+                marginLeft: 5,
+                fontSize: 17,
+                fontWeight: "500",
+              }}
+            >
+              {!onPassRecovery ? "Entrar" : "Recuperar"}
+            </Animated.Text>
+          </TouchableOpacity>
+          {loading && <ActivityIndicator color={colors.primary} />}
+        </View>
+      </KeyboardAwareScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 

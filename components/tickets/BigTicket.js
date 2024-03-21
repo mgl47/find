@@ -49,7 +49,7 @@ export default function BigTicket() {
       >
         <Text
           style={{
-            color: "white",
+            color: colors.white,
             fontSize: 40,
             textShadowColor: "rgba(0, 0, 0, 0.75)",
             textShadowOffset: { width: 0, height: 1 },

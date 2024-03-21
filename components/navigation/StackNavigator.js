@@ -36,9 +36,10 @@ const Stack = createStackNavigator();
 
 function StackNavigator() {
   const navigation = useNavigation();
-  const { user, authLoading } = useAuth();
+  const { user, authLoading, authSheetRef, setAuthModalUp } = useAuth();
   const fromHome = true;
   const invisibleHeaders = ["event", "artist", "venue"];
+
   return (
     <Stack.Navigator
       screenOptions={({ route }) => ({
@@ -57,10 +58,15 @@ function StackNavigator() {
         headerBackgroundContainerStyle: !invisibleHeaders?.includes(route.name)
           ? {
               backgroundColor: colors.white,
+              // shadowOffset: { width: 0.5, height: 0.5 },
+              // elevation: 2,
+
+              // shadowOpacity: 0.3,
+              // shadowRadius: 1,
               shadowOffset: { width: 0.5, height: 0.5 },
               elevation: 2,
 
-              shadowOpacity: 0.3,
+              shadowOpacity: 0.1,
               shadowRadius: 1,
             }
           : {},
@@ -73,7 +79,9 @@ function StackNavigator() {
           headerLeft: () => (
             <TouchableOpacity
               onPress={() =>
-                user ? navigation.openDrawer() : navigation.navigate("auth")
+                user
+                  ? navigation.openDrawer()
+                  : (authSheetRef?.current?.present(), setAuthModalUp(true))
               }
               // onPress={handleAuthSheet}
               style={{ left: 20, bottom: 1 }}

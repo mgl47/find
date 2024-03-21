@@ -51,6 +51,9 @@ import {
   GiftModal,
   PurchaseModal,
 } from "../../components/screensComponents/CompEventScreen";
+import axios from "axios";
+import { useData } from "../../components/hooks/useData";
+import { useAuth } from "../../components/hooks/useAuth";
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const [firstMount, setFirstMount] = useState(true);
@@ -58,10 +61,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     setFirstMount(false);
   }, []);
   const isIPhoneWithNotch =
-    Platform.OS === 'ios' &&
-    (Dimensions.get('window').height === 852 ||Dimensions.get('window').height === 844 ||Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896||Dimensions.get('window').height === 926||Dimensions.get('window').height === 932 );
+    Platform.OS === "ios" &&
+    (Dimensions.get("window").height === 852 ||
+      Dimensions.get("window").height === 844 ||
+      Dimensions.get("window").height === 812 ||
+      Dimensions.get("window").height === 896 ||
+      Dimensions.get("window").height === 926 ||
+      Dimensions.get("window").height === 932);
 
-  console.log(Dimensions.get('window').height);
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
@@ -71,6 +78,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [scrolling, setScrolling] = useState(false);
   const [scrollingPos, setScrollingPos] = useState(0);
   const [mediaIndex, setMediaIndex] = useState(0);
+  const { apiUrl } = useData();
+  const { user, headerToken, getUpdatedUserInfo } = useAuth();
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
@@ -154,7 +163,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </TouchableOpacity>
         ) : null,
       headerRight: () =>
-      
         !inFullscreen &&
         !scrolling && (
           <View
@@ -221,6 +229,84 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         ) : null,
     });
   }, [scrolling, inFullscreen, mediaIndex]);
+
+  useEffect(() => {
+    if (user?.goingToEvents?.includes(Event?._id)) {
+      setGoing(true);
+    } else if (user?.likedEvents?.includes(Event?._id)) {
+      setInterested(true);
+    }
+    console.log("dsafv");
+  }, [user]);
+
+  const likeEvent = async () => {
+    const updatedLikedEvents = [...user?.likedEvents];
+    const newGoingtoEvents = [...user?.goingToEvents];
+
+    if (!updatedLikedEvents.includes(Event?._id)) {
+      setGoing(false);
+      const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
+      if (indexToRemove !== -1) {
+        newGoingtoEvents.splice(indexToRemove, 1);
+      }
+      setInterested(true);
+      updatedLikedEvents.push(Event?._id);
+    } else {
+      setInterested(false);
+      const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
+      if (indexToRemove !== -1) {
+        updatedLikedEvents.splice(indexToRemove, 1);
+      }
+    }
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        { likedEvents: updatedLikedEvents, goingtoEvents: newGoingtoEvents },
+        { headers: { Authorization: headerToken } }
+      );
+      console.log(response?.data);
+      getUpdatedUserInfo();
+    } catch (error) {
+      console.error("Error updating liked events:", error);
+    }
+  };
+  const goingtoEvents = async () => {
+    //Add to Going
+    const updatedLikedEvents = [...user?.likedEvents];
+
+    const newGoingtoEvents = [...user?.goingToEvents];
+
+    if (!newGoingtoEvents.includes(Event?._id)) {
+      setInterested(false);
+      //remove from likedEvents
+      const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
+      if (indexToRemove !== -1) {
+        updatedLikedEvents.splice(indexToRemove, 1);
+      }
+
+      setGoing(true);
+
+      newGoingtoEvents.push(Event?._id);
+    } else {
+      setGoing(false);
+      const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
+      if (indexToRemove !== -1) {
+        newGoingtoEvents.splice(indexToRemove, 1);
+      }
+    }
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        { goingToEvents: newGoingtoEvents, likedEvents: updatedLikedEvents },
+        { headers: { Authorization: headerToken } }
+      );
+      console.log(response?.data);
+      getUpdatedUserInfo();
+    } catch (error) {
+      console.error("Error updating liked events:", error);
+    }
+  };
+
   return (
     <>
       {scrolling && (
@@ -230,15 +316,15 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           exiting={SlideOutUp.duration(500)}
           style={{
             position: "absolute",
-            height: isIPhoneWithNotch?90:65,
+            height: isIPhoneWithNotch ? 90 : 65,
             width: "100%",
             backgroundColor: colors.white,
             zIndex: 2,
             shadowOffset: { width: 0.5, height: 0.5 },
-              elevation: 2,
+            elevation: 2,
 
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
           }}
         />
       )}
@@ -262,57 +348,56 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
-           
-                <VideoPlayer
-                  // playbackCallback={()=>console.log("fdasfsdgafdsF")}
-                  fullscreen={{
-                    inFullscreen: inFullscreen,
-                    enterFullscreen: async () => {
-                      setInFullsreen(true);
+              <VideoPlayer
+                // playbackCallback={()=>console.log("fdasfsdgafdsF")}
+                fullscreen={{
+                  inFullscreen: inFullscreen,
+                  enterFullscreen: async () => {
+                    setInFullsreen(true);
 
-                      // setStatusBarHidden(true, "fade");
-                      await ScreenOrientation.lockAsync(
-                        ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
-                      );
+                    // setStatusBarHidden(true, "fade");
+                    await ScreenOrientation.lockAsync(
+                      ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+                    );
 
-                      videoRef.current.setStatusAsync({
-                        shouldPlay: true,
-                      });
-                    },
-                    exitFullscreen: async () => {
-                      // setStatusBarHidden(false, "fade");
+                    videoRef.current.setStatusAsync({
+                      shouldPlay: true,
+                    });
+                  },
+                  exitFullscreen: async () => {
+                    // setStatusBarHidden(false, "fade");
 
-                      await ScreenOrientation.lockAsync(
-                        ScreenOrientation.OrientationLock.PORTRAIT_UP
-                      );
-                      setInFullsreen(false);
-                    },
-                  }}
-                  mute={{
-                    visible: true,
-                    enterMute: () => setIsMute(true),
-                    exitMute: () => setIsMute(false),
-                    isMute: isMute,
-                  }}
-                  style={{
-                    videoBackgroundColor: "black",
-                    height: inFullscreen ? width : height * 0.37,
-                    width: inFullscreen ? height : initialWidth,
-                  }}
-                  videoProps={{
-                    ref: videoRef,
-                    source: {
-                      uri: Event?.videos[0]?.uri,
-                    },
+                    await ScreenOrientation.lockAsync(
+                      ScreenOrientation.OrientationLock.PORTRAIT_UP
+                    );
+                    setInFullsreen(false);
+                  },
+                }}
+                mute={{
+                  visible: true,
+                  enterMute: () => setIsMute(true),
+                  exitMute: () => setIsMute(false),
+                  isMute: isMute,
+                }}
+                style={{
+                  videoBackgroundColor: "black",
+                  height: inFullscreen ? width : height * 0.37,
+                  width: inFullscreen ? height : initialWidth,
+                }}
+                videoProps={{
+                  ref: videoRef,
+                  source: {
+                    uri: Event?.videos[0]?.uri,
+                  },
 
-                    // source: require("../assets/rolling.mp4"),
-                    resizeMode: inFullscreen ? "contain" : "cover",
-                    // useNativeControls
-                    isMuted: isMute,
-                    shouldPlay: true,
-                    isLooping: true,
-                  }}
-                />
+                  // source: require("../assets/rolling.mp4"),
+                  resizeMode: inFullscreen ? "contain" : "cover",
+                  // useNativeControls
+                  isMuted: isMute,
+                  shouldPlay: true,
+                  isLooping: true,
+                }}
+              />
             ) : // </TouchableOpacity>
             null
           }
@@ -482,7 +567,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             </TouchableOpacity> */}
             <Chip
               // elevated
-              
+
               elevation={1}
               icon={() => (
                 <MaterialCommunityIcons
@@ -501,7 +586,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 borderRadius: 12,
               }}
               onPress={() => {
-                setInterested(!interested), setGoing(false);
+                // setInterested(!interested),
+                likeEvent();
+                // getUpdatedUserInfo();
               }}
             >
               Interressado
@@ -523,9 +610,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 // paddingHorizontal: 2,
                 borderRadius: 12,
               }}
-              onPress={() => {
-                setGoing(!going), setInterested(false);
-              }}
+              onPress={goingtoEvents}
             >
               Vou
             </Chip>
@@ -668,10 +753,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               marginTop: 5,
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
+              // shadowOffset: { width: 0.5, height: 0.5 },
+              // shadowOpacity: 0.3,
+              // shadowRadius: 1,
+              // elevation: 2,
               shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
+              shadowOpacity: 0.1,
               shadowRadius: 1,
-              elevation: 2,
+              elevation: 0.5,
               height: 50,
               padding: 10,
             }}
@@ -709,10 +798,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               alignItems: "center",
               borderBottomRightRadius: 10,
               borderBottomLeftRadius: 10,
+              // shadowOffset: { width: 0.5, height: 0.5 },
+              // shadowOpacity: 0.3,
+              // shadowRadius: 1,
+              // elevation: 2,
               shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
+              shadowOpacity: 0.1,
               shadowRadius: 1,
-              elevation: 2,
+              elevation: 0.5,
               // shadowColor: colors.light2,
             }}
           >
@@ -850,10 +943,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     backgroundColor: colors.white,
 
                     borderRadius: 10,
+                    // shadowOffset: { width: 0.5, height: 0.5 },
+                    // shadowOpacity: 0.3,
+                    // shadowRadius: 1,
+                    // elevation: 2,
                     shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.3,
+                    shadowOpacity: 0.1,
                     shadowRadius: 1,
-                    elevation: 2,
+                    elevation: 0.5,
                   }}
                 >
                   <TouchableOpacity

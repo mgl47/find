@@ -2,6 +2,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Keyboard,
   Modal,
   Platform,
   StyleSheet,
@@ -50,16 +51,18 @@ import Animated, {
 import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 
-import { recommendedEvents } from "../../../components/Data/events";
+import { recommendedEvents } from "../../../components/Data/stockEvents";
 import { markers } from "../../../components/Data/markers";
 import SmallCard from "../../../components/cards/SmallCard";
 import colors from "../../../components/colors";
 import { Button } from "react-native";
+import { TouchableWithoutFeedback } from "react-native";
+import { useData } from "../../../components/hooks/useData";
 const { height, width } = Dimensions.get("window");
 
 const VenuesExplorer = () => {
   const navigation = useNavigation();
-
+  const { venues } = useData();
   const mapViewRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -98,394 +101,442 @@ const VenuesExplorer = () => {
     // consol
   });
   return (
-    <Animated.View
-      style={{ flex: 1 }}
-      entering={SlideInDown}
-      exiting={SlideOutDown}
-    >
-      <View
-        style={{
-          shadowOffset: { width: 0.5, height: 0.5 },
-          shadowOpacity: 0.3,
-          shadowRadius: 1,
-          elevation: 2,
-          //   padding: 10,
-
-          // position: "absolute",
-          width: "100%",
-          // borderRadius: 5,
-          height: "80%",
-          // top: 70,
-          //   marginBottom: tabIndex == 0 ? 10 : -20,
-        }}
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <Animated.View
+        style={{ flex: 1 }}
+        entering={SlideInDown}
+        exiting={SlideOutDown}
       >
-        <MapView
-          onPress={() => setVenueDetails(false)}
-          ref={mapViewRef}
-          region={region}
-          //   provider="google"
-          mapType="standard"
-          style={[styles.map, {}]}
-          showsUserLocation={true}
+        <View
+          style={{
+            // shadowOffset: { width: 0.5, height: 0.5 },
+            // shadowOpacity: 0.3,
+            // shadowRadius: 1,
+            // elevation: 2,
+
+            width: "100%",
+            height: "80%",
+          }}
         >
-          {markers?.map((item) => {
-            return (
-              <Marker
-                key={item.id}
-                // onPress={handleMarkerPress}
-                onPress={async () => {
-                  const newRegion = {
-                    latitude: item?.lat - 0.004,
-                    longitude: item?.long,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.011,
-                  };
-                  if (Platform.OS === "ios") {
-                    mapViewRef.current.animateToRegion(newRegion, 200);
-                  } else {
-                    setRegion(newRegion);
-                  }
-                  getResults(item);
-                }}
-                coordinate={{
-                  latitude: item?.lat,
-                  longitude: item?.long,
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: item?.lat == region?.latitude ? 2 : 1,
+          <MapView
+            onPress={() => setVenueDetails(false)}
+            ref={mapViewRef}
+            region={region}
+            //   provider="google"
+            mapType="standard"
+            style={[styles.map, {}]}
+            showsUserLocation={true}
+          >
+            {venues?.map((item) => {
+              return (
+                <Marker
+                  key={item._id}
+                  // onPress={handleMarkerPress}
+                  onPress={async () => {
+                    const newRegion = {
+                      latitude: item?.address?.lat - 0.004,
+                      longitude: item?.address?.long,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.011,
+                    };
+                    if (Platform.OS === "ios") {
+                      mapViewRef.current.animateToRegion(newRegion, 200);
+                    } else {
+                      setRegion(newRegion);
+                    }
+                    getResults(item);
+                  }}
+                  coordinate={{
+                    latitude: item?.address?.lat,
+                    longitude: item?.address?.long,
                   }}
                 >
                   <View
                     style={{
-                      backgroundColor: colors.white,
-                      borderWidth: 0.2,
-                      borderColor: colors.darkGrey,
-                      padding: 5,
-                      alignItems: "center",
                       justifyContent: "center",
-                      borderRadius: 10,
+                      alignItems: "center",
+                      zIndex: item?.lat == region?.latitude ? 2 : 1,
                     }}
                   >
-                    <Text style={{ fontSize: 11, fontWeight: "500" }}>
-                      {item?.displayName}
-                    </Text>
+                    <View
+                      style={{
+                        backgroundColor: colors.white,
+                        borderWidth: 0.2,
+                        borderColor: colors.darkGrey,
+                        padding: 3,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: 5,
+                        bottom: 2,
+                        // backgroundColor: colors.white,
+                        // borderWidth: 0.2,
+                        // borderColor: colors.darkGrey,
+                        // padding: 5,
+                        // alignItems: "center",
+                        // justifyContent: "center",
+                        // borderRadius: 10,
+                      }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: "500" }}>
+                        {item?.displayName}
+                      </Text>
+                    </View>
+                    <Image
+                      // resizeMode="contain"
+                      style={{
+                        height: item?.lat == region?.latitude ? 80 : 50,
+                        width: item?.lat == region?.latitude ? 80 : 50,
+                        // borderRadius: 10,
+                        borderRadius: 50,
+
+                        borderWidth: 0.2,
+                        borderColor: colors.darkGrey,
+                        backgroundColor: colors.grey,
+                      }}
+                      source={{ uri: item?.photos?.[0]?.uri }}
+                    />
                   </View>
-                  <Image
-                    resizeMode="contain"
-                    style={{
-                      height: item?.lat == region?.latitude ? 80 : 50,
-                      width: item?.lat == region?.latitude ? 80 : 50,
-                      borderRadius: 10,
-                      borderWidth: 0.2,
-                      borderColor: colors.darkGrey,
-                    }}
-                    source={{ uri: item?.uri }}
-                  />
-                </View>
-              </Marker>
-            );
-          })}
-        </MapView>
-      </View>
-      <BottomSheetModalProvider>
-        <View style={styles.sheetContainer}>
-          <BottomSheetModal
-            // enableDismissOnClose={false}
-            enablePanDownToClose={false}
-            ref={bottomSheetModalRef}
-            index={venueDetails ? 2 : 1}
-            snapPoints={snapPoints}
-            onChange={handleSheetChanges}
-          >
-            <BottomSheetView
-              style={styles.contentContainer}
-              // BottomSheetModalProvider
-              
+                </Marker>
+              );
+            })}
+          </MapView>
+        </View>
+        <BottomSheetModalProvider>
+          <View style={styles.sheetContainer}>
+            <BottomSheetModal
+              // enableDismissOnClose={false}
+              enablePanDownToClose={false}
+              ref={bottomSheetModalRef}
+              index={venueDetails ? 2 : 1}
+              snapPoints={snapPoints}
+              onChange={handleSheetChanges}
             >
-              <>
-                <FlatList
-                  style={{ backgroundColor: colors.background }}
-                  data={
-                    tabIndex == 1
-                      ? favVenues
-                      : venueDetails
-                      ? recommendedEvents.slice(1, 3).reverse()
-                      : markers
-                  }
-                  showsVerticalScrollIndicator={false}
-                  keyExtractor={(item) => item.id}
-                  ListHeaderComponent={
-                    <>
-                      {loading && (
-                        <Animated.View
-                          style={{
-                            // position: "absolute",
-                            alignSelf: "center",
-                            // top: 10,
-                            // zIndex: 2,
-                            marginVertical: 20,
-                          }}
-                          // entering={SlideInUp.duration(300)}
-                          // exiting={SlideOutUp.duration(300)}
-                        >
-                          <ActivityIndicator
-                            animating={true}
-                            color={colors.primary}
-                          />
-                        </Animated.View>
-                      )}
+              <BottomSheetView
+                style={styles.contentContainer}
+                // BottomSheetModalProvider
+              >
+                <>
+                  {/* <View style={styles.separator}/> */}
+                  {venueDetails && !loading && (
+                    <View
+                      style={{
+                        backgroundColor: colors.white,
+                        // borderBottomLeftRadius: 10,
+                        // borderBottomRightRadius: 10,
+                        marginTop: 3,
+                        // shadowOffset: { width: 0.5, height: 0.5 },
+                        // shadowOpacity: 0.3,
+                        // shadowRadius: 1,
+                        // elevation: 2,
 
-                      {venueDetails && !loading && (
-                        <View
-                          style={{
-                            backgroundColor: colors.white,
-                            borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10,
-                            shadowOffset: { width: 0.5, height: 0.5 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 1,
-                            elevation: 2,
-                            width: "95%",
-                            alignSelf: "center",
-                            // bottom: 6,
-                            zIndex: 0,
-                          }}
-                        >
-                          <TouchableOpacity
-                            onPress={() => {
-                              navigation.navigate("venue");
-                            }}
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              width: "100%",
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 1,
+                        elevation: 1,
 
-                              alignItems: "center",
-                            }}
-                          >
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                padding: 10,
-                              }}
-                            >
-                              <Image
-                                style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: 50,
-                                  marginRight: 10,
-                                  borderWidth: 0.1,
-                                }}
-                                source={{
-                                  uri: venueDetails?.uri,
-                                }}
-                              />
-                              <Text
-                                style={{
-                                  fontSize: 15,
-                                  fontWeight: "500",
-                                  // color: colors.white,
-                                }}
-                              >
-                                {venueDetails?.displayName}
-                              </Text>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  // navigation.goBack();
-                                }}
-                                style={{
-                                  // padding: 10,
-                                  left: 10,
-                                  // alignSelf: "flex-end",
-                                  // position: "absolute",
-                                  // marginBottom: 10,
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    color: colors.primary,
-                                    fontSize: 14,
-                                    fontWeight: "600",
-                                  }}
-                                >
-                                  {tabIndex == 1 ? "Seguindo" : "Seguir"}
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                            <Entypo
-                              name="chevron-right"
-                              size={24}
-                              color={colors.primary}
-                            />
-                          </TouchableOpacity>
-                          {venueDetails?.description && (
-                            <View style={styles.separator} />
-                          )}
-                          {venueDetails?.description && (
-                            <View style={{ padding: 5 }}>
-                              <Text
-                                style={{
-                                  fontSize: 13,
-                                  fontWeight: "500",
-                                  color: colors.darkGrey,
-                                  zIndex: 2,
-                                }}
-                              >
-                                {venueDetails?.description}
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-                      )}
-                    </>
-                  }
-                  renderItem={({ item }) => {
-                    return !loading && !venueDetails ? (
-                      <View
+                        alignSelf: "center",
+                        zIndex: 1,
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          navigation.navigate("venue", venueDetails);
+                        }}
                         style={{
-                          padding: 10,
-                          borderBottomRightRadius: 10,
-                          borderBottomLeftRadius: 10,
-                          shadowOffset: { width: 0.5, height: 0.5 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 1,
-                          elevation: 2,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+
+                          alignItems: "center",
                         }}
                       >
                         <View
                           style={{
-                            backgroundColor: colors.white,
-                            borderRadius: 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            padding: 10,
                           }}
                         >
-                          <TouchableOpacity
-                            onPress={() => {
-                              navigation.navigate("venue");
-                            }}
+                          <Image
                             style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              padding: 10,
-                              alignItems: "center",
+                              width: 40,
+                              height: 40,
+                              borderRadius: 50,
+                              marginRight: 10,
+                              borderWidth: 0.1,
+                            }}
+                            source={{
+                              uri: venueDetails?.photos[0]?.uri,
+                            }}
+                          />
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "500",
+                              // color: colors.white,
                             }}
                           >
-                            <View
+                            {venueDetails?.displayName}
+                          </Text>
+                          <TouchableOpacity
+                            onPress={() => {
+                              // navigation.goBack();
+                            }}
+                            style={{
+                              // padding: 10,
+                              left: 10,
+                              // alignSelf: "flex-end",
+                              // position: "absolute",
+                              // marginBottom: 10,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                color: colors.primary,
+                                fontSize: 14,
+                                fontWeight: "600",
+                              }}
+                            >
+                              {tabIndex == 1 ? "Seguindo" : "Seguir"}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                        <Entypo
+                          name="chevron-right"
+                          size={24}
+                          color={colors.primary}
+                        />
+                      </TouchableOpacity>
+                      {venueDetails?.description && (
+                        <View style={styles.separator} />
+                      )}
+                      {venueDetails?.description && (
+                        <View style={{ padding: 5 }}>
+                          <Text
+                            style={{
+                              fontSize: 13,
+                              fontWeight: "500",
+                              color: colors.darkGrey,
+                              zIndex: 2,
+                            }}
+                          >
+                            {venueDetails?.description}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+                  <FlatList
+                    style={{ backgroundColor: colors.background }}
+                    data={
+                      tabIndex == 1
+                        ? favVenues
+                        : venueDetails
+                        ? recommendedEvents.slice(1, 3).reverse()
+                        : venues
+                    }
+                    showsVerticalScrollIndicator={false}
+                    keyExtractor={(item) => item._id}
+                    ListHeaderComponent={
+                      <>
+                        {loading && (
+                          <Animated.View
+                            style={{
+                              // position: "absolute",
+                              alignSelf: "center",
+                              // top: 10,
+                              // zIndex: 2,
+                              marginVertical: 20,
+                            }}
+                            // entering={SlideInUp.duration(300)}
+                            // exiting={SlideOutUp.duration(300)}
+                          >
+                            <ActivityIndicator
+                              animating={true}
+                              color={colors.primary}
+                            />
+                          </Animated.View>
+                        )}
+                        {venueDetails && !loading && (
+                          <>
+                            <Text
+                              style={{
+                                fontSize: 18,
+                                fontWeight: "500",
+                                // width: "80%",
+                                color: colors.primary,
+                                marginLeft: 10,
+                                marginTop: 10,
+                                // marginBottom: 5,
+                              }}
+                            >
+                              Próximos Eventos
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 16,
+                                fontWeight: "500",
+                                // width: "80%",
+                                color: colors.black2,
+                                marginLeft: 10,
+                                marginTop: 5,
+                                // marginBottom: 5,
+                              }}
+                            >
+                              {recommendedEvents?.length > 1
+                                ? recommendedEvents?.length + " Eventos"
+                                : recommendedEvents?.length > 0
+                                ? recommendedEvents?.length + " Evento"
+                                : ""}
+                            </Text>
+                          </>
+                        )}
+                      </>
+                    }
+                    renderItem={({ item }) => {
+                      return !loading && !venueDetails ? (
+                        <View
+                          style={{
+                            paddingHorizontal: 10,
+                            marginBottom:10,
+                            borderBottomRightRadius: 10,
+                            borderBottomLeftRadius: 10,
+                            // shadowOffset: { width: 0.5, height: 0.5 },
+                            // shadowOpacity: 0.3,
+                            // shadowRadius: 1,
+                            // elevation: 2,
+                            shadowOffset: { width: 0.5, height: 0.5 },
+                            shadowOpacity: 0.1,
+                            shadowRadius: 1,
+                            elevation: 0.5,
+                          }}
+                        >
+                          <View
+                            style={{
+                              backgroundColor: colors.white,
+                              borderRadius: 10,
+                            }}
+                          >
+                            <TouchableOpacity
+                              onPress={() => {
+                                navigation.navigate("venue", item);
+                              }}
                               style={{
                                 flexDirection: "row",
                                 alignItems: "center",
+                                justifyContent: "space-between",
+                                padding: 10,
+                                alignItems: "center",
                               }}
                             >
-                              <Image
+                              <View
                                 style={{
-                                  width: 40,
-                                  height: 40,
-                                  borderRadius: 50,
-                                  marginRight: 10,
-                                  borderWidth: 0.1,
-                                }}
-                                source={{
-                                  uri: item?.uri,
-                                }}
-                              />
-                              <Text
-                                style={{
-                                  fontSize: 15,
-                                  fontWeight: "500",
+                                  flexDirection: "row",
+                                  alignItems: "center",
                                 }}
                               >
-                                {item?.displayName}
-                              </Text>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  // navigation.goBack();
-                                }}
-                                style={{
-                                  padding: 2,
-                                  paddingHorizontal: tabIndex == 1 ? 5 : 0,
-                                  left: 10,
-                                  borderRadius: tabIndex == 1 ? 5 : 0,
-                                  borderWidth: tabIndex == 1 ? 1 : 0,
-                                  borderColor: colors.primary,
-                                  // alignSelf: "flex-end",
-                                  // position: "absolute",
-                                  // marginBottom: 10,
-                                }}
-                              >
+                                <Image
+                                  style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 50,
+                                    marginRight: 10,
+                                    borderWidth: 0.1,
+                                  }}
+                                  source={{
+                                    uri: item?.photos[0]?.uri,
+                                  }}
+                                />
                                 <Text
                                   style={{
-                                    color: colors.primary,
-                                    fontSize: 14,
-                                    fontWeight: "600",
+                                    fontSize: 15,
+                                    fontWeight: "500",
                                   }}
                                 >
-                                  {tabIndex == 1 ? "Seguindo" : "Seguir"}
+                                  {item?.displayName}
                                 </Text>
-                              </TouchableOpacity>
-                            </View>
+                                <TouchableOpacity
+                                  onPress={() => {
+                                    // navigation.goBack();
+                                  }}
+                                  style={{
+                                    padding: 2,
+                                    paddingHorizontal: tabIndex == 1 ? 5 : 0,
+                                    left: 10,
+                                    borderRadius: tabIndex == 1 ? 5 : 0,
+                                    borderWidth: tabIndex == 1 ? 1 : 0,
+                                    borderColor: colors.primary,
+                                    // alignSelf: "flex-end",
+                                    // position: "absolute",
+                                    // marginBottom: 10,
+                                  }}
+                                >
+                                  <Text
+                                    style={{
+                                      color: colors.primary,
+                                      fontSize: 14,
+                                      fontWeight: "600",
+                                    }}
+                                  >
+                                    {tabIndex == 1 ? "Seguindo" : "Seguir"}
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
 
-                            <Entypo
-                              name="chevron-right"
-                              size={24}
-                              color={colors.primary}
-                            />
-                          </TouchableOpacity>
-                          {item?.description && (
-                            <View style={styles.separator} />
-                          )}
-                          {item?.description && (
-                            <View style={{ padding: 10 }}>
-                              <Text
-                                style={{
-                                  fontSize: 13,
-                                  fontWeight: "500",
-                                  color: colors.darkGrey,
-                                }}
-                              >
-                                {item?.description}
-                              </Text>
-                            </View>
-                          )}
+                              <Entypo
+                                name="chevron-right"
+                                size={24}
+                                color={colors.primary}
+                              />
+                            </TouchableOpacity>
+                            {item?.description && (
+                              <View style={styles.separator} />
+                            )}
+                            {item?.description && (
+                              <View style={{ padding: 10 }}>
+                                <Text
+                                  style={{
+                                    fontSize: 13,
+                                    fontWeight: "500",
+                                    color: colors.darkGrey,
+                                  }}
+                                >
+                                  {item?.description}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
                         </View>
-                      </View>
-                    ) : (
-                      !loading && (
-                        <TouchableOpacity
-                          activeOpacity={0.8}
-                          style={{
-                            shadowOffset: { width: 0.5, height: 0.5 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 1,
-                            elevation: 2,
-                            padding: 10,
-                            //   marginTop:120
+                      ) : (
+                        !loading && (
+                          <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={{
+                              shadowOffset: { width: 0.5, height: 0.5 },
+                              shadowOpacity: 0.1,
+                              shadowRadius: 1,
+                              elevation: 1,
+                              // padding: 10,
+                            }}
+                            // onPress={() => navigation.navigate("event", item)}
+                          >
+                            <SmallCard {...item} />
+                          </TouchableOpacity>
+                        )
+                      );
+                    }}
+                    ListFooterComponent={<View style={{ marginBottom: 10 }} />}
+                  />
+                </>
+              </BottomSheetView>
+            </BottomSheetModal>
+          </View>
+        </BottomSheetModalProvider>
 
-                            // marginBottom: 200
-                          }}
-                          // onPress={() => navigation.navigate("event", item)}
-                        >
-                          <SmallCard {...item} />
-                        </TouchableOpacity>
-                      )
-                    );
-                  }}
-                  ListFooterComponent={<View style={{ marginBottom: 10 }} />}
-                />
-              </>
-            </BottomSheetView>
-          </BottomSheetModal>
-        </View>
-      </BottomSheetModalProvider>
-
-      <></>
-    </Animated.View>
+        <></>
+      </Animated.View>
+    </TouchableWithoutFeedback>
   );
 };
 

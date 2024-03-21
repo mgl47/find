@@ -112,7 +112,7 @@ export const trendingEvents = [
     ],
     going: 74,
     title: "Rolling Loud Cv: Edição 2024",
-    dates:[],
+    dates: [],
     date: "Qua, 06-08 Jul - 15h00",
     description:
       "Prepare-se para experimentar a fusão definitiva de música, cultura e emoção no Rolling Loud CV 2024! Junte-se a nós para um fim de semana inesquecível de performances sem parar dos artistas mais quentes do hip-hop, rap e além. Dos cabeças de cartaz icônicos aos talentos emergentes, nossa programação promete eletrizar cada momento. Mergulhe nos ritmos pulsantes, na atmosfera vibrante e na energia incomparável enquanto transformamos Cabo Verde no epicentro da cena musical global. Garanta seu lugar agora e faça parte da história sendo feita no Rolling Loud CV 2024!",
@@ -124,22 +124,78 @@ export const trendingEvents = [
       },
     ],
     photos: [
-      {
-        id: 1,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 2,
-        uri: "https://d17t27i218htgr.cloudfront.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTW1GaVpqVmlOeTA0WVdVeExUUm1NakF0WVRNeFlpMDRZVGhqTTJRellUQm1PR1FHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--a8233269a8be523b47bc647747c984447721382e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDRG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLQUJ6QTZDbk5oZG1WeWV3YzZDbk4wY21sd1ZEb01jWFZoYkdsMGVXbGEiLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--1cca388767d511d8884c9fa9b0eb35c8aea0be6b/RLPortugal2023FINALLineupFullRes.jpg",
-      },
-      {
-        id: 3,
-        uri: "https://res.cloudinary.com/tjacob/image/upload/f_jpg,q_90,w_1250/rolling_loud_2_94c503e54c.jpg",
-      },
-      {
-        id: 4,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/5093/rolling-loud.jpg",
-      },
+      [
+        {
+          id: 1,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d17t27i218htgr.cloudfront.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTW1GaVpqVmlOeTA0WVdVeExUUm1NakF0WVRNeFlpMDRZVGhqTTJRellUQm1PR1FHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--a8233269a8be523b47bc647747c984447721382e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDRG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLQUJ6QTZDbk5oZG1WeWV3YzZDbk4wY21sd1ZEb01jWFZoYkdsMGVXbGEiLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--1cca388767d511d8884c9fa9b0eb35c8aea0be6b/RLPortugal2023FINALLineupFullRes.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://res.cloudinary.com/tjacob/image/upload/f_jpg,q_90,w_1250/rolling_loud_2_94c503e54c.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/5093/rolling-loud.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d17t27i218htgr.cloudfront.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTW1GaVpqVmlOeTA0WVdVeExUUm1NakF0WVRNeFlpMDRZVGhqTTJRellUQm1PR1FHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--a8233269a8be523b47bc647747c984447721382e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDRG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLQUJ6QTZDbk5oZG1WeWV3YzZDbk4wY21sd1ZEb01jWFZoYkdsMGVXbGEiLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--1cca388767d511d8884c9fa9b0eb35c8aea0be6b/RLPortugal2023FINALLineupFullRes.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://res.cloudinary.com/tjacob/image/upload/f_jpg,q_90,w_1250/rolling_loud_2_94c503e54c.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/5093/rolling-loud.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d17t27i218htgr.cloudfront.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTW1GaVpqVmlOeTA0WVdVeExUUm1NakF0WVRNeFlpMDRZVGhqTTJRellUQm1PR1FHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--a8233269a8be523b47bc647747c984447721382e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDRG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLQUJ6QTZDbk5oZG1WeWV3YzZDbk4wY21sd1ZEb01jWFZoYkdsMGVXbGEiLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--1cca388767d511d8884c9fa9b0eb35c8aea0be6b/RLPortugal2023FINALLineupFullRes.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://res.cloudinary.com/tjacob/image/upload/f_jpg,q_90,w_1250/rolling_loud_2_94c503e54c.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/5093/rolling-loud.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d17t27i218htgr.cloudfront.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTW1GaVpqVmlOeTA0WVdVeExUUm1NakF0WVRNeFlpMDRZVGhqTTJRellUQm1PR1FHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--a8233269a8be523b47bc647747c984447721382e/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaDdDRG9MWm05eWJXRjBTU0lJYW5CbkJqb0dSVlE2RkhKbGMybDZaVjkwYjE5c2FXMXBkRnNIYVFLQUJ6QTZDbk5oZG1WeWV3YzZDbk4wY21sd1ZEb01jWFZoYkdsMGVXbGEiLCJleHAiOm51bGwsInB1ciI6InZhcmlhdGlvbiJ9fQ==--1cca388767d511d8884c9fa9b0eb35c8aea0be6b/RLPortugal2023FINALLineupFullRes.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://res.cloudinary.com/tjacob/image/upload/f_jpg,q_90,w_1250/rolling_loud_2_94c503e54c.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/5093/rolling-loud.jpg",
+        },
+      ],
     ],
     promoter: {
       id: 1,
@@ -368,24 +424,67 @@ export const recommendedEvents = [
         long: -23.517431,
       },
     },
-
+    dates: [
+      {
+        displayDate: "Sex, 27 Mai",
+        hour: "16:30",
+      },
+    ],
     photos: [
-      {
-        id: 1,
-        uri: "https://images.unsplash.com/photo-1635861496491-4fd2cb740dfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=704&q=80",
-      },
-      {
-        id: 2,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 3,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 4,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1635861496491-4fd2cb740dfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=704&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1635861496491-4fd2cb740dfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=704&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1635861496491-4fd2cb740dfa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=704&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
     ],
     interest: "36 people are going",
     onPress: "Sun7ven",
@@ -395,6 +494,12 @@ export const recommendedEvents = [
 
     title: "Espaço Y",
     date: "Dom, 05 June - 13h00",
+    dates: [
+      {
+        displayDate: "Dom, 05 Jun",
+        hour: "13:00",
+      },
+    ],
     venue: {
       id: 1,
       displayName: "Auditório Nacional",
@@ -408,22 +513,60 @@ export const recommendedEvents = [
       },
     },
     photos: [
-      {
-        id: 1,
-        uri: "https://jornaleconomico.sapo.pt/wp-content/uploads/2021/07/palco.jpg",
-      },
-      {
-        id: 2,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 3,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 4,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
+      [
+        {
+          id: 1,
+          uri: "https://jornaleconomico.sapo.pt/wp-content/uploads/2021/07/palco.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://jornaleconomico.sapo.pt/wp-content/uploads/2021/07/palco.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://jornaleconomico.sapo.pt/wp-content/uploads/2021/07/palco.jpg",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
     ],
     interest: "74 people are going",
     onPress: "SpaceY",
@@ -433,6 +576,12 @@ export const recommendedEvents = [
 
     title: "Prendi cuzinha ku Tanxinha - Bolachas",
     date: "Qua, 25 Mai - 16h00",
+    dates: [
+      {
+        displayDate: "Qua, 25 Mai",
+        hour: "16:00",
+      },
+    ],
     venue: {
       id: 1,
       displayName: "Parque 5 de Julho",
@@ -446,22 +595,60 @@ export const recommendedEvents = [
       },
     },
     photos: [
-      {
-        id: 1,
-        uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",
-      },
-      {
-        id: 2,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 3,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
-      {
-        id: 4,
-        uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
-      },
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
+      [
+        {
+          id: 1,
+          uri: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=765&q=80",
+        },
+        {
+          id: 2,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 3,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+        {
+          id: 4,
+          uri: "https://d1mnxluw9mpf9w.cloudfront.net/media/13277/Rolling-loud-logo.jpg",
+        },
+      ],
     ],
     interest: "21 people are going",
     onPress: "Cookies",

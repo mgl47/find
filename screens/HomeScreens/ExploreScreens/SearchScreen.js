@@ -44,7 +44,10 @@ import Animated, {
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 import { categories } from "../../../components/Data/categories";
-import { newEvents, recommendedEvents } from "../../../components/Data/stockEvents";
+import {
+  newEvents,
+  recommendedEvents,
+} from "../../../components/Data/stockEvents";
 import SmallCard from "../../../components/cards/SmallCard";
 import MediumCard from "../../../components/cards/MediumCard";
 const SearchScreen = ({
@@ -102,7 +105,7 @@ const SearchScreen = ({
             // marginTop: 40,
             flexDirection: "row",
             alignItems: "center",
-            // backgroundColor: "white",
+            // backgroundColor: colors.white,
             zIndex: 2,
           }}
         >
@@ -215,6 +218,7 @@ const SearchScreen = ({
                   return (
                     <Chip
                       elevation={1}
+                      elevated={false}
                       textStyle={
                         {
                           // color: colors.white,
@@ -241,6 +245,29 @@ const SearchScreen = ({
                     >
                       {item.label}
                     </Chip>
+                    // <TouchableOpacity
+                    //   style={{
+                    //     shadowOffset: { width: 0.5, height: 0.5 },
+                    //     shadowOpacity: 0.4,
+                    //     shadowRadius: 1,
+                    //     elevation: 1,
+                    //     backgroundColor: colors.white,
+                    //     marginHorizontal: 5,
+                    //     padding: 5,
+                    //     borderRadius: 10,
+                    //     marginVertical:5
+                    //   }}
+                    // >
+                    //   <Text
+                    //     style={{
+                    //       color: colors.dark2,
+                    //       fontSize: 15,
+                    //       fontWeight: "500",
+                    //     }}
+                    //   >
+                    //     {item?.label}
+                    //   </Text>
+                    // </TouchableOpacity>
                   );
                 }}
               />
@@ -303,11 +330,17 @@ const SearchScreen = ({
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={{
+                        // shadowOffset: { width: 0.5, height: 0.5 },
+                        // shadowOpacity: 0.3,
+                        // shadowRadius: 1,
+                        // elevation: 2,
                         shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.3,
+                        shadowOpacity: 0.1,
                         shadowRadius: 1,
-                        elevation: 2,
-                        padding: 10,
+                        elevation: 0.5,
+                        // padding: 10,
+                        paddingHorizontal: 10,
+                        marginTop: 10,
                       }}
                       // onPress={() => navigation.navigate("event", item)}
                     >

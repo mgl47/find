@@ -6,11 +6,14 @@ import { Appbar, Avatar } from "react-native-paper";
 import NotificationScreen from "../../screens/NotificationScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
 import colors from "../colors";
-import { Platform } from "react-native";
+import { Dimensions, Platform } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 // import StackNavigator from "./StackNavigator";
 
 const Tab = createMaterialBottomTabNavigator();
+const isIPhoneWithNotch =
+Platform.OS === 'ios' &&
+(Dimensions.get('window').height === 852 ||Dimensions.get('window').height === 844 ||Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896||Dimensions.get('window').height === 926||Dimensions.get('window').height === 932 );
 
 const TabNavigator = () => {
   const { AuthModalUp } = useAuth();
@@ -22,10 +25,11 @@ const TabNavigator = () => {
       initialRouteName="Home"
       // inactiveColor="#3e2465"
       barStyle={{
-        backgroundColor: "white",
+        backgroundColor: colors.white,
         borderTopWidth: 0.2,
         borderColor: colors.grey,
-        marginBottom: Platform.OS == "ios" ? -30 : -10,
+        // marginBottom: Platform.OS == "ios" ? -30 : -10,
+        marginBottom:isIPhoneWithNotch?-33:-13,
         display: AuthModalUp ? "none" : "flex",
         //         marginBottom: -10,
       }}

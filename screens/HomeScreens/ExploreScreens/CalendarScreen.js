@@ -238,11 +238,16 @@ const CalendarScreen = () => {
           <TouchableOpacity
             activeOpacity={0.8}
             style={{
+              // shadowOffset: { width: 0.5, height: 0.5 },
+              // shadowOpacity: 0.3,
+              // shadowRadius: 1,
+              // elevation: 2,
               shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
+              shadowOpacity: 0.1,
               shadowRadius: 1,
               elevation: 2,
-              padding: 10,
+              
+              padding: 7,
             }}
             // onPress={() => navigation.navigate("event", item)}
           >

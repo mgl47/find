@@ -16,15 +16,15 @@ export default {
 
   // light: "#F2F2F2",
 
-  light: "white",
+  // light: colors.white,
   // light2: "#E8E8E8",
   light2: "#F2F2F2",
 
   dark2: "#2e2e2e",
-  // light: "white",
+  // light: colors.white,
   // dark2:"#2e2e2e",
-
-  lightGrey: "#EEEFF1",
+  lightGrey: "#E8E8E8",
+  // lightGrey: "#EEEFF1",
   lightGrey2: "#F9F9F9",
 
   // dark: "#2e2e2e",

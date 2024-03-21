@@ -55,8 +55,8 @@ export function DrawerContent(props) {
             uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
           }}
           style={{
-            width: 60,
-            height: 60,
+            width: 55,
+            height: 55,
             borderRadius: 50,
             marginLeft: 20,
             //   marginTop: 5,
@@ -89,6 +89,7 @@ export function DrawerContent(props) {
       >
         @veiga.erickson
       </Text>
+      <View style={[styles.separator, { marginTop: 10,width:"100%",right:0 }]} />
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={{
@@ -102,65 +103,84 @@ export function DrawerContent(props) {
             <MaterialCommunityIcons
               name="account-outline"
               color={colors.black}
-              size={33}
+              size={30}
             />
           )}
           label="Perfil"
           labelStyle={{
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: "500",
             right: 20,
             color: colors.black,
           }}
           onPress={() => navigation.navigate("profile")}
         />
-        {/* <View style={styles.separator} /> */}
+        <View style={styles.separator} />
+
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
-            <Ionicons name="ticket-outline" size={30} color={colors.black} />
+            <Ionicons name="ticket-outline" size={28} color={colors.black} />
           )}
+          
           label="Meus Bilhetes"
           labelStyle={{
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: "500",
             right: 20,
             color: colors.black,
           }}
           onPress={() => {}}
+          
         />
-        {/* <View style={styles.separator} /> */}
+        <View style={styles.separator} />
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="calendar-heart"
               color={colors.black}
-              size={35}
+              size={28}
             />
           )}
           label="Interessado"
           labelStyle={{
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: "500",
             right: 20,
             color: colors.black,
           }}
           onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
         />
+        <View style={styles.separator} />
 
+        <DrawerItem
+          style={{ left: 2 }}
+          icon={({ color, size }) => (
+            <Octicons name="gear" size={26} color={colors.black} />
+          )}
+          label="Definições"
+          labelStyle={{
+            fontSize: 16,
+            fontWeight: "500",
+            right: 20,
+            color: colors.black,
+          }}
+          onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
+        />
+        <View style={styles.separator} />
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="logout"
-              size={33}
+              size={30}
               color={colors.black}
             />
           )}
           label="Sair"
           labelStyle={{
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: "500",
             right: 20,
             color: colors.black,
@@ -237,5 +257,12 @@ const DrawerNavigator = () => {
 export default DrawerNavigator;
 
 const styles = StyleSheet.create({
-  separator: { width: "95%", height: 1, backgroundColor: colors.grey },
+  separator: {
+    width: "80%",
+    height: 1,
+    right:10,
+    backgroundColor: colors.lightGrey,
+    // marginVertical: 10,
+    alignSelf: "flex-end",
+  },
 });

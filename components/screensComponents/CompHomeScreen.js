@@ -193,7 +193,7 @@ export function VenuesModal({ venueModalVisible, setVenueModalVisible }) {
         <View
           style={{
             flexDirection: "row",
-            // backgroundColor: "white",
+            // backgroundColor: colors.white,
             width: "100%",
             alignItems: "center",
             justifyContent: "center",
@@ -250,7 +250,7 @@ export function VenuesModal({ venueModalVisible, setVenueModalVisible }) {
             // shadowOpacity: 0.3,
             // shadowRadius: 1,
             // elevation: 2,
-            backgroundColor: "white",
+            backgroundColor: colors.white,
           }}
           value={tabIndex}
           onChange={setTabIndex}

@@ -33,16 +33,20 @@ export default function HomeScreen({ navigation }) {
 
   const { setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
-  const { events } = useData();
-  const handleAuthSheet = useCallback(() => {
-    setAuthModalUp(true);
-    authSheetRef.current?.present();
-  }, []);
+  const { events, getEvents } = useData();
+  // const handleAuthSheet = useCallback(() => {
+  //   setAuthModalUp(true);
+  //   authSheetRef.current?.present();
+  // }, []);
+  const [refreshing, setRefreshing] = useState(false);
+  
 
   return (
     <>
       <View style={styles.container}>
         <FlatList
+          onRefresh={getEvents}
+          refreshing={refreshing}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={
             <>
@@ -60,10 +64,14 @@ export default function HomeScreen({ navigation }) {
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={{
-                        shadowOffset: { width: 1, height: 1 },
-                        shadowOpacity: 1,
+                        // shadowOffset: { width: 1, height: 1 },
+                        // shadowOpacity: 1,
+                        // shadowRadius: 1,
+                        // elevation: 3,
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.1,
                         shadowRadius: 1,
-                        elevation: 3,
+                        elevation: 0.5,
                         marginVertical: 5,
                       }}
                       // onPress={() =>
@@ -96,7 +104,7 @@ export default function HomeScreen({ navigation }) {
                     city: trendingEvents[1]?.venue?.city,
                   }}
                   image={{
-                    uri: trendingEvents[1]?.photos[0]?.uri,
+                    uri: trendingEvents[1]?.photos[0]?.[0]?.uri,
                   }}
                 />
                 {/* <BigCard
@@ -121,11 +129,16 @@ export default function HomeScreen({ navigation }) {
                     <TouchableOpacity
                       activeOpacity={0.8}
                       style={{
+                        // shadowOffset: { width: 0.5, height: 0.5 },
+                        // shadowOpacity: 0.3,
+                        // shadowRadius: 1,
+                        // elevation: 2,
                         shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.3,
+                        shadowOpacity: 0.1,
                         shadowRadius: 1,
-                        elevation: 2,
-                        padding: 10,
+                        elevation: 0.5,
+                        paddingHorizontal: 10,
+                        marginTop: 10,
                       }}
                       onPress={() => navigation.navigate("addEvent", item)}
                     >

@@ -122,7 +122,7 @@ const SearchScreen2 = ({
               // marginTop: 40,
               flexDirection: "row",
               alignItems: "center",
-              // backgroundColor: "white",
+              // backgroundColor: colors.white,
               zIndex: 2,
             }}
           >

@@ -118,7 +118,7 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   return (
-    <Screen style={{ backgroundColor: "white" }}>
+    <Screen style={{ backgroundColor: colors.white }}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => (!user ? navigation.openDrawer() : setShowModal(true))}

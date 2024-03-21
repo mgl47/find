@@ -1,4 +1,11 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Keyboard,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, {
   createContext,
   useCallback,
@@ -22,14 +29,17 @@ import colors from "../colors";
 import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
+import axios from "axios";
 
 const AuthContext = createContext();
 const Tab = createMaterialTopTabNavigator();
 
 export const AuthProvider = ({ children }) => {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
-  const  authSheetRef=useRef(null)
+  const authSheetRef = useRef(null);
 
   const [headerToken, setHeaderToken] = useState("");
 
@@ -40,6 +50,9 @@ export const AuthProvider = ({ children }) => {
       if (tokenValue !== null) {
         setUser(JSON.parse(userValue));
         setHeaderToken(tokenValue);
+        // getUpdatedUserInfo(tokenValue);
+
+        // console.log(tokenValue);
       }
     } catch (e) {
       // error reading value
@@ -50,6 +63,60 @@ export const AuthProvider = ({ children }) => {
     getUser();
   }, []);
 
+  const getUpdatedUserInfo = async () => {
+    try {
+      if (headerToken) {
+        const response = await axios.get(
+          `${apiUrl}/user/current/${user?._id}`,
+          {
+            headers: {
+              Authorization: headerToken,
+            },
+          }
+        );
+
+        // console.log(response.data);
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.log(error.response.data);
+
+      console.log(error);
+    }
+  };
+
+  const signIn = async () => {
+    Keyboard.dismiss();
+
+    await new Promise((resolve, reject) => {
+      setTimeout(resolve, 1500);
+    });
+    try {
+      if (validated) {
+        const response = await axios.post(
+          `${url}/auth/login`,
+          {
+            username: user?.username,
+            password: user?.password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setUser(response.data.user);
+
+        await AsyncStorage.setItem(
+          "headerToken",
+          "Bearer " + response.data.token
+        );
+        // const jsonValue = JSON.stringify(response.data.user);
+        await AsyncStorage.setItem("user", jsonValue);
+        // JSON.parse(jsonValue);
+      }
+    } catch (error) {}
+  };
   const [AuthModalUp, setAuthModalUp] = useState(false);
 
   const memoedValue = useMemo(
@@ -60,9 +127,11 @@ export const AuthProvider = ({ children }) => {
       authLoading,
       setAuthModalUp,
       AuthModalUp,
-      authSheetRef
+      authSheetRef,
+      setHeaderToken,
+      getUpdatedUserInfo,
     }),
-    [, user, authLoading,AuthModalUp,authSheetRef]
+    [headerToken, user, authLoading, AuthModalUp, authSheetRef]
   );
 
   return (

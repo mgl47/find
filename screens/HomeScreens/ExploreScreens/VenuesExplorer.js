@@ -62,7 +62,7 @@ const { height, width } = Dimensions.get("window");
 
 const VenuesExplorer = () => {
   const navigation = useNavigation();
-const{venues}=useData()
+  const { venues, events } = useData();
   const mapViewRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -100,6 +100,117 @@ const{venues}=useData()
   const handleSheetChanges = useCallback((index) => {
     // consol
   });
+  function VenuesList(item) {
+    return (
+      <View
+        style={{
+          paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
+          marginTop: 10,
+          borderRadius: 10,
+          paddingVertical: Platform?.OS === "ios" ? 1 : 0,
+          // shadowOffset: { width: 0.5, height: 0.5 },
+          // shadowOpacity: 0.3,
+          // shadowRadius: 1,
+          // elevation: 2,
+          shadowOffset: { width: 0.5, height: 0.5 },
+          shadowOpacity: 0.1,
+          shadowRadius: 1,
+          elevation: 0.5,
+          overflow: "hidden",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: colors.white,
+            borderRadius: 10,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("venue", item);
+            }}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: 10,
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 50,
+                  marginRight: 10,
+                  borderWidth: 0.1,
+                }}
+                source={{
+                  uri: item?.photos[0]?.uri,
+                }}
+              />
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: "500",
+                }}
+              >
+                {item?.displayName}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  // navigation.goBack();
+                }}
+                style={{
+                  padding: 2,
+                  paddingHorizontal: tabIndex == 1 ? 5 : 0,
+                  left: 10,
+                  borderRadius: tabIndex == 1 ? 5 : 0,
+                  borderWidth: tabIndex == 1 ? 1 : 0,
+                  borderColor: colors.primary,
+                  // alignSelf: "flex-end",
+                  // position: "absolute",
+                  // marginBottom: 10,
+                }}
+              >
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 14,
+                    fontWeight: "600",
+                  }}
+                >
+                  {tabIndex == 1 ? "Seguindo" : "Seguir"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Entypo name="chevron-right" size={24} color={colors.primary} />
+          </TouchableOpacity>
+          {item?.description && <View style={styles.separator} />}
+          {item?.description && (
+            <View style={{ padding: 10 }}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: "500",
+                  color: colors.darkGrey,
+                }}
+              >
+                {item?.description}
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  }
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Animated.View
@@ -109,18 +220,13 @@ const{venues}=useData()
       >
         <View
           style={{
-            shadowOffset: { width: 0.5, height: 0.5 },
-            shadowOpacity: 0.3,
-            shadowRadius: 1,
-            elevation: 2,
-            //   padding: 10,
+            // shadowOffset: { width: 0.5, height: 0.5 },
+            // shadowOpacity: 0.3,
+            // shadowRadius: 1,
+            // elevation: 2,
 
-            // position: "absolute",
             width: "100%",
-            // borderRadius: 5,
             height: "80%",
-            // top: 70,
-            //   marginBottom: tabIndex == 0 ? 10 : -20,
           }}
         >
           <MapView
@@ -172,7 +278,7 @@ const{venues}=useData()
                         alignItems: "center",
                         justifyContent: "center",
                         borderRadius: 5,
-                        bottom:2
+                        bottom: 2,
                         // backgroundColor: colors.white,
                         // borderWidth: 0.2,
                         // borderColor: colors.darkGrey,
@@ -195,8 +301,8 @@ const{venues}=useData()
                         borderRadius: 50,
 
                         borderWidth: 0.2,
-                        borderColor: colors.darkGrey                  ,      backgroundColor:colors.grey,
-
+                        borderColor: colors.darkGrey,
+                        backgroundColor: colors.grey,
                       }}
                       source={{ uri: item?.photos?.[0]?.uri }}
                     />
@@ -229,19 +335,23 @@ const{venues}=useData()
                         // borderBottomLeftRadius: 10,
                         // borderBottomRightRadius: 10,
                         marginTop: 3,
+                        // shadowOffset: { width: 0.5, height: 0.5 },
+                        // shadowOpacity: 0.3,
+                        // shadowRadius: 1,
+                        // elevation: 2,
+
                         shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.3,
+                        shadowOpacity: 0.1,
                         shadowRadius: 1,
-                        elevation: 2,
-                        // width: "95%",
+                        elevation: 1,
+
                         alignSelf: "center",
-                        // bottom: 6,
                         zIndex: 1,
                       }}
                     >
                       <TouchableOpacity
                         onPress={() => {
-                          navigation.navigate("venue",venueDetails);
+                          navigation.navigate("venue", venueDetails);
                         }}
                         style={{
                           flexDirection: "row",
@@ -329,13 +439,13 @@ const{venues}=useData()
                     </View>
                   )}
                   <FlatList
-                    style={{ backgroundColor: colors.background }}
+                    style={{
+                      backgroundColor: colors.background,
+                      padding: Platform?.OS === "ios" ? 0 : 10,
+                      overflow: "hidden",
+                    }}
                     data={
-                      tabIndex == 1
-                        ? favVenues
-                        : venueDetails
-                        ? recommendedEvents.slice(1, 3).reverse()
-                        : venues
+                      tabIndex == 1 ? favVenues : venueDetails ? events : venues
                     }
                     showsVerticalScrollIndicator={false}
                     keyExtractor={(item) => item._id}
@@ -367,8 +477,8 @@ const{venues}=useData()
                                 fontWeight: "500",
                                 // width: "80%",
                                 color: colors.primary,
-                                marginLeft: 10,
-                                marginTop: 10,
+                                marginLeft: Platform?.OS === "ios" ? 20 : 10,
+                                marginTop: Platform?.OS === "ios" ? 10 : 0,
                                 // marginBottom: 5,
                               }}
                             >
@@ -380,8 +490,9 @@ const{venues}=useData()
                                 fontWeight: "500",
                                 // width: "80%",
                                 color: colors.black2,
-                                marginLeft: 10,
+                                marginLeft: Platform?.OS === "ios" ? 20 : 10,
                                 marginTop: 5,
+
                                 // marginBottom: 5,
                               }}
                             >
@@ -397,126 +508,20 @@ const{venues}=useData()
                     }
                     renderItem={({ item }) => {
                       return !loading && !venueDetails ? (
-                        <View
-                          style={{
-                            padding: 10,
-                            borderBottomRightRadius: 10,
-                            borderBottomLeftRadius: 10,
-                            shadowOffset: { width: 0.5, height: 0.5 },
-                            shadowOpacity: 0.3,
-                            shadowRadius: 1,
-                            elevation: 2,
-                          }}
-                        >
-                          <View
-                            style={{
-                              backgroundColor: colors.white,
-                              borderRadius: 10,
-                            }}
-                          >
-                            <TouchableOpacity
-                              onPress={() => {
-                                navigation.navigate("venue",item);
-                              }}
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                padding: 10,
-                                alignItems: "center",
-                              }}
-                            >
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Image
-                                  style={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 50,
-                                    marginRight: 10,
-                                    borderWidth: 0.1,
-                                  }}
-                                  source={{
-                                    uri: item?.photos[0]?.uri,
-                                  }}
-                                />
-                                <Text
-                                  style={{
-                                    fontSize: 15,
-                                    fontWeight: "500",
-                                  }}
-                                >
-                                  {item?.displayName}
-                                </Text>
-                                <TouchableOpacity
-                                  onPress={() => {
-                                    // navigation.goBack();
-                                  }}
-                                  style={{
-                                    padding: 2,
-                                    paddingHorizontal: tabIndex == 1 ? 5 : 0,
-                                    left: 10,
-                                    borderRadius: tabIndex == 1 ? 5 : 0,
-                                    borderWidth: tabIndex == 1 ? 1 : 0,
-                                    borderColor: colors.primary,
-                                    // alignSelf: "flex-end",
-                                    // position: "absolute",
-                                    // marginBottom: 10,
-                                  }}
-                                >
-                                  <Text
-                                    style={{
-                                      color: colors.primary,
-                                      fontSize: 14,
-                                      fontWeight: "600",
-                                    }}
-                                  >
-                                    {tabIndex == 1 ? "Seguindo" : "Seguir"}
-                                  </Text>
-                                </TouchableOpacity>
-                              </View>
-
-                              <Entypo
-                                name="chevron-right"
-                                size={24}
-                                color={colors.primary}
-                              />
-                            </TouchableOpacity>
-                            {item?.description && (
-                              <View style={styles.separator} />
-                            )}
-                            {item?.description && (
-                              <View style={{ padding: 10 }}>
-                                <Text
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: "500",
-                                    color: colors.darkGrey,
-                                  }}
-                                >
-                                  {item?.description}
-                                </Text>
-                              </View>
-                            )}
-                          </View>
-                        </View>
+                        <VenuesList {...item} />
                       ) : (
                         !loading && (
                           <TouchableOpacity
                             activeOpacity={0.8}
                             style={{
                               shadowOffset: { width: 0.5, height: 0.5 },
-                              shadowOpacity: 0.3,
+                              shadowOpacity: 0.1,
                               shadowRadius: 1,
-                              elevation: 2,
-                              padding: 10,
-                              //   marginTop:120
-
-                              // marginBottom: 200
+                              elevation: 1,
+                              // padding: 10,
+                              marginTop: 10,
+                              paddingHorizontal:
+                                Platform?.OS === "ios" ? 10 : 0,
                             }}
                             // onPress={() => navigation.navigate("event", item)}
                           >
@@ -568,7 +573,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "95%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.light2,
     marginBottom: 2,
     alignSelf: "center",
   },

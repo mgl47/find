@@ -1,4 +1,11 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import { TextInput } from "react-native-paper";
 import colors from "../../components/colors";
@@ -15,7 +22,7 @@ const SignUpScreen = () => {
   const navigation = useNavigation();
 
   const url = process.env.EXPO_PUBLIC_API_URL;
-  const { setUser } = useAuth();
+  const { setUser ,authSheetRef,setHeaderToken} = useAuth();
 
   const [person, setPerson] = useState({
     username: "",
@@ -72,9 +79,12 @@ const SignUpScreen = () => {
             },
           }
         );
+        setHeaderToken("Bearer " + response.data.token)
 
         setUser(response.data.user);
-        await AsyncStorage.setItem("headerToken", response.data.token);
+        await AsyncStorage.setItem("headerToken", "Bearer "+response.data.token);
+        authSheetRef?.current?.close()
+
         navigation.openDrawer();
       }
     } catch (error) {
@@ -90,136 +100,138 @@ const SignUpScreen = () => {
   };
 
   return (
-    <KeyboardAwareScrollView
-      style={{
-        padding: 10,
-        flex: 1,
-        backgroundColor: colors.background,
-        // marginBottom: 200,
-      }}
-    >
-      <BlockModal active={loading} />
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <KeyboardAwareScrollView
+        style={{
+          padding: 10,
+          flex: 1,
+          backgroundColor: colors.background,
+          // marginBottom: 200,
+        }}
+      >
+        <BlockModal active={loading} />
 
-      <TextInput
-        error={!isUsernameValid}
-        style={{ marginBottom: 10 }}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        mode="outlined"
-        outlineColor={colors.primary}
-        activeOutlineColor={colors.primary}
-        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-        label="Nome de usuário (único)"
-        activeUnderlineColor={colors.primary}
-        value={person?.username}
-        onChangeText={validateUsername}
-        autoCapitalize="none"
-      />
-      <TextInput
-        error={!isEmailValid}
-        style={{ marginBottom: 10 }}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        mode="outlined"
-        activeOutlineColor={colors.primary}
-        outlineColor={colors.primary}
-        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-        label="Email"
-        activeUnderlineColor={colors.primary}
-        value={person?.email}
-        onChangeText={validateEmail}
-        autoCapitalize="none"
+        <TextInput
+          error={!isUsernameValid}
+          style={{ marginBottom: 10, backgroundColor: colors.background }}
+          underlineStyle={{ backgroundColor: colors.primary }}
+          mode="outlined"
+          outlineColor={colors.primary}
+          activeOutlineColor={colors.primary}
+          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+          label="Nome de usuário (único)"
+          activeUnderlineColor={colors.primary}
+          value={person?.username}
+          onChangeText={validateUsername}
+          autoCapitalize="none"
+        />
+        <TextInput
+          error={!isEmailValid}
+          style={{ marginBottom: 10, backgroundColor: colors.background }}
+          underlineStyle={{ backgroundColor: colors.primary }}
+          mode="outlined"
+          activeOutlineColor={colors.primary}
+          outlineColor={colors.primary}
+          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+          label="Email"
+          activeUnderlineColor={colors.primary}
+          value={person?.email}
+          onChangeText={validateEmail}
+          autoCapitalize="none"
 
-        // onChangeText={(text) => setUser({ ...user, email: text })}
-      />
-      <TextInput
-        style={{ marginBottom: 10, backgroundColor: colors.background }}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        mode="outlined"
-        outlineColor={colors.primary}
-        activeOutlineColor={colors.primary}
-        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-        right={
-          <TextInput.Icon
-            onPress={() => setShowPassword(!showPassword)}
-            icon={showPassword ? "eye" : "eye-off"}
-          />
-        }
-        secureTextEntry={!showPassword}
-        label="Palavra Passe"
-        activeUnderlineColor={colors.primary}
-        value={person?.password}
-        onChangeText={(text) => setPerson({ ...person, password: text })}
-        autoCapitalize="none"
-      />
-      <TextInput
-        error={!isPasswordValid}
-        mode="outlined"
-        outlineColor={colors.primary}
-        activeOutlineColor={colors.primary}
-        style={{ marginBottom: 20, backgroundColor: colors.background }}
-        // style={{ marginBottom: 30, backgroundColor: colors.background }}
-        underlineStyle={{ backgroundColor: colors.primary }}
-        // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-        right={
-          <TextInput.Icon
-            onPress={() => setShowRepPassword(!showRepPassword)}
-            icon={showRepPassword ? "eye" : "eye-off"}
-          />
-        }
-        secureTextEntry={!showRepPassword}
-        label="Confirmar Palavra Passe"
-        activeUnderlineColor={colors.primary}
-        value={person.confPassword}
-        onChangeText={validatePassword}
-        onSubmitEditing={validated ? signUp : null}
-        autoCapitalize="none"
-      />
-      <View>
-        <Text
-          style={{
-            position: "absolute",
-            color: "#b00000",
-            left: 15,
-            top: -25,
-          }}
-        >
-          {errorMsg}
-        </Text>
-        <TouchableOpacity
-          disabled={!validated}
-          onPress={signUp}
-          style={{
-            alignSelf: "center",
-            flexDirection: "row",
-            height: 50,
-            width: "90%",
-            backgroundColor: colors.primary,
-            borderRadius: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowOffset: { width: 0.5, height: 0.5 },
-            shadowOpacity: 0.3,
-            shadowRadius: 1,
-            elevation: 2,
-          }}
-        >
-          <MaterialCommunityIcons
-            name="account-outline"
-            size={24}
-            color={colors.white}
-          />
+          // onChangeText={(text) => setUser({ ...user, email: text })}
+        />
+        <TextInput
+          style={{ marginBottom: 10, backgroundColor: colors.background }}
+          underlineStyle={{ backgroundColor: colors.primary }}
+          mode="outlined"
+          outlineColor={colors.primary}
+          activeOutlineColor={colors.primary}
+          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+          right={
+            <TextInput.Icon
+              onPress={() => setShowPassword(!showPassword)}
+              icon={showPassword ? "eye" : "eye-off"}
+            />
+          }
+          secureTextEntry={!showPassword}
+          label="Palavra Passe"
+          activeUnderlineColor={colors.primary}
+          value={person?.password}
+          onChangeText={(text) => setPerson({ ...person, password: text })}
+          autoCapitalize="none"
+        />
+        <TextInput
+          error={!isPasswordValid}
+          mode="outlined"
+          outlineColor={colors.primary}
+          activeOutlineColor={colors.primary}
+          style={{ marginBottom: 20, backgroundColor: colors.background }}
+          // style={{ marginBottom: 30, backgroundColor: colors.background }}
+          underlineStyle={{ backgroundColor: colors.primary }}
+          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+          right={
+            <TextInput.Icon
+              onPress={() => setShowRepPassword(!showRepPassword)}
+              icon={showRepPassword ? "eye" : "eye-off"}
+            />
+          }
+          secureTextEntry={!showRepPassword}
+          label="Confirmar Palavra Passe"
+          activeUnderlineColor={colors.primary}
+          value={person.confPassword}
+          onChangeText={validatePassword}
+          onSubmitEditing={validated ? signUp : null}
+          autoCapitalize="none"
+        />
+        <View>
           <Text
             style={{
-              color: colors.white,
-              marginLeft: 5,
-              fontSize: 17,
-              fontWeight: "500",
+              position: "absolute",
+              color: "#b00000",
+              left: 15,
+              top: -25,
             }}
           >
-            Criar Conta
+            {errorMsg}
           </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAwareScrollView>
+          <TouchableOpacity
+            disabled={!validated}
+            onPress={signUp}
+            style={{
+              alignSelf: "center",
+              flexDirection: "row",
+              height: 50,
+              width: "90%",
+              backgroundColor: colors.primary,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="account-outline"
+              size={24}
+              color={colors.white}
+            />
+            <Text
+              style={{
+                color: colors.white,
+                marginLeft: 5,
+                fontSize: 17,
+                fontWeight: "500",
+              }}
+            >
+              Criar Conta
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAwareScrollView>
+    </TouchableWithoutFeedback>
   );
 };
 
