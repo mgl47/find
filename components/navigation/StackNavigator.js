@@ -57,12 +57,8 @@ function StackNavigator() {
         headerStyle: { backgroundColor: "transparent" },
         headerBackgroundContainerStyle: !invisibleHeaders?.includes(route.name)
           ? {
-              backgroundColor: colors.white,
-              // shadowOffset: { width: 0.5, height: 0.5 },
-              // elevation: 2,
+              backgroundColor: colors.primary,
 
-              // shadowOpacity: 0.3,
-              // shadowRadius: 1,
               shadowOffset: { width: 0.5, height: 0.5 },
               elevation: 2,
 
@@ -83,17 +79,16 @@ function StackNavigator() {
                   ? navigation.openDrawer()
                   : (authSheetRef?.current?.present(), setAuthModalUp(true))
               }
-              // onPress={handleAuthSheet}
               style={{ left: 20, bottom: 1 }}
             >
               {user ? (
                 <Image
                   source={{
-                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                    uri: user?.photos?.avatar[0]?.uri,
                   }}
                   style={{
-                    width: 35,
-                    height: 35,
+                    width: 40,
+                    height: 40,
                     borderRadius: 50,
                     // left:20
                   }}
@@ -132,50 +127,10 @@ function StackNavigator() {
           headerTitleAlign: "center",
           headerTitle: () => (
             <Image
-              source={require("../../assets/logos/logo1.png")}
-              style={{ width: 35, height: 35, bottom: 3 }}
+              source={require("../../assets/logos/logo_white.png")}
+              style={{ width: 35, height: 35,  }}
               resizeMode="contain"
             />
-
-            // <TouchableOpacity
-            //   onPress={() => navigation.navigate("search", fromHome)}
-            //   style={{
-            //     flex: 1,
-            //     flexDirection: "row",
-            //     borderRadius: 20,
-            //     backgroundColor: colors.lightGrey,
-            //     // height: 30,
-            //     alignItems: "center",
-            //     paddingHorizontal: 10,
-
-            //     // left: 10,
-            //     width: "100%",
-            //     bottom:2,
-            //     right:10,
-            //     // left: 40,
-            //   }}
-            // >
-            //   {/* <Entypo
-            //     style={{ zIndex: 1, marginLeft: 10 }}
-            //     name="magnifying-glass"
-            //     size={19}
-            //     color={colors.description}
-            //   />
-            //   <Text style={{ marginLeft: 10, color: colors.description }}>
-            //     artistas, eventos ou lugares
-            //   </Text> */}
-
-            //   {/* <TextInput
-            //     // onSubmitEditing={() => navigation.navigate("search", searchText)}
-            //     onPressIn={() => navigation.navigate("search")}
-            //     // placeholder="encontre artistas, eventos ou lugares"
-            //     placeholder=" artistas, eventos ou lugares"
-            //     placeholderTextColor={colors.description}
-            //     returnKeyType="search"
-            //     // autoFocus={firstMount ? true : false}
-            //     style={[styles.search, { width: "100%" }]}
-            //   /> */}
-            // </TouchableOpacity>
           ),
           headerRight: () => (
             <TouchableOpacity
@@ -190,73 +145,10 @@ function StackNavigator() {
               <MaterialIcons
                 name="manage-search"
                 size={35}
-                color={colors.darkSeparator}
+                color={colors.white}
               />
-
-              {/*
-              <Entypo
-                name="magnifying-glass"
-                size={25}
-                color={colors.darkSeparator}
-              /> */}
             </TouchableOpacity>
           ),
-          // <View
-          //   style={{ position: "absolute", right: 10, flexDirection: "row" }}
-          // >
-          //   {/* <TouchableOpacity
-          //     // onPress={() => setVenueModalVisible(true)}
-          //     onPress={() => navigation.navigate("venuesExplorer")}
-          //     style={{
-          //       borderRadius: 50,
-          //       padding: 5,
-          //       marginRight: 5,
-          //     }}
-          //   >
-          //     <Entypo
-          //       name="location"
-          //       size={24}
-          //       color={colors.darkSeparator}
-          //     />
-          //   </TouchableOpacity> */}
-          //   {/* <TouchableOpacity
-          //     // onPress={() => setCalendarModalVisible(true)}
-
-          //     onPress={() => navigation.navigate("calendar")}
-          //     style={{
-          //       borderRadius: 50,
-          //       padding: 5,
-          //       marginRight: 5,
-          //     }}
-          //   >
-          //     <MaterialCommunityIcons
-          //       name="calendar-month"
-          //       size={26}
-          //       color={colors.darkSeparator}
-          //     />
-          //   </TouchableOpacity> */}
-          //   <TouchableOpacity
-          //     style={{
-          //       borderRadius: 50,
-          //       padding: 5,
-          //       // backgroundColor: colors.grey,
-          //     }}
-          //     onPress={() => navigation.navigate("search")}
-          //   >
-          //     <MaterialIcons
-          //       name="manage-search"
-          //       size={35}
-          //       color={colors.darkSeparator}
-          //     />
-
-          //     {/*
-          //     <Entypo
-          //       name="magnifying-glass"
-          //       size={25}
-          //       color={colors.darkSeparator}
-          //     /> */}
-          //   </TouchableOpacity>
-          // </View>
         })}
       />
       <Stack.Screen
@@ -439,8 +331,8 @@ function StackNavigator() {
 
       <Stack.Screen
         options={{
-          headerShown: true,
-          title: "Perfil",
+          headerTransparent: true,
+          headerBackgroundContainerStyle: { backgroundColor: "transparent" },
         }}
         name="profile"
         component={ProfileScreen}

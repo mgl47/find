@@ -52,7 +52,7 @@ export function DrawerContent(props) {
       >
         <Image
           source={{
-            uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+            uri: user?.photos?.avatar[0]?.uri,
           }}
           style={{
             width: 55,
@@ -74,10 +74,10 @@ export function DrawerContent(props) {
           marginLeft: 20,
           marginLeft: 20,
           marginTop: 10,
-          paddingBottom: 5,
+          paddingBottom: 2
         }}
       >
-        Erickson
+        {user?.displayName}
       </Text>
       <Text
         style={{
@@ -87,9 +87,11 @@ export function DrawerContent(props) {
           // paddingBottom: 5,
         }}
       >
-        @veiga.erickson
+        @{user?.username}
       </Text>
-      <View style={[styles.separator, { marginTop: 10,width:"100%",right:0 }]} />
+      <View
+        style={[styles.separator, { marginTop: 10, width: "100%", right: 0 }]}
+      />
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={{
@@ -122,7 +124,6 @@ export function DrawerContent(props) {
           icon={({ color, size }) => (
             <Ionicons name="ticket-outline" size={28} color={colors.black} />
           )}
-          
           label="Meus Bilhetes"
           labelStyle={{
             fontSize: 16,
@@ -131,7 +132,6 @@ export function DrawerContent(props) {
             color: colors.black,
           }}
           onPress={() => {}}
-          
         />
         <View style={styles.separator} />
         <DrawerItem
@@ -170,7 +170,7 @@ export function DrawerContent(props) {
         />
         <View style={styles.separator} />
         <DrawerItem
-          style={{ left: 2 }}
+          style={{ }}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="logout"
@@ -180,9 +180,10 @@ export function DrawerContent(props) {
           )}
           label="Sair"
           labelStyle={{
+            
             fontSize: 16,
             fontWeight: "500",
-            right: 20,
+            right: 25,
             color: colors.black,
           }}
           onPress={() => {
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "80%",
     height: 1,
-    right:10,
+    right: 10,
     backgroundColor: colors.lightGrey,
     // marginVertical: 10,
     alignSelf: "flex-end",

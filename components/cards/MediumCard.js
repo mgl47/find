@@ -7,8 +7,7 @@ const { width, height } = Dimensions.get("window");
 
 function MediumCard({ title, date, photos, Category, city, venue }) {
   return (
-    // <View style={styles.card}>
-    //   {/* <Image style={styles.image} source={{ uri: photos[0]?.uri }} /> */}
+
 
     <ImageBackground
       style={styles.card}
@@ -24,22 +23,16 @@ function MediumCard({ title, date, photos, Category, city, venue }) {
           <Text numberOfLines={2} style={styles.title}>
             {title}
           </Text>
-          {/* <View style={{ flexDirection: "row", alignItems: "center" }}> */}
-          {/* <Text numberOfLines={1} style={styles.venue}>
-            {(venue?.displayName + ", " + venue?.city)?.slice(0, 24) +
-              ((venue?.displayName + ", " + venue?.city)?.length > 24
-                ? "..."
-                : "")}
-          </Text> */}
+      
           <Text numberOfLines={1} style={styles.venue}>
             {venue?.displayName + ", " + venue?.city}
           </Text>
-          {/* </View> */}
+
           <Text style={styles.date}>{date}</Text>
         </View>
       </LinearGradient>
 
-      {/* <Text style={styles.Category}>{Category}</Text> */}
+
     </ImageBackground>
     // </View>
   );

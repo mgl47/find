@@ -36,7 +36,7 @@ const TabNavigator = () => {
       backBehavior="initialRoute"
       shifting={true}
       sceneAnimationEnabled={false}
-      activeColor={colors.primary}
+      activeColor={colors.primary2}
       activeIndicatorStyle={{ backgroundColor: "transparent" }}
       screenOptions={{}}
     >

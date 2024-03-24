@@ -1,7 +1,10 @@
 import {
+  Dimensions,
   FlatList,
+  Image,
   StyleSheet,
   Text,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -27,6 +30,12 @@ import { useAuth } from "../../components/hooks/useAuth";
 import AuthBottomSheet from "../../components/screensComponents/AuthBottomSheet";
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
+import BigCard2 from "../../components/cards/BigCards2";
+import Carousel from "react-native-snap-carousel";
+import { ImageBackground } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { ScrollView } from "react-native";
+const { width, height } = Dimensions.get("window");
 
 export default function HomeScreen({ navigation }) {
   // const{authSheetRef}=useAuth()
@@ -39,134 +48,120 @@ export default function HomeScreen({ navigation }) {
   //   authSheetRef.current?.present();
   // }, []);
   const [refreshing, setRefreshing] = useState(false);
-  
-
+  const carouselRef = useRef(null);
+ 
+  _renderItem = ({ item, index }) => {
+    return (
+      <TouchableOpacity activeOpacity={0.95} onPress={()=>navigation.navigate("event",item)}>
+        <BigCard {...item} />
+      </TouchableOpacity >
+    );
+  };
   return (
-    <>
-      <View style={styles.container}>
-        <FlatList
-          onRefresh={getEvents}
-          refreshing={refreshing}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={
-            <>
-              {/* <Text style={[styles.headerText, { marginTop: 5 }]}>Em alta</Text> */}
+    <View style={styles.container}>
+      <FlatList
+      
+        contentContainerStyle={{ backgroundColor: colors.background }}
+        onRefresh={getEvents}
+        bounces={false}
+        
+        refreshing={refreshing}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={
+          <>
 
-              <FlatList
-                showsHorizontalScrollIndicator={false}
-                horizontal
-                // data={trendingEvents}
-                data={events}
-                keyExtractor={(item) => item.uuid}
-                // keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      style={{
-                        // shadowOffset: { width: 1, height: 1 },
-                        // shadowOpacity: 1,
-                        // shadowRadius: 1,
-                        // elevation: 3,
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 1,
-                        elevation: 0.5,
-                        marginVertical: 5,
-                      }}
-                      // onPress={() =>
-                      //   item.valid ? navigation.navigate("event", item) : null
-                      // }
-                      onPress={() => navigation.navigate("event", item)}
-                    >
-                      <MediumCard {...item} />
-                    </TouchableOpacity>
-                  );
+            <View
+              style={{
+                backgroundColor: colors.primary,
+                position: "absolute",
+                width: "100%",
+                height: 250,
+              }}
+            />
+            <Carousel
+
+              inactiveSlideOpacity={1}
+              ref={carouselRef}
+              data={events}
+              renderItem={_renderItem}
+              // sliderWidth={300}
+              sliderWidth={width}
+              itemWidth={width * 0.8}
+            
+            />
+         
+            {/* <Text style={styles.headerText}>Bu próximo evento</Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation?.navigate("event", trendingEvents[1])}
+              style={{
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 1,
+                shadowRadius: 1,
+                elevation: 3,
+                marginVertical: 10,
+              }}
+            >
+              <BigCard2
+                title={trendingEvents[1]?.title}
+                date={trendingEvents[1]?.date}
+                venue={{
+                  displayName: trendingEvents[1]?.venue?.displayName,
+                  city: trendingEvents[1]?.venue?.city,
+                }}
+                image={{
+                  uri: trendingEvents[1]?.photos[0]?.[0]?.uri,
                 }}
               />
-              <Text style={styles.headerText}>Bu próximo evento</Text>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => navigation?.navigate("event", trendingEvents[1])}
-                style={{
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 1,
-                  shadowRadius: 1,
-                  elevation: 3,
-                  marginVertical: 10,
-                }}
-              >
-                <BigCard
-                  title={trendingEvents[1]?.title}
-                  date={trendingEvents[1]?.date}
-                  venue={{
-                    displayName: trendingEvents[1]?.venue?.displayName,
-                    city: trendingEvents[1]?.venue?.city,
-                  }}
-                  image={{
-                    uri: trendingEvents[1]?.photos[0]?.[0]?.uri,
-                  }}
-                />
-                {/* <BigCard
-                  title="Workshop de fotografia"
-                  date="Domingo, 29 Mai - 14h00"
-                  venue={{
-                    displayName: "Praça Alexandre Albuquerque",
-                    city: "Praia",
-                  }}
-                  image={{
-                    uri: "https://images.unsplash.com/photo-1553249067-9571db365b57?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
-                  }}
-                /> */}
-              </TouchableOpacity>
-              <Text style={styles.headerText}>Pa bó</Text>
-              <FlatList
-                data={recommendedEvents}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => {
-                  return (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      style={{
-                        // shadowOffset: { width: 0.5, height: 0.5 },
-                        // shadowOpacity: 0.3,
-                        // shadowRadius: 1,
-                        // elevation: 2,
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 1,
-                        elevation: 0.5,
-                        paddingHorizontal: 10,
-                        marginTop: 10,
-                      }}
-                      onPress={() => navigation.navigate("addEvent", item)}
-                    >
-                      <SmallCard {...item} />
-                    </TouchableOpacity>
-                  );
-                }}
-                ListFooterComponent={<View style={{ marginBottom: 50 }} />}
-              />
-            </>
-          }
-        />
-      </View>
+          
+            </TouchableOpacity> */}
+            <Text style={styles.headerText}>Pa bó</Text>
+            <FlatList
+              data={recommendedEvents}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => {
+                return (
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={{
+                      // shadowOffset: { width: 0.5, height: 0.5 },
+                      // shadowOpacity: 0.3,
+                      // shadowRadius: 1,
+                      // elevation: 2,
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 1,
+                      elevation: 0.5,
+                      paddingHorizontal: 10,
+                      marginTop: 10,
+                    }}
+                    onPress={() => navigation.navigate("addEvent", item)}
+                  >
+                    <SmallCard {...item} />
+                  </TouchableOpacity>
+                );
+              }}
+              ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+            />
+          </>
+        }
+      />
       <AuthBottomSheet
         authSheetRef={authSheetRef}
         setAuthModalUp={setAuthModalUp}
       />
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    backgroundColor: colors.background,
+    backgroundColor: colors.primary,
   },
   headerContainer: {
-    backgroundColor: colors.white,
+    // backgroundColor: colors.white,
 
     alignItems: "center",
     justifyContent: "center",
@@ -178,7 +173,8 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     // padding: 5,
     left: 20,
-    // marginVertical: 5,
+    color: colors.primary,
+    marginTop: 10,
   },
   search: {
     height: 40,
@@ -186,5 +182,28 @@ const styles = StyleSheet.create({
     backgroundColor: colors.light2,
     borderRadius: 30,
     paddingLeft: 40,
+  },
+  venue: {
+    fontSize: 14.5,
+    alignSelf: "flex-start",
+    fontWeight: "600",
+    color: colors.white,
+  },
+  title: {
+    alignSelf: "flex-start",
+    fontSize: 18,
+    fontWeight: "600",
+    color: colors.white,
+    lineHeight: 30,
+    width: "70%",
+  },
+
+  date: {
+    fontSize: 15,
+    alignSelf: "flex-start",
+    fontWeight: "600",
+    color: colors.white,
+
+    marginTop: 3,
   },
 });

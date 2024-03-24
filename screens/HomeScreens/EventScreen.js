@@ -120,9 +120,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.primary2}
         />
-        {/* <Entypo name="chevron-down" size={24} color={colors.primary} /> */}
+        {/* <Entypo name="chevron-down" size={24} color={colors.primary2} /> */}
       </TouchableOpacity>
     );
   };
@@ -133,9 +133,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.primary2}
         />
-        {/* <Entypo name="chevron-up" size={24} color={colors.primary} /> */}
+        {/* <Entypo name="chevron-up" size={24} color={colors.primary2} /> */}
       </TouchableOpacity>
     );
   };
@@ -152,7 +152,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <MaterialCommunityIcons
               name="arrow-left"
               size={28}
-              color={scrolling ? colors.black : colors.white}
+              color={colors.white}
               style={{
                 shadowOffset: !scrolling ? { width: 0.5, height: 0.5 } : {},
                 shadowOpacity: !scrolling ? 0.3 : 0,
@@ -192,11 +192,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               }}
               name="photo-library"
               size={20}
-              color={scrolling ? colors.black : colors.white}
+              color={ colors.white}
             />
             <Text
               style={{
-                color: scrolling ? colors.black : colors.white,
+                color:  colors.white,
                 fontSize: 14,
                 fontWeight: "600",
               }}
@@ -221,7 +221,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontWeight: "500",
               // top: 40,
               // width:"100%",
-              color: colors.black,
+              color: colors.white,
             }}
           >
             {Event?.title}
@@ -236,68 +236,87 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     } else if (user?.likedEvents?.includes(Event?._id)) {
       setInterested(true);
     }
-    console.log("dsafv");
-  }, [user]);
+  }, []);
 
+  // const likeEvent = async () => {
+  //   const updatedLikedEvents = [...user?.likedEvents];
+  //   const newGoingtoEvents = [...user?.goingToEvents];
+  //   let operation;
+  //   if (!updatedLikedEvents.includes(Event?._id)) {
+  //     setInterested(true);
+
+  //     setGoing(false);
+  //     const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
+  //     if (indexToRemove !== -1) {
+  //       newGoingtoEvents.splice(indexToRemove, 1);
+  //     }
+  //     updatedLikedEvents.push(Event?._id);
+  //     operation = { type: "likeEvent", eventId: Event?._id };
+  //   } else {
+  //     setInterested(false);
+  //     const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
+  //     if (indexToRemove !== -1) {
+  //       updatedLikedEvents.splice(indexToRemove, 1);
+  //       operation = { type: "removelikedEvent", eventId: Event?._id };
+  //     }
+  //   }
+  //   try {
+  //     const response = await axios.patch(
+  //       `${apiUrl}/user/current/${user?._id}`,
+
+  //       {
+  //         operation,
+  //         updates: {
+  //           likedEvents: updatedLikedEvents,
+  //           goingtoEvents: newGoingtoEvents,
+  //         },
+  //       },
+  //       { headers: { Authorization: headerToken } }
+  //     );
+  //     getUpdatedUserInfo();
+  //   } catch (error) {
+  //     console.error("Error updating liked events:", error);
+  //   }
+  // };
   const likeEvent = async () => {
-    const updatedLikedEvents = [...user?.likedEvents];
-    const newGoingtoEvents = [...user?.goingToEvents];
+    let updateInterested = [];
+    let updatedGoing = [];
 
-    if (!updatedLikedEvents.includes(Event?._id)) {
-      setGoing(false);
-      const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
-      if (indexToRemove !== -1) {
-        newGoingtoEvents.splice(indexToRemove, 1);
-      }
+    updatedGoing = user?.goingToEvents || [];
+    updateInterested = user?.likedEvents || [];
+
+    const index = updateInterested.indexOf(Event?._id);
+    if (user?.likedEvents?.includes(Event?._id) && index !== -1) {
+      setInterested(false);
+
+      updateInterested.splice(index, 1);
+    } else {
       setInterested(true);
-      updatedLikedEvents.push(Event?._id);
-    } else {
-      setInterested(false);
-      const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
-      if (indexToRemove !== -1) {
-        updatedLikedEvents.splice(indexToRemove, 1);
-      }
-    }
-    try {
-      const response = await axios.patch(
-        `${apiUrl}/user/current/${user?._id}`,
-        { likedEvents: updatedLikedEvents, goingtoEvents: newGoingtoEvents },
-        { headers: { Authorization: headerToken } }
-      );
-      console.log(response?.data);
-      getUpdatedUserInfo();
-    } catch (error) {
-      console.error("Error updating liked events:", error);
-    }
-  };
-  const goingtoEvents = async () => {
-    //Add to Going
-    const updatedLikedEvents = [...user?.likedEvents];
-
-    const newGoingtoEvents = [...user?.goingToEvents];
-
-    if (!newGoingtoEvents.includes(Event?._id)) {
-      setInterested(false);
-      //remove from likedEvents
-      const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
-      if (indexToRemove !== -1) {
-        updatedLikedEvents.splice(indexToRemove, 1);
-      }
-
-      setGoing(true);
-
-      newGoingtoEvents.push(Event?._id);
-    } else {
       setGoing(false);
-      const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
-      if (indexToRemove !== -1) {
-        newGoingtoEvents.splice(indexToRemove, 1);
+
+      updateInterested.push(Event?._id);
+    }
+    if (user?.goingToEvents?.includes(Event?._id)) {
+      const index = updatedGoing.indexOf(Event?._id);
+      if (index !== -1) {
+        // setGoing(false);
+        updatedGoing.splice(index, 1);
       }
     }
     try {
       const response = await axios.patch(
         `${apiUrl}/user/current/${user?._id}`,
-        { goingToEvents: newGoingtoEvents, likedEvents: updatedLikedEvents },
+        {
+          operation: {
+            type: "eventStatus",
+            task: "interest",
+            eventId: Event?._id,
+          },
+          updates: {
+            likedEvents: updateInterested,
+            goingToEvents: updatedGoing,
+          },
+        },
         { headers: { Authorization: headerToken } }
       );
       console.log(response?.data);
@@ -306,6 +325,89 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.error("Error updating liked events:", error);
     }
   };
+  const goingtoEvent = async () => {
+    let updateInterested = [];
+    let updatedGoing = [];
+
+    updatedGoing = user?.goingToEvents || [];
+    updateInterested = user?.likedEvents || [];
+
+    const index = updatedGoing.indexOf(Event?._id);
+    if (user?.goingToEvents?.includes(Event?._id) && index !== -1) {
+      setGoing(false);
+
+      updatedGoing.splice(index, 1);
+    } else {
+      setGoing(true);
+      setInterested(false);
+
+      updatedGoing.push(Event?._id);
+    }
+    if (user?.likedEvents?.includes(Event?._id)) {
+      const index = updateInterested.indexOf(Event?._id);
+      if (index !== -1) {
+        // setGoing(false);
+        updateInterested.splice(index, 1);
+      }
+    }
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: {
+            type: "eventStatus",
+            task: "going",
+            eventId: Event?._id,
+          },
+          updates: {
+            likedEvents: updateInterested,
+            goingToEvents: updatedGoing,
+          },
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      console.log(response?.data);
+      getUpdatedUserInfo();
+    } catch (error) {
+      console.error("Error updating liked events:", error);
+    }
+  };
+  // const goingtoEvents = async () => {
+  //   const updatedLikedEvents = [...user?.likedEvents];
+
+  //   const newGoingtoEvents = [...user?.goingToEvents];
+
+  //   if (!newGoingtoEvents.includes(Event?._id)) {
+  //     setGoing(true);
+
+  //     setInterested(false);
+  //     //remove from likedEvents
+  //     const likedIndexToRemove = updatedLikedEvents.indexOf(Event?._id);
+  //     if (likedIndexToRemove !== -1) {
+  //       updatedLikedEvents.splice(likedIndexToRemove, 1);
+  //     }
+
+  //     newGoingtoEvents.push(Event?._id);
+  //   } else {
+  //     setGoing(false);
+  //     const goingIndexToRemove = newGoingtoEvents.indexOf(Event?._id);
+  //     if (goingIndexToRemove !== -1) {
+  //       newGoingtoEvents.splice(goingIndexToRemove, 1);
+  //     }
+  //   }
+  //   try {
+  //     const response = await axios.patch(
+  //       `${apiUrl}/user/current/${user?._id}`,
+  //       { goingToEvents: newGoingtoEvents, likedEvents: updatedLikedEvents },
+  //       { headers: { Authorization: headerToken } }
+  //     );
+  //     console.log(response?.data);
+  //     getUpdatedUserInfo();
+  //   } catch (error) {
+  //     console.error("Error updating liked events:", error);
+  //   }
+  // };
 
   return (
     <>
@@ -318,7 +420,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: isIPhoneWithNotch ? 90 : 65,
             width: "100%",
-            backgroundColor: colors.white,
+            backgroundColor: colors.primary,
             zIndex: 2,
             shadowOffset: { width: 0.5, height: 0.5 },
             elevation: 2,
@@ -344,7 +446,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             Event?.videos?.length > 0 || Event?.photos?.[0]?.length > 1
           }
           horizontal
-          data={Event?.photos?.[1]}
+          data={Event?.photos?.[0]}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
@@ -478,7 +580,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     fontSize: 20,
                     fontWeight: "500",
                     // width: "80%",
-                    color: colors.primary,
+                    color: colors.primary2,
                     // marginLeft: 5,
                   }}
                 >
@@ -504,7 +606,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: 14,
                 fontWeight: "500",
                 // width: "80%",
-                color: colors.primary,
+                color: colors.primary2,
                 marginLeft: 5,
               }}
             >
@@ -524,7 +626,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <MaterialCommunityIcons
               name="lightning-bolt-outline"
               size={22}
-              color={colors.primary}
+              color={colors.primary2}
             />
             <Text
               style={{
@@ -534,7 +636,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: colors.darkGrey,
               }}
             >
-              {Event?.going} Pessoas vão!
+              {Event?.goingUsers?.length}
+              {Event?.goingUsers?.length > 1 ? " Pessoas vão!" : " Pessoa vai!"}
             </Text>
           </View>
           <View style={{ flexDirection: "row", marginVertical: 5 }}>
@@ -545,7 +648,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: interested ? colors.primary : colors.white,
+                backgroundColor: interested ? colors.primary2 : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 12,
@@ -580,7 +683,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: interested ? colors.white : colors.black,
               }}
               style={{
-                backgroundColor: interested ? colors.primary : colors.white,
+                backgroundColor: interested ? colors.primary2 : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 12,
@@ -606,11 +709,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: going ? colors.white : colors.black,
               }}
               style={{
-                backgroundColor: going ? colors.primary : colors.white,
+                backgroundColor: going ? colors.primary2 : colors.white,
                 // paddingHorizontal: 2,
                 borderRadius: 12,
               }}
-              onPress={goingtoEvents}
+              onPress={goingtoEvent}
             >
               Vou
             </Chip>
@@ -666,7 +769,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontWeight: "500",
                 left: 10,
                 // width: "80%",
-                color: colors.primary,
+                color: colors.primary2,
                 // marginLeft: 5,
                 marginTop: 10,
               }}
@@ -679,7 +782,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 15,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.primary2,
                   // marginLeft: 5,
                   marginTop: 10,
                 }}
@@ -736,7 +839,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontWeight: "500",
               left: 10,
 
-              color: colors.primary,
+              color: colors.primary2,
 
               marginBottom: 5,
             }}
@@ -788,7 +891,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 {Event?.venue?.displayName}
               </Text>
             </View>
-            <Entypo name="chevron-right" size={24} color={colors.primary} />
+            <Entypo name="chevron-right" size={24} color={colors.primary2} />
           </TouchableOpacity>
           <View
             style={{
@@ -821,7 +924,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={styles.map}
             >
               <Marker
-                pinColor={colors.primary}
+                pinColor={colors.primary2}
                 coordinate={{
                   latitude: Event?.venue?.lat,
                   longitude: Event?.venue?.long,
@@ -851,12 +954,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <FontAwesome5 name="walking" size={20} color={colors.primary} />
+                <FontAwesome5 name="walking" size={20} color={colors.primary2} />
                 <Text style={{ fontSize: 22, color: colors.black2 }}> | </Text>
                 <MaterialCommunityIcons
                   name="car"
                   size={25}
-                  color={colors.primary}
+                  color={colors.primary2}
                 />
               </View>
             </TouchableOpacity>
@@ -884,7 +987,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <MaterialCommunityIcons
                 name="phone"
                 size={25}
-                color={colors.primary}
+                color={colors.primary2}
               />
             </TouchableOpacity> */}
           </View>
@@ -893,7 +996,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontSize: 18,
               fontWeight: "500",
               left: 10,
-              color: colors.primary,
+              color: colors.primary2,
 
               marginVertical: 10,
             }}
@@ -993,7 +1096,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <Entypo
                       name="chevron-right"
                       size={24}
-                      color={colors.primary}
+                      color={colors.primary2}
                     />
                   </TouchableOpacity>
                   <View style={[styles.separator, { width: "90%" }]} />
@@ -1017,7 +1120,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <MaterialCommunityIcons
                       name="phone"
                       size={25}
-                      color={colors.primary}
+                      color={colors.primary2}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1070,7 +1173,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   {Event?.promoter?.displayName}
                 </Text>
               </View>
-              <Entypo name="chevron-right" size={24} color={colors.primary} />
+              <Entypo name="chevron-right" size={24} color={colors.primary2} />
             </TouchableOpacity>
             <View style={[styles.separator, { width: "90%" }]} />
 
@@ -1093,7 +1196,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <MaterialCommunityIcons
                 name="phone"
                 size={25}
-                color={colors.primary}
+                color={colors.primary2}
               />
             </TouchableOpacity>
           </View> */}
@@ -1158,7 +1261,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               // left: 10,
               borderRadius: 10,
               borderWidth: 1,
-              borderColor: colors.primary,
+              borderColor: colors.primary2,
               alignItems: "center",
               justifyContent: "center",
               shadowOffset: { width: 1, height: 1 },
@@ -1173,21 +1276,21 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <Text
               style={{
                 fontSize: 15,
-                color: colors.primary,
+                color: colors.primary2,
                 fontWeight: "500",
                 marginRight: 10,
               }}
             >
               Presentear
             </Text>
-            <Feather name="gift" size={24} color={colors.primary} />
+            <Feather name="gift" size={24} color={colors.primary2} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handlePurchaseSheet}
             style={{
               width: 150,
               height: 40,
-              backgroundColor: colors.primary, // position: "absolute",
+              backgroundColor: colors.primary2, // position: "absolute",
               zIndex: 1,
               top: 10,
               // left: 10,
@@ -1262,7 +1365,7 @@ const styles = StyleSheet.create({
   more: {
     position: "absolute",
     backgroundColor: colors.background,
-    color: colors.primary,
+    color: colors.primary2,
     alignSelf: "flex-end",
     fontWeight: "500",
     // marginBottom: 5,

@@ -377,7 +377,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           },
         ];
       }
-      photos = [resized1, resized3, resized3, resized4];
+      photos = [resized1, resized2, resized3, resized4];
       console.log(photos);
     } catch (error) {
       console.log(error);

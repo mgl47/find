@@ -151,7 +151,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
             </TouchableOpacity>
             <View style={{ flexDirection: "row" }}>
               <TouchableHighlight
-                underlayColor={colors.light}
+                underlayColor={colors.light2}
                 onPress={() => {}}
                 style={{
                   backgroundColor: colors.black,

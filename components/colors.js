@@ -1,12 +1,18 @@
 export default {
   primary: "#0072CE",
+  primary: "#002a4d",
+
+  primary2: "#004680",
+  // primary: "#800060",
+  // primary: "#800060",  //pink
+ 
   // secondary: "#E78200",
   background: "#faf8f8",
   // background:"#f2f2f2",
   // background:"#FFFAFA",
   // background: "#F5FFFA",
   black2: "#333333",
-  primary2: "#169ABD",
+  // primary2: "#169ABD",
   blue: "#1412a3",
   white: "white",
   white_shade: "#FFF5EE",

@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
         setUser(JSON.parse(userValue));
         setHeaderToken(tokenValue);
         // getUpdatedUserInfo(tokenValue);
+        getUpdatedUserInfo();
 
         // console.log(tokenValue);
       }
@@ -76,7 +77,10 @@ export const AuthProvider = ({ children }) => {
         );
 
         // console.log(response.data);
+
         setUser(response.data);
+        const jsonValue = JSON.stringify(response.data);
+        await AsyncStorage.setItem("user", jsonValue);
       }
     } catch (error) {
       console.log(error.response.data);
@@ -123,7 +127,7 @@ export const AuthProvider = ({ children }) => {
     () => ({
       headerToken,
       user,
-      setUser: setUser,
+      setUser,
       authLoading,
       setAuthModalUp,
       AuthModalUp,
