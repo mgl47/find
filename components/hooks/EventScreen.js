@@ -59,12 +59,14 @@ import ImageView from "react-native-image-viewing";
 import { useDesign } from "../../components/hooks/useDesign";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
-  const { width, height, isIPhoneWithNotch } = useDesign();
+  const { width, height,primaryhoneWithNotch } = useDesign()
 
+  
   const [firstMount, setFirstMount] = useState(true);
   useEffect(() => {
     setFirstMount(false);
   }, []);
+
 
   const Event = route.params;
   const videoRef = React.useRef(null);
@@ -232,14 +234,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         ) : null,
     });
   }, [scrolling, inFullscreen, mediaIndex]);
+
   useEffect(() => {
     if (user?.goingToEvents?.includes(Event?._id)) {
       setGoing(true);
-      setInterested(false);
     } else if (user?.likedEvents?.includes(Event?._id)) {
       setInterested(true);
     }
-  }, [user]);
+  }, []);
 
   const likeEvent = async () => {
     let updateInterested = [];
@@ -346,7 +348,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           exiting={SlideOutUp.duration(500)}
           style={{
             position: "absolute",
-            height: isIPhoneWithNotch ? 90 : 65,
+            height: primaryhoneWithNotch ? 90 : 65,
             width: "100%",
             backgroundColor: colors.primary2,
             zIndex: 2,

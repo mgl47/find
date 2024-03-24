@@ -110,7 +110,7 @@ export const AuthProvider = ({ children }) => {
           "headerToken",
           "Bearer " + response.data.token
         );
-        // const jsonValue = JSON.stringify(response.data.user);
+        const jsonValue = JSON.stringify(response.data.user);
         await AsyncStorage.setItem("user", jsonValue);
         // JSON.parse(jsonValue);
       }

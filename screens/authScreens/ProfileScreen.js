@@ -299,10 +299,10 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
     setLoading(false);
   };
-  let displayCover=[]
+  let displayCover = [];
   const coverIndex = user?.photos?.cover[2];
-   displayCover?.push(coverIndex);
-  let displayAvatar=[]
+  displayCover?.push(coverIndex);
+  let displayAvatar = [];
   const avatarIndex = user?.photos?.avatar[2];
   displayAvatar?.push(avatarIndex);
   return (
@@ -644,7 +644,10 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
           </TouchableOpacity>
           {/* )} */}
         </View>
-        <ScrollView>
+        <ScrollView
+          contentContainerStyle={{ backgroundColor: colors.background }}
+          style={{ backgroundColor: colors.background }}
+        >
           <TouchableOpacity
             onPress={() => photoInput(setCoverUri)}
             style={{

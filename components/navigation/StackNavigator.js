@@ -61,7 +61,7 @@ function StackNavigator() {
 
               shadowOffset: { width: 0.5, height: 0.5 },
               elevation: 2,
-
+              shadowColor: colors.primary2,
               shadowOpacity: 0.1,
               shadowRadius: 1,
             }
@@ -72,6 +72,7 @@ function StackNavigator() {
         name="home"
         component={TabNavigator}
         options={({ route }) => ({
+          headerShown: false,
           headerLeft: () => (
             <TouchableOpacity
               onPress={() =>
@@ -94,28 +95,6 @@ function StackNavigator() {
                   }}
                 />
               ) : (
-                // <TouchableOpacity
-                //   onPress={() => {
-                //     navigation.navigate("auth");
-                //   }}
-                //   style={{
-                //     padding: 10,
-                //     // right: 10,
-                //     // alignSelf: "flex-end",
-                //     // position: "absolute",
-                //     // marginBottom: 10,
-                //   }}
-                // >
-                //   <Text
-                //     style={{
-                //       color: colors.primary,
-                //       fontSize: 16,
-                //       fontWeight: "600",
-                //     }}
-                //   >
-                //     Entrar
-                //   </Text>
-                // </TouchableOpacity>
                 <MaterialCommunityIcons
                   name="account-outline"
                   size={35}
@@ -128,7 +107,7 @@ function StackNavigator() {
           headerTitle: () => (
             <Image
               source={require("../../assets/logos/logo_white.png")}
-              style={{ width: 35, height: 35,  }}
+              style={{ width: 35, height: 35 }}
               resizeMode="contain"
             />
           ),
@@ -341,7 +320,7 @@ function StackNavigator() {
         options={{
           headerShown: true,
           title: "Criar Evento",
-          headerTitleStyle:{color:colors.white},
+          headerTitleStyle: { color: colors.white },
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}

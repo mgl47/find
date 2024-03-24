@@ -34,6 +34,7 @@ import BigCard2 from "../../components/cards/BigCards2";
 import Carousel from "react-native-snap-carousel";
 import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { ScrollView } from "react-native";
 const { width, height } = Dimensions.get("window");
 
 export default function HomeScreen({ navigation }) {
@@ -59,10 +60,10 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <FlatList
-        style={{ backgroundColor: colors.primary }}
+      
         contentContainerStyle={{ backgroundColor: colors.background }}
         onRefresh={getEvents}
-        // bounces={false}
+        bounces={false}
         
         refreshing={refreshing}
         showsVerticalScrollIndicator={false}
@@ -71,7 +72,7 @@ export default function HomeScreen({ navigation }) {
 
             <View
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary2,
                 position: "absolute",
                 width: "100%",
                 height: 250,
@@ -157,7 +158,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    // backgroundColor: colors.background,
+    backgroundColor: colors.primary,
   },
   headerContainer: {
     // backgroundColor: colors.white,
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 19,
-    fontWeight: "500",
+    fontWeight: "600",
     // padding: 5,
     left: 20,
     color: colors.primary,

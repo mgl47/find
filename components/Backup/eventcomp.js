@@ -98,7 +98,7 @@ export const PurchaseModal = ({
   // const snapPoints = useMemo(() => ["40%", `${baseSnapPont}`, "80%"], []);
 
   const snapPoints = useMemo(() => ["50%", `${customSnap}`, "80%"], []);
-  const { headerToken, user, getUpdatedUserInfo } = useAuth();
+  const { headerToken, user } = useAuth();
   const handleSheetChanges = useCallback((index) => {}, []);
   // Event?.tickets?.length>2?
   const [firstRender, setFirstRender] = useState(true);
@@ -195,17 +195,6 @@ export const PurchaseModal = ({
     },
   });
   const buyTickets = async () => {
-    let updateInterested = [];
-    let updatedGoing = [];
-    updatedGoing = user?.goingToEvents || [];
-    updateInterested = user?.likedEvents || [];
-    const index = updatedGoing.indexOf(Event?._id);
-    if (user?.goingToEvents?.includes(Event?._id) && index !== -1) {
-      updatedGoing.splice(index, 1);
-    } else {
-      updatedGoing.push(Event?._id);
-    }
-
     try {
       const response = await axios.post(
         `${apiUrl}/purchase/`,
@@ -220,24 +209,13 @@ export const PurchaseModal = ({
             tickets: state.cart?.filter((ticket) => ticket?.amount != 0),
             total: state.total,
           },
-          userUpdates: {
-            operation: {
-              type: "eventStatus",
-              task: "going",
-              eventId: Event?._id,
-            },
-            updates: {
-              likedEvents: updateInterested,
-              goingToEvents: updatedGoing,
-            },
-          },
         },
         {
           headers: { Authorization: headerToken },
         }
       );
       console.log(response?.data);
-      getUpdatedUserInfo();
+      // getUpdatedUserInfo();
     } catch (error) {
       console.error("Error updating liked events:", error);
     }
@@ -247,385 +225,339 @@ export const PurchaseModal = ({
       <BottomSheetModal
         // style={{backgroundColor:}}
         ref={bottomSheetModalRef}
-        index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+        index={keyboardVisible? 2 : onPayment? 0:1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setPurchaseModalUp(false), clear(), setOnPayment(false);
+          setPurchaseModalUp(false), clear();
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
-          {onPayment ? (
-            <>
-              <Animated.View
-                style={{ flex: 1 }}
-                entering={SlideInRight}
-                exiting={SlideOutRight}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => setOnPayment(false)}
-                    style={{
-                      padding: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="arrow-left"
-                      size={20}
-                      color={colors.primary}
-                    />
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontWeight: "500",
-                      }}
-                    >
-                      Voltar
-                    </Text>
-                  </TouchableOpacity>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Text
-                      style={{
-                        fontWeight: "500",
-                        fontSize: 19,
-                        marginRight: 20,
-                        marginLeft: 5,
-                        color: colors.primary,
-                      }}
-                    >
-                      Confirmar compra
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    padding: 10,
-                  }}
-                >
-                  <TextInput
-                    // error={!firstAt}
-                    style={{
-                      marginVertical: 10,
-                      marginBottom: 5,
-                      backgroundColor: colors.background,
-                    }}
-                    // autoFocus
-                    mode="outlined"
-                    activeOutlineColor={colors.primary}
-                    underlineStyle={{ backgroundColor: colors.primary }}
-                    outlineColor={colors.primary}
-                    // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                    label="Número de cartão"
-                    defaultValue={paymentInfo?.cardInfo?.number}
-                    activeUnderlineColor={colors.primary}
-                    value={paymentInfo?.cardInfo?.number}
-                    onChangeText={(text) =>
-                      setPaymentInfo({
-                        ...paymentInfo,
-                        cardInfo: {
-                          ...paymentInfo?.cardInfo,
-                          number: text,
-                        },
-                      })
-                    }
-                  />
-
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "600",
+              left: "8%",
+              // width: "80%",
+              color: colors.primary,
+              // marginLeft: 5,
+              marginTop: 10,
+            }}
+          >
+            Bilhetes
+          </Text>
+          <Animated.FlatList
+            entering={firstRender ? null : SlideInRight}
+            data={onPayment ? [] : state?.cart}
+            keyExtractor={(item) => item?.id}
+            ListHeaderComponent={
+              onPayment ? (
+                <Animated.View entering={SlideInRight} exiting={SlideOutRight}>
                   <View
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      marginVertical: 10,
-                      marginBottom: 20,
                     }}
                   >
-                    <TextInput
-                      // error={!firstAt}
+                    <TouchableOpacity
+                      onPress={() => setOnPayment(false)}
                       style={{
-                        marginBottom: 5,
-                        backgroundColor: colors.background,
-                        width: "48%",
-                      }}
-                      // autoFocus
-                      mode="outlined"
-                      activeOutlineColor={colors.primary}
-                      underlineStyle={{ backgroundColor: colors.primary }}
-                      outlineColor={colors.primary}
-                      // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                      label="Data de validade"
-                      defaultValue={paymentInfo?.cardInfo?.date}
-                      activeUnderlineColor={colors.primary}
-                      value={paymentInfo?.cardInfo?.date}
-                      onChangeText={(text) =>
-                        setPaymentInfo({
-                          ...paymentInfo,
-                          cardInfo: {
-                            ...paymentInfo?.cardInfo,
-                            date: text,
-                          },
-                        })
-                      }
-                    />
-                    <TextInput
-                      // error={!firstAt}
-                      style={{
-                        marginBottom: 5,
-                        backgroundColor: colors.background,
-                        width: "48%",
-                      }}
-                      // autoFocus
-                      mode="outlined"
-                      activeOutlineColor={colors.primary}
-                      underlineStyle={{ backgroundColor: colors.primary }}
-                      outlineColor={colors.primary}
-                      // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                      label="ccv"
-                      defaultValue={paymentInfo?.cardInfo?.ccv}
-                      activeUnderlineColor={colors.primary}
-                      value={paymentInfo?.cardInfo?.ccv}
-                      onChangeText={(text) =>
-                        setPaymentInfo({
-                          ...paymentInfo,
-                          cardInfo: { ...paymentInfo?.cardInfo, ccv: text },
-                        })
-                      }
-                    />
-                  </View>
-
-                  <View>
-                    {state?.cart
-                      ?.filter((item) => item?.amount != 0)
-                      ?.map((ticket) => {
-                        return (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontSize: 17,
-                                fontWeight: "500",
-                                color: colors.primary,
-                                // left: 10,
-                              }}
-                            >
-                              {ticket?.amount}x
-                            </Text>
-
-                            <Text
-                              style={{
-                                fontSize: 15,
-                                fontWeight: "500",
-                                color: colors.darkSeparator,
-                                top: 2,
-                                position: "absolute",
-                                left: 20,
-                              }}
-                            >
-                              {(ticket?.amount > 1
-                                ? " Bilhetes "
-                                : " Bilhete ") +
-                                ticket?.category +
-                                (ticket?.amount > 1
-                                  ? " selecionados"
-                                  : " selecionado ")}
-                            </Text>
-                          </View>
-                        );
-                      })}
-                  </View>
-                  <View
-                    // entering={SlideInRight}
-                    // exiting={SlideOutLeft}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      // margin: 20,
-                    }}
-                  >
-                    <View
-                      style={{
+                        padding: 10,
                         flexDirection: "row",
                         alignItems: "center",
                       }}
                     >
+                      <MaterialCommunityIcons
+                        name="arrow-left"
+                        size={20}
+                        color={colors.primary}
+                      />
                       <Text
                         style={{
-                          fontSize: 19,
-                          color: colors.black2,
-                          fontWeight: "600",
-                          marginRight: 5,
-                        }}
-                      >
-                        Total:
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 19,
                           color: colors.primary,
-                          fontWeight: "600",
+                          fontSize: 16,
+                          fontWeight: "500",
                         }}
                       >
-                        cve {formatNumber(state?.total)}
+                        Voltar
+                      </Text>
+                    </TouchableOpacity>
+
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "500",
+                          fontSize: 19,
+                          marginRight: 20,
+                          marginLeft: 5,
+                          color: colors.primary,
+                        }}
+                      >
+                        Confirmar compra
                       </Text>
                     </View>
-                    <TouchableOpacity
-                      disabled={state.total == 0}
-                      onPress={() =>
-                        onPayment ? buyTickets() : setOnPayment(true)
-                      }
-                      style={{
-                        width: 150,
-                        height: 40,
-                        backgroundColor:
-                          state?.total != 0 ? colors.primary : colors.darkGrey, // position: "absolute",
-                        zIndex: 1,
-                        // top: 10,
-                        // left: 10,
-                        borderRadius: 10,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        shadowOffset: { width: 1, height: 1 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 1,
-                        elevation: 3,
-                        shadowColor: colors.dark,
-                        flexDirection: "row",
-                      }}
-                      activeOpacity={0.5}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          color: colors.white,
-                          fontWeight: "500",
-                          marginRight: 10,
-                        }}
-                      >
-                        {onPayment ? "Pagar" : "Confirmar"}
-                      </Text>
-                      {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
-                    </TouchableOpacity>
                   </View>
-                </View>
-              </Animated.View>
-            </>
-          ) : (
-            <Animated.FlatList
-              entering={firstRender ? null : SlideInLeft}
-              exiting={SlideOutLeft}
-              data={state?.cart}
-              keyExtractor={(item) => item?.id}
-              ListHeaderComponent={
-                <Text
+                </Animated.View>
+              ) : (
+                <View style={{ marginBottom: 10 }} />
+              )
+            }
+            renderItem={({ item }) => {
+              return (
+                <Animated.View
+                  entering={SlideInLeft}
+                  exiting={SlideOutLeft}
+                  activeOpacity={0.5}
                   style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    left: "8%",
-                    // width: "80%",
-                    color: colors.primary,
-                    // marginLeft: 5,
-                    marginVertical: 10,
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 1,
+                    elevation: 2,
+                    width: "100%",
                   }}
+                  // onPress={() => navigation.navigate("event", item)}
                 >
-                  Bilhetes
-                </Text>
-              }
-              renderItem={({ item }) => {
-                return (
-                  <View
-                    activeOpacity={0.5}
-                    style={{
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 1,
-                      elevation: 2,
-                      width: "100%",
-                    }}
-                    // onPress={() => navigation.navigate("event", item)}
-                  >
-                    <View style={styles.card}>
+                  <View style={styles.card}>
+                    <View
+                      style={{
+                        width: "70%",
+                        // backgroundColor: colors.light2,
+                        padding: 10,
+                      }}
+                    >
                       <View
-                        style={{
-                          width: "70%",
-                          // backgroundColor: colors.light2,
-                          padding: 10,
-                        }}
+                        style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <Text numberOfLines={2} style={[styles.price]}>
-                            cve {formatNumber(item?.price)}
-                          </Text>
-                          <Text numberOfLines={2} style={[styles.priceType]}>
-                            {item?.type}
-                          </Text>
-                        </View>
-
-                        <Text style={styles.description}>
-                          {item?.description}
+                        <Text numberOfLines={2} style={[styles.price]}>
+                          cve {formatNumber(item?.price)}
+                        </Text>
+                        <Text numberOfLines={2} style={[styles.priceType]}>
+                          {item?.type}
                         </Text>
                       </View>
-                      <View style={styles.counterView}>
-                        <TouchableOpacity
-                          disabled={
+
+                      <Text style={styles.description}>
+                        {item?.description}
+                      </Text>
+                    </View>
+                    <View style={styles.counterView}>
+                      <TouchableOpacity
+                        disabled={
+                          state?.cart?.filter((cartItem) => {
+                            if (cartItem?.id == item?.id)
+                              return cartItem?.amount;
+                          }) == 0
+                        }
+                        onPress={() => decrease(item)}
+                      >
+                        <AntDesign
+                          name="minuscircle"
+                          size={24}
+                          color={
                             state?.cart?.filter((cartItem) => {
                               if (cartItem?.id == item?.id)
                                 return cartItem?.amount;
                             }) == 0
+                              ? colors.grey
+                              : colors.darkGrey
                           }
-                          onPress={() => decrease(item)}
-                        >
-                          <AntDesign
-                            name="minuscircle"
-                            size={24}
-                            color={
-                              state?.cart?.filter((cartItem) => {
-                                if (cartItem?.id == item?.id)
-                                  return cartItem?.amount;
-                              }) == 0
-                                ? colors.grey
-                                : colors.darkGrey
-                            }
-                          />
-                        </TouchableOpacity>
-                        <Text
-                          style={{
-                            fontSize: 22,
-                            fontWeight: "600",
-                            color: colors.primary,
-                          }}
-                        >
-                          {item?.amount}
-                        </Text>
-                        <TouchableOpacity onPress={() => increase(item)}>
-                          <AntDesign
-                            name="pluscircle"
-                            size={24}
-                            color={colors.primary}
-                          />
-                        </TouchableOpacity>
-                      </View>
+                        />
+                      </TouchableOpacity>
+                      <Text
+                        style={{
+                          fontSize: 22,
+                          fontWeight: "600",
+                          color: colors.primary,
+                        }}
+                      >
+                        {item?.amount}
+                      </Text>
+                      <TouchableOpacity onPress={() => increase(item)}>
+                        <AntDesign
+                          name="pluscircle"
+                          size={24}
+                          color={colors.primary}
+                        />
+                      </TouchableOpacity>
                     </View>
                   </View>
-                );
-              }}
-              ListFooterComponent={
+                </Animated.View>
+              );
+            }}
+            ListFooterComponent={
+              onPayment ? (
+                <View entering={SlideInRight} exiting={SlideOutRight}>
+                  <Animated.View
+                  entering={SlideInRight} exiting={SlideOutRight}
+                    style={{
+                      flex: 1,
+                      padding: 10,
+                    }}
+                  >
+                    <TextInput
+                      // error={!firstAt}
+                      style={{
+                        marginVertical: 10,
+                        marginBottom: 5,
+                        backgroundColor: colors.background,
+                      }}
+                      // autoFocus
+                      mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      underlineStyle={{ backgroundColor: colors.primary }}
+                      outlineColor={colors.primary}
+                      // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                      label="Número de cartão"
+                      defaultValue={paymentInfo?.cardInfo?.number}
+                      activeUnderlineColor={colors.primary}
+                      value={paymentInfo?.cardInfo?.number}
+                      onChangeText={(text) =>
+                        setPaymentInfo({
+                          ...paymentInfo,
+                          cardInfo: { ...paymentInfo?.cardInfo, number: text },
+                        })
+                      }
+                    />
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginVertical: 10,
+                      }}
+                    >
+                      <TextInput
+                        // error={!firstAt}
+                        style={{
+                          marginBottom: 5,
+                          backgroundColor: colors.background,
+                          width: "48%",
+                        }}
+                        // autoFocus
+                        mode="outlined"
+                        activeOutlineColor={colors.primary}
+                        underlineStyle={{ backgroundColor: colors.primary }}
+                        outlineColor={colors.primary}
+                        // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                        label="Data de validade"
+                        defaultValue={paymentInfo?.cardInfo?.date}
+                        activeUnderlineColor={colors.primary}
+                        value={paymentInfo?.cardInfo?.date}
+                        onChangeText={(text) =>
+                          setPaymentInfo({
+                            ...paymentInfo,
+                            cardInfo: { ...paymentInfo?.cardInfo, date: text },
+                          })
+                        }
+                      />
+                      <TextInput
+                        // error={!firstAt}
+                        style={{
+                          marginBottom: 5,
+                          backgroundColor: colors.background,
+                          width: "48%",
+                        }}
+                        // autoFocus
+                        mode="outlined"
+                        activeOutlineColor={colors.primary}
+                        underlineStyle={{ backgroundColor: colors.primary }}
+                        outlineColor={colors.primary}
+                        // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                        label="ccv"
+                        defaultValue={paymentInfo?.cardInfo?.ccv}
+                        activeUnderlineColor={colors.primary}
+                        value={paymentInfo?.cardInfo?.ccv}
+                        onChangeText={(text) =>
+                          setPaymentInfo({
+                            ...paymentInfo,
+                            cardInfo: { ...paymentInfo?.cardInfo, ccv: text },
+                          })
+                        }
+                      />
+                    </View>
+                    <Animated.View
+                      // entering={SlideInRight}
+                      // exiting={SlideOutLeft}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        margin: 20,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 19,
+                            color: colors.black2,
+                            fontWeight: "600",
+                            marginRight: 5,
+                          }}
+                        >
+                          Total:
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 19,
+                            color: colors.primary,
+                            fontWeight: "600",
+                          }}
+                        >
+                          cve {formatNumber(state?.total)}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        disabled={state.total == 0}
+                        onPress={() =>
+                          onPayment ? buyTickets() : setOnPayment(true)
+                        }
+                        style={{
+                          width: 150,
+                          height: 40,
+                          backgroundColor:
+                            state?.total != 0
+                              ? colors.primary
+                              : colors.darkGrey, // position: "absolute",
+                          zIndex: 1,
+                          // top: 10,
+                          // left: 10,
+                          borderRadius: 10,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowOpacity: 0.3,
+                          shadowRadius: 1,
+                          elevation: 3,
+                          shadowColor: colors.dark,
+                          flexDirection: "row",
+                        }}
+                        activeOpacity={0.5}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            color: colors.white,
+                            fontWeight: "500",
+                            marginRight: 10,
+                          }}
+                        >
+                          {onPayment ? "Pagar" : "Confirmar"}
+                        </Text>
+                        {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
+                      </TouchableOpacity>
+                    </Animated.View>
+                  </Animated.View>
+                </View>
+              ) : (
                 // <View />
 
                 <Animated.View
@@ -702,9 +634,9 @@ export const PurchaseModal = ({
                     {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
                   </TouchableOpacity>
                 </Animated.View>
-              }
-            />
-          )}
+              )
+            }
+          />
         </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>

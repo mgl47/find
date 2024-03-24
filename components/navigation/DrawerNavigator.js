@@ -75,7 +75,7 @@ export function DrawerContent(props) {
           marginLeft: 20,
           marginTop: 10,
           paddingBottom: 2,
-          color:colors.white
+          color: colors.white,
         }}
       >
         {user?.displayName}
@@ -85,7 +85,7 @@ export function DrawerContent(props) {
           fontSize: 14,
           fontWeight: "400",
           marginLeft: 20, // marginTop: 10,
-          color:colors.lightGrey
+          color: colors.lightGrey,
 
           // paddingBottom: 5,
         }}
@@ -173,7 +173,7 @@ export function DrawerContent(props) {
         />
         <View style={styles.separator} />
         <DrawerItem
-          style={{ }}
+          style={{}}
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="logout"
@@ -183,7 +183,6 @@ export function DrawerContent(props) {
           )}
           label="Sair"
           labelStyle={{
-            
             fontSize: 16,
             fontWeight: "500",
             right: 25,
@@ -225,7 +224,10 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       screenOptions={{
-        drawerType: "front",
+        drawerType: "slide",
+        // drawerHideStatusBarOnOpen:true,
+        overlayColor:"rgba(0,0,0,0.7)",
+        headerBackground: "red",
         headerShown: false,
         drawerIcon: () => (
           <Image

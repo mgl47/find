@@ -11,6 +11,7 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  newEvents,
   recommendedEvents,
   trendingEvents,
 } from "../../components/Data/stockEvents";
@@ -24,6 +25,7 @@ import {
   MaterialCommunityIcons,
   Entypo,
   FontAwesome5,
+  MaterialIcons,
 } from "@expo/vector-icons";
 
 import { useAuth } from "../../components/hooks/useAuth";
@@ -35,41 +37,104 @@ import Carousel from "react-native-snap-carousel";
 import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native";
+import Screen from "../../components/Screen";
 const { width, height } = Dimensions.get("window");
 
 export default function HomeScreen({ navigation }) {
   // const{authSheetRef}=useAuth()
 
-  const { setAuthModalUp, authSheetRef } = useAuth();
+  const { user, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
   const { events, getEvents } = useData();
-  // const handleAuthSheet = useCallback(() => {
-  //   setAuthModalUp(true);
-  //   authSheetRef.current?.present();
-  // }, []);
   const [refreshing, setRefreshing] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
+  const handleScroll = (event) => {
+    setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
+    // setScrollingPos(event.nativeEvent.contentOffset.y / 20);
+  };
   const carouselRef = useRef(null);
- 
+
   _renderItem = ({ item, index }) => {
     return (
-      <TouchableOpacity activeOpacity={0.95} onPress={()=>navigation.navigate("event",item)}>
+      <TouchableOpacity
+        activeOpacity={0.95}
+        onPress={() => navigation.navigate("event", item)}
+      >
         <BigCard {...item} />
-      </TouchableOpacity >
+      </TouchableOpacity>
     );
   };
+
   return (
-    <View style={styles.container}>
+    <Screen style={[styles.container]}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          // backgroundColor: colors.primary2,
+        }}
+      >
+        <TouchableOpacity
+          onPress={() =>
+            user
+              ? navigation.openDrawer()
+              : (authSheetRef?.current?.present(), setAuthModalUp(true))
+          }
+          style={{ left: 20, bottom: 1 }}
+        >
+          {user ? (
+            <Image
+              source={{
+                uri: user?.photos?.avatar[0]?.uri,
+              }}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                // left:20
+              }}
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name="account-outline"
+              size={35}
+              color={colors.white}
+            />
+          )}
+        </TouchableOpacity>
+        <Image
+          // source={
+          //   scrolling
+          //     ? require("../../assets/logos/logo1.png")
+          //     : require("../../assets/logos/logo_white.png")
+          // }
+          source={require("../../assets/logos/logo_white.png")}
+          style={{ width: 35, height: 35, left: 5 }}
+          resizeMode="contain"
+        />
+        <TouchableOpacity
+          style={{
+            borderRadius: 50,
+            padding: 5,
+            right: 10,
+            // backgroundColor: colors.grey,
+          }}
+          onPress={() => navigation.navigate("search")}
+        >
+          <MaterialIcons name="manage-search" size={35} color={colors.white} />
+        </TouchableOpacity>
+      </View>
       <FlatList
-      
         contentContainerStyle={{ backgroundColor: colors.background }}
         onRefresh={getEvents}
         bounces={false}
-        
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
         refreshing={refreshing}
         showsVerticalScrollIndicator={false}
         ListFooterComponent={
           <>
-
             <View
               style={{
                 backgroundColor: colors.primary2,
@@ -79,7 +144,6 @@ export default function HomeScreen({ navigation }) {
               }}
             />
             <Carousel
-
               inactiveSlideOpacity={1}
               ref={carouselRef}
               data={events}
@@ -87,9 +151,8 @@ export default function HomeScreen({ navigation }) {
               // sliderWidth={300}
               sliderWidth={width}
               itemWidth={width * 0.8}
-            
             />
-         
+
             {/* <Text style={styles.headerText}>Bu próximo evento</Text>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -151,14 +214,14 @@ export default function HomeScreen({ navigation }) {
         authSheetRef={authSheetRef}
         setAuthModalUp={setAuthModalUp}
       />
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary2,
   },
   headerContainer: {
     // backgroundColor: colors.white,
