@@ -44,7 +44,10 @@ import Animated, {
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 import { categories } from "../../components/Data/categories";
-import { newEvents, recommendedEvents } from "../../components/Data/stockEvents";
+import {
+  newEvents,
+  recommendedEvents,
+} from "../../components/Data/stockEvents";
 import { artist } from "../../components/Data/artist";
 
 import SmallCard from "../../components/cards/SmallCard";
@@ -102,7 +105,7 @@ const SearchScreen2 = ({
           >
             <Text
               style={{
-                color: colors.primary,
+                color: colors.white,
                 fontSize: 16,
                 fontWeight: "600",
               }}
@@ -115,7 +118,11 @@ const SearchScreen2 = ({
 
       headerTitle: () =>
         category ? (
-          <Text style={{ fontSize: 17, fontWeight: "600" }}>{category}</Text>
+          <Text
+            style={{ fontSize: 17, fontWeight: "600", color: colors.white }}
+          >
+            {category}
+          </Text>
         ) : (
           <View
             style={{

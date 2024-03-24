@@ -25,6 +25,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useReducer,
 } from "react";
 import colors from "../../components/colors";
 import {
@@ -54,6 +55,8 @@ import {
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 import { useAuth } from "../../components/hooks/useAuth";
+import ImageView from "react-native-image-viewing";
+
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const [firstMount, setFirstMount] = useState(true);
@@ -78,7 +81,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [scrolling, setScrolling] = useState(false);
   const [scrollingPos, setScrollingPos] = useState(0);
   const [mediaIndex, setMediaIndex] = useState(0);
-  const { apiUrl } = useData();
+  const { apiUrl, formatNumber } = useData();
+  const [imageVisible, setImageVisible] = useState(false);
+  const [currentImageIndex, setImageIndex] = useState(0);
+  const onShowGallery = (index) => {
+    setImageIndex(index);
+    setImageVisible(true);
+  };
   const { user, headerToken, getUpdatedUserInfo } = useAuth();
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
@@ -120,9 +129,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary2}
+          color={colors.primary}
         />
-        {/* <Entypo name="chevron-down" size={24} color={colors.primary2} /> */}
+        {/* <Entypo name="chevron-down" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
     );
   };
@@ -133,9 +142,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary2}
+          color={colors.primary}
         />
-        {/* <Entypo name="chevron-up" size={24} color={colors.primary2} /> */}
+        {/* <Entypo name="chevron-up" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
     );
   };
@@ -192,11 +201,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               }}
               name="photo-library"
               size={20}
-              color={ colors.white}
+              color={colors.white}
             />
             <Text
               style={{
-                color:  colors.white,
+                color: colors.white,
                 fontSize: 14,
                 fontWeight: "600",
               }}
@@ -238,46 +247,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
   }, []);
 
-  // const likeEvent = async () => {
-  //   const updatedLikedEvents = [...user?.likedEvents];
-  //   const newGoingtoEvents = [...user?.goingToEvents];
-  //   let operation;
-  //   if (!updatedLikedEvents.includes(Event?._id)) {
-  //     setInterested(true);
-
-  //     setGoing(false);
-  //     const indexToRemove = newGoingtoEvents.indexOf(Event?._id);
-  //     if (indexToRemove !== -1) {
-  //       newGoingtoEvents.splice(indexToRemove, 1);
-  //     }
-  //     updatedLikedEvents.push(Event?._id);
-  //     operation = { type: "likeEvent", eventId: Event?._id };
-  //   } else {
-  //     setInterested(false);
-  //     const indexToRemove = updatedLikedEvents.indexOf(Event?._id);
-  //     if (indexToRemove !== -1) {
-  //       updatedLikedEvents.splice(indexToRemove, 1);
-  //       operation = { type: "removelikedEvent", eventId: Event?._id };
-  //     }
-  //   }
-  //   try {
-  //     const response = await axios.patch(
-  //       `${apiUrl}/user/current/${user?._id}`,
-
-  //       {
-  //         operation,
-  //         updates: {
-  //           likedEvents: updatedLikedEvents,
-  //           goingtoEvents: newGoingtoEvents,
-  //         },
-  //       },
-  //       { headers: { Authorization: headerToken } }
-  //     );
-  //     getUpdatedUserInfo();
-  //   } catch (error) {
-  //     console.error("Error updating liked events:", error);
-  //   }
-  // };
   const likeEvent = async () => {
     let updateInterested = [];
     let updatedGoing = [];
@@ -373,41 +342,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.error("Error updating liked events:", error);
     }
   };
-  // const goingtoEvents = async () => {
-  //   const updatedLikedEvents = [...user?.likedEvents];
-
-  //   const newGoingtoEvents = [...user?.goingToEvents];
-
-  //   if (!newGoingtoEvents.includes(Event?._id)) {
-  //     setGoing(true);
-
-  //     setInterested(false);
-  //     //remove from likedEvents
-  //     const likedIndexToRemove = updatedLikedEvents.indexOf(Event?._id);
-  //     if (likedIndexToRemove !== -1) {
-  //       updatedLikedEvents.splice(likedIndexToRemove, 1);
-  //     }
-
-  //     newGoingtoEvents.push(Event?._id);
-  //   } else {
-  //     setGoing(false);
-  //     const goingIndexToRemove = newGoingtoEvents.indexOf(Event?._id);
-  //     if (goingIndexToRemove !== -1) {
-  //       newGoingtoEvents.splice(goingIndexToRemove, 1);
-  //     }
-  //   }
-  //   try {
-  //     const response = await axios.patch(
-  //       `${apiUrl}/user/current/${user?._id}`,
-  //       { goingToEvents: newGoingtoEvents, likedEvents: updatedLikedEvents },
-  //       { headers: { Authorization: headerToken } }
-  //     );
-  //     console.log(response?.data);
-  //     getUpdatedUserInfo();
-  //   } catch (error) {
-  //     console.error("Error updating liked events:", error);
-  //   }
-  // };
 
   return (
     <>
@@ -420,7 +354,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: isIPhoneWithNotch ? 90 : 65,
             width: "100%",
-            backgroundColor: colors.primary,
+            backgroundColor: colors.primary2,
             zIndex: 2,
             shadowOffset: { width: 0.5, height: 0.5 },
             elevation: 2,
@@ -503,14 +437,28 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             ) : // </TouchableOpacity>
             null
           }
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             {
               return !inFullscreen ? (
-                <Image
-                  style={{ width: initialWidth, height: height * 0.37 }}
-                  source={{ uri: item?.uri }}
-                  blurRadius={scrollingPos}
-                />
+                <>
+                  <ImageView
+                    // images={savingMode ? listing?.thumb : listing?.photos}
+                    images={Event?.photos[0]}
+                    imageIndex={currentImageIndex}
+                    onRequestClose={() => setImageVisible(false)}
+                    visible={imageVisible}
+                  />
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => onShowGallery(index)}
+                  >
+                    <Image
+                      style={{ width: initialWidth, height: height * 0.37 }}
+                      source={{ uri: item?.uri }}
+                      blurRadius={scrollingPos}
+                    />
+                  </TouchableOpacity>
+                </>
               ) : (
                 []
               );
@@ -580,11 +528,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     fontSize: 20,
                     fontWeight: "500",
                     // width: "80%",
-                    color: colors.primary2,
+                    color: colors.primary,
                     // marginLeft: 5,
                   }}
                 >
-                  cve {Event?.tickets[0]?.amount}
+                  cve {formatNumber(Event?.tickets[0]?.price)}
                 </Text>
               </View>
             </View>
@@ -606,7 +554,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: 14,
                 fontWeight: "500",
                 // width: "80%",
-                color: colors.primary2,
+                color: colors.primary,
                 marginLeft: 5,
               }}
             >
@@ -626,7 +574,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <MaterialCommunityIcons
               name="lightning-bolt-outline"
               size={22}
-              color={colors.primary2}
+              color={colors.primary}
             />
             <Text
               style={{
@@ -648,7 +596,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: interested ? colors.primary2 : colors.white,
+                backgroundColor: interested ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 12,
@@ -683,7 +631,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: interested ? colors.white : colors.black,
               }}
               style={{
-                backgroundColor: interested ? colors.primary2 : colors.white,
+                backgroundColor: interested ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 marginRight: 10,
                 borderRadius: 12,
@@ -709,7 +657,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: going ? colors.white : colors.black,
               }}
               style={{
-                backgroundColor: going ? colors.primary2 : colors.white,
+                backgroundColor: going ? colors.primary : colors.white,
                 // paddingHorizontal: 2,
                 borderRadius: 12,
               }}
@@ -769,7 +717,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontWeight: "500",
                 left: 10,
                 // width: "80%",
-                color: colors.primary2,
+                color: colors.primary,
                 // marginLeft: 5,
                 marginTop: 10,
               }}
@@ -782,7 +730,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 15,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.primary2,
+                  color: colors.primary,
                   // marginLeft: 5,
                   marginTop: 10,
                 }}
@@ -839,7 +787,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontWeight: "500",
               left: 10,
 
-              color: colors.primary2,
+              color: colors.primary,
 
               marginBottom: 5,
             }}
@@ -891,7 +839,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 {Event?.venue?.displayName}
               </Text>
             </View>
-            <Entypo name="chevron-right" size={24} color={colors.primary2} />
+            <Entypo name="chevron-right" size={24} color={colors.primary} />
           </TouchableOpacity>
           <View
             style={{
@@ -924,7 +872,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={styles.map}
             >
               <Marker
-                pinColor={colors.primary2}
+                pinColor={colors.primary}
                 coordinate={{
                   latitude: Event?.venue?.lat,
                   longitude: Event?.venue?.long,
@@ -954,12 +902,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 </Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <FontAwesome5 name="walking" size={20} color={colors.primary2} />
+                <FontAwesome5 name="walking" size={20} color={colors.primary} />
                 <Text style={{ fontSize: 22, color: colors.black2 }}> | </Text>
                 <MaterialCommunityIcons
                   name="car"
                   size={25}
-                  color={colors.primary2}
+                  color={colors.primary}
                 />
               </View>
             </TouchableOpacity>
@@ -987,7 +935,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <MaterialCommunityIcons
                 name="phone"
                 size={25}
-                color={colors.primary2}
+                color={colors.primary}
               />
             </TouchableOpacity> */}
           </View>
@@ -996,7 +944,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontSize: 18,
               fontWeight: "500",
               left: 10,
-              color: colors.primary2,
+              color: colors.primary,
 
               marginVertical: 10,
             }}
@@ -1096,7 +1044,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <Entypo
                       name="chevron-right"
                       size={24}
-                      color={colors.primary2}
+                      color={colors.primary}
                     />
                   </TouchableOpacity>
                   <View style={[styles.separator, { width: "90%" }]} />
@@ -1120,7 +1068,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <MaterialCommunityIcons
                       name="phone"
                       size={25}
-                      color={colors.primary2}
+                      color={colors.primary}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1173,7 +1121,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   {Event?.promoter?.displayName}
                 </Text>
               </View>
-              <Entypo name="chevron-right" size={24} color={colors.primary2} />
+              <Entypo name="chevron-right" size={24} color={colors.primary} />
             </TouchableOpacity>
             <View style={[styles.separator, { width: "90%" }]} />
 
@@ -1196,7 +1144,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <MaterialCommunityIcons
                 name="phone"
                 size={25}
-                color={colors.primary2}
+                color={colors.primary}
               />
             </TouchableOpacity>
           </View> */}
@@ -1261,7 +1209,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               // left: 10,
               borderRadius: 10,
               borderWidth: 1,
-              borderColor: colors.primary2,
+              borderColor: colors.primary,
               alignItems: "center",
               justifyContent: "center",
               shadowOffset: { width: 1, height: 1 },
@@ -1276,21 +1224,22 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <Text
               style={{
                 fontSize: 15,
-                color: colors.primary2,
+                color: colors.primary,
                 fontWeight: "500",
                 marginRight: 10,
               }}
             >
               Presentear
             </Text>
-            <Feather name="gift" size={24} color={colors.primary2} />
+            <Feather name="gift" size={24} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handlePurchaseSheet}
+            // onPress={handleClick}
             style={{
               width: 150,
               height: 40,
-              backgroundColor: colors.primary2, // position: "absolute",
+              backgroundColor: colors.primary, // position: "absolute",
               zIndex: 1,
               top: 10,
               // left: 10,
@@ -1365,7 +1314,7 @@ const styles = StyleSheet.create({
   more: {
     position: "absolute",
     backgroundColor: colors.background,
-    color: colors.primary2,
+    color: colors.primary,
     alignSelf: "flex-end",
     fontWeight: "500",
     // marginBottom: 5,

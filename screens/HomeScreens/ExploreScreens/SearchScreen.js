@@ -88,7 +88,7 @@ const SearchScreen = ({
           >
             <Text
               style={{
-                color: colors.primary,
+                color: colors.white,
                 fontSize: 16,
                 fontWeight: "600",
               }}

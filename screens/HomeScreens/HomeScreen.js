@@ -72,7 +72,7 @@ export default function HomeScreen({ navigation }) {
 
             <View
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: colors.primary2,
                 position: "absolute",
                 width: "100%",
                 height: 250,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 19,
-    fontWeight: "500",
+    fontWeight: "600",
     // padding: 5,
     left: 20,
     color: colors.primary,

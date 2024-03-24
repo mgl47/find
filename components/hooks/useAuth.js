@@ -21,18 +21,13 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Animated, { SlideInDown } from "react-native-reanimated";
-import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
+
 
 import colors from "../colors";
-import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
 import axios from "axios";
 
 const AuthContext = createContext();
-const Tab = createMaterialTopTabNavigator();
 
 export const AuthProvider = ({ children }) => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;

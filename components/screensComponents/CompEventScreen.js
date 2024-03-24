@@ -12,6 +12,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
 } from "react";
@@ -39,26 +40,100 @@ import {
   Feather,
   Ionicons,
 } from "@expo/vector-icons";
+import { useData } from "../hooks/useData";
 export const PurchaseModal = ({
   Event,
   bottomSheetModalRef,
   setPurchaseModalUp,
 }) => {
-  // const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["25%", "50%"], []);
+  const { formatNumber } = useData();
+  const snapPoints = useMemo(() => ["25%", "65%"], []);
+  const snapPoints2 = useMemo(() => ["25%", "65%"], []);
 
-  // const[purchaseModalUp,setPurchaseModalUp]=useState(false)
-
-  const handleSheetChanges = useCallback((index) => {
-
-  }, []);
-  const [searchText, setSearchText] = useState("");
-  const [selectedUser, setSelectedUser] = useState(false);
+  const handleSheetChanges = useCallback((index) => {}, []);
+  // Event?.tickets?.length>2?
   const [firstRender, setFirstRender] = useState(true);
 
   useEffect(() => {
     setFirstRender(false);
   }, []);
+  const initialState = {
+    loading: false,
+    cart: Event?.tickets,
+    total: 0,
+    amount: 0,
+  };
+  const [state, dispatch] = useReducer(reducer, initialState);
+  useEffect(() => {
+    dispatch({ type: "GET_TOTALS" });
+  }, [state.cart]);
+  function reducer(state, action) {
+    switch (action.type) {
+      case "INCREASE": {
+        let tempCart = state.cart.map((cartItem) => {
+          if (cartItem?.id === action.payload?.id) {
+            cartItem = { ...cartItem, amount: cartItem.amount + 1 };
+          }
+
+          return cartItem;
+        });
+
+        return { ...state, cart: tempCart };
+      }
+      case "DECREASE": {
+        let tempCart = state.cart.map((cartItem) => {
+          if (cartItem?.id === action.payload?.id) {
+            if (cartItem?.amount == 0) {
+              return cartItem;
+            }
+
+            cartItem = { ...cartItem, amount: cartItem.amount - 1 };
+          }
+
+          return cartItem;
+        });
+
+        return { ...state, cart: tempCart };
+      }
+      case "CLEAR": {
+        return { cart: Event?.tickets, total: 0, amount: 0 };
+      }
+      case "GET_TOTALS": {
+        let { total, amount } = state.cart.reduce(
+          (cartTotal, cartItem) => {
+            const { price, amount } = cartItem;
+            const itemTotal = price * amount;
+
+            cartTotal.total += itemTotal;
+            cartTotal.amount += amount;
+
+            return cartTotal;
+          },
+          {
+            total: 0,
+            amount: 0,
+          }
+        );
+        total = parseFloat(total.toFixed(2));
+        return { ...state, total, amount };
+      }
+    }
+    throw Error("Unknown action: " + action.type);
+  }
+
+  function handleClick() {
+    dispatch({ type: "incremented_age" });
+  }
+  const increase = (item) => {
+    dispatch({ type: "INCREASE", payload: item });
+  };
+  const decrease = (item) => {
+    dispatch({ type: "DECREASE", payload: item });
+  };
+  const clear = (item) => {
+    dispatch({ type: "CLEAR", payload: item });
+  };
+  console.log(state?.cart);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -68,13 +143,13 @@ export const PurchaseModal = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setPurchaseModalUp(false);
+          setPurchaseModalUp(false), clear();
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
           <Animated.FlatList
             entering={firstRender ? null : SlideInRight}
-            data={Event?.tickets}
+            data={state?.cart}
             keyExtractor={(item) => item?.id}
             ListHeaderComponent={<View style={{ marginBottom: 10 }} />}
             renderItem={({ item }) => {
@@ -102,7 +177,7 @@ export const PurchaseModal = ({
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <Text numberOfLines={2} style={[styles.price]}>
-                          cve {item?.amount}
+                          cve {formatNumber(item?.price)}
                         </Text>
                         <Text numberOfLines={2} style={[styles.priceType]}>
                           {item?.type}
@@ -114,11 +189,26 @@ export const PurchaseModal = ({
                       </Text>
                     </View>
                     <View style={styles.counterView}>
-                      <TouchableOpacity>
+                      <TouchableOpacity
+                        disabled={
+                          state?.cart?.filter((cartItem) => {
+                            if (cartItem?.id == item?.id)
+                              return cartItem?.amount;
+                          }) == 0
+                        }
+                        onPress={() => decrease(item)}
+                      >
                         <AntDesign
                           name="minuscircle"
                           size={24}
-                          color={colors.black2}
+                          color={
+                            state?.cart?.filter((cartItem) => {
+                              if (cartItem?.id == item?.id)
+                                return cartItem?.amount;
+                            }) == 0
+                              ? colors.grey
+                              : colors.darkGrey
+                          }
                         />
                       </TouchableOpacity>
                       <Text
@@ -128,9 +218,9 @@ export const PurchaseModal = ({
                           color: colors.primary,
                         }}
                       >
-                        2
+                        {item?.amount}
                       </Text>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={() => increase(item)}>
                         <AntDesign
                           name="pluscircle"
                           size={24}
@@ -174,7 +264,7 @@ export const PurchaseModal = ({
                       fontWeight: "600",
                     }}
                   >
-                    cve 36,000
+                    cve {formatNumber(state?.total)}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -239,22 +329,18 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
       keyboardDidHideListener.remove();
     };
   }, []);
-  const handleSheetChanges = useCallback((index) => {
-
-  }, []);
+  const handleSheetChanges = useCallback((index) => {}, []);
   const [searchText, setSearchText] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [advance, setAdvance] = useState(false);
   const [firstRender, setFirstRender] = useState(true);
 
-
   useEffect(() => {
     setFirstRender(false);
   }, []);
   return (
-    <BottomSheetModalProvider >
+    <BottomSheetModalProvider>
       <BottomSheetModal
-      
         // style={{backgroundColor:}}
         ref={bottomSheetModalRef2}
         index={keyboardVisible ? 2 : advance ? 1 : 0}
@@ -371,7 +457,7 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
                             color: colors.primary,
                           }}
                         >
-                          2
+                          {item?.amount}
                         </Text>
                         <TouchableOpacity>
                           <AntDesign
@@ -563,7 +649,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    
+
     // alignItems: "center",
     backgroundColor: colors.background,
   },

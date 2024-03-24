@@ -53,6 +53,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import uuid from "react-native-uuid";
+import ImageView from "react-native-image-viewing";
 
 const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
@@ -67,6 +68,8 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
+  const [avatarVisible, setAvatarVisible] = useState(false);
+  const [coverVisible, setCoverVisible] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [avatarUri, setAvatarUri] = useState(null);
@@ -97,7 +100,6 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
     setUserInfo(user);
     setInitialUserInfo(user);
   }, [user, modalVisible]);
-
 
   // console.log(userInfo);
   const handleScroll = (event) => {
@@ -297,8 +299,12 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
     setLoading(false);
   };
-
-
+  let displayCover=[]
+  const coverIndex = user?.photos?.cover[2];
+   displayCover?.push(coverIndex);
+  let displayAvatar=[]
+  const avatarIndex = user?.photos?.avatar[2];
+  displayAvatar?.push(avatarIndex);
   return (
     <>
       {scrolling && (
@@ -325,20 +331,37 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
         style={{ backgroundColor: colors.background }}
         ListHeaderComponent={
           <>
+            <ImageView
+              images={displayCover}
+              imageIndex={0}
+              onRequestClose={() => setCoverVisible(false)}
+              visible={coverVisible}
+            />
             <TouchableOpacity activeOpacity={0.9}>
-              <Image
-                style={{
-                  height: 150,
-                  width: "100%",
-                  backgroundColor: colors.darkGrey,
-                }}
-                source={{ uri: user?.photos?.cover[0]?.uri ?? " " }}
-              />
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setCoverVisible(true)}
+              >
+                <Image
+                  style={{
+                    height: 150,
+                    width: "100%",
+                    backgroundColor: colors.darkGrey,
+                  }}
+                  source={{ uri: user?.photos?.cover[0]?.uri ?? " " }}
+                />
+              </TouchableOpacity>
             </TouchableOpacity>
             <View style={{ flexDirection: "row" }}>
+              <ImageView
+                images={displayAvatar}
+                imageIndex={0}
+                onRequestClose={() => setAvatarVisible(false)}
+                visible={avatarVisible}
+              />
               <TouchableHighlight
                 underlayColor={colors.light2}
-                // onPress={() => photoInput(setAvatarUri)}
+                onPress={() => setAvatarVisible(true)}
                 style={{
                   backgroundColor: colors.black,
                   borderRadius: 100,
@@ -394,7 +417,11 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Chip
                   elevation={1}
                   icon={() => (
-                    <Foundation name="pencil" size={20} color={colors.black2} />
+                    <Foundation
+                      name="pencil"
+                      size={20}
+                      color={colors.primary}
+                    />
                   )}
                   textStyle={
                     {

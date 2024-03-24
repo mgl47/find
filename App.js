@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 // import { StatusBar } from "expo-status-bar";
-import { Platform, StatusBar, StyleSheet, Text, View } from "react-native";
+import { LogBox, Platform, StatusBar, StyleSheet, Text, View } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -14,7 +14,13 @@ import DrawerNavigator, {
 } from "./components/navigation/DrawerNavigator";
 import { AuthProvider } from "./components/hooks/useAuth";
 import { DataProvider } from "./components/hooks/useData";
-
+LogBox.ignoreLogs([
+  "iewPropTypes will be removed from React Native, along with all other PropTypes. We recommend that you migrate away from PropTypes and switch to a type system like TypeScript. If you need to continue using ViewPropTypes, migrate to the 'deprecated-react-native-prop-types' package.",
+  "Sending `onAnimatedValueUpdate` with no listeners registered.",
+  // "`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.",
+  // "No native splash screen registered for given view controller. Call 'SplashScreen.show' for given view controller first.",
+  // "TypeError: Cannot read property 'indexOf' of undefined",
+]);
 export default function App() {
   return (
     <SafeAreaProvider>

@@ -48,13 +48,31 @@ export const DataProvider = ({ children }) => {
     getEvents();
     getVenues();
   }, []);
+  function formatNumber(number) {
+    if (typeof number !== "number" && typeof number !== "string") {
+      return "";
+    }
 
+    const stringNumber = number
+      .toString()
+      ?.replace(/,/g, "")
+      ?.replace(/\./g, "");
+    const parts = stringNumber.split(".");
+    parts[0] = parts[0]?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    if (parts[1]) {
+      return parts.join(".");
+    } else {
+      return parts[0];
+    }
+  }
   const memoedValue = useMemo(
     () => ({
       events,
       getEvents,
       apiUrl,
       venues,
+      formatNumber
     }),
     [events, venues]
   );

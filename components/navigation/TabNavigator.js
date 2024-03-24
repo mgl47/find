@@ -22,7 +22,7 @@ const TabNavigator = () => {
       keyboardHidesNavigationBar={true}
       // activeColor="#f0edf6"
 
-      initialRouteName="Home"
+      initialRouteName="início"
       // inactiveColor="#3e2465"
       barStyle={{
         backgroundColor: colors.white,
@@ -36,7 +36,7 @@ const TabNavigator = () => {
       backBehavior="initialRoute"
       shifting={true}
       sceneAnimationEnabled={false}
-      activeColor={colors.primary2}
+      activeColor={colors.primary}
       activeIndicatorStyle={{ backgroundColor: "transparent" }}
       screenOptions={{}}
     >
@@ -54,7 +54,8 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Home"
+        name="início"
+        
         component={HomeScreen}
         options={{
           headerShown: false,
@@ -68,7 +69,7 @@ const TabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name="Notifications"
+        name="Notificações"
         component={NotificationScreen}
         options={{
           tabBarIcon: ({ color, focused, size }) => (

@@ -30,7 +30,6 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import colors from "../colors";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useAuth } from "../hooks/useAuth";
 
 const Tab = createMaterialTopTabNavigator();
 const AuthBottomSheet = ({ Event, authSheetRef, setAuthModalUp }) => {

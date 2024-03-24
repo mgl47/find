@@ -82,7 +82,7 @@ const ExploreScreens = ({
           >
             <Text
               style={{
-                color: colors.primary,
+                color: colors.white,
                 fontSize: 16,
                 fontWeight: "600",
               }}
@@ -92,7 +92,7 @@ const ExploreScreens = ({
           </TouchableOpacity>
         </Animated.View>
       ),
-  
+
       headerTitle: () => (
         <View
           style={{
@@ -129,7 +129,7 @@ const ExploreScreens = ({
                 onChangeText={setSearchText}
                 onSubmitEditing={() => {
                   Keyboard.dismiss(),
-                  navigation.navigate("search2", { text: searchText });
+                    navigation.navigate("search2", { text: searchText });
                 }}
                 placeholder=" artistas, eventos ou lugares"
                 placeholderTextColor={colors.description}
@@ -162,7 +162,7 @@ const ExploreScreens = ({
       ),
     });
   }, [navigation, firstMount, inSearch, searchText, inputRef]); // Add inputRef as dependency if used
-  
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Animated.View style={{ flex: 1 }} entering={firstMount && SlideInDown}>
@@ -172,11 +172,15 @@ const ExploreScreens = ({
 
             tabBarInactiveTintColor: colors.darkGrey,
             tabBarIndicatorContainerStyle: {
-              backgroundColor: colors.background,
+              backgroundColor: colors.primary2,
             },
-
+            tabBarIndicatorStyle: {
+              backgroundColor: colors.white,
+              // bottom: 2,
+              height:4,
+            },
             tabBarLabelStyle: (active) => ({
-              color: active ? colors.primary : colors.black2,
+              color: active ? colors.white : colors.lightGrey,
             }),
 
             // tabBarIndicatorStyle: {
@@ -191,6 +195,7 @@ const ExploreScreens = ({
               tabBarLabelStyle: {
                 fontWeight: "600",
                 fontSize: 13,
+                color: colors.white,
               },
             }}
             name="Explorar"
@@ -202,6 +207,7 @@ const ExploreScreens = ({
               tabBarLabelStyle: {
                 fontWeight: "600",
                 fontSize: 13,
+                color: colors.white,
               },
             }}
             name="Lugares"
@@ -212,6 +218,7 @@ const ExploreScreens = ({
               tabBarLabelStyle: {
                 fontWeight: "600",
                 fontSize: 13,
+                color: colors.white,
               },
             }}
             name="Calendário"

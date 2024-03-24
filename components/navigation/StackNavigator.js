@@ -57,7 +57,7 @@ function StackNavigator() {
         headerStyle: { backgroundColor: "transparent" },
         headerBackgroundContainerStyle: !invisibleHeaders?.includes(route.name)
           ? {
-              backgroundColor: colors.primary,
+              backgroundColor: colors.primary2,
 
               shadowOffset: { width: 0.5, height: 0.5 },
               elevation: 2,
@@ -119,7 +119,7 @@ function StackNavigator() {
                 <MaterialCommunityIcons
                   name="account-outline"
                   size={35}
-                  color={colors.darkSeparator}
+                  color={colors.white}
                 />
               )}
             </TouchableOpacity>
@@ -174,7 +174,7 @@ function StackNavigator() {
             >
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.white,
                   fontSize: 16,
                   fontWeight: "600",
                 }}
@@ -248,7 +248,7 @@ function StackNavigator() {
             >
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.white,
                   fontSize: 16,
                   fontWeight: "600",
                 }}
@@ -294,7 +294,7 @@ function StackNavigator() {
             >
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.white,
                   fontSize: 16,
                   fontWeight: "600",
                 }}
@@ -341,6 +341,7 @@ function StackNavigator() {
         options={{
           headerShown: true,
           title: "Criar Evento",
+          headerTitleStyle:{color:colors.white},
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}
@@ -351,7 +352,7 @@ function StackNavigator() {
               <MaterialCommunityIcons
                 name="arrow-left"
                 size={28}
-                color={colors.black}
+                color={colors.white}
               />
             </TouchableOpacity>
           ),

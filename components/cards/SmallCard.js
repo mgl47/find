@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 18,
     fontWeight: "600",
-    color: colors.primary2,
+    color: colors.primary,
     lineHeight: 30,
     width: "70%",
     marginVertical:5

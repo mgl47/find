@@ -34,10 +34,14 @@ import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
 import { artist as arti } from "../../components/Data/artist";
 import SmallCard from "../../components/cards/SmallCard";
+import ImageView from "react-native-image-viewing";
+
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
   const Event = route.params;
   const[artist,setArtist]=useState(arti[0])
+  const [avatarVisible, setAvatarVisible] = useState(false);
+  const [coverVisible, setCoverVisible] = useState(false);
 
   const videoRef = React.useRef(null);
   const [muted, setMuted] = useState(true);
@@ -117,6 +121,12 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         ) : null,
     });
   }, [scrolling]);
+  let displayCover=[]
+  const coverIndex = artist?.photos?.cover[2]||[];
+   displayCover?.push(coverIndex);
+  let displayAvatar=[]
+  const avatarIndex = artist?.photos?.avatar[2]||[];
+  displayAvatar?.push(avatarIndex);
   return (
     <>
       {scrolling && (
@@ -143,16 +153,29 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         style={{backgroundColor:colors.background}}
         ListHeaderComponent={
           <>
-            <TouchableOpacity activeOpacity={0.9}>
+            <ImageView
+              images={displayCover}
+              imageIndex={0}
+              onRequestClose={() => setCoverVisible(false)}
+              visible={coverVisible}
+            />
+            <TouchableOpacity                 onPress={() => setCoverVisible(true)}
+ activeOpacity={0.9}>
               <Image
                 style={{ height: 150, width: "100%" }}
                 source={{ uri: artist?.cover }}
               />
             </TouchableOpacity>
             <View style={{ flexDirection: "row" }}>
+            <ImageView
+                images={displayAvatar}
+                imageIndex={0}
+                onRequestClose={() => setAvatarVisible(false)}
+                visible={avatarVisible}
+              />
               <TouchableHighlight
                 underlayColor={colors.light2}
-                onPress={() => {}}
+                onPress={() => setAvatarVisible(true)}
                 style={{
                   backgroundColor: colors.black,
                   borderRadius: 100,
