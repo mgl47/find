@@ -45,6 +45,8 @@ import { TextInput } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
 import { useAuth } from "../hooks/useAuth";
+import uuid from "react-native-uuid";
+
 export const PurchaseModal = ({
   Event,
   bottomSheetModalRef,
@@ -69,25 +71,6 @@ export const PurchaseModal = ({
     };
   }, []);
   const { height } = Dimensions.get("window");
-  // console.log(height / Event?.tickets?.length/3.5);
-
-  // console.log(height / Event?.tickets?.length/5.5);
-
-  // const baseSnapPont = height / 5 * Event?.tickets?.length+(height<700?10:-100)
-
-  // const baseSnapPont = height / 2 * Event?.tickets?.length+(height<700?10:-100)
-
-  //2
-  // const baseSnapPont =
-  //  ( height * 0.04 )* Event?.tickets?.length + (height < 700 ? 0 : -10);
-
-  //1
-  //  const baseSnapPont =
-  //  ( height * 0.05 )* Event?.tickets?.length + (height < 700 ? 0 : -10);
-
-  //3
-  // const baseSnapPont =
-  // ( height * 0.05 )* Event?.tickets?.length + (height < 700 ? 0 : -10);
 
   const baseSnapPont = Event?.tickets?.length * height * 0.05;
   const TL = Event?.tickets?.length;
@@ -95,7 +78,7 @@ export const PurchaseModal = ({
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
   }%`;
 
-  // const snapPoints = useMemo(() => ["40%", `${baseSnapPont}`, "80%"], []);
+  const uuidKey = uuid.v4();
 
   const snapPoints = useMemo(() => ["50%", `${customSnap}`, "80%"], []);
   const { headerToken, user, getUpdatedUserInfo } = useAuth();
@@ -185,7 +168,20 @@ export const PurchaseModal = ({
     dispatch({ type: "CLEAR", payload: item });
   };
 
-  console.log(state.total);
+  console.log(state.cart?.filter((ticket) => ticket?.amount != 0));
+
+  const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
+  // const newArray = cartTickets.flatMap((item) =>
+  //   Array.from({ length: item.amount }, () => ({ ...item }))
+  // );
+
+  const separatedTickets = cartTickets.flatMap((item) => {
+    const { amount, ...rest } = item; // Destructuring to separate amount
+    return Array.from({ length: item.amount }, () => ({
+      ...rest,
+      uuid: uuid.v4(),
+    }));
+  });
 
   const [paymentInfo, setPaymentInfo] = useState({
     cardInfo: {
@@ -212,18 +208,30 @@ export const PurchaseModal = ({
         {
           cardInfo: paymentInfo,
           details: {
+            uuid: uuidKey,
             buyer: user,
             event: Event,
             eventId: Event?._id,
             cardDetails: paymentInfo?.cardInfo,
             purchaseDate: new Date(),
-            tickets: state.cart?.filter((ticket) => ticket?.amount != 0),
+            tickets: separatedTickets,
             total: state.total,
           },
           userUpdates: {
+            eventTicket: {
+              uuid: uuidKey,
+              buyer: { userId: user?._id, username: user?.username,displayName: user?.displayName},
+              eventId: Event?._id,
+              event: Event,
+
+              purchaseDate: new Date(),
+              tickets: separatedTickets,
+              total: state.total,
+              uri: Event?.photos[0]?.[0]?.uri,
+            },
             operation: {
               type: "eventStatus",
-              task: "going",
+              task: "purchase",
               eventId: Event?._id,
             },
             updates: {
@@ -237,7 +245,9 @@ export const PurchaseModal = ({
         }
       );
       console.log(response?.data);
+
       getUpdatedUserInfo();
+      bottomSheetModalRef.current.close();
     } catch (error) {
       console.error("Error updating liked events:", error);
     }

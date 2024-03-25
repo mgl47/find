@@ -30,6 +30,10 @@ import { useAuth } from "../hooks/useAuth";
 import SearchScreen2 from "../../screens/HomeScreens/SearchScreen2";
 import ExploreScreens from "../../screens/HomeScreens/ExploreScreens/ExploreScreens";
 import EventAddingScreen from "../../screens/OrgScreens/EventAddingScreen";
+import MyTickets from "../../screens/authScreens/MyTickets";
+import TicketDetails from "../../screens/authScreens/TicketsDetails";
+import MyEvents from "../../screens/OrgScreens/MyEvents";
+import EventManagingScreen from "../../screens/OrgScreens/ManagingNavigator/EventManagingScreen";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -43,15 +47,26 @@ function StackNavigator() {
   return (
     <Stack.Navigator
       screenOptions={({ route }) => ({
-        // headerLeft: () => (
-        //   <TouchableOpacity
-        //     onPress={() => navigation.goBack()}
-        //     style={{ left: 20 }}
-        //   >
-        //     <MaterialCommunityIcons name="arrow-left" size={24} color="black" />
-        //   </TouchableOpacity>
-        // ),
-
+        headerLeft: () => (
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              left: 20,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={28}
+              color={colors.white}
+              style={{
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+              }}
+            />
+          </TouchableOpacity>
+        ),
         // headerShown: false,
         headerTitleAlign: "center",
         headerStyle: { backgroundColor: "transparent" },
@@ -315,6 +330,46 @@ function StackNavigator() {
         }}
         name="profile"
         component={ProfileScreen}
+      />
+      <Stack.Screen
+        options={{
+          // headerTransparent: true,
+          // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
+          headerTitle: "Meus Bilhetes",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="myTickets"
+        component={MyTickets}
+      />
+      <Stack.Screen
+        options={{
+          // headerTransparent: true,
+          // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
+          headerTitle: "Detalhes do Bilhete",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="ticketDetails"
+        component={TicketDetails}
+      />
+      <Stack.Screen
+        options={{
+          // headerTransparent: true,
+          // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
+          headerTitle: "Meus Eventos",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="myEvents"
+        component={MyEvents}
+      />
+      <Stack.Screen
+        options={{
+          // headerTransparent: true,
+          // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
+          headerTitle: "Gerenciar Evento",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="manageEvent"
+        component={EventManagingScreen}
       />
       <Stack.Screen
         options={{

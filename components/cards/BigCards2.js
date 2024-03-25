@@ -3,8 +3,14 @@ import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 import { LinearGradient } from "expo-linear-gradient";
 import { ImageBackground } from "react-native";
-
-function BigCard2({ title, date, image, Category, city, venue }) {
+import {
+  MaterialCommunityIcons,
+  Octicons,
+  Entypo,
+  Ionicons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+function BigCard2({ title, dates, photos, Category, city, venue }) {
   return (
     // <View style={styles.card}>
     //   {/* <Image style={styles.image} source={{ uri: photos[0]?.uri }} /> */}
@@ -12,7 +18,7 @@ function BigCard2({ title, date, image, Category, city, venue }) {
       <ImageBackground
         style={styles.card}
         source={{
-          uri: image?.uri,
+          uri: photos?.[0]?.[0]?.uri,
         }}
       >
         <LinearGradient
@@ -28,8 +34,19 @@ function BigCard2({ title, date, image, Category, city, venue }) {
               <Text style={styles.venue}>, </Text>
               <Text style={styles.venue}>{venue?.city}</Text>
             </View>
-            <Text style={styles.date}>{date}</Text>
+
+            <Text style={styles.date}>
+              {dates[dates?.length - 1].displayDate +
+                " - " +
+                dates[dates?.length - 1].hour}
+            </Text>
           </View>
+          <MaterialCommunityIcons
+            style={{ position: "absolute", bottom: 10, right: 10 }}
+            name="arrow-right"
+            size={25}
+            color={colors.white}
+          />
         </LinearGradient>
 
         {/* <Text style={styles.Category}>{Category}</Text> */}
@@ -41,10 +58,11 @@ function BigCard2({ title, date, image, Category, city, venue }) {
 const styles = StyleSheet.create({
   card: {
     height: 185,
-    borderRadius: 20,
+    borderRadius: 10,
     overflow: "hidden",
     width: "100%",
     alignSelf: "center",
+    marginTop: 10,
   },
 
   title: {

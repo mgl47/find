@@ -24,14 +24,15 @@ import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
 import axios from "axios";
+import { useAuth } from "./useAuth";
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [venues, setVenues] = useState([]);
-
   //   const [headerToken, setHeaderToken] = useState("");
+  const { headerToken } = useAuth();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const getEvents = async () => {
@@ -44,6 +45,7 @@ export const DataProvider = ({ children }) => {
     // console.log(result?.data);
     setVenues(result?.data);
   };
+
   useEffect(() => {
     getEvents();
     getVenues();
@@ -72,9 +74,9 @@ export const DataProvider = ({ children }) => {
       getEvents,
       apiUrl,
       venues,
-      formatNumber
+      formatNumber,
     }),
-    [events, venues]
+    [events, venues,]
   );
 
   return (

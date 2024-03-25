@@ -9,6 +9,7 @@ import {
   Octicons,
   Entypo,
   Ionicons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 
 import {
@@ -121,7 +122,20 @@ export function DrawerContent(props) {
           onPress={() => navigation.navigate("profile")}
         />
         <View style={styles.separator} />
-
+        <DrawerItem
+          style={{ left: 2 }}
+          icon={({ color, size }) => (
+            <MaterialIcons name="event-note" size={28} color={colors.white} />
+          )}
+          label="Meus Eventos"
+          labelStyle={{
+            fontSize: 16,
+            fontWeight: "500",
+            right: 20,
+            color: colors.lightGrey,
+          }}
+          onPress={() => navigation.navigate("myEvents")}
+        />
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
@@ -134,7 +148,7 @@ export function DrawerContent(props) {
             right: 20,
             color: colors.lightGrey,
           }}
-          onPress={() => {}}
+          onPress={() => navigation.navigate("myTickets")}
         />
         <View style={styles.separator} />
         <DrawerItem
@@ -226,7 +240,7 @@ const DrawerNavigator = () => {
       screenOptions={{
         drawerType: "slide",
         // drawerHideStatusBarOnOpen:true,
-        overlayColor:"rgba(0,0,0,0.7)",
+        overlayColor: "rgba(0,0,0,0.7)",
         headerBackground: "red",
         headerShown: false,
         drawerIcon: () => (

@@ -180,6 +180,7 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity> */}
             <Text style={styles.headerText}>Pa bó</Text>
             <FlatList
+            style={{backgroundColor:colors.background}}
               data={recommendedEvents}
               showsVerticalScrollIndicator={false}
               keyExtractor={(item) => item.id}
@@ -199,8 +200,10 @@ export default function HomeScreen({ navigation }) {
                       paddingHorizontal: 10,
                       marginTop: 10,
                     }}
-                    onPress={() => navigation.navigate("addEvent", item)}
-                  >
+                    // onPress={() => navigation.navigate("addEvent", item)}
+                    onPress={() => navigation.navigate("manageEvent", item)}
+
+>
                     <SmallCard {...item} />
                   </TouchableOpacity>
                 );

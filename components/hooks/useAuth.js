@@ -21,8 +21,6 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 
-
-
 import colors from "../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
@@ -37,7 +35,8 @@ export const AuthProvider = ({ children }) => {
   const authSheetRef = useRef(null);
 
   const [headerToken, setHeaderToken] = useState("");
-
+  const [myEvents, setMyEvents] = useState([]);
+  const [cacheChecked, setCacheChecked] = useState(false);
   const getUser = async () => {
     try {
       const tokenValue = await AsyncStorage.getItem("headerToken");
@@ -45,19 +44,25 @@ export const AuthProvider = ({ children }) => {
       if (tokenValue !== null) {
         setUser(JSON.parse(userValue));
         setHeaderToken(tokenValue);
-        // getUpdatedUserInfo(tokenValue);
-        getUpdatedUserInfo();
-
-        // console.log(tokenValue);
       }
+
+      setCacheChecked(true);
+      // await getUpdatedUserInfo(userValue, tokenValue);
+
+      console.log("before uppdate");
     } catch (e) {
       // error reading value
     }
   };
 
   useEffect(() => {
-    getUser();
-  }, []);
+    if (!cacheChecked) {
+      getUser();
+    }
+    if (cacheChecked&&user) {
+      getUpdatedUserInfo();
+    }
+  }, [cacheChecked]);
 
   const getUpdatedUserInfo = async () => {
     try {
@@ -71,11 +76,10 @@ export const AuthProvider = ({ children }) => {
           }
         );
 
-        // console.log(response.data);
-
         setUser(response.data);
         const jsonValue = JSON.stringify(response.data);
         await AsyncStorage.setItem("user", jsonValue);
+        getMyEvents();
       }
     } catch (error) {
       console.log(error.response.data);
@@ -84,37 +88,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signIn = async () => {
-    Keyboard.dismiss();
-
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 1500);
+  const getMyEvents = async () => {
+    const result = await axios.get(`${apiUrl}/user/event/`, {
+      headers: {
+        Authorization: headerToken,
+      },
     });
-    try {
-      if (validated) {
-        const response = await axios.post(
-          `${url}/auth/login`,
-          {
-            username: user?.username,
-            password: user?.password,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        setUser(response.data.user);
-
-        await AsyncStorage.setItem(
-          "headerToken",
-          "Bearer " + response.data.token
-        );
-        const jsonValue = JSON.stringify(response.data.user);
-        await AsyncStorage.setItem("user", jsonValue);
-        // JSON.parse(jsonValue);
-      }
-    } catch (error) {}
+    setMyEvents(result?.data);
   };
   const [AuthModalUp, setAuthModalUp] = useState(false);
 
@@ -122,15 +102,15 @@ export const AuthProvider = ({ children }) => {
     () => ({
       headerToken,
       user,
+      myEvents,
       setUser,
-      authLoading,
-      setAuthModalUp,
       AuthModalUp,
+      setAuthModalUp,
       authSheetRef,
       setHeaderToken,
       getUpdatedUserInfo,
     }),
-    [headerToken, user, authLoading, AuthModalUp, authSheetRef]
+    [headerToken, user, myEvents, AuthModalUp, authSheetRef]
   );
 
   return (
