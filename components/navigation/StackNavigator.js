@@ -21,6 +21,7 @@ import {
   MaterialCommunityIcons,
   Entypo,
   FontAwesome5,
+  FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -357,6 +358,18 @@ function StackNavigator() {
           // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
           headerTitle: "Meus Eventos",
           headerTitleStyle: { color: colors.white },
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate("addEvent")}
+              style={{ right: 20 }}
+            >
+              <FontAwesome
+                name={"plus-circle"}
+                size={30}
+                color={colors.white}
+              />
+            </TouchableOpacity>
+          ),
         }}
         name="myEvents"
         component={MyEvents}

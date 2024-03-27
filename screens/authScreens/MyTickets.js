@@ -72,7 +72,7 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
 
       <FlatList
         data={user?.purchasedTickets}
-        keyExtractor={(item) => item?.uuid}
+        keyExtractor={(item) => item?.purchaseId}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity onPress={() => navigation.navigate("ticketDetails",item)}>

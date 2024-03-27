@@ -45,12 +45,19 @@ import { markers } from "../../components/Data/markers";
 import uuid from "react-native-uuid";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import colors from "../colors";
-import Animated, { SlideInDown } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInDown,
+} from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
 import Screen from "../Screen";
 import { Calendar } from "react-native-calendars";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import axios from "axios";
+import { useData } from "../../components/hooks/useData";
+import { useAuth } from "../hooks/useAuth";
 
 const { height, width } = Dimensions.get("window");
 
@@ -69,7 +76,7 @@ export const TicketsSheet = ({
   // const [tickets, setTickets] = useState([]);
 
   const [price, setPrice] = useState("");
-  const [amount, setAmount] = useState("");
+  const [available, setAvailable] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [ticketDates, setTicketDates] = useState([]);
@@ -79,7 +86,7 @@ export const TicketsSheet = ({
   const clear = () => {
     setDescription("");
     setCategory("");
-    setAmount("");
+    setAvailable("");
     setPrice("");
     setTicketDates([]);
   };
@@ -105,7 +112,9 @@ export const TicketsSheet = ({
 
     tempTickets.push({
       price: Number(price),
-      amount: Number(amount),
+      available: Number(available),
+      amount: 0,
+
       description,
       category: category,
       id: uuid.v4(),
@@ -265,7 +274,7 @@ export const TicketsSheet = ({
           />
 
           <TextInput
-            error={!amount}
+            error={!available}
             style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
@@ -278,10 +287,10 @@ export const TicketsSheet = ({
             activeOutlineColor={colors.primary}
             label="Quantidade"
             activeUnderlineColor={colors.primary}
-            value={amount}
+            value={available}
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
-            onChangeText={setAmount}
+            onChangeText={setAvailable}
           />
           {dates?.map((date) => (
             <View
@@ -371,13 +380,13 @@ export const EditTicketsSheet = ({
   const [ticketDates, setTicketDates] = useState([]);
 
   const [price, setPrice] = useState("");
-  const [amount, setAmount] = useState("");
+  const [available, setAvailable] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
 
   useEffect(() => {
     // if (selectedTicket!=undefined) {
-    setAmount(String(selectedTicket?.ticket?.amount));
+    setAvailable(String(selectedTicket?.ticket?.amount));
     setPrice(String(selectedTicket?.ticket?.price));
     setCategory(selectedTicket?.ticket?.category);
     setTicketDates(selectedTicket?.ticket?.dates);
@@ -419,7 +428,8 @@ export const EditTicketsSheet = ({
           ...updatedTickets[selectedTicket?.index], // Copy the existing ticket object
           price: Number(price),
           description: description,
-          amount: Number(amount),
+          available: Number(available),
+          amount: 0,
           id: setSelectedTicket?.ticket?.id,
           category: category,
           dates: ticketDates,
@@ -530,7 +540,7 @@ export const EditTicketsSheet = ({
           />
 
           <TextInput
-            error={!amount}
+            error={!available}
             style={{ marginBottom: 5 }}
             // autoFocus
             underlineStyle={{ backgroundColor: colors.primary }}
@@ -542,11 +552,11 @@ export const EditTicketsSheet = ({
             activeOutlineColor={colors.primary}
             label="Quantidade"
             activeUnderlineColor={colors.primary}
-            value={amount}
+            value={available}
             defaultValue={String(selectedTicket?.ticket?.amount)}
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
-            onChangeText={setAmount}
+            onChangeText={setAvailable}
           />
           {dates?.map((date) => (
             <View
@@ -664,7 +674,7 @@ export const VenueSelector = ({
     venue.id = uuid.v4();
     venue.address.lat = newMarker?.latitude;
     venue.address.long = newMarker?.longitude;
-    venue.photos = [
+    (venue.photos = [
       {
         id: 1,
         uri: "https://scontent.fopo3-2.fna.fbcdn.net/v/t31.18172-8/13220730_1347686511913909_1118731680861521309_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=4dc865&_nc_eui2=AeHynjX1ye85plORdI-EY4s7-9foNdj7fU371-g12Pt9TWRIT-0ZBtFlguV4yzjJISh8S4V0Axsi1rxa25KNSVPM&_nc_ohc=vi-qKdNEL0EAX9tox6R&_nc_ht=scontent.fopo3-2.fna&oh=00_AfCQUJ24zOBjvG7fCHW1FcHxapBhxQ7GeTLNdU4aqBy2oQ&oe=660CA567",
@@ -677,8 +687,8 @@ export const VenueSelector = ({
         id: 3,
         uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfESMUWnwWeRqQ3LL4bVbdLlOgjF_dCNdtpU5yEWCUw&s",
       },
-    ],
-    venue.phone = [];
+    ]),
+      (venue.phone = []);
 
     console.log(venue);
     // setSelectedVenue(venue);
@@ -922,7 +932,10 @@ export const VenueSelector = ({
                   <>
                     <TextInput
                       //   error={!amount}
-                      style={{ marginBottom: 5 }}
+                      style={{
+                        marginBottom: 5,
+                        backgroundColor: colors.background,
+                      }}
                       // autoFocus
                       underlineStyle={{ backgroundColor: colors.primary }}
                       contentStyle={{}}
@@ -1277,10 +1290,19 @@ export const VenueSelector = ({
   );
 };
 
-export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
+export const UserSelector = ({
+  userSheetModalRef,
+  type,
+  users,
+  setUsers,
+  filter,
+  eventId,
+}) => {
   // const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ["55%", "75%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { apiUrl } = useData();
+  const { user, headerToken, getMyEvents } = useAuth();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -1298,26 +1320,88 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
     };
   }, []);
   const handleSheetChanges = useCallback((index) => {}, []);
-  const [searchText, setSearchText] = useState("");
-
-  const addUser = async () => {
-    const newUser = {
-      displayName: "Erickson",
-      username: "veiga.erickson",
-      id: uuid.v4(),
-      type: type,
-    };
-    // userSheetModalRef.current.close();
-
-    let tempUsers = [...users];
-    tempUsers.push(newUser);
-
-    setUsers(tempUsers);
-    // await new Promise((resolve) =>
-    //   setTimeout(() => resolve(userSheetModalRef.current.close()), 100)
-    // );
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchedUser, setSearchedUSer] = useState(null);
+  const [usersList, setusersList] = useState(users);
+  const clear = () => {
+    setSearched(false);
+    setSearchedUSer(null);
+    setSearch("");
+    setusersList([]);
   };
 
+  const findUser = async () => {
+    setLoading(true);
+    setSearched(false);
+    setSearchedUSer(null);
+    try {
+      const response = await axios.get(
+        `${apiUrl}/users/?filter=${filter}&search=${search?.toLowerCase()}`
+      );
+      if (response.status === 200) {
+        setSearchedUSer(response?.data);
+      }
+    } catch (error) {
+      console.error("Error retrieving users:", error);
+    }
+    setSearched(true);
+    setLoading(false);
+  };
+
+  const addUser = () => {
+    // Create a new array with the existing usersList
+    let users = [...usersList];
+    const usersId = users?.map((user) => user?._id);
+
+    // Check if searchedUser is not already in the list
+    if (!usersId?.includes(searchedUser?._id)) {
+      const newStaff = {
+        ...searchedUser,
+        level: "Colaborador",
+        addedBy: user?.displayName,
+      };
+      users.push(newStaff);
+    }
+
+    // Update the state with the new array
+    setusersList(users);
+  };
+  const removeUser = (selectedUser) => {
+    let users = [...usersList];
+    const newUsers = users?.filter((user) => user?._id != selectedUser?._id);
+    setusersList(newUsers);
+  };
+
+  const save = async () => {
+    if (type == "members") {
+      saveMembers();
+    }
+    // setUsers(usersList);
+  };
+
+  const saveMembers = async () => {
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/event/${eventId}`,
+        {
+          operation: {
+            type: "eventStatus",
+            task: "staff",
+            eventId: eventId,
+          },
+          updates: usersList,
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      if (response?.status == 200) {
+        getMyEvents(), userSheetModalRef.current?.close();
+      }
+    } catch (error) {
+      console.error("Error updating liked events:", error);
+    }
+  };
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -1327,6 +1411,7 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
         index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
+        onDismiss={clear}
       >
         <BottomSheetView style={styles.contentContainer}>
           <View style={{ padding: 10 }}>
@@ -1348,11 +1433,11 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
               >
                 {type == "artist"
                   ? "Adicionar Artista"
+                  : type == "members"
+                  ? "Adiconar Membro"
                   : "Adicionar Organizador"}
               </Text>
-              <TouchableOpacity
-                onPress={() => userSheetModalRef.current.close()}
-              >
+              <TouchableOpacity onPress={save}>
                 <Text
                   style={{
                     color: colors.primary,
@@ -1360,138 +1445,119 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                     fontWeight: "600",
                   }}
                 >
-                  Sair
+                  Guardar
                 </Text>
               </TouchableOpacity>
             </View>
-            <TextInput
-              // error={!searchText}
-              style={{ marginBottom: 10 }}
-              // autoFocus
-              underlineStyle={{ backgroundColor: colors.primary }}
-              // contentStyle={{
-              //   backgroundColor: colors.background,
-              //   fontWeight: "500",
-              // }}
-              outlineColor={colors.primary}
-              mode="outlined"
-              placeholder="Pesquise por um usuário"
-              activeOutlineColor={colors.primary}
-              label="Nome"
-              activeUnderlineColor={colors.primary}
-              returnKeyType="search"
-              value={searchText}
-              cursorColor={colors.primary}
-              // onChangeText={(text) => setPerson({ ...person, email: text })}
-              onChangeText={setSearchText}
-            />
-            <Text
-              style={{
-                color: colors.darkGrey,
-                alignSelf: "center",
-                marginBottom: 5,
-              }}
-            >
-              1 resultado encontrado
-            </Text>
-            <TouchableOpacity
-              onPress={addUser}
-              activeOpacity={0.5}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
-                width: "100%",
-              }}
-              // onPress={() => navigation.navigate("event", item)}
-            >
-              <View style={styles.userCard}>
-                <Image
-                  source={{
-                    uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                  }}
+            <View>
+              <TextInput
+                // error={!searchText}
+                style={{ marginBottom: 10, backgroundColor: colors.background }}
+                // autoFocus
+                underlineStyle={{ backgroundColor: colors.primary }}
+                // contentStyle={{
+                //   backgroundColor: colors.background,
+                //   fontWeight: "500",
+                // }}
+
+                outlineColor={colors.primary}
+                mode="outlined"
+                placeholder="Pesquise por um usuário"
+                activeOutlineColor={colors.primary}
+                label="Nome"
+                activeUnderlineColor={colors.primary}
+                returnKeyType="search"
+                value={search}
+                cursorColor={colors.primary}
+                // onChangeText={(text) => setPerson({ ...person, email: text })}
+                onChangeText={setSearch}
+                onSubmitEditing={findUser}
+              />
+              {searched && !searchedUser && !loading && (
+                <Text
                   style={{
-                    width: 70,
-                    height: 70,
-                    borderRadius: 50,
-
-                    // marginLeft: 20,
-                    // position: "absolute",
+                    color: colors.darkGrey,
+                    alignSelf: "center",
+                    bottom: -10,
+                    position: "absolute",
                   }}
+                >
+                  {" Este usuário não existe!"}
+                </Text>
+              )}
 
-                  // resizeMode="contain"
-                />
-                <View style={{ alignItems: "center", marginLeft: 10 }}>
-                  <Text numberOfLines={2} style={[styles.displayName]}>
-                    Erickson{" "}
-                  </Text>
-                  <Text numberOfLines={2} style={[styles.userName]}>
-                    veiga.erickson{" "}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <Text
-              style={[
-                styles.switchText,
-                {
-                  color: colors.primary,
-                  marginVertical: 10,
-                  alignSelf: "flex-end",
-                  fontWeight: "500",
-                },
-              ]}
-            >
-              {`${users?.length} ${
-                users?.length > 1 ? "adicionados" : "adicionado"
-              }`}
-            </Text>
-            {/* <TouchableOpacity
-              onPress={() => {
-                Keyboard.dismiss(), setAdvance(true);
-              }}
-              style={{
-                marginTop: 20,
-                width: 150,
-                height: 40,
-                backgroundColor: colors.primary, // position: "absolute",
-                zIndex: 1,
-                // top: 10,
-                // left: 10,
-                borderRadius: 10,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowOffset: { width: 1, height: 1 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 3,
-                shadowColor: colors.dark,
-                flexDirection: "row",
-                alignSelf: "center",
-              }}
-              activeOpacity={0.5}
-            >
-              <Text
+              {loading && (
+                <Animated.View
+                  style={{
+                    // position: "absolute",
+                    alignSelf: "center",
+                    // top: 10,
+                    // zIndex: 4,
+                    bottom: -35,
+                    position: "absolute",
+                  }}
+                  // entering={SlideInUp.duration(300)}
+                  // exiting={SlideOutUp.duration(300)}
+                >
+                  <ActivityIndicator animating={true} color={colors.primary} />
+                </Animated.View>
+              )}
+            </View>
+            {!loading && searchedUser && (
+              <TouchableOpacity
+                onPress={addUser}
+                activeOpacity={0.5}
                 style={{
-                  fontSize: 15,
-                  color: colors.white,
-                  fontWeight: "500",
-                  marginRight: 10,
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 1,
+                  elevation: 2,
+                  width: "100%",
+                  marginTop: 10,
                 }}
+                // onPress={() => navigation.navigate("event", item)}
               >
-                Avançar
-              </Text>
-            </TouchableOpacity> */}
+                <Animated.View
+                  style={styles.userCard}
+                  entering={FadeIn}
+                  exiting={FadeOut}
+                >
+                  <Image
+                    source={{
+                      uri: searchedUser?.photos?.avatar?.[0]?.uri,
+                    }}
+                    style={{
+                      width: 70,
+                      height: 70,
+                      borderRadius: 50,
+
+                      // marginLeft: 20,
+                      // position: "absolute",
+                    }}
+
+                    // resizeMode="contain"
+                  />
+                  <View style={{ alignItems: "center", marginLeft: 10 }}>
+                    <Text numberOfLines={2} style={[styles.displayName]}>
+                      {searchedUser?.displayName}
+                    </Text>
+                    <Text numberOfLines={2} style={[styles.userName]}>
+                      @{searchedUser?.username}
+                    </Text>
+                  </View>
+                </Animated.View>
+              </TouchableOpacity>
+            )}
+
             <View>
               <FlatList
-                // style={{ width: "100%" }}
+                style={{ top: loading && 110 }}
                 // numColumns={5}
 
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={users}
-                keyExtractor={(item) => item?.id}
+                data={usersList}
+                keyExtractor={(item) => item?._id}
                 renderItem={({ item }) => {
                   return (
                     <TouchableOpacity
@@ -1500,7 +1566,7 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                         alignItems: "center",
                         // justifyContent: "center",
                       }}
-                      onPress={() => navigation.navigate("artist", item)}
+                      onPress={() => removeUser(item)}
                     >
                       <Image
                         style={{
@@ -1511,7 +1577,7 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                           borderWidth: 0.009,
                         }}
                         source={{
-                          uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
+                          uri: item?.photos?.avatar?.[0]?.uri,
                         }}
                       />
                       <Text
@@ -1527,6 +1593,345 @@ export const UserSelector = ({ userSheetModalRef, type, users, setUsers }) => {
                 }}
               />
             </View>
+            {/* <Text
+              style={[
+                styles.switchText,
+                {
+                  color: colors.primary,
+                  marginVertical: 10,
+                  alignSelf: "flex-end",
+                  fontWeight: "500",
+                },
+              ]}
+            >
+              {`${users?.length} ${
+                users?.length > 1 ? "adicionados" : "adicionado"
+              }`}
+            </Text> */}
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+    </BottomSheetModalProvider>
+  );
+};
+
+export const UserManager = ({
+  userSheetModalRef,
+  type,
+  users,
+  setUsers,
+  filter,
+  eventId,
+}) => {
+  // const bottomSheetModalRef = useRef(null);
+  const snapPoints = useMemo(() => ["55%", "75%"], []);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { apiUrl } = useData();
+  const { user, headerToken, getMyEvents } = useAuth();
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+  const handleSheetChanges = useCallback((index) => {}, []);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchedUser, setSearchedUSer] = useState(null);
+  const [usersList, setusersList] = useState(users);
+  const clear = () => {
+    setSearched(false);
+    setSearchedUSer(null);
+    setSearch("");
+  };
+
+  const findUser = async () => {
+    setLoading(true);
+    setSearched(false);
+    setSearchedUSer(null);
+    try {
+      const response = await axios.get(
+        `${apiUrl}/users/?filter=${filter}&search=${search?.toLowerCase()}`
+      );
+      if (response.status === 200) {
+        setSearchedUSer(response?.data);
+      }
+    } catch (error) {
+      console.error("Error retrieving users:", error);
+    }
+    setSearched(true);
+    setLoading(false);
+  };
+
+  const addUser = () => {
+    // Create a new array with the existing usersList
+    let users = [...usersList];
+    const usersId = users?.map((user) => user?._id);
+
+    // Check if searchedUser is not already in the list
+    if (!usersId?.includes(searchedUser?._id)) {
+      const newStaff = {
+        ...searchedUser,
+        level: "Colaborador",
+        addedBy: user?.displayName,
+      };
+      users.push(newStaff);
+    }
+
+    // Update the state with the new array
+    setusersList(users);
+  };
+  const removeUser = (selectedUser) => {
+    let users = [...usersList];
+    const newUsers = users?.filter((user) => user?._id != selectedUser?._id);
+    setusersList(newUsers);
+  };
+
+  const save = async () => {
+    if (type == "members") {
+      saveMembers();
+    }
+    setUsers(usersList);
+  };
+  const saveMembers = async () => {
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/event/${eventId}`,
+        {
+          operation: {
+            type: "eventStatus",
+            task: "staff",
+            eventId: eventId,
+          },
+          updates: usersList,
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      if (response?.status == 200) {
+        // getMyEvents(),
+        userSheetModalRef.current?.close();
+      }
+    } catch (error) {
+      console.error("Error updating liked events:", error);
+    }
+  };
+  return (
+    <BottomSheetModalProvider>
+      <BottomSheetModal
+        // style={{backgroundColor:}}
+        ref={userSheetModalRef}
+        // index={keyboardVisible ? 1 : 0}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        onDismiss={clear}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <View style={{ padding: 10 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 10,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontWeight: "500",
+                  // alignSelf: "center",
+                  left: 10,
+                }}
+              >
+                {type == "artist"
+                  ? "Adicionar Artista"
+                  : type == "members"
+                  ? "Adiconar Membro"
+                  : "Adicionar Organizador"}
+              </Text>
+              <TouchableOpacity onPress={save}>
+                <Text
+                  style={{
+                    color: colors.primary,
+                    fontSize: 16,
+                    fontWeight: "600",
+                  }}
+                >
+                  Guardar
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View>
+              <TextInput
+                // error={!searchText}
+                style={{ marginBottom: 10, backgroundColor: colors.background }}
+                // autoFocus
+                underlineStyle={{ backgroundColor: colors.primary }}
+                // contentStyle={{
+                //   backgroundColor: colors.background,
+                //   fontWeight: "500",
+                // }}
+
+                outlineColor={colors.primary}
+                mode="outlined"
+                placeholder="Pesquise por um usuário"
+                activeOutlineColor={colors.primary}
+                label="Nome"
+                activeUnderlineColor={colors.primary}
+                returnKeyType="search"
+                value={search}
+                cursorColor={colors.primary}
+                // onChangeText={(text) => setPerson({ ...person, email: text })}
+                onChangeText={setSearch}
+                onSubmitEditing={findUser}
+              />
+              {searched && !searchedUser && !loading && (
+                <Text
+                  style={{
+                    color: colors.darkGrey,
+                    alignSelf: "center",
+                    bottom: -10,
+                    position: "absolute",
+                  }}
+                >
+                  {" Este usuário não existe!"}
+                </Text>
+              )}
+
+              {loading && (
+                <Animated.View
+                  style={{
+                    // position: "absolute",
+                    alignSelf: "center",
+                    // top: 10,
+                    // zIndex: 4,
+                    bottom: -35,
+                    position: "absolute",
+                  }}
+                  // entering={SlideInUp.duration(300)}
+                  // exiting={SlideOutUp.duration(300)}
+                >
+                  <ActivityIndicator animating={true} color={colors.primary} />
+                </Animated.View>
+              )}
+            </View>
+            {!loading && searchedUser && (
+              <TouchableOpacity
+                onPress={addUser}
+                activeOpacity={0.5}
+                style={{
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 1,
+                  elevation: 2,
+                  width: "100%",
+                  marginTop: 10,
+                }}
+                // onPress={() => navigation.navigate("event", item)}
+              >
+                <Animated.View
+                  style={styles.userCard}
+                  entering={FadeIn}
+                  exiting={FadeOut}
+                >
+                  <Image
+                    source={{
+                      uri: searchedUser?.photos?.avatar?.[0]?.uri,
+                    }}
+                    style={{
+                      width: 70,
+                      height: 70,
+                      borderRadius: 50,
+
+                      // marginLeft: 20,
+                      // position: "absolute",
+                    }}
+
+                    // resizeMode="contain"
+                  />
+                  <View style={{ alignItems: "center", marginLeft: 10 }}>
+                    <Text numberOfLines={2} style={[styles.displayName]}>
+                      {searchedUser?.displayName}
+                    </Text>
+                    <Text numberOfLines={2} style={[styles.userName]}>
+                      @{searchedUser?.username}
+                    </Text>
+                  </View>
+                </Animated.View>
+              </TouchableOpacity>
+            )}
+
+            <View>
+              <FlatList
+                style={{ top: loading && 110 }}
+                // numColumns={5}
+
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={usersList}
+                keyExtractor={(item) => item?._id}
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity
+                      style={{
+                        padding: 5,
+                        alignItems: "center",
+                        // justifyContent: "center",
+                      }}
+                      onPress={() => removeUser(item)}
+                    >
+                      <Image
+                        style={{
+                          height: 60,
+                          width: 60,
+                          borderRadius: 50,
+                          marginBottom: 2,
+                          borderWidth: 0.009,
+                        }}
+                        source={{
+                          uri: item?.photos?.avatar?.[0]?.uri,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          width: item?.displayName?.length > 15 ? 100 : null,
+                          textAlign: "center",
+                        }}
+                      >
+                        {item?.displayName}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </View>
+            {/* <Text
+              style={[
+                styles.switchText,
+                {
+                  color: colors.primary,
+                  marginVertical: 10,
+                  alignSelf: "flex-end",
+                  fontWeight: "500",
+                },
+              ]}
+            >
+              {`${users?.length} ${
+                users?.length > 1 ? "adicionados" : "adicionado"
+              }`}
+            </Text> */}
           </View>
         </BottomSheetView>
       </BottomSheetModal>

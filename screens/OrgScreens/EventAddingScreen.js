@@ -88,7 +88,7 @@ import { useAuth } from "../../components/hooks/useAuth";
 
 function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const url = process.env.EXPO_PUBLIC_API_URL;
-  const { headerToken } = useAuth();
+  const { headerToken, user } = useAuth();
   const [ticketsSheetup, setTicketsSheetup] = useState(false);
   const [editTicketsSheetup, setEditTicketsSheetup] = useState(false);
   const [userModalUp, setUserModalUp] = useState(false);
@@ -509,7 +509,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         venue,
 
         // pushToken: token,
-        // userId: user.uid,
+        creatorId: user.uid,
+        createdBy: {
+          avatar: user?.photos?.avatar?.[0]?.uri,
+          displayName: user?.displayName
+        },
       };
 
       // if (resizedBannerURL && resized1Photo) {
@@ -525,7 +529,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           },
         }
       );
-      console.log(result?.status);
+      // console.log(result?.status);
       // } else {
       //   console.log("houve um erro");
       // }
@@ -548,12 +552,10 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     }
   };
 
-  console.log(venue);
- 
-   const addVenue = async () => {
+
+  const addVenue = async () => {
     setLoading(true);
     try {
-
       const result = await axios.post(
         `${url}/user/venue/`,
 
@@ -566,8 +568,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           },
         }
       );
-      console.log(result?.status);
-  
+      // console.log(result?.status);
     } catch (error) {
       console.log(error);
 
@@ -594,15 +595,15 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   //       }
   //     );
   //     console.log(result?.status);
-  
+
   //   } catch (error) {
-     
+
   //     console.log("houve um erro2");
   //   } finally {
   //     setLoading(false);
   //   }
   // };
-  
+
   const handlePhoneNumberChange1 = (inputValue) => {
     if (
       (inputValue.length > 0 &&

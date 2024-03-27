@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     if (!cacheChecked) {
       getUser();
     }
-    if (cacheChecked&&user) {
+    if (cacheChecked && user) {
       getUpdatedUserInfo();
     }
   }, [cacheChecked]);
@@ -77,8 +77,10 @@ export const AuthProvider = ({ children }) => {
         );
 
         setUser(response.data);
+
         const jsonValue = JSON.stringify(response.data);
         await AsyncStorage.setItem("user", jsonValue);
+
         getMyEvents();
       }
     } catch (error) {
@@ -89,6 +91,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getMyEvents = async () => {
+    console.log("my events fetched");
     const result = await axios.get(`${apiUrl}/user/event/`, {
       headers: {
         Authorization: headerToken,
@@ -104,6 +107,7 @@ export const AuthProvider = ({ children }) => {
       user,
       myEvents,
       setUser,
+      getMyEvents,
       AuthModalUp,
       setAuthModalUp,
       authSheetRef,

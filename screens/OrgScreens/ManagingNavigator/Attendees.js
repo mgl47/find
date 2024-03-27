@@ -35,44 +35,12 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     );
   }
 
-  const attendees = event?.buyers;
-
-  let list = [];
-
-  event?.buyers.forEach((item) => {
-    list.push(...item?.tickets);
-  });
-
-  console.log(list?.length);
-
-  // console.log(event?.buyers?.[0]?.tickets);
-  const users = [
-    {
-      username: "erickson.veiga",
-      category: "Normal",
-      checkedIn: false,
-      displayName: "Erickson Veiga",
-    },
-    {
-      username: "mgl",
-      category: "VIP",
-      checkedIn: true,
-      checkedAt: "23:18",
-      displayName: "Miguel",
-    },
-    {
-      username: "badiahh",
-      category: "Normal",
-      checkedIn: false,
-      displayName: "Sandra Antunes",
-    },
-  ];
 
   return (
     <View style={{ flex: 1 }}>
       <FlatList
-        data={users}
-        keyExtractor={(item) => item?.username}
+        data={event?.attendees}
+        keyExtractor={(item) => item?.uuid}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
@@ -168,6 +136,16 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 >
                   {item?.category}
                 </Text>
+                {/* <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "600",
+                    marginLeft: 5,
+                    color: colors.black2,
+                  }}
+                >
+                  {item?.uuid}
+                </Text> */}
               </View>
             </TouchableOpacity>
           );

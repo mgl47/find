@@ -54,7 +54,7 @@ export const PurchaseModal = ({
 }) => {
   const { formatNumber, apiUrl } = useData();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-
+  const purchaseId = uuid.v4();
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -72,7 +72,6 @@ export const PurchaseModal = ({
   }, []);
   const { height } = Dimensions.get("window");
 
-  const baseSnapPont = Event?.tickets?.length * height * 0.05;
   const TL = Event?.tickets?.length;
   const customSnap = `${
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
@@ -87,9 +86,7 @@ export const PurchaseModal = ({
   const [firstRender, setFirstRender] = useState(true);
   // const [onConfirming, setOnConfirming] = useState(false);
   const [onPayment, setOnPayment] = useState(false);
-  useEffect(() => {
-    setFirstRender(false);
-  }, []);
+
   const initialState = {
     loading: false,
     cart: Event?.tickets,
@@ -160,9 +157,13 @@ export const PurchaseModal = ({
   }
   const increase = (item) => {
     dispatch({ type: "INCREASE", payload: item });
+    setFirstRender(false)
+
   };
   const decrease = (item) => {
     dispatch({ type: "DECREASE", payload: item });
+    setFirstRender(false)
+
   };
   const clear = (item) => {
     dispatch({ type: "CLEAR", payload: item });
@@ -171,17 +172,27 @@ export const PurchaseModal = ({
   console.log(state.cart?.filter((ticket) => ticket?.amount != 0));
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
-  // const newArray = cartTickets.flatMap((item) =>
-  //   Array.from({ length: item.amount }, () => ({ ...item }))
-  // );
 
   const separatedTickets = cartTickets.flatMap((item) => {
     const { amount, ...rest } = item; // Destructuring to separate amount
     return Array.from({ length: item.amount }, () => ({
       ...rest,
       uuid: uuid.v4(),
+      username: user?.username,
+      displayName: user?.displayName,
+      purchaseId,
     }));
   });
+  // const newAttendees = cartTickets.flatMap((item) => {
+  //   const { amount, ...rest } = item; // Destructuring to separate amount
+  //   return Array.from({ length: item.amount }, () => ({
+  //     ...rest,
+  //     uuid: uuid.v4(),
+  //     username: user?.username,
+  //     displayName: user?.displayName,
+  //     purchaseId,
+  //   }));
+  // });
 
   const [paymentInfo, setPaymentInfo] = useState({
     cardInfo: {
@@ -208,7 +219,7 @@ export const PurchaseModal = ({
         {
           cardInfo: paymentInfo,
           details: {
-            uuid: uuidKey,
+            purchaseId,
             buyer: user,
             event: Event,
             eventId: Event?._id,
@@ -219,11 +230,14 @@ export const PurchaseModal = ({
           },
           userUpdates: {
             eventTicket: {
-              uuid: uuidKey,
-              buyer: { userId: user?._id, username: user?.username,displayName: user?.displayName},
+              purchaseId,
+              buyer: {
+                userId: user?._id,
+                username: user?.username,
+                displayName: user?.displayName,
+              },
               eventId: Event?._id,
               event: Event,
-
               purchaseDate: new Date(),
               tickets: separatedTickets,
               total: state.total,
@@ -261,7 +275,7 @@ export const PurchaseModal = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setPurchaseModalUp(false), clear(), setOnPayment(false);
+          setPurchaseModalUp(false), clear(), setOnPayment(false),setFirstRender(true)
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -496,7 +510,8 @@ export const PurchaseModal = ({
                     <TouchableOpacity
                       disabled={state.total == 0}
                       onPress={() =>
-                        onPayment ? buyTickets() : setOnPayment(true)
+                        onPayment ? buyTickets() :( setOnPayment(true),    setFirstRender(false))
+
                       }
                       style={{
                         width: 150,
@@ -639,7 +654,7 @@ export const PurchaseModal = ({
                 // <View />
 
                 <Animated.View
-                  entering={SlideInLeft}
+                  entering={firstRender ? null : SlideInLeft}
                   exiting={SlideOutLeft}
                   style={{
                     flexDirection: "row",
@@ -747,9 +762,7 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   const [advance, setAdvance] = useState(false);
   const [firstRender, setFirstRender] = useState(true);
 
-  useEffect(() => {
-    setFirstRender(false);
-  }, []);
+
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal

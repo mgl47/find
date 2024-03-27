@@ -34,7 +34,8 @@ import { ScrollView } from "react-native-gesture-handler";
 const SignInScreen = () => {
   const navigation = useNavigation();
 
-  const { user, setUser, setHeaderToken, authSheetRef } = useAuth();
+  const { user, setUser, setHeaderToken, authSheetRef, getMyEvents } =
+    useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);

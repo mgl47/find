@@ -84,18 +84,17 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               marginLeft: 10,
             }}
           >
-            {
-              ticket?.event?.dates[ticket?.event?.dates?.length - 1]
-                ?.displayDate+" - "+    ticket?.event?.dates[ticket?.event?.dates?.length - 1]
-                ?.hour
-            }
+            {ticket?.event?.dates[ticket?.event?.dates?.length - 1]
+              ?.displayDate +
+              " - " +
+              ticket?.event?.dates[ticket?.event?.dates?.length - 1]?.hour}
           </Text>
         </View>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 10,
+            // marginBottom: 10,
           }}
         >
           <Entypo name="location" size={25} color={colors.darkSeparator} />
@@ -113,6 +112,18 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
             {" " + ticket?.event?.venue?.city}
           </Text>
         </View>
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "600",
+            color: colors.primary,
+            alignSelf: "flex-start",
+            marginLeft: 20,
+            marginTop: 10,
+          }}
+        >
+          {ticket?.buyer?.displayName}
+        </Text>
         <Text
           style={{
             color: colors.black,
@@ -139,9 +150,8 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 width,
                 alignItems: "center",
-                marginBottom:1
+                marginBottom: 1,
               }}
-            
             >
               <View
                 style={{
@@ -178,26 +188,53 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                   size={260}
                   enableLinearGradient={item?.category !== "VIP"}
                   color={colors.darkGold}
-                //   quietZone={10}
+                  //   quietZone={10}
                   backgroundColor={colors.white}
                 />
               </View>
+              {item?.checkedIn && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    // marginBottom: 10, /
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: "600",
+                      textAlign: "center",
+                      color:
+                        item?.category == "VIP"
+                          ? colors.darkGold
+                          : colors.dark2,
+                      // marginBottom: 10,
+                      //   marginLeft: 10,
+                      //   textDecorationLine: "underline",
+                    }}
+                  >
+                    Hora de chegada:{" "}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "600",
+                      textAlign: "center",
+                      color: "green",
+                      // marginBottom: 10,
+                      //   marginLeft: 10,
+                      //   textDecorationLine: "underline",
+                    }}
+                  >
+                    {item?.checkedAt}
+                  </Text>
+                </View>
+              )}
             </View>
           );
         }}
       />
-      <Text
-        style={{
-          fontSize: 20,
-          fontWeight: "600",
-          color: colors.primary,
-          alignSelf: "flex-start",
-          marginLeft: 20,
-          marginVertical: 20,
-        }}
-      >
-        {ticket?.buyer?.displayName}
-      </Text>
     </View>
   );
 };
