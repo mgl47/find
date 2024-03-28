@@ -1382,6 +1382,7 @@ export const UserSelector = ({
   };
 
   const saveMembers = async () => {
+    const newStaffId = usersList?.map((item) => item?._id);
     try {
       const response = await axios.patch(
         `${apiUrl}/user/event/${eventId}`,
@@ -1391,7 +1392,7 @@ export const UserSelector = ({
             task: "staff",
             eventId: eventId,
           },
-          updates: usersList,
+          updates: { newStaffId, newStaff: usersList },
         },
         { headers: { Authorization: headerToken } }
       );
@@ -1705,6 +1706,8 @@ export const UserManager = ({
     setUsers(usersList);
   };
   const saveMembers = async () => {
+    const newStaffId = usersList?.map((item) => item?._id);
+
     try {
       const response = await axios.patch(
         `${apiUrl}/user/event/${eventId}`,
@@ -1714,7 +1717,7 @@ export const UserManager = ({
             task: "staff",
             eventId: eventId,
           },
-          updates: usersList,
+          updates: { newStaffId, newStaff: usersList },
         },
         { headers: { Authorization: headerToken } }
       );

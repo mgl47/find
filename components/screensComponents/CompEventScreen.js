@@ -86,24 +86,67 @@ export const PurchaseModal = ({
   const [firstRender, setFirstRender] = useState(true);
   // const [onConfirming, setOnConfirming] = useState(false);
   const [onPayment, setOnPayment] = useState(false);
-
+  const [limitReached, setLimitReached] = useState(false);
+  const [available, setAvailable] = useState([]);
   const initialState = {
     loading: false,
     cart: Event?.tickets,
     total: 0,
     amount: 0,
   };
-
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     dispatch({ type: "GET_TOTALS" });
   }, [state.cart]);
+
+  let purchasedAlready = 0;
+  user?.purchasedTickets?.forEach((purchase) => {
+    purchase?.tickets?.forEach((ticket) => {
+      if (ticket?.eventId == Event?._id) {
+        purchasedAlready += 1;
+      }
+    });
+  });
+
+  useEffect(() => {
+    if (Event?.ticketsLimit != 0) {
+      if (
+        state?.amount >= Event?.ticketsLimit ||
+        state?.amount + purchasedAlready >= Event?.ticketsLimit
+      ) {
+        setLimitReached(true);
+      } else {
+        setLimitReached(false);
+      }
+    }
+  }, [user, Event, state.amount]);
+
+  console.log(available);
+
   function reducer(state, action) {
     switch (action.type) {
       case "INCREASE": {
+        if (limitReached) {
+          return state;
+        }
         let tempCart = state.cart.map((cartItem) => {
-          if (cartItem?.id === action.payload?.id) {
-            cartItem = { ...cartItem, amount: cartItem.amount + 1 };
+          if (cartItem?.id === action.payload?.id && cartItem?.available > 0) {
+            // // console.log(action);
+            // Event?.tickets?.forEach((ticket) => {
+            //   // if (ticket?.id == cartItem?.id) {
+            //   console.log(ticket?.available);
+            //   // }
+            // });
+
+            cartItem = {
+              ...cartItem,
+              amount: cartItem.amount + 1,
+              available: cartItem.available - 1,
+            };
+            if (cartItem?.available == 0) {
+              setAvailable([...available, cartItem?.id]);
+            }
+            // console.log(cartItem?.available);
           }
 
           return cartItem;
@@ -118,7 +161,16 @@ export const PurchaseModal = ({
               return cartItem;
             }
 
-            cartItem = { ...cartItem, amount: cartItem.amount - 1 };
+            cartItem = {
+              ...cartItem,
+              amount: cartItem.amount - 1,
+              available: cartItem.available + 1,
+            };
+            if (available?.includes(cartItem?.id)) {
+              const newAvailable = available.filter((id) => id != cartItem?.id);
+              console.log("removed from available");
+              setAvailable(newAvailable);
+            }
           }
 
           return cartItem;
@@ -157,42 +209,31 @@ export const PurchaseModal = ({
   }
   const increase = (item) => {
     dispatch({ type: "INCREASE", payload: item });
-    setFirstRender(false)
-
+    setFirstRender(false);
   };
   const decrease = (item) => {
     dispatch({ type: "DECREASE", payload: item });
-    setFirstRender(false)
-
+    setFirstRender(false);
   };
   const clear = (item) => {
     dispatch({ type: "CLEAR", payload: item });
   };
 
-  console.log(state.cart?.filter((ticket) => ticket?.amount != 0));
+  // console.log(state.cart?.filter((ticket) => ticket?.amount != 0));
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
 
   const separatedTickets = cartTickets.flatMap((item) => {
-    const { amount, ...rest } = item; // Destructuring to separate amount
+    const { amount, ...rest } = item;
     return Array.from({ length: item.amount }, () => ({
       ...rest,
       uuid: uuid.v4(),
       username: user?.username,
       displayName: user?.displayName,
       purchaseId,
+      eventId: Event?._id,
     }));
   });
-  // const newAttendees = cartTickets.flatMap((item) => {
-  //   const { amount, ...rest } = item; // Destructuring to separate amount
-  //   return Array.from({ length: item.amount }, () => ({
-  //     ...rest,
-  //     uuid: uuid.v4(),
-  //     username: user?.username,
-  //     displayName: user?.displayName,
-  //     purchaseId,
-  //   }));
-  // });
 
   const [paymentInfo, setPaymentInfo] = useState({
     cardInfo: {
@@ -212,12 +253,11 @@ export const PurchaseModal = ({
     } else {
       updatedGoing.push(Event?._id);
     }
-
     try {
       const response = await axios.post(
         `${apiUrl}/purchase/`,
         {
-          cardInfo: paymentInfo,
+          // cardInfo: paymentInfo,
           details: {
             purchaseId,
             buyer: user,
@@ -260,8 +300,8 @@ export const PurchaseModal = ({
       );
       console.log(response?.data);
 
-      getUpdatedUserInfo();
-      bottomSheetModalRef.current.close();
+      // getUpdatedUserInfo();
+      // bottomSheetModalRef.current.close();
     } catch (error) {
       console.error("Error updating liked events:", error);
     }
@@ -275,7 +315,10 @@ export const PurchaseModal = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setPurchaseModalUp(false), clear(), setOnPayment(false),setFirstRender(true)
+          setPurchaseModalUp(false),
+            clear(),
+            setOnPayment(false),
+            setFirstRender(true);
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -510,8 +553,9 @@ export const PurchaseModal = ({
                     <TouchableOpacity
                       disabled={state.total == 0}
                       onPress={() =>
-                        onPayment ? buyTickets() :( setOnPayment(true),    setFirstRender(false))
-
+                        onPayment
+                          ? buyTickets()
+                          : (setOnPayment(true), setFirstRender(false))
                       }
                       style={{
                         width: 150,
@@ -556,19 +600,43 @@ export const PurchaseModal = ({
               data={state?.cart}
               keyExtractor={(item) => item?.id}
               ListHeaderComponent={
-                <Text
+                <View
                   style={{
-                    fontSize: 18,
-                    fontWeight: "600",
-                    left: "8%",
-                    // width: "80%",
-                    color: colors.primary,
-                    // marginLeft: 5,
-                    marginVertical: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginHorizontal: 30,
                   }}
                 >
-                  Bilhetes
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "600",
+                      left: "8%",
+                      // width: "80%",
+                      color: colors.primary,
+                      // marginLeft: 5,
+                      marginVertical: 10,
+                    }}
+                  >
+                    Bilhetes
+                  </Text>
+                  {Event?.ticketsLimit > 0 && (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        // fontWeight: "600",
+                        left: "8%",
+                        // width: "80%",
+                        color: colors.darkGrey,
+                        marginLeft: 5,
+                        marginVertical: 10,
+                      }}
+                    >
+                      limite por usuário:{" " + Event?.ticketsLimit}
+                    </Text>
+                  )}
+                </View>
               }
               renderItem={({ item }) => {
                 return (
@@ -638,11 +706,20 @@ export const PurchaseModal = ({
                         >
                           {item?.amount}
                         </Text>
-                        <TouchableOpacity onPress={() => increase(item)}>
+                        <TouchableOpacity
+                          disabled={
+                            limitReached || available?.includes(item?.id)
+                          }
+                          onPress={() => increase(item)}
+                        >
                           <AntDesign
                             name="pluscircle"
                             size={24}
-                            color={colors.primary}
+                            color={
+                              limitReached || available?.includes(item?.id)
+                                ? colors.grey
+                                : colors.primary
+                            }
                           />
                         </TouchableOpacity>
                       </View>
@@ -761,7 +838,6 @@ export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
   const [selectedUser, setSelectedUser] = useState("");
   const [advance, setAdvance] = useState(false);
   const [firstRender, setFirstRender] = useState(true);
-
 
   return (
     <BottomSheetModalProvider>

@@ -59,7 +59,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [position, setPosition] = useState(selectedMember?.level);
-  console.log(event?.category);
+  console.log(selectedMember?.level);
 
   useEffect(() => {
     setPosition({ value: selectedMember?.level, label: selectedMember?.level });
@@ -82,6 +82,8 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
     let users = [...members];
     const newStaff = users?.filter((user) => user?._id != selectedMember?._id);
     setMembers(newStaff);
+    const newStaffId = newStaff?.map((item) => item?._id);
+
     try {
       const response = await axios.patch(
         `${apiUrl}/user/event/${event?._id}`,
@@ -91,18 +93,18 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
             task: "staff",
             eventId: event?._id,
           },
-          updates: newStaff,
+          updates: { newStaffId, newStaff },
         },
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        // getMyEvents(),
-        manageMembersSheetRef.current?.close();
+        getMyEvents(), manageMembersSheetRef.current?.close();
       }
     } catch (error) {
       console.error("Error updating liked events:", error);
     }
   };
+  console.log(members);
 
   // const
   const updateMember = async () => {
@@ -116,7 +118,9 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         return member;
       }
     });
-    console.log(newStaff);
+    const newStaffId = newStaff?.map((item) => item?._id);
+
+    // console.log(newStaffId);
 
     // setMembers(newStaff);
 
@@ -129,7 +133,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
             task: "staff",
             eventId: event?._id,
           },
-          updates: newStaff,
+          updates: { newStaffId, newStaff },
         },
         { headers: { Authorization: headerToken } }
       );
@@ -196,7 +200,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
             >
               <Image
                 source={{
-                  uri: user?.photos?.avatar?.[0]?.uri,
+                  uri: event?.createdBy?.avatar,
                 }}
                 style={{
                   width: 70,
@@ -211,10 +215,21 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               />
               <View style={{ alignItems: "center", marginLeft: 10 }}>
                 <Text numberOfLines={2} style={[styles.displayName]}>
-                  {user?.displayName}
+                  {event?.createdBy?.displayName}
                 </Text>
                 <Text numberOfLines={2} style={[styles.userName]}>
-                  @{user?.username}
+                  @{event?.createdBy?.username}
+                </Text>
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    alignItems: "center",
+                    fontSize: 16.5,
+                    color: colors.darkSeparator,
+                    fontWeight: "500",
+                  }}
+                >
+                  Criador{" "}
                 </Text>
               </View>
             </Animated.View>

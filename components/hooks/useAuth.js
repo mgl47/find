@@ -20,6 +20,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
+import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import colors from "../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -29,6 +30,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  const navigation = useNavigation();
 
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
@@ -92,15 +94,29 @@ export const AuthProvider = ({ children }) => {
 
   const getMyEvents = async () => {
     console.log("my events fetched");
+    try {
+
+    
     const result = await axios.get(`${apiUrl}/user/event/`, {
       headers: {
         Authorization: headerToken,
       },
     });
     setMyEvents(result?.data);
+      
+    } catch (error) {
+      console.log(error);
+    }
   };
   const [AuthModalUp, setAuthModalUp] = useState(false);
-
+  const logOut = async () => {
+    await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("headerToken");
+    setUser(null);
+    setMyEvents([]);
+    setHeaderToken(null);
+    navigation.dispatch(DrawerActions.closeDrawer());
+  };
   const memoedValue = useMemo(
     () => ({
       headerToken,
@@ -113,6 +129,7 @@ export const AuthProvider = ({ children }) => {
       authSheetRef,
       setHeaderToken,
       getUpdatedUserInfo,
+      logOut,
     }),
     [headerToken, user, myEvents, AuthModalUp, authSheetRef]
   );

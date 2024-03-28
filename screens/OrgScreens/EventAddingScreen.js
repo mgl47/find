@@ -58,6 +58,7 @@ import {
 } from "firebase/storage";
 import axios from "axios";
 import { useAuth } from "../../components/hooks/useAuth";
+import RNPickerSelect from "react-native-picker-select";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -172,6 +173,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const orgSheetModalRef = useRef(null);
 
   const [tickets, setTickets] = useState([]);
+  const [ticketsLimit, setTicketsLimit] = useState({ label: "0", value: "0" });
   const [selectedTicket, setSelectedTicket] = useState("");
   const handleTicketSheet = useCallback((ticket, index) => {
     // setTicketsSheetup(true);
@@ -506,13 +508,14 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         organizers,
         artists,
         tickets,
+        ticketsLimit: Number(ticketsLimit?.value),
         venue,
 
         // pushToken: token,
         creatorId: user.uid,
         createdBy: {
           avatar: user?.photos?.avatar?.[0]?.uri,
-          displayName: user?.displayName
+          displayName: user?.displayName,
         },
       };
 
@@ -551,7 +554,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       setLoading(false);
     }
   };
-
 
   const addVenue = async () => {
     setLoading(true);
@@ -1100,34 +1102,104 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               );
             })}
           {!freeEvent && (
-            <View style={[styles.switchContainer]}>
-              <Text
-                style={[styles.switchText, { color: colors.darkSeparator }]}
-              >
-                Adicionar Bilhete
-              </Text>
-              <TouchableOpacity
-                style={styles.switch}
-                onPress={handleTicketSheet}
-              >
-                {/* <Ionicons
+            <>
+              <View style={[styles.switchContainer]}>
+                <Text
+                  style={[styles.switchText, { color: colors.darkSeparator }]}
+                >
+                  Adicionar Bilhete
+                </Text>
+                <TouchableOpacity
+                  style={styles.switch}
+                  onPress={handleTicketSheet}
+                >
+                  {/* <Ionicons
               name={"add-circle-outline"}
               size={30}
               color={colors.primary}
             /> */}
-                <Text
-                  style={{
-                    color: colors.primary,
-                    fontSize: 14,
-                    left: 20,
-                    padding: 3,
-                    fontWeight: "600",
-                  }}
-                >
-                  Adicionar
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 14,
+                      left: 20,
+                      padding: 3,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Adicionar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <RNPickerSelect
+                style={{ left: 40 }}
+                // placeholder={{ label: getMemberPosition(selectedMember) }}
+                placeholder={{}}
+                value={ticketsLimit?.value}
+                // onValueChange={(value) => setTicketsLimit({ value })}
+                onValueChange={(value, label) =>
+                  setTicketsLimit({ value, label })
+                }
+                items={[
+                  { label: "0", value: "0" },
+                  { label: "1", value: "1" },
+                  { label: "2", value: "2" },
+                  { label: "3", value: "3" },
+                  { label: "4", value: "4" },
+                  { label: "5", value: "5" },
+                  { label: "6", value: "6" },
+                  { label: "7", value: "7" },
+                  { label: "8", value: "8" },
+                  { label: "9", value: "9" },
+                  { label: "10", value: "10" },
+                ]}
+              >
+                <View style={[styles.switchContainer, {}]}>
+                  <Text
+                    style={[styles.switchText, { color: colors.darkSeparator }]}
+                  >
+                    Limite por usuário
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text
+                      numberOfLines={2}
+                      style={{
+                        alignSelf: "flex-start",
+                        fontSize: 17,
+                        fontWeight: "400",
+                        color: colors.primary2,
+                        marginVertical: 3,
+                        marginLeft: 30,
+                      }}
+                    >
+                      {ticketsLimit?.value}
+                    </Text>
+
+                    <MaterialCommunityIcons
+                      style={{ position: "absolute", right: -30 }}
+                      name="unfold-more-horizontal"
+                      size={26}
+                      color={colors.primary}
+                    />
+                  </View>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      // alignSelf: "flex-start",
+                      fontSize: 15,
+                      fontWeight: "400",
+                      color: colors.darkGrey,
+                      marginVertical: 3,
+                      marginLeft: 10,
+                      position: "absolute",
+                      right: 0,
+                    }}
+                  >
+                    sem limite: 0{" "}
+                  </Text>
+                </View>
+              </RNPickerSelect>
+            </>
           )}
           <View style={styles.separator} />
           {!venue && (
