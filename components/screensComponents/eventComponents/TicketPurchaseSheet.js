@@ -1,4 +1,5 @@
 import {
+  Button,
   Dimensions,
   FlatList,
   Image,
@@ -22,7 +23,7 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { AntDesign } from "@expo/vector-icons";
-import colors from "../colors";
+import colors from "../../colors";
 import Animated, {
   FadeInRight,
   FadeOutLeft,
@@ -40,21 +41,47 @@ import {
   Feather,
   Ionicons,
 } from "@expo/vector-icons";
-import { useData } from "../hooks/useData";
-import { TextInput } from "react-native-paper";
+import { useData } from "../../hooks/useData";
+import { ActivityIndicator, TextInput } from "react-native-paper";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import uuid from "react-native-uuid";
+import toast from "../../toast";
 
-export const PurchaseModal = ({
+export default TicketPurchaseSheet = ({
   Event,
   bottomSheetModalRef,
   setPurchaseModalUp,
+  purchaseModalUp,
 }) => {
-  const { formatNumber, apiUrl } = useData();
+  const { formatNumber, apiUrl, getOneEvent } = useData();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const purchaseId = uuid.v4();
+  const [loading, setLoading] = useState(true);
+
+  const [event, setEvent] = useState(Event);
+  // const [initialState, setInitialState] = useState({});
+  let initialState = {
+    cart: event?.tickets,
+    total: 0,
+    amount: 0,
+  };
+  const getSelectedEvent = async () => {
+    if (purchaseModalUp) {
+      setLoading(true);
+      const event = await getOneEvent(Event?._id);
+      setEvent(event);
+      dispatch({ type: "CLEAR", payload: event?.tickets });
+
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getSelectedEvent();
+  }, [purchaseModalUp]);
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -72,7 +99,7 @@ export const PurchaseModal = ({
   }, []);
   const { height } = Dimensions.get("window");
 
-  const TL = Event?.tickets?.length;
+  const TL = event?.tickets?.length;
   const customSnap = `${
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
   }%`;
@@ -88,40 +115,42 @@ export const PurchaseModal = ({
   const [onPayment, setOnPayment] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   const [available, setAvailable] = useState([]);
-  const initialState = {
-    loading: false,
-    cart: Event?.tickets,
-    total: 0,
-    amount: 0,
-  };
+
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     dispatch({ type: "GET_TOTALS" });
   }, [state.cart]);
-
   let purchasedAlready = 0;
   user?.purchasedTickets?.forEach((purchase) => {
     purchase?.tickets?.forEach((ticket) => {
-      if (ticket?.eventId == Event?._id) {
+      if (ticket?.eventId == event?._id) {
         purchasedAlready += 1;
       }
     });
   });
 
   useEffect(() => {
-    if (Event?.ticketsLimit != 0) {
+    if (event?.ticketsLimit != 0) {
       if (
-        state?.amount >= Event?.ticketsLimit ||
-        state?.amount + purchasedAlready >= Event?.ticketsLimit
+        state?.amount >= event?.ticketsLimit ||
+        state?.amount + purchasedAlready >= event?.ticketsLimit
       ) {
         setLimitReached(true);
       } else {
         setLimitReached(false);
       }
     }
-  }, [user, Event, state.amount]);
+  }, [user, event, state.amount]);
 
-  console.log(available);
+  useEffect(() => {
+    if (limitReached) {
+      toast({
+        msg: "Limite por usúario atingido!",
+        color: colors.white,
+        textcolor: colors.primary,
+      });
+    }
+  }, [limitReached]);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -131,13 +160,6 @@ export const PurchaseModal = ({
         }
         let tempCart = state.cart.map((cartItem) => {
           if (cartItem?.id === action.payload?.id && cartItem?.available > 0) {
-            // // console.log(action);
-            // Event?.tickets?.forEach((ticket) => {
-            //   // if (ticket?.id == cartItem?.id) {
-            //   console.log(ticket?.available);
-            //   // }
-            // });
-
             cartItem = {
               ...cartItem,
               amount: cartItem.amount + 1,
@@ -145,6 +167,11 @@ export const PurchaseModal = ({
             };
             if (cartItem?.available == 0) {
               setAvailable([...available, cartItem?.id]);
+              toast({
+                msg: `Quantidade disponível atingida para o bilhete "${cartItem?.category}"!`,
+                color: colors.white,
+                textcolor: colors.primary,
+              });
             }
             // console.log(cartItem?.available);
           }
@@ -179,8 +206,9 @@ export const PurchaseModal = ({
         return { ...state, cart: tempCart };
       }
       case "CLEAR": {
-        return { cart: Event?.tickets, total: 0, amount: 0 };
+        return { cart: action?.payload, total: 0, amount: 0 };
       }
+
       case "GET_TOTALS": {
         let { total, amount } = state.cart.reduce(
           (cartTotal, cartItem) => {
@@ -204,9 +232,6 @@ export const PurchaseModal = ({
     throw Error("Unknown action: " + action.type);
   }
 
-  function handleClick() {
-    dispatch({ type: "incremented_age" });
-  }
   const increase = (item) => {
     dispatch({ type: "INCREASE", payload: item });
     setFirstRender(false);
@@ -218,8 +243,9 @@ export const PurchaseModal = ({
   const clear = (item) => {
     dispatch({ type: "CLEAR", payload: item });
   };
-
-  // console.log(state.cart?.filter((ticket) => ticket?.amount != 0));
+  const clean = () => {
+    setOnPayment(false), setFirstRender(true);
+  };
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
 
@@ -231,7 +257,7 @@ export const PurchaseModal = ({
       username: user?.username,
       displayName: user?.displayName,
       purchaseId,
-      eventId: Event?._id,
+      eventId: event?._id,
     }));
   });
 
@@ -247,11 +273,11 @@ export const PurchaseModal = ({
     let updatedGoing = [];
     updatedGoing = user?.goingToEvents || [];
     updateInterested = user?.likedEvents || [];
-    const index = updatedGoing.indexOf(Event?._id);
-    if (user?.goingToEvents?.includes(Event?._id) && index !== -1) {
+    const index = updatedGoing.indexOf(event?._id);
+    if (user?.goingToEvents?.includes(event?._id) && index !== -1) {
       updatedGoing.splice(index, 1);
     } else {
-      updatedGoing.push(Event?._id);
+      updatedGoing.push(event?._id);
     }
     try {
       const response = await axios.post(
@@ -260,33 +286,26 @@ export const PurchaseModal = ({
           // cardInfo: paymentInfo,
           details: {
             purchaseId,
-            buyer: user,
-            event: Event,
-            eventId: Event?._id,
+            buyer: {
+              userId: user?._id,
+              username: user?.username,
+              email: user?.email,
+              displayName: user?.displayName,
+              uri: event?.photos[0]?.[0]?.uri,
+            },
+            event: event,
+            eventId: event?._id,
             cardDetails: paymentInfo?.cardInfo,
             purchaseDate: new Date(),
             tickets: separatedTickets,
             total: state.total,
+            uri: event?.photos[0]?.[0]?.uri,
           },
           userUpdates: {
-            eventTicket: {
-              purchaseId,
-              buyer: {
-                userId: user?._id,
-                username: user?.username,
-                displayName: user?.displayName,
-              },
-              eventId: Event?._id,
-              event: Event,
-              purchaseDate: new Date(),
-              tickets: separatedTickets,
-              total: state.total,
-              uri: Event?.photos[0]?.[0]?.uri,
-            },
             operation: {
-              type: "eventStatus",
-              task: "purchase",
-              eventId: Event?._id,
+              type: "purchase",
+              // task: "purchase",
+              eventId: event?._id,
             },
             updates: {
               likedEvents: updateInterested,
@@ -298,14 +317,54 @@ export const PurchaseModal = ({
           headers: { Authorization: headerToken },
         }
       );
-      console.log(response?.data);
+      // console.log(response?.data);
 
       // getUpdatedUserInfo();
       // bottomSheetModalRef.current.close();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      toast({
+        msg: error?.response?.data?.msg,
+        color: colors.darkRed,
+        textcolor: colors.white,
+        duration: 1000,
+      });
+      console.log(error?.response?.data?.invalidTickets);
+      // console.log("Error updating liked events:", error);
     }
   };
+
+  if (loading) {
+    return (
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          // style={{backgroundColor:}}
+          ref={bottomSheetModalRef}
+          index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+          snapPoints={snapPoints}
+          onChange={handleSheetChanges}
+          onDismiss={() => {
+            setPurchaseModalUp(false), clean();
+          }}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            <Animated.View
+              style={{
+                // position: "absolute",
+                alignSelf: "center",
+                // top: 10,
+                // zIndex: 2,
+                marginVertical: 20,
+              }}
+              // entering={SlideInUp.duration(300)}
+              // exiting={SlideOutUp.duration(300)}
+            >
+              <ActivityIndicator animating={true} color={colors.primary} />
+            </Animated.View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    );
+  }
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -315,10 +374,7 @@ export const PurchaseModal = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          setPurchaseModalUp(false),
-            clear(),
-            setOnPayment(false),
-            setFirstRender(true);
+          setPurchaseModalUp(false), clean();
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
@@ -505,15 +561,18 @@ export const PurchaseModal = ({
                               {(ticket?.amount > 1
                                 ? " Bilhetes "
                                 : " Bilhete ") +
+                                '"' +
                                 ticket?.category +
+                                '"' +
                                 (ticket?.amount > 1
-                                  ? " selecionados"
-                                  : " selecionado ")}
+                                  ? " selecionados!"
+                                  : " selecionado!")}
                             </Text>
                           </View>
                         );
                       })}
                   </View>
+
                   <View
                     // entering={SlideInRight}
                     // exiting={SlideOutLeft}
@@ -521,7 +580,7 @@ export const PurchaseModal = ({
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      // margin: 20,
+                      marginTop: 20,
                     }}
                   >
                     <View
@@ -621,7 +680,7 @@ export const PurchaseModal = ({
                   >
                     Bilhetes
                   </Text>
-                  {Event?.ticketsLimit > 0 && (
+                  {event?.ticketsLimit > 0 && (
                     <Text
                       style={{
                         fontSize: 14,
@@ -633,7 +692,7 @@ export const PurchaseModal = ({
                         marginVertical: 10,
                       }}
                     >
-                      limite por usuário:{" " + Event?.ticketsLimit}
+                      limite por usuário:{" " + event?.ticketsLimit}
                     </Text>
                   )}
                 </View>
@@ -665,8 +724,11 @@ export const PurchaseModal = ({
                           <Text numberOfLines={2} style={[styles.price]}>
                             cve {formatNumber(item?.price)}
                           </Text>
-                          <Text numberOfLines={2} style={[styles.priceType]}>
-                            {item?.type}
+                          <Text
+                            numberOfLines={2}
+                            style={[styles.ticketCategory]}
+                          >
+                            {item?.category}
                           </Text>
                         </View>
 
@@ -740,6 +802,12 @@ export const PurchaseModal = ({
                     margin: 20,
                   }}
                 >
+                  {/* <Button
+                      title="refresh"
+                      onPress={() =>
+                        toast({ msg: "Limite por usúario atingido!" })
+                      }
+                    /> */}
                   <View
                     style={{
                       flexDirection: "row",
@@ -813,334 +881,6 @@ export const PurchaseModal = ({
   );
 };
 
-export const GiftModal = ({ Event, bottomSheetModalRef2, setGiftModalUp }) => {
-  // const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["35%", "55%", "75%"], []);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => setKeyboardVisible(false)
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
-  const handleSheetChanges = useCallback((index) => {}, []);
-  const [searchText, setSearchText] = useState("");
-  const [selectedUser, setSelectedUser] = useState("");
-  const [advance, setAdvance] = useState(false);
-  const [firstRender, setFirstRender] = useState(true);
-
-  return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal
-        // style={{backgroundColor:}}
-        ref={bottomSheetModalRef2}
-        index={keyboardVisible ? 2 : advance ? 1 : 0}
-        snapPoints={snapPoints}
-        onChange={handleSheetChanges}
-        onDismiss={() => {
-          setGiftModalUp(false), setAdvance(false);
-        }}
-      >
-        <BottomSheetView style={styles.contentContainer}>
-          {advance ? (
-            <Animated.FlatList
-              entering={firstRender ? null : SlideInRight}
-              exiting={SlideOutRight}
-              data={Event?.tickets}
-              keyExtractor={(item) => item?.id}
-              ListHeaderComponent={
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => setAdvance(false)}
-                    style={{
-                      padding: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="arrow-left"
-                      size={20}
-                      color={colors.primary}
-                    />
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 16,
-                        fontWeight: "500",
-                      }}
-                    >
-                      Voltar
-                    </Text>
-                  </TouchableOpacity>
-
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Feather name="gift" size={20} color={colors.black} />
-
-                    <Text
-                      style={{
-                        fontWeight: "500",
-                        fontSize: 15,
-                        marginRight: 20,
-                        marginLeft: 5,
-                        color: colors.primary,
-                      }}
-                    >
-                      veiga.erickson
-                    </Text>
-                  </View>
-                </View>
-              }
-              renderItem={({ item }) => {
-                return (
-                  <View
-                    activeOpacity={0.5}
-                    style={{
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 1,
-                      elevation: 2,
-                      width: "100%",
-                    }}
-                    // onPress={() => navigation.navigate("event", item)}
-                  >
-                    <View style={styles.card}>
-                      <View
-                        style={{
-                          width: "70%",
-                          // backgroundColor: colors.light2,
-                          padding: 10,
-                        }}
-                      >
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
-                          <Text numberOfLines={2} style={[styles.price]}>
-                            cve {item?.amount}
-                          </Text>
-                          <Text numberOfLines={2} style={[styles.priceType]}>
-                            {item?.type}
-                          </Text>
-                        </View>
-
-                        <Text style={styles.description}>
-                          {item?.description}
-                        </Text>
-                      </View>
-                      <View style={styles.counterView}>
-                        <TouchableOpacity>
-                          <AntDesign
-                            name="minuscircle"
-                            size={24}
-                            color={colors.black2}
-                          />
-                        </TouchableOpacity>
-                        <Text
-                          style={{
-                            fontSize: 22,
-                            fontWeight: "600",
-                            color: colors.primary,
-                          }}
-                        >
-                          {item?.amount}
-                        </Text>
-                        <TouchableOpacity>
-                          <AntDesign
-                            name="pluscircle"
-                            size={24}
-                            color={colors.primary}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                );
-              }}
-              ListFooterComponent={
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    margin: 20,
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 19,
-                        color: colors.black2,
-                        fontWeight: "600",
-                        marginRight: 5,
-                      }}
-                    >
-                      Total:
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 19,
-                        color: colors.primary,
-                        fontWeight: "600",
-                      }}
-                    >
-                      cve 36,000
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    // onPress={handlePresentModalPress}
-                    style={{
-                      width: 150,
-                      height: 40,
-                      backgroundColor: colors.primary, // position: "absolute",
-                      zIndex: 1,
-                      // top: 10,
-                      // left: 10,
-                      borderRadius: 10,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      shadowOffset: { width: 1, height: 1 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 1,
-                      elevation: 3,
-                      shadowColor: colors.dark,
-                      flexDirection: "row",
-                    }}
-                    activeOpacity={0.5}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: colors.white,
-                        fontWeight: "500",
-                        marginRight: 10,
-                      }}
-                    >
-                      Avançar
-                    </Text>
-                    {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
-                  </TouchableOpacity>
-                </View>
-              }
-            />
-          ) : (
-            <Animated.View
-              entering={firstRender ? null : SlideInLeft}
-              exiting={SlideOutLeft}
-              style={{ alignItems: "center" }}
-            >
-              <TextInput
-                value={searchText}
-                onChangeText={setSearchText}
-                placeholder="Pesquise por um usuário"
-                returnKeyType="search"
-                // autoFocus
-                style={styles.search}
-              />
-              <Text style={{ color: colors.darkGrey, bottom: 10 }}>
-                1 resultado encontrado
-              </Text>
-              <View
-                activeOpacity={0.5}
-                style={{
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 1,
-                  elevation: 2,
-                  width: "100%",
-                }}
-                // onPress={() => navigation.navigate("event", item)}
-              >
-                <View style={styles.card}>
-                  <Image
-                    source={{
-                      uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                    }}
-                    style={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: 50,
-
-                      // marginLeft: 20,
-                      // position: "absolute",
-                    }}
-
-                    // resizeMode="contain"
-                  />
-                  <View style={{ alignItems: "center", marginLeft: 10 }}>
-                    <Text numberOfLines={2} style={[styles.displayName]}>
-                      Erickson{" "}
-                    </Text>
-                    <Text numberOfLines={2} style={[styles.userName]}>
-                      veiga.erickson{" "}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss(), setAdvance(true);
-                }}
-                style={{
-                  marginTop: 20,
-                  width: 150,
-                  height: 40,
-                  backgroundColor: colors.primary, // position: "absolute",
-                  zIndex: 1,
-                  // top: 10,
-                  // left: 10,
-                  borderRadius: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 1,
-                  elevation: 3,
-                  shadowColor: colors.dark,
-                  flexDirection: "row",
-                }}
-                activeOpacity={0.5}
-              >
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.white,
-                    fontWeight: "500",
-                    marginRight: 10,
-                  }}
-                >
-                  Avançar
-                </Text>
-                {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </BottomSheetView>
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
-  );
-};
-
 const styles = StyleSheet.create({
   sheetContainer: {
     flex: 1,
@@ -1190,14 +930,14 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
 
-  priceType: {
+  ticketCategory: {
     alignSelf: "flex-start",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "600",
-    color: colors.grey,
+    color: colors.description2,
     lineHeight: 30,
     // width: "65%",
-    marginLeft: 5,
+    marginLeft: 10,
   },
   userName: {
     fontSize: 14,

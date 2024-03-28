@@ -338,7 +338,7 @@ import {
           setCoverUri(null);
         }
       } catch (error) {
-        console.error("Error updating liked events:", error);
+        console.log("Error updating liked events:", error);
       }
     };
   

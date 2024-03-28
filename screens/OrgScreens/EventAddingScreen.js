@@ -39,13 +39,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import colors from "../../components/colors";
 import ImageImputList from "../../components/ImageInputs/ImageImputList";
 import { TextInput } from "react-native-paper";
-import {
-  DateSelector,
-  EditTicketsSheet,
-  TicketsSheet,
-  UserSelector,
-  VenueSelector,
-} from "../../components/screensComponents/CompAddingScreen";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import VideoInputList from "../../components/ImageInputs/VideoInputList";
 import { storage } from "../../firebase";
@@ -59,6 +53,10 @@ import {
 import axios from "axios";
 import { useAuth } from "../../components/hooks/useAuth";
 import RNPickerSelect from "react-native-picker-select";
+import UserSelectorSheetSheet from "../../components/screensComponents/EventAddingComponents/UserSelectorSheet";
+import AddTicketsSheet from "../../components/screensComponents/EventAddingComponents/AddTicketsSheet";
+import EditTicketsSheet from "../../components/screensComponents/EventAddingComponents/EditTicketsSheet";
+import VenueSelectorSheet from "../../components/screensComponents/EventAddingComponents/VenueSelectorSheet";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -1346,10 +1344,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               </View>
             </>
           )}
-          <VenueSelector
+          <VenueSelectorSheet
             venueModal={venueModal}
             setVenueModal={setVenueModal}
-            setVenue={setVenue}
+            setVen
+            ue={setVenue}
             venue={venue}
           />
           <View style={styles.separator} />
@@ -1763,13 +1762,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         </TouchableOpacity>
       </KeyboardAwareScrollView>
 
-      <UserSelector
+      <UserSelectorSheetSheet
         type={"artist"}
         users={artists}
         setUsers={setArtists}
         userSheetModalRef={artSheetModalRef}
       />
-      <UserSelector
+      <UserSelectorSheetSheet
         type={"organizer"}
         users={organizers}
         setUsers={setOrganizers}
@@ -1782,7 +1781,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         transparent
       ></Modal>
 
-      <TicketsSheet
+      <AddTicketsSheet
         // setTicketsSheetup={setTicketsSheetup}
         dates={dates}
         ticketsSheetRef={ticketsSheetRef}

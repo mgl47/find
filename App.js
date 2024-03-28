@@ -22,6 +22,7 @@ import DrawerNavigator, {
 import { AuthProvider } from "./components/hooks/useAuth";
 import { DataProvider } from "./components/hooks/useData";
 import { DesignProvider } from "./components/hooks/useDesign";
+import FlashMessage from "react-native-flash-message";
 LogBox.ignoreLogs([
   "iewPropTypes will be removed from React Native, along with all other PropTypes. We recommend that you migrate away from PropTypes and switch to a type system like TypeScript. If you need to continue using ViewPropTypes, migrate to the 'deprecated-react-native-prop-types' package.",
   "Sending `onAnimatedValueUpdate` with no listeners registered.",
@@ -48,6 +49,7 @@ export default function App() {
               </DataProvider>
             </DesignProvider>
           </AuthProvider>
+          <FlashMessage position="top" />
         </NavigationContainer>
       </PaperProvider>
     </SafeAreaProvider>

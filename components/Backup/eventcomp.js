@@ -217,7 +217,7 @@ export const PurchaseModal = ({
       console.log(response?.data);
       // getUpdatedUserInfo();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log("Error updating liked events:", error);
     }
   };
   return (

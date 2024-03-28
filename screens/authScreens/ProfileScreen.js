@@ -295,7 +295,7 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
         setCoverUri(null);
       }
     } catch (error) {
-      console.error("Error updating user profile:", error);
+      console.log("Error updating user profile:", error);
     }
     setLoading(false);
   };

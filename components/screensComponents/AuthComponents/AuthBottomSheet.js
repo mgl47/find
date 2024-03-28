@@ -23,11 +23,11 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
-import Screen from "../Screen2";
-import SignInScreen from "../../screens/authScreens/SignInScreen";
-import SignUpScreen from "../../screens/authScreens/SignUpScreen";
+import Screen from "../../Screen2";
+import SignInScreen from "../../../screens/authScreens/SignInScreen";
+import SignUpScreen from "../../../screens/authScreens/SignUpScreen";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import colors from "../colors";
+import colors from "../../colors";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 

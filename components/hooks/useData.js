@@ -22,7 +22,6 @@ import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import colors from "../colors";
 import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import AuthBottomSheet from "../screensComponents/AuthBottomSheet";
 import axios from "axios";
 import { useAuth } from "./useAuth";
 
@@ -39,6 +38,25 @@ export const DataProvider = ({ children }) => {
     const result = await axios.get(`${apiUrl}/events/`);
     // console.log(result?.data);
     setEvents(result?.data);
+  };
+
+  const getOneEvent = async (eventId) => {
+    try {
+      const result = await axios.get(
+        `${apiUrl}/user/event/one/?eventId=${eventId}`,
+        {
+          headers: {
+            Authorization: headerToken,
+          },
+        }
+      );
+
+      // getOneEvent
+      // console.log(result?.data);
+      return result?.data;
+    } catch (error) {
+      console.log(error.response?.data);
+    }
   };
   const getVenues = async () => {
     const result = await axios.get(`${apiUrl}/venues/`);
@@ -75,8 +93,9 @@ export const DataProvider = ({ children }) => {
       apiUrl,
       venues,
       formatNumber,
+      getOneEvent,
     }),
-    [events, venues,]
+    [events, venues]
   );
 
   return (

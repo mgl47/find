@@ -29,7 +29,6 @@ import {
 } from "@expo/vector-icons";
 
 import { useAuth } from "../../components/hooks/useAuth";
-import AuthBottomSheet from "../../components/screensComponents/AuthBottomSheet";
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 import BigCard2 from "../../components/cards/BigCards2";
@@ -38,6 +37,9 @@ import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native";
 import Screen from "../../components/Screen";
+import Animated from "react-native-reanimated";
+import { ActivityIndicator } from "react-native-paper";
+import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 const { width, height } = Dimensions.get("window");
 
 export default function HomeScreen({ navigation }) {
@@ -143,15 +145,32 @@ export default function HomeScreen({ navigation }) {
                 height: 250,
               }}
             />
-            <Carousel
-              inactiveSlideOpacity={1}
-              ref={carouselRef}
-              data={events}
-              renderItem={_renderItem}
-              // sliderWidth={300}
-              sliderWidth={width}
-              itemWidth={width * 0.8}
-            />
+            {events?.length>0 ? (
+              <Carousel
+                inactiveSlideOpacity={1}
+                ref={carouselRef}
+                data={events}
+                renderItem={_renderItem}
+                // sliderWidth={300}
+                sliderWidth={width}
+                itemWidth={width * 0.8}
+              />
+            ) : (
+              <Animated.View
+                style={{
+                  // position: "absolute",
+                  alignSelf: "center",
+                  // top: 10,
+                  // zIndex: 2,
+                  // marginVertical: 10,
+                  height: height * 0.442,
+                }}
+                // entering={SlideInUp.duration(300)}
+                // exiting={SlideOutUp.duration(300)}
+              >
+                <ActivityIndicator style={{top:"30%"}} animating={true} color={colors.white} />
+              </Animated.View>
+            )}
 
             {/* <Text style={styles.headerText}>Bu próximo evento</Text>
             <TouchableOpacity
@@ -180,7 +199,7 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity> */}
             <Text style={styles.headerText}>Pa bó</Text>
             <FlatList
-            style={{backgroundColor:colors.background}}
+              style={{ backgroundColor: colors.background }}
               data={recommendedEvents}
               showsVerticalScrollIndicator={false}
               keyExtractor={(item) => item.id}
@@ -202,8 +221,7 @@ export default function HomeScreen({ navigation }) {
                     }}
                     // onPress={() => navigation.navigate("addEvent", item)}
                     onPress={() => navigation.navigate("manageEvent", item)}
-
->
+                  >
                     <SmallCard {...item} />
                   </TouchableOpacity>
                 );

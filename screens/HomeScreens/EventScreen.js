@@ -48,15 +48,15 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { Chip } from "react-native-paper";
-import {
-  GiftModal,
-  PurchaseModal,
-} from "../../components/screensComponents/CompEventScreen";
+
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 import { useAuth } from "../../components/hooks/useAuth";
 import ImageView from "react-native-image-viewing";
 import { useDesign } from "../../components/hooks/useDesign";
+
+import TicketPurchaseSheet from "../../components/screensComponents/eventComponents/TicketPurchaseSheet";
+import TicketGiftSheet from "../../components/screensComponents/eventComponents/TicketGiftSheet";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
@@ -1146,30 +1146,19 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           <View style={{ marginBottom: 100 }} />
         </View>
       </ScrollView>
-      <PurchaseModal
+      <TicketPurchaseSheet
         bottomSheetModalRef={bottomSheetModalRef}
         setPurchaseModalUp={setPurchaseModalUp}
+        purchaseModalUp={purchaseModalUp}
         Event={Event}
       />
-      <GiftModal
+
+      <TicketGiftSheet
         bottomSheetModalRef2={bottomSheetModalRef2}
         setGiftModalUp={setGiftModalUp}
         Event={Event}
       />
-      {/* <BottomSheetModalProvider >
-        <BottomSheetModal
-        // style={{backgroundColor:}}
-          ref={bottomSheetModalRef}
-          index={1}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          onDismiss={()=>setPurchaseModalUp(false)}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <Text>Awesome 🎉</Text>
-          </BottomSheetView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider> */}
+
       {!inFullscreen && !purchaseModalUp && !GiftModalUp && (
         <Animated.View
           entering={!firstMount && SlideInDown}

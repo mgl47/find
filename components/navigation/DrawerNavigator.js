@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     width: "80%",
     height: 1,
     right: 10,
-    backgroundColor: colors.dark2,
+    // backgroundColor: colors.darkSeparator,
     // marginVertical: 10,
     alignSelf: "flex-end",
   },

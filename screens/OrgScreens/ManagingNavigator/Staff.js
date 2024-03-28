@@ -9,10 +9,7 @@ import React, {
 import { useAuth } from "../../../components/hooks/useAuth";
 import { ActivityIndicator } from "react-native-paper";
 import colors from "../../../components/colors";
-import {
-  UserManager,
-  UserSelector,
-} from "../../../components/screensComponents/CompAddingScreen";
+
 import {
   MaterialCommunityIcons,
   MaterialIcons,
@@ -33,6 +30,7 @@ import {
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
 import { useData } from "../../../components/hooks/useData";
+import UserSelectorSheet from "../../../components/screensComponents/EventAddingComponents/UserSelectorSheet";
 
 const Staff = ({ navigation, navigation: { goBack }, route }) => {
   const routeEvent = route.params;
@@ -101,7 +99,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         getMyEvents(), manageMembersSheetRef.current?.close();
       }
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log("Error updating liked events:", error);
     }
   };
   console.log(members);
@@ -141,7 +139,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         getMyEvents(), manageMembersSheetRef.current?.close();
       }
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log("Error updating liked events:", error);
     }
   };
   if (loading || event === null) {
@@ -491,7 +489,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
           </BottomSheetView>
         </BottomSheetModal>
       </BottomSheetModalProvider>
-      <UserSelector
+      <UserSelectorSheet
         type={"members"}
         users={members}
         setUsers={setMembers}

@@ -282,7 +282,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.log(response?.data);
       getUpdatedUserInfo();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log("Error updating liked events:", error);
     }
   };
   const goingtoEvent = async () => {
@@ -330,7 +330,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.log(response?.data);
       getUpdatedUserInfo();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log("Error updating liked events:", error);
     }
   };
 
