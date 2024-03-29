@@ -55,13 +55,19 @@ export const DataProvider = ({ children }) => {
       // console.log(result?.data);
       return result?.data;
     } catch (error) {
-      console.log(error.response?.data);
+      console.log(error?.response?.data?.msg);
     }
   };
   const getVenues = async () => {
-    const result = await axios.get(`${apiUrl}/venues/`);
-    // console.log(result?.data);
-    setVenues(result?.data);
+    try {
+      const result = await axios.get(`${apiUrl}/venues/`);
+      // console.log(result?.data);
+      setVenues(result?.data);
+      
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+
+    }
   };
 
   useEffect(() => {

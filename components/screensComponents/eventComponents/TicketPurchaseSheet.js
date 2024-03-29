@@ -43,7 +43,6 @@ import {
 } from "@expo/vector-icons";
 import { useData } from "../../hooks/useData";
 import { ActivityIndicator, TextInput } from "react-native-paper";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import axios from "axios";
 import { useAuth } from "../../hooks/useAuth";
 import uuid from "react-native-uuid";
@@ -55,18 +54,30 @@ export default TicketPurchaseSheet = ({
   setPurchaseModalUp,
   purchaseModalUp,
 }) => {
+  const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const purchaseId = uuid.v4();
-  const [loading, setLoading] = useState(true);
-
   const [event, setEvent] = useState(Event);
-  // const [initialState, setInitialState] = useState({});
-  let initialState = {
+  const [available, setAvailable] = useState([]);
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const TL = event?.tickets?.length;
+  const customSnap = `${
+    TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
+  }%`;
+  const snapPoints = useMemo(() => ["50%", `${customSnap}`, "80%"], []);
+  const handleSheetChanges = useCallback((index) => {}, []);
+  const [firstRender, setFirstRender] = useState(true);
+  const [onPayment, setOnPayment] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const purchaseId = uuid.v4();
+  const initialState = {
     cart: event?.tickets,
     total: 0,
     amount: 0,
   };
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const getSelectedEvent = async () => {
     if (purchaseModalUp) {
       setLoading(true);
@@ -77,11 +88,25 @@ export default TicketPurchaseSheet = ({
       setLoading(false);
     }
   };
-
+  const restart = async () => {
+    try {
+      setLoading(true);
+      // setOnPayment(false), setFirstRender(true);
+      // setAvailable([]);
+      // setLimitReached(false);
+      const event = await getOneEvent(Event?._id);
+      setEvent(event);
+      dispatch({ type: "CLEAR", payload: event?.tickets });
+      setLoading(false);
+      clean();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     getSelectedEvent();
   }, [purchaseModalUp]);
-
+  console.log(available);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -99,29 +124,13 @@ export default TicketPurchaseSheet = ({
   }, []);
   const { height } = Dimensions.get("window");
 
-  const TL = event?.tickets?.length;
-  const customSnap = `${
-    TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
-  }%`;
-
   const uuidKey = uuid.v4();
 
-  const snapPoints = useMemo(() => ["50%", `${customSnap}`, "80%"], []);
-  const { headerToken, user, getUpdatedUserInfo } = useAuth();
-  const handleSheetChanges = useCallback((index) => {}, []);
-  // Event?.tickets?.length>2?
-  const [firstRender, setFirstRender] = useState(true);
-  // const [onConfirming, setOnConfirming] = useState(false);
-  const [onPayment, setOnPayment] = useState(false);
-  const [limitReached, setLimitReached] = useState(false);
-  const [available, setAvailable] = useState([]);
-
-  const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
     dispatch({ type: "GET_TOTALS" });
   }, [state.cart]);
   let purchasedAlready = 0;
-  user?.purchasedTickets?.forEach((purchase) => {
+  myTickets.forEach((purchase) => {
     purchase?.tickets?.forEach((ticket) => {
       if (ticket?.eventId == event?._id) {
         purchasedAlready += 1;
@@ -136,21 +145,22 @@ export default TicketPurchaseSheet = ({
         state?.amount + purchasedAlready >= event?.ticketsLimit
       ) {
         setLimitReached(true);
-      } else {
-        setLimitReached(false);
       }
+      // else {
+      //   setLimitReached(false);
+      // }
     }
   }, [user, event, state.amount]);
 
   useEffect(() => {
-    if (limitReached) {
+    if (limitReached && state.amount != 0) {
       toast({
         msg: "Limite por usúario atingido!",
         color: colors.white,
         textcolor: colors.primary,
       });
     }
-  }, [limitReached]);
+  }, [limitReached, state]);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -198,6 +208,7 @@ export default TicketPurchaseSheet = ({
               console.log("removed from available");
               setAvailable(newAvailable);
             }
+            setLimitReached(false);
           }
 
           return cartItem;
@@ -245,6 +256,8 @@ export default TicketPurchaseSheet = ({
   };
   const clean = () => {
     setOnPayment(false), setFirstRender(true);
+    setAvailable([]);
+    setLimitReached(false);
   };
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
@@ -279,6 +292,14 @@ export default TicketPurchaseSheet = ({
     } else {
       updatedGoing.push(event?._id);
     }
+
+    const filteredEvent = { ...event };
+    delete filteredEvent.goingUsers;
+    delete filteredEvent.interestedUsers;
+    delete filteredEvent.attendees;
+    delete filteredEvent.staffIds;
+    delete filteredEvent.staff;
+
     try {
       const response = await axios.post(
         `${apiUrl}/purchase/`,
@@ -291,10 +312,9 @@ export default TicketPurchaseSheet = ({
               username: user?.username,
               email: user?.email,
               displayName: user?.displayName,
-              uri: event?.photos[0]?.[0]?.uri,
+              uri: user?.photos?.avatar?.[0]?.uri,
             },
-            event: event,
-            eventId: event?._id,
+            event: filteredEvent,
             cardDetails: paymentInfo?.cardInfo,
             purchaseDate: new Date(),
             tickets: separatedTickets,
@@ -302,34 +322,33 @@ export default TicketPurchaseSheet = ({
             uri: event?.photos[0]?.[0]?.uri,
           },
           userUpdates: {
-            operation: {
-              type: "purchase",
-              // task: "purchase",
-              eventId: event?._id,
-            },
-            updates: {
-              likedEvents: updateInterested,
-              goingToEvents: updatedGoing,
-            },
+            likedEvents: updateInterested,
+            goingToEvents: updatedGoing,
           },
         },
         {
           headers: { Authorization: headerToken },
         }
       );
-      // console.log(response?.data);
+      if (response.status == 200) {
+        bottomSheetModalRef.current.close();
 
-      // getUpdatedUserInfo();
-      // bottomSheetModalRef.current.close();
+        setPurchaseModalUp(false);
+        getUpdatedUser();
+      }
     } catch (error) {
+      if (error?.response?.data?.restart) {
+        restart();
+      }
       toast({
         msg: error?.response?.data?.msg,
         color: colors.darkRed,
         textcolor: colors.white,
-        duration: 1000,
+        hide: false,
+        // duration: 1000,
       });
       console.log(error?.response?.data?.invalidTickets);
-      // console.log("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
 
@@ -698,6 +717,10 @@ export default TicketPurchaseSheet = ({
                 </View>
               }
               renderItem={({ item }) => {
+                const unavailable = event?.tickets?.some(
+                  (ticket) => ticket?.id === item?.id && ticket?.available === 0
+                );
+
                 return (
                   <View
                     activeOpacity={0.5}
@@ -721,7 +744,17 @@ export default TicketPurchaseSheet = ({
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
                         >
-                          <Text numberOfLines={2} style={[styles.price]}>
+                          <Text
+                            numberOfLines={2}
+                            style={[
+                              styles.price,
+                              {
+                                color: !unavailable
+                                  ? colors.primary
+                                  : colors.darkGrey,
+                              },
+                            ]}
+                          >
                             cve {formatNumber(item?.price)}
                           </Text>
                           <Text
@@ -733,7 +766,7 @@ export default TicketPurchaseSheet = ({
                         </View>
 
                         <Text style={styles.description}>
-                          {item?.description}
+                          {!unavailable ? item?.description : "Indisponível"}
                         </Text>
                       </View>
                       <View style={styles.counterView}>
@@ -763,14 +796,18 @@ export default TicketPurchaseSheet = ({
                           style={{
                             fontSize: 22,
                             fontWeight: "600",
-                            color: colors.primary,
+                            color: !unavailable
+                              ? colors.primary
+                              : colors.darkGrey,
                           }}
                         >
                           {item?.amount}
                         </Text>
                         <TouchableOpacity
                           disabled={
-                            limitReached || available?.includes(item?.id)
+                            limitReached ||
+                            available?.includes(item?.id) ||
+                            unavailable
                           }
                           onPress={() => increase(item)}
                         >
@@ -778,7 +815,9 @@ export default TicketPurchaseSheet = ({
                             name="pluscircle"
                             size={24}
                             color={
-                              limitReached || available?.includes(item?.id)
+                              limitReached ||
+                              available?.includes(item?.id) ||
+                              unavailable
                                 ? colors.grey
                                 : colors.primary
                             }

@@ -38,7 +38,7 @@ import { useDesign } from "../../components/hooks/useDesign";
 
 const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
   const [index, setIndex] = useState(1);
-  const { user } = useAuth();
+  const { myTickets } = useAuth();
   const { height, width } = useDesign();
 
   const uuidKey = uuid.v4();
@@ -71,27 +71,18 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
       </Tab>
 
       <FlatList
-        data={user?.purchasedTickets}
+        data={myTickets}
         keyExtractor={(item) => item?.purchaseId}
         renderItem={({ item }) => {
           return (
-            <TouchableOpacity onPress={() => navigation.navigate("ticketDetails",item)}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={{ padding: 10 }}
+              onPress={() => navigation.navigate("ticketDetails", item)}
+            >
               <BigTicket {...item} />
             </TouchableOpacity>
           );
-
-          //   return (
-          //     <TouchableOpacity
-          //       style={{
-          //         alignSelf: "center",
-          //         borderRadius: 10,
-          //         width: "95%",
-          //         height: height * 0.25,
-          //         backgroundColor: "red",
-          //         marginTop: 10,
-          //       }}
-          //     ></TouchableOpacity>
-          //   );
         }}
       />
     </View>

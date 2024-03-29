@@ -56,7 +56,7 @@ export default UserSelectorSheet = ({
   const snapPoints = useMemo(() => ["55%", "75%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const { apiUrl } = useData();
-  const { user, headerToken, getMyEvents } = useAuth();
+  const { user, headerToken, getUpdatedUser } = useAuth();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -98,7 +98,7 @@ export default UserSelectorSheet = ({
         setSearchedUSer(response?.data);
       }
     } catch (error) {
-      console.log("Error retrieving users:", error);
+      console.log(error?.response?.data?.msg);
     }
     setSearched(true);
     setLoading(false);
@@ -151,10 +151,10 @@ export default UserSelectorSheet = ({
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getMyEvents(), userSheetModalRef.current?.close();
+        getUpdatedUser(), userSheetModalRef.current?.close();
       }
     } catch (error) {
-      console.log("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
   return (

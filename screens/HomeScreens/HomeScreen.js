@@ -37,15 +37,14 @@ import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native";
 import Screen from "../../components/Screen";
-import Animated from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { ActivityIndicator } from "react-native-paper";
 import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 const { width, height } = Dimensions.get("window");
-
+import OneBigTicket from "../../components/tickets/OneBigTicket";
+import CountDown from "react-native-countdown-component";
 export default function HomeScreen({ navigation }) {
-  // const{authSheetRef}=useAuth()
-
-  const { user, setAuthModalUp, authSheetRef } = useAuth();
+  const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
   const { events, getEvents } = useData();
   const [refreshing, setRefreshing] = useState(false);
@@ -55,7 +54,7 @@ export default function HomeScreen({ navigation }) {
     // setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
   const carouselRef = useRef(null);
-
+  // const user = false;
   _renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity
@@ -66,6 +65,13 @@ export default function HomeScreen({ navigation }) {
       </TouchableOpacity>
     );
   };
+  const currentDate = new Date();
+  // Target date
+  const targetDate = new Date(myTickets?.[0]?.event?.dates?.[0]?.date);
+  // Calculate the difference in milliseconds between the two dates
+  const differenceInMilliseconds = targetDate.getTime() - currentDate.getTime();
+  // Convert milliseconds to seconds
+  const differenceInSeconds = differenceInMilliseconds / 1000;
 
   return (
     <Screen style={[styles.container]}>
@@ -112,7 +118,7 @@ export default function HomeScreen({ navigation }) {
           //     : require("../../assets/logos/logo_white.png")
           // }
           source={require("../../assets/logos/logo_white.png")}
-          style={{ width: 35, height: 35, left: 5 }}
+          style={{ width: 35, height: 35, left: !user ? 5 : 3 }}
           resizeMode="contain"
         />
         <TouchableOpacity
@@ -145,7 +151,7 @@ export default function HomeScreen({ navigation }) {
                 height: 250,
               }}
             />
-            {events?.length>0 ? (
+            {events?.length > 0 ? (
               <Carousel
                 inactiveSlideOpacity={1}
                 ref={carouselRef}
@@ -168,7 +174,11 @@ export default function HomeScreen({ navigation }) {
                 // entering={SlideInUp.duration(300)}
                 // exiting={SlideOutUp.duration(300)}
               >
-                <ActivityIndicator style={{top:"30%"}} animating={true} color={colors.white} />
+                <ActivityIndicator
+                  style={{ top: "30%" }}
+                  animating={true}
+                  color={colors.white}
+                />
               </Animated.View>
             )}
 
@@ -197,7 +207,75 @@ export default function HomeScreen({ navigation }) {
               />
           
             </TouchableOpacity> */}
-            <Text style={styles.headerText}>Pa bó</Text>
+            {/* <Text style={styles.headerText}>Pa bó</Text> */}
+            {myTickets?.length > 0 && (
+              <Animated.View
+                // style={{ marginBottom: 20 }}
+                entering={FadeIn}
+                exiting={FadeOut}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-around",
+                    marginBottom: 5,
+                  }}
+                >
+                  <Text style={styles.headerText}>Bu próximo evento</Text>
+                  {differenceInSeconds > 0 && (
+                    <CountDown
+                      size={15}
+                      until={differenceInSeconds}
+                      style={{
+                        alignItems: "center",
+                        // backgroundColor:colors.background,
+                        // left: 10,
+                        top: 10,
+
+                        // position: "absolute",
+                      }}
+                      // onFinish={() => alert('Finished')}
+                      digitStyle={{
+                        backgroundColor: colors.white,
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 1,
+                        elevation: 0.5,
+                      }}
+                      digitTxtStyle={{ color: colors.primary }}
+                      timeLabelStyle={{
+                        color: colors.primary,
+                        fontWeight: "bold",
+                      }}
+                      separatorStyle={{ color: colors.white }}
+                      timeToShow={[
+                        differenceInSeconds > 86000 ? "D" : "",
+                        "H",
+                        "M",
+                        "S",
+                      ]}
+                      timeLabels={{
+                        d: "dias",
+                        h: "horas",
+                        m: "minutos",
+                        s: "segundos",
+                      }}
+                      // showSeparator
+                    />
+                  )}
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={{ padding: 10 }}
+                  onPress={() =>
+                    navigation.navigate("ticketDetails", myTickets?.[0])
+                  }
+                >
+                  <OneBigTicket {...myTickets?.[0]} />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
             <FlatList
               style={{ backgroundColor: colors.background }}
               data={recommendedEvents}

@@ -240,7 +240,7 @@ const DrawerNavigator = () => {
       screenOptions={{
         drawerType: "slide",
         // drawerHideStatusBarOnOpen:true,
-        overlayColor: "rgba(0,0,0,0.7)",
+        overlayColor: "rgba(0,0,0,0.83)",
         headerBackground: "red",
         headerShown: false,
         drawerIcon: () => (

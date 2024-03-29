@@ -34,8 +34,7 @@ import { ScrollView } from "react-native-gesture-handler";
 const SignInScreen = () => {
   const navigation = useNavigation();
 
-  const { user, setUser, setHeaderToken, authSheetRef, getMyEvents } =
-    useAuth();
+  const { getUpdatedUser, setUser, setHeaderToken, authSheetRef } = useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -72,28 +71,26 @@ const SignInScreen = () => {
             },
           }
         );
-        // console.log(response.data.user);
-        setUser(response.data.user);
-        setHeaderToken("Bearer " + response.data.token);
-
-        // navigation.goBack();
-        // bottomSheetModalRef.current
-        await AsyncStorage.setItem(
-          "headerToken",
-          "Bearer " + response.data.token
-        );
-        const jsonValue = JSON.stringify(response.data.user);
-        await AsyncStorage.setItem("user", jsonValue);
-        JSON.parse(jsonValue);
-        authSheetRef?.current?.close();
-        navigation.openDrawer();
-
+        if (response.status == 200) {
+          setUser(response.data.user);
+          setHeaderToken("Bearer " + response.data.token);
+          await AsyncStorage.setItem(
+            "headerToken",
+            "Bearer " + response.data.token
+          );
+          
+          const jsonValue = JSON.stringify(response.data.user);
+          await AsyncStorage.setItem("user", jsonValue);
+          authSheetRef?.current?.close();
+          navigation.openDrawer();
+          getUpdatedUser(response.data.user?._id,"Bearer " + response.data.token);
+        }
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
       Keyboard.dismiss();
     } catch (error) {
       if (error.response) {
-        console.log(error.response.data);
+        console.log(error?.response?.data?.msg);
         setErrorMsg(error.response.data.msg);
       } else {
         console.log(error.message);

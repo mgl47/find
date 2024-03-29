@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }) => {
 
   const [headerToken, setHeaderToken] = useState("");
   const [myEvents, setMyEvents] = useState([]);
+  const [myTickets, setMyTickets] = useState([]);
+
   const [cacheChecked, setCacheChecked] = useState(false);
   const getUser = async () => {
     try {
@@ -49,12 +51,9 @@ export const AuthProvider = ({ children }) => {
       }
 
       setCacheChecked(true);
-      // await getUpdatedUserInfo(userValue, tokenValue);
 
       console.log("before uppdate");
-    } catch (e) {
-      // error reading value
-    }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -62,59 +61,47 @@ export const AuthProvider = ({ children }) => {
       getUser();
     }
     if (cacheChecked && user) {
-      getUpdatedUserInfo();
+      getUpdatedUser();
     }
   }, [cacheChecked]);
 
-  const getUpdatedUserInfo = async () => {
+  const getUpdatedUser = async (id,token) => {
+
     try {
-      if (headerToken) {
+      // if (headerToken) {
         const response = await axios.get(
-          `${apiUrl}/user/current/${user?._id}`,
+          `${apiUrl}/user/current/${id??user?._id}`,
           {
             headers: {
-              Authorization: headerToken,
+              Authorization:token?? headerToken,
             },
           }
         );
 
-        setUser(response.data);
+        setMyEvents(response?.data?.events);
+        setMyTickets(response?.data?.tickets);
+        setUser(response?.data?.user);
 
-        const jsonValue = JSON.stringify(response.data);
+        const jsonValue = JSON.stringify(response.data?.user);
         await AsyncStorage.setItem("user", jsonValue);
-
-        getMyEvents();
-      }
+      // }
     } catch (error) {
-      console.log(error.response.data);
+      console.log(error?.response?.data?.msg);
 
-      console.log(error);
     }
   };
 
-  const getMyEvents = async () => {
-    console.log("my events fetched");
-    try {
-
-    
-    const result = await axios.get(`${apiUrl}/user/event/`, {
-      headers: {
-        Authorization: headerToken,
-      },
-    });
-    setMyEvents(result?.data);
-      
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const [AuthModalUp, setAuthModalUp] = useState(false);
   const logOut = async () => {
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("headerToken");
-    setUser(null);
+    setCacheChecked(false);
+
     setMyEvents([]);
+    setMyTickets([]);
     setHeaderToken(null);
+    setUser(null);
+
     navigation.dispatch(DrawerActions.closeDrawer());
   };
   const memoedValue = useMemo(
@@ -122,16 +109,16 @@ export const AuthProvider = ({ children }) => {
       headerToken,
       user,
       myEvents,
+      myTickets,
       setUser,
-      getMyEvents,
       AuthModalUp,
       setAuthModalUp,
       authSheetRef,
       setHeaderToken,
-      getUpdatedUserInfo,
+      getUpdatedUser,
       logOut,
     }),
-    [headerToken, user, myEvents, AuthModalUp, authSheetRef]
+    [headerToken, user, AuthModalUp, authSheetRef]
   );
 
   return (

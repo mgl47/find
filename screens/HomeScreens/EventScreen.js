@@ -82,7 +82,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     setImageIndex(index);
     setImageVisible(true);
   };
-  const { user, headerToken, getUpdatedUserInfo } = useAuth();
+  const { user, headerToken, getUpdatedUser } = useAuth();
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
@@ -282,10 +282,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         },
         { headers: { Authorization: headerToken } }
       );
-      console.log(response?.data);
-      getUpdatedUserInfo();
+      // console.log(response?.data);
+      getUpdatedUser();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
   const goingtoEvent = async () => {
@@ -330,10 +330,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         },
         { headers: { Authorization: headerToken } }
       );
-      console.log(response?.data);
-      getUpdatedUserInfo();
+      // console.log(response?.data);
+      getUpdatedUser();
     } catch (error) {
-      console.error("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
 
@@ -633,7 +633,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               onPress={() => {
                 // setInterested(!interested),
                 likeEvent();
-                // getUpdatedUserInfo();
+                // getUpdatedUser();
               }}
             >
               Interressado

@@ -58,7 +58,7 @@ import ImageView from "react-native-image-viewing";
 const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
 
-  const { user, headerToken, getUpdatedUserInfo } = useAuth();
+  const { user, headerToken, getUpdatedUser } = useAuth();
   const { apiUrl } = useData();
 
   const [artist, setArtist] = useState(arti[0]);
@@ -290,12 +290,12 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
       if (response.status === 200) {
         setModalVisible(false);
-        getUpdatedUserInfo();
+        getUpdatedUser();
         setAvatarUri(null);
         setCoverUri(null);
       }
     } catch (error) {
-      console.log("Error updating user profile:", error);
+      console.log(error?.response?.data?.msg);
     }
     setLoading(false);
   };

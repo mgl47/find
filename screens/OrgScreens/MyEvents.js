@@ -44,7 +44,6 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
   const { height, width } = useDesign();
 
   const uuidKey = uuid.v4();
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Tab
@@ -78,6 +77,8 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
+            activeOpacity={0.8}
+
               onPress={() => navigation.navigate("manageEvent", item)}
             >
               <BigCard2 {...item} />

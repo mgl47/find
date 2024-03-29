@@ -10,16 +10,20 @@ import { useAuth } from "../../../components/hooks/useAuth";
 import { ActivityIndicator } from "react-native-paper";
 import colors from "../../../components/colors";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useData } from "../../../components/hooks/useData";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const routeEvent = route.params;
 
   const { user, myEvents } = useAuth();
+  // const { getOneEvent } = useData();
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
 
   const getSelectedEvent = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
     setEvent(myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]);
+    // const event = await getOneEvent(routeEvent?._id);
+    // setEvent(event);
     setLoading(false);
   };
 
@@ -34,7 +38,6 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
       </View>
     );
   }
-
 
   return (
     <View style={{ flex: 1 }}>

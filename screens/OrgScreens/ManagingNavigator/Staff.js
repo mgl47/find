@@ -35,7 +35,7 @@ import UserSelectorSheet from "../../../components/screensComponents/EventAdding
 const Staff = ({ navigation, navigation: { goBack }, route }) => {
   const routeEvent = route.params;
 
-  const { user, headerToken, myEvents, getMyEvents } = useAuth();
+  const { user, headerToken, myEvents, getUpdatedUser } = useAuth();
   const { apiUrl } = useData();
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
@@ -57,7 +57,6 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [position, setPosition] = useState(selectedMember?.level);
-  console.log(selectedMember?.level);
 
   useEffect(() => {
     setPosition({ value: selectedMember?.level, label: selectedMember?.level });
@@ -96,13 +95,12 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getMyEvents(), manageMembersSheetRef.current?.close();
+        getUpdatedUser(), manageMembersSheetRef.current?.close();
       }
     } catch (error) {
-      console.log("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
-  console.log(members);
 
   // const
   const updateMember = async () => {
@@ -136,10 +134,10 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getMyEvents(), manageMembersSheetRef.current?.close();
+        getUpdatedUser(), manageMembersSheetRef.current?.close();
       }
     } catch (error) {
-      console.log("Error updating liked events:", error);
+      console.log(error?.response?.data?.msg);
     }
   };
   if (loading || event === null) {
@@ -179,7 +177,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         keyExtractor={(item) => item?._id}
         ListHeaderComponent={
           <TouchableOpacity
-            onPress={getMyEvents}
+            onPress={getUpdatedUser}
             activeOpacity={0.5}
             style={{
               shadowOffset: { width: 0.5, height: 0.5 },

@@ -42,7 +42,8 @@ import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 
 import { markers } from "../../../components/Data/markers";
 
-import uuid from "react-native-uuid";import Animated, {
+import uuid from "react-native-uuid";
+import Animated, {
   FadeIn,
   FadeOut,
   SlideInDown,
@@ -102,6 +103,7 @@ export default AddTicketsSheet = ({
     tempTickets.push({
       price: Number(price),
       available: Number(available),
+      quantity: Number(available),
       amount: 0,
 
       description,

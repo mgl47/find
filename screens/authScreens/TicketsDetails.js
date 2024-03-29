@@ -50,15 +50,17 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
   const ticket = route.params;
   return (
-    <View style={{ backgroundColor: colors.background }}>
-      <View style={{ padding: 10 }}>
+    <View style={{ backgroundColor: colors.background, zIndex: 0 }}>
+      <View style={{ padding: 10, backgroundColor: colors.primary2 }}>
         <Text
           style={{
-            fontSize: 25,
+            fontSize: 21,
             fontWeight: "600",
-            color: colors.primary,
+            color: colors.white,
             alignSelf: "center",
-            marginVertical: 20,
+            textAlign: "center",
+            marginBottom: 10,
+            // marginVertical: 20,
           }}
         >
           {ticket?.event?.title}
@@ -67,21 +69,22 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            marginBottom: 10,
+            marginVertical: 10,
           }}
         >
           <MaterialCommunityIcons
+            style={{ left: 3 }}
             name="calendar-month"
             size={25}
-            color={colors.darkSeparator}
+            color={colors.white}
           />
           <Text
             style={{
-              fontSize: 17,
+              fontSize: 16,
               fontWeight: "600",
               // width: "80%",
-              color: colors.darkSeparator,
-              marginLeft: 10,
+              color: colors.lightGrey,
+              marginLeft: 14,
             }}
           >
             {ticket?.event?.dates[ticket?.event?.dates?.length - 1]
@@ -97,14 +100,19 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
             // marginBottom: 10,
           }}
         >
-          <Entypo name="location" size={25} color={colors.darkSeparator} />
+          <Entypo
+            style={{ left: 4 }}
+            name="location"
+            size={22}
+            color={colors.white}
+          />
           <Text
             style={{
-              fontSize: 17,
+              fontSize: 16,
               fontWeight: "600",
               //   width: "70%",
-              color: colors.primary,
-              marginLeft: 10,
+              color: colors.lightGrey,
+              marginLeft: 18,
               textDecorationLine: "underline",
             }}
           >
@@ -112,32 +120,54 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
             {" " + ticket?.event?.venue?.city}
           </Text>
         </View>
-        <Text
+        <View
           style={{
-            fontSize: 20,
-            fontWeight: "600",
-            color: colors.primary,
-            alignSelf: "flex-start",
-            marginLeft: 20,
+            flexDirection: "row",
+            alignItems: "center",
             marginTop: 10,
+            marginBottom: 60,
+            // marginBottom: 10,
           }}
         >
-          {ticket?.buyer?.displayName}
-        </Text>
-        <Text
-          style={{
-            color: colors.black,
-            fontSize: 18,
-            fontWeight: "600",
-            alignSelf: "flex-end",
-          }}
-        >
-          {Number(mediaIndex) + 1 + " / " + ticket?.tickets?.length}
-        </Text>
+          <MaterialCommunityIcons
+            name="account-outline"
+            size={30}
+            color={colors.white}
+          />
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "600",
+              color: colors.white,
+              // alignSelf: "flex-start",
+              marginLeft: 10,
+            }}
+          >
+            {ticket?.buyer?.displayName}
+          </Text>
+        </View>
+
+        {ticket?.tickets?.length > 1 && (
+          <Text
+            style={{
+              color: colors.white,
+              fontSize: 15,
+              fontWeight: "600",
+              alignSelf: "flex-end",
+              position: "absolute",
+              // marginBottom: 40,
+              // top: 40,
+              right: 5,
+              bottom: 10,
+            }}
+          >
+            {Number(mediaIndex) + 1 + "/" + ticket?.tickets?.length}
+          </Text>
+        )}
       </View>
 
       <FlatList
-        // style={{ marginTop: 10 }}
+        style={{ bottom: 40, zIndex: 2 }}
         showsHorizontalScrollIndicator={false}
         pagingEnabled
         onScroll={(e) => handleMediaScroll(e)}
@@ -150,18 +180,19 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 width,
                 alignItems: "center",
-                marginBottom: 1,
               }}
             >
               <View
                 style={{
                   shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.1,
+                  shadowOpacity: 0.2,
                   shadowRadius: 1,
-                  elevation: 0.5,
+                  elevation: 0.7,
                   backgroundColor: "white",
                   padding: 10,
                   paddingHorizontal: 20,
+                  borderRadius: 10,
+                  marginBottom: 1,
                 }}
               >
                 {/* <Text>{item?.uuid}</Text> */}
@@ -197,7 +228,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    // marginBottom: 10, /
+                    marginTop: 10,
                   }}
                 >
                   <Text
