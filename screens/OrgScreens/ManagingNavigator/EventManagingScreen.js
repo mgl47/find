@@ -47,6 +47,7 @@ import { useData } from "../../../components/hooks/useData";
 import { Button } from "react-native";
 import { useDesign } from "../../../components/hooks/useDesign";
 import { ActivityIndicator } from "react-native-paper";
+import LottieView from "lottie-react-native";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -60,12 +61,15 @@ const EventManagingScreen = ({
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const [loading, setLoading] = useState(false);
+  const animation = useRef(null);
 
   const [index, setIndex] = useState(1);
 
   const [showScanModal, setShowScanModal] = useState(false);
   const [scanned, setScanned] = useState(false);
+  const [statusCode, setStatusCode] = useState(0);
   const [scannedTicket, setScannedTicket] = useState("");
+
   const { getUpdatedUser, myEvents, headerToken, user } = useAuth();
   const { apiUrl } = useData();
   const { isIPhoneWithNotch } = useDesign();
@@ -83,8 +87,9 @@ const EventManagingScreen = ({
   const attendeesId = selectedEvent?.attendees?.map((item) => item?.uuid);
 
   const clean = () => {
-    setFlashMode(FlashMode.off)
+    setFlashMode(FlashMode.off);
     setLoading(false);
+    setStatusCode(0);
     setScannedTicket("");
     setScanned(false);
   };
@@ -93,14 +98,15 @@ const EventManagingScreen = ({
     if (scanned) return;
     setLoading(true);
     setScanned(true);
-    const ticketUser = selectedEvent?.attendees?.filter(
-      (attendee) => attendee?.uuid == item?.data
-    )[0];
+    // const ticketUser = await selectedEvent?.attendees?.filter(
+    //   (attendee) => attendee?.uuid == item?.data
+    // )[0];
 
+    // console.log(ticketUser);
     try {
       const result = await axios.patch(
         `${apiUrl}/purchase/checkin/${selectedEvent?._id}`,
-        { ticketUser },
+        { uuid: item?.data },
         {
           headers: {
             "Content-Type": "application/json",
@@ -108,15 +114,19 @@ const EventManagingScreen = ({
           },
         }
       );
+      console.log(result);
 
-      if (result.status == 200) {
+      if (result.status == 200 || result.status == 201) {
         setLoading(false);
-
+        setStatusCode(result?.status);
         setScannedTicket(result?.data);
+        // console.log(res);
 
         const time = setTimeout(() => {
+          setStatusCode(0);
+
           setScannedTicket("");
-        }, 2000);
+        }, 3000);
 
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
@@ -126,22 +136,36 @@ const EventManagingScreen = ({
       }
     } catch (error) {
       setLoading(false);
-      setScannedTicket("");
 
-      console.log(error?.response?.data?.msg);
+      // setScannedTicket(error?.response?.status);
+      setStatusCode(error?.response?.status);
+
+      const time = setTimeout(() => {
+        setStatusCode(0);
+
+        setScannedTicket("");
+      }, 3000);
+
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      setScanned(false);
+
+      return () => clearTimeout(time);
+      // console.log(error?.response?.status);
     }
 
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setScanned(false);
     // navigation.goBack();
   };
-
+  console.log(statusCode);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity
           style={{ right: 20 }}
-          onPress={() => setShowScanModal(true)}
+          // onPress={() => setShowScanModal(true)}
+          onPress={()=>navigation.navigate("qrValidator",selectedEvent)}
         >
           <MaterialCommunityIcons
             name="qrcode-scan"
@@ -151,7 +175,7 @@ const EventManagingScreen = ({
         </TouchableOpacity>
       ),
     });
-  }, [navigation]); // Add inputRef as dependency if used
+  }, [navigation]); 
 
   useEffect(() => {
     getUpdatedUser();
@@ -237,7 +261,7 @@ const EventManagingScreen = ({
         animationType="slide"
         visible={showScanModal}
         onRequestClose={() => {
-          setShowScanModal(false),clean()
+          setShowScanModal(false), clean();
         }}
       >
         <View
@@ -274,8 +298,7 @@ const EventManagingScreen = ({
             {/* <FontAwesome5 name="user-circle" size={40} color={colors.black2} /> */}
             <TouchableOpacity
               onPress={() => {
-                setShowScanModal(false),
-                clean()
+                setShowScanModal(false), clean();
               }}
               style={{ padding: 10, right: 5, position: "absolute" }}
             >
@@ -356,13 +379,14 @@ const EventManagingScreen = ({
             </TouchableOpacity>
           </View>
 
-          <View style={{ padding: 10, borderRadius: 15 }}>
+          <View style={{ padding: 10, borderRadius: 15, zIndex: 5, zIndex: 5 }}>
             <TouchableOpacity
               onPress={toggleFlashMode}
               style={{
                 position: "absolute",
                 bottom: 20,
                 right: 15,
+                zIndex: 5,
 
                 backgroundColor: "transparent",
                 zIndex: 2,
@@ -403,6 +427,51 @@ const EventManagingScreen = ({
               //   barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
               // }}
             />
+            {statusCode == 200 && (
+              <LottieView
+                autoPlay
+                ref={animation}
+                style={{
+                  width: 200,
+                  height: 200,
+                  position: "absolute",
+                  alignSelf: "center",
+                  bottom: -85, // backgroundColor: "#eee",
+                }}
+                // Find more Lottie files at https://lottiefiles.com/featured
+                source={require("../../../components/animations/check.json")}
+              />
+            )}
+            {statusCode == 201 && (
+              <LottieView
+                autoPlay
+                ref={animation}
+                style={{
+                  width: 200,
+                  height: 200,
+                  position: "absolute",
+                  alignSelf: "center",
+                  bottom: -85, // backgroundColor: "#eee",
+                }}
+                // Find more Lottie files at https://lottiefiles.com/featured
+                source={require("../../../components/animations/attention.json")}
+              />
+            )}
+            {statusCode == 404 && (
+              <LottieView
+                autoPlay
+                ref={animation}
+                style={{
+                  width: 160,
+                  height: 160,
+                  position: "absolute",
+                  alignSelf: "center",
+                  bottom: -65, // backgroundColor: "#eee",
+                }}
+                // Find more Lottie files at https://lottiefiles.com/featured
+                source={require("../../../components/animations/invalid.json")}
+              />
+            )}
           </View>
 
           <TouchableOpacity
@@ -413,12 +482,17 @@ const EventManagingScreen = ({
               shadowRadius: 1,
               elevation: 0.5,
               paddingHorizontal: 10,
-              marginTop: 10,
+              marginTop: 40,
+              zIndex: 2,
             }}
             // onPress={() => navigation.navigate("addEvent", item)}
             // onPress={() => navigation.navigate("manageEvent", item)}
           >
-            <View style={[styles.card, {}]}>
+            <Animated.View
+              style={[styles.card, {}]}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
               {loading ? (
                 <Animated.View
                   style={{
@@ -433,8 +507,11 @@ const EventManagingScreen = ({
                 >
                   <ActivityIndicator animating={true} color={colors.primary} />
                 </Animated.View>
-              ) : scannedTicket ? (
-                <>
+              ) : scannedTicket && statusCode != 404 ? (
+                <Animated.View
+                  entering={FadeIn.duration(200)}
+                  exiting={FadeOut.duration(200)}
+                >
                   <View
                     style={{
                       flexDirection: "row",
@@ -476,26 +553,24 @@ const EventManagingScreen = ({
                   >
                     <MaterialIcons
                       name={
-                        scannedTicket?.checkedIn
+                        statusCode == 201
                           ? "check-circle"
                           : "check-circle-outline"
                       }
                       size={24}
-                      color={
-                        scannedTicket?.checkedIn ? "green" : colors.darkGrey
-                      }
+                      color={statusCode == 201 ? "#ff8000" : "green"}
                     />
                     <Text
                       style={{
                         fontSize: 15,
                         fontWeight: "600",
                         marginLeft: 5,
-                        color: scannedTicket?.checkedIn
-                          ? "green"
-                          : colors.darkSeparator,
+                        color: statusCode == 201 ? "#ff8000" : "green",
                       }}
                     >
-                      {"CHECK IN"}
+                      {statusCode == 201
+                        ? "Este bilhete já foi escaneado às:"
+                        : "CHECK IN"}
                     </Text>
                     {scannedTicket?.checkedAt && (
                       <Text
@@ -520,9 +595,9 @@ const EventManagingScreen = ({
                   >
                     {scannedTicket?.category}
                   </Text>
-                </>
+                </Animated.View>
               ) : (
-                <>
+                <View>
                   <View
                     style={{
                       flexDirection: "row",
@@ -600,9 +675,9 @@ const EventManagingScreen = ({
                       top: 4,
                     }}
                   />
-                </>
+                </View>
               )}
-            </View>
+            </Animated.View>
           </TouchableOpacity>
         </View>
       </Modal>

@@ -29,8 +29,6 @@ export default function BigTicket({ uri, tickets, event }) {
   }
   // console.log(tickets[0]?.dates?.[0]?.displayDate);
 
-  console.log(event);
-
   const weekdy = tickets?.[0]?.dates?.[0]?.displayDate?.split(",")[0];
   const day = tickets?.[0]?.dates?.[0]?.displayDate?.split(" ")[1];
   const month = tickets?.[0]?.dates?.[0]?.displayDate?.split(" ")[2];
@@ -53,15 +51,15 @@ export default function BigTicket({ uri, tickets, event }) {
       }}
     >
       <View
-        style={{ left: "24%", width: "80%", padding: 12, zIndex: 2, top: 20 }}
+        style={{ left: "24%", width: "80%", padding: 12, zIndex: 2, top: 18 }}
       >
         <Text
           style={{
-            color: colors.lightGrey,
+            color: colors.white,
             fontSize: 19,
             fontWeight: "600",
             marginRight: 10,
-            textAlign: "center",
+            // textAlign: "center",
             // top: 30,
             // left: 20,
           }}
@@ -74,12 +72,12 @@ export default function BigTicket({ uri, tickets, event }) {
             fontSize: 15,
             fontWeight: "500",
             marginRight: 10,
-            textAlign: "center",
+            // textAlign: "center",
             top: 10,
             // left: 20,
           }}
         >
-          {event?.venue?.displayName}
+          {event?.venue?.displayName + ", " + event?.venue?.city}
         </Text>
         {/* <Text
           style={{
@@ -126,7 +124,7 @@ export default function BigTicket({ uri, tickets, event }) {
           justifyContent: "center",
           // backgroundColor: "red",
           position: "absolute",
-          top:80,
+          top: 80,
           height: "100%",
           width: "25%",
         }}
@@ -282,7 +280,7 @@ const styles = StyleSheet.create({});
 //       }}
 //     >
 //       <View
-//         style={{ left: "24%", width: "80%", padding: 10, zIndex: 2, top: 20 }}
+//         style={{ left: "24%", width: "80%", padding: 12, zIndex: 2, top: 20 }}
 //       >
 //         <Text
 //           style={{
@@ -354,6 +352,8 @@ const styles = StyleSheet.create({});
 //           // alignItems: "center",
 //           justifyContent: "center",
 //           // backgroundColor: "red",
+//           position: "absolute",
+//           top:80,
 //           height: "100%",
 //           width: "25%",
 //         }}
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({});
 //         <View style={{ alignItems: "center", zIndex: 5, bottom: 50 }}>
 //           <Text
 //             style={{
-//               fontSize: 20,
+//               fontSize: 18,
 //               color: colors.white,
 //               fontWeight: "600",
 //               marginBottom: 8,
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({});
 //           </Text>
 //           <Text
 //             style={{
-//               fontSize: 18,
+//               fontSize: 25,
 //               color: colors.lightGrey,
-//               fontWeight: "600",
+//               fontWeight: "700",
 //               marginBottom: 8,
 //             }}
 //           >
@@ -381,8 +381,8 @@ const styles = StyleSheet.create({});
 //           </Text>
 //           <Text
 //             style={{
-//               fontSize: 18,
-//               color: colors.light2,
+//               fontSize: 16,
+//               color: colors.grey,
 //               fontWeight: "500",
 //               marginBottom: 8,
 //             }}

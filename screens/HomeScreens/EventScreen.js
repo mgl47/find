@@ -57,6 +57,7 @@ import { useDesign } from "../../components/hooks/useDesign";
 
 import TicketPurchaseSheet from "../../components/screensComponents/eventComponents/TicketPurchaseSheet";
 import TicketGiftSheet from "../../components/screensComponents/eventComponents/TicketGiftSheet";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
@@ -459,7 +460,18 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             }
           }}
         />
+
         <View style={styles.container}>
+          {/* <LinearGradient
+            // colors={["#00000000", "#000000"]}
+            colors={[ colors.black,colors.black,"transparent",]}
+            style={{
+              height: 100,
+              width: width,
+              position: "absolute",
+              // bottom: 0,
+            }}
+          /> */}
           <Text style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}>
             {Event?.title}
           </Text>

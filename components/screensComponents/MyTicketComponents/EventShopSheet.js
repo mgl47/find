@@ -1,0 +1,1084 @@
+import {
+  Button,
+  Dimensions,
+  FlatList,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+  Text,
+} from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useReducer,
+  useState,
+} from "react";
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
+import uuid from "react-native-uuid";
+
+import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
+import {
+  MaterialCommunityIcons,
+  MaterialIcons,
+  AntDesign,
+  FontAwesome5,
+  Feather,
+  Ionicons,
+} from "@expo/vector-icons";
+import colors from "../../colors";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideInUp,
+  SlideOutDown,
+  SlideOutLeft,
+  SlideOutRight,
+  SlideOutUp,
+} from "react-native-reanimated";
+import { TextInput } from "react-native-paper";
+
+import axios from "axios";
+import { useData } from "../../hooks/useData";
+import { useAuth } from "../../hooks/useAuth";
+import { cocktails } from "../../Data/cocktails";
+
+const { height, width } = Dimensions.get("window");
+
+export default EventShopSheet = ({
+  sheetRef,
+  storeSheetUp,
+  setStoreSheetUp,
+  type,
+  users,
+  setUsers,
+  filter,
+  eventId,
+}) => {
+  // const bottomSheetModalRef = useRef(null);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+  const handleSheetChanges = useCallback((index) => {
+    setBlockButtons(true);
+  }, []);
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardInfo: {
+      number: 0,
+      date: "",
+      ccv: 0,
+    },
+  });
+  const purchaseId = uuid.v4();
+
+  const initialState = {
+    cart: cocktails,
+    total: 0,
+    amount: 0,
+  };
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case "INCREASE": {
+        // if (limitReached) {
+        //   return state;
+        // }
+        let tempCart = state.cart.map((cartItem) => {
+          if (cartItem?.id === action.payload?.id) {
+            // console.log("|FAsad");
+            cartItem = {
+              ...cartItem,
+              amount: cartItem.amount + 1,
+              //   available: cartItem.available - 1,
+            };
+            if (cartItem?.available == 0) {
+              //   setAvailable([...available, cartItem?.id]);
+              //   toast({
+              //     msg: `Quantidade disponível atingida para o bilhete "${cartItem?.category}"!`,
+              //     color: colors.white,
+              //     textcolor: colors.primary,
+              //   });
+            }
+            // console.log(cartItem?.available);
+          }
+
+          return cartItem;
+        });
+
+        return { ...state, cart: tempCart };
+      }
+      case "DECREASE": {
+        let tempCart = state.cart.map((cartItem) => {
+          if (cartItem?.id === action.payload?.id) {
+            if (cartItem?.amount == 0) {
+              return cartItem;
+            }
+
+            cartItem = {
+              ...cartItem,
+              amount: cartItem.amount - 1,
+              //   available: cartItem.available + 1,
+            };
+            // if (available?.includes(cartItem?.id)) {
+            //   const newAvailable = available.filter((id) => id != cartItem?.id);
+            //   console.log("removed from available");
+            //   //   setAvailable(newAvailable);
+            // }
+            // setLimitReached(false);
+          }
+
+          return cartItem;
+        });
+
+        return { ...state, cart: tempCart };
+      }
+      case "CLEAR": {
+        return { cart: action?.payload, total: 0, amount: 0 };
+      }
+
+      case "GET_TOTALS": {
+        let { total, amount } = state.cart.reduce(
+          (cartTotal, cartItem) => {
+            const { price, amount } = cartItem;
+            const itemTotal = price * amount;
+
+            cartTotal.total += itemTotal;
+            cartTotal.amount += amount;
+
+            return cartTotal;
+          },
+          {
+            total: 0,
+            amount: 0,
+          }
+        );
+        total = parseFloat(total.toFixed(2));
+        return { ...state, total, amount };
+      }
+    }
+    throw Error("Unknown action: " + action.type);
+  }
+  useEffect(() => {
+    dispatch({ type: "GET_TOTALS" });
+  }, [state.cart]);
+  const increase = (item) => {
+    dispatch({ type: "INCREASE", payload: item });
+    setFirstRender(false);
+  };
+  const decrease = (item) => {
+    dispatch({ type: "DECREASE", payload: item });
+    setFirstRender(false);
+  };
+  const clear = (item) => {
+    dispatch({ type: "CLEAR", payload: item });
+  };
+  const clean = async () => {
+    setOnPayment(false),
+      setTopUp(false),
+      setFirstRender(true),
+      setStoreSheetUp(false);
+    clear(cocktails);
+    setPaymentInfo({});
+    sheetRef?.current?.close();
+
+    // sheetRef?.current?.close();
+  };
+  const snapPoints = useMemo(() => ["60%", "70%", "90%"], []);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const { apiUrl, formatNumber } = useData();
+  const { user, headerToken, getUpdatedUser } = useAuth();
+  const [blockButtons, setBlockButtons] = useState(false);
+  const [firstRender, setFirstRender] = useState(true);
+  const [onPayment, setOnPayment] = useState(false);
+  const [topUp, setTopUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [emptyCardInfo, setEmptyCardInfo] = useState(false);
+  console.log("total " + state?.total);
+  console.log("user: " + user?.balance?.amount);
+
+  const validator = async () => {
+    console.log(state?.total);
+    if (state?.total == 0) {
+      return;
+    } else if (!onPayment) {
+      setOnPayment(true);
+    } else if (onPayment && user?.balance?.amount >= state?.total) {
+      buyProduct();
+    } else if (onPayment && !topUp) {
+      setTopUp(true);
+    } else {
+      topUpAccount();
+    }
+
+    // onPress={() =>
+    //   topUp
+    //     ? topUpAccount()
+    //     : onPayment
+    //     ? setTopUp(!topUp)
+    //     : setOnPayment(true)
+    // }
+  };
+  const buyProduct = async () => {
+    if (user?.balance?.total < state?.total) {
+      setTopUp(true);
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: { type: "accountBalance", task: "charge" },
+          amount: Number(state?.total),
+        },
+        { headers: { Authorization: headerToken } }
+      );
+
+      if (response.status === 200) {
+        getUpdatedUser();
+        clean();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
+  const topUpAccount = async () => {
+    if (
+      !paymentInfo?.cardInfo?.amount ||
+      Number(paymentInfo?.cardInfo?.amount) <= 0 ||
+      !paymentInfo?.cardInfo?.number ||
+      !paymentInfo?.cardInfo?.ccv ||
+      !paymentInfo?.cardInfo?.date
+    ) {
+      setEmptyCardInfo(true);
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: { type: "accountBalance", task: "topUp" },
+          amount: Number(paymentInfo?.cardInfo?.amount),
+        },
+        { headers: { Authorization: headerToken } }
+      );
+
+      if (response.status === 200) {
+        await getUpdatedUser();
+
+        setTopUp(false);
+        // setOnPayment(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <BottomSheetModalProvider>
+      <BottomSheetModal
+        // style={{backgroundColor:}}
+        ref={sheetRef}
+        // index={keyboardVisible ? 1 : 0}
+        index={onPayment ? 0 : 1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        onDismiss={clean}
+      >
+        <BottomSheetView
+          style={[
+            styles.contentContainer,
+            // { backgroundColor: loading ? "rgba(0, 0, 0, 0.1)" : "transparent" },
+          ]}
+        >
+          <View style={{ flex: 1 }}>
+            {onPayment ? (
+              <>
+                <Animated.View
+                  style={{ flex: 1, zIndex: 3 }}
+                  entering={SlideInRight}
+                  exiting={SlideOutRight}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      borderBottomWidth: 1,
+                      borderColor: colors.grey,
+                      marginBottom: 10,
+                      zIndex: 3,
+                    }}
+                  >
+                    <TouchableOpacity
+                      onPress={() => {
+                        setOnPayment(false), setTopUp(false);
+                      }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <MaterialCommunityIcons
+                        name="arrow-left"
+                        size={20}
+                        color={colors.primary}
+                      />
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontWeight: "500",
+                        }}
+                      >
+                        Voltar
+                      </Text>
+                    </TouchableOpacity>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        alignSelf: "flex-end",
+                        // marginRight: 20,
+                        marginRight: 20,
+                        marginLeft: 5,
+                        zIndex: 3,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "500",
+                          color: colors.black,
+
+                          // left: 10,
+                        }}
+                      >
+                        Balanço:
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          fontWeight: "500",
+                          color: colors.primary,
+                          // top: 2,
+                          // position: "absolute",
+                          // left: 20,
+                        }}
+                      >
+                        {" cve " + user?.balance?.amount || 0}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Animated.FlatList
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                    data={state?.cart?.filter((item) => item?.amount != 0)}
+                    keyExtractor={(item) => item?.id}
+                    ListHeaderComponent={
+                      <>
+                        {topUp && (
+                          <Animated.View
+                            entering={SlideInUp.duration(200)}
+                            exiting={SlideOutUp.duration(80)}
+                            style={{
+                              padding: 10,
+                              zIndex: 1,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                fontWeight: "400",
+                                marginBottom: 5,
+                                color: colors.darkRed,
+                                textAlign: "center",
+                              }}
+                            >
+                              Não tens saldo suficiente.{"\n"}Por favor carregue
+                              a sua conta!
+                            </Text>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                marginBottom: 5,
+                                // marginVertical: 10,
+                                // marginBottom: 20,
+                              }}
+                            >
+                              <TextInput
+                                error={
+                                  (emptyCardInfo &&
+                                    paymentInfo?.cardInfo?.amount < 0) ||
+                                  !paymentInfo?.cardInfo?.amount
+                                }
+                                style={{
+                                  backgroundColor: "transparent",
+                                  width: "25%",
+                                }}
+                                // autoFocus
+                                mode="outlined"
+                                activeOutlineColor={colors.primary}
+                                underlineStyle={{
+                                  backgroundColor: colors.primary,
+                                }}
+                                outlineColor={colors.primary}
+                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                label="Valor"
+                                defaultValue={paymentInfo?.cardInfo?.amount}
+                                activeUnderlineColor={colors.primary}
+                                value={paymentInfo?.cardInfo?.amount}
+                                onChangeText={(text) =>
+                                  setPaymentInfo({
+                                    ...paymentInfo,
+                                    cardInfo: {
+                                      ...paymentInfo?.cardInfo,
+                                      amount: text,
+                                    },
+                                  })
+                                }
+                              />
+                              <TextInput
+                                error={
+                                  emptyCardInfo &&
+                                  !paymentInfo?.cardInfo?.number
+                                }
+                                style={{
+                                  width: "72%",
+                                  backgroundColor: "transparent",
+                                }}
+                                // autoFocus
+                                mode="outlined"
+                                activeOutlineColor={colors.primary}
+                                underlineStyle={{
+                                  backgroundColor: colors.primary,
+                                }}
+                                outlineColor={colors.primary}
+                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                label="Número de cartão"
+                                defaultValue={paymentInfo?.cardInfo?.number}
+                                activeUnderlineColor={colors.primary}
+                                value={paymentInfo?.cardInfo?.number}
+                                onChangeText={(text) =>
+                                  setPaymentInfo({
+                                    ...paymentInfo,
+                                    cardInfo: {
+                                      ...paymentInfo?.cardInfo,
+                                      number: text,
+                                    },
+                                  })
+                                }
+                              />
+                            </View>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                // marginVertical: 10,
+                                // marginBottom: 20,
+                              }}
+                            >
+                              <TextInput
+                                error={
+                                  emptyCardInfo && !paymentInfo?.cardInfo?.date
+                                }
+                                style={{
+                                  marginBottom: 5,
+                                  backgroundColor: "transparent",
+                                  width: "48%",
+                                }}
+                                // autoFocus
+                                mode="outlined"
+                                activeOutlineColor={colors.primary}
+                                underlineStyle={{
+                                  backgroundColor: colors.primary,
+                                }}
+                                outlineColor={colors.primary}
+                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                label="Data de validade"
+                                defaultValue={paymentInfo?.cardInfo?.date}
+                                activeUnderlineColor={colors.primary}
+                                value={paymentInfo?.cardInfo?.date}
+                                onChangeText={(text) =>
+                                  setPaymentInfo({
+                                    ...paymentInfo,
+                                    cardInfo: {
+                                      ...paymentInfo?.cardInfo,
+                                      date: text,
+                                    },
+                                  })
+                                }
+                              />
+                              <TextInput
+                                error={
+                                  emptyCardInfo && !paymentInfo?.cardInfo?.ccv
+                                }
+                                style={{
+                                  marginBottom: 5,
+                                  backgroundColor: "transparent",
+                                  width: "48%",
+                                }}
+                                // autoFocus
+                                mode="outlined"
+                                activeOutlineColor={colors.primary}
+                                underlineStyle={{
+                                  backgroundColor: colors.primary,
+                                }}
+                                outlineColor={colors.primary}
+                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                label="cvv"
+                                defaultValue={paymentInfo?.cardInfo?.ccv}
+                                activeUnderlineColor={colors.primary}
+                                value={paymentInfo?.cardInfo?.ccv}
+                                onChangeText={(text) =>
+                                  setPaymentInfo({
+                                    ...paymentInfo,
+                                    cardInfo: {
+                                      ...paymentInfo?.cardInfo,
+                                      ccv: text,
+                                    },
+                                  })
+                                }
+                              />
+                            </View>
+                          </Animated.View>
+                        )}
+                        <Text
+                          style={{
+                            fontSize: 17,
+                            fontWeight: "500",
+                            color: colors.primary,
+                            marginLeft: 10,
+                            // marginTop: 10,
+                            marginBottom: 10,
+
+                            // left: 10,
+                          }}
+                        >
+                          Produtos selecionados
+                        </Text>
+                      </>
+                    }
+                    ItemSeparatorComponent={
+                      <View
+                        style={{
+                          alignSelf: "center",
+                          width: "95%",
+                          backgroundColor: colors.grey,
+                          height: 1,
+                          marginVertical: 10,
+                        }}
+                      />
+                    }
+                    renderItem={({ item }) => {
+                      return (
+                        <Animated.View
+                          entering={FadeIn}
+                          exiting={FadeOut}
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            marginLeft: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 17,
+                              fontWeight: "500",
+                              color: colors.primary,
+                              // left: 10,
+                            }}
+                          >
+                            {item?.amount}x
+                          </Text>
+
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "500",
+                              color: colors.dark,
+                              top: 2,
+                              position: "absolute",
+                              left: 30,
+                            }}
+                          >
+                            {item?.displayName +
+                              (item?.amount > 1
+                                ? " selecionados!"
+                                : " selecionado!")}
+                          </Text>
+                        </Animated.View>
+                      );
+                    }}
+                  />
+                </Animated.View>
+              </>
+            ) : (
+              <Animated.FlatList
+                entering={!firstRender && SlideInLeft}
+                exiting={SlideOutLeft}
+                data={state?.cart}
+                style={{ margin: 1 }}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ alignItems: "center" }}
+                numColumns={2}
+                keyExtractor={(item) => item?.id}
+                ListHeaderComponent={
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 40,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "500",
+                        color: colors.primary,
+                        // alignSelf: "center",
+                      }}
+                    >
+                      Loja
+                    </Text>
+                    <TouchableOpacity onPress={{}}>
+                      <Text
+                        style={{
+                          color: colors.primary,
+                          fontSize: 16,
+                          fontWeight: "600",
+                        }}
+                      >
+                        {/* Guardar */}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                }
+                renderItem={({ item }) => {
+                  return (
+                    <Animated.View
+                      entering={FadeIn}
+                      exiting={FadeOut.duration(10)}
+                      style={{
+                        margin: 10,
+                        marginBottom: 50,
+
+                        alignItems: "center",
+                        backgroundColor: colors.white,
+                        //   width: width * 0.45,
+                        //   height: height * 0.2,
+                        width: width * 0.45,
+                        height: 150,
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 1,
+                        elevation: 0.5,
+                        paddingHorizontal: 10,
+                        padding: 10,
+                        //   marginTop: 50,
+                        borderRadius: 10,
+                      }}
+                      // onPress={() => navigation.navigate("addEvent", item)}
+                    >
+                      <View
+                        style={{
+                          // height: height * 0.15,
+                          // width: width * 0.3,
+                          height: 120,
+                          width: 130,
+                          borderRadius: 10,
+                          // bottom: 40,
+                          zIndex: 1,
+                          // overflow: "hidden",
+
+                          // marginLeft: 20,
+                          bottom: 70,
+                          position: "absolute",
+                          shadowOffset: { width: 1, height: 1 },
+                          shadowOpacity: 1,
+                          shadowRadius: 3,
+                          elevation: 2,
+                          shadowColor: colors.grey,
+                          backgroundColor: colors.background,
+                        }}
+                      >
+                        {/* <View
+                          style={{
+                            height: 20,
+                            width: 50,
+                            backgroundColor: colors.primary,
+                            position: "absolute",
+                            // right: width * 0.12,
+                            left: -10,
+
+                            // top: 100,
+                            transform: [{ rotate: "45deg" }],
+                            borderRadius:10,
+                            borderWidth: 1,
+                            borderColor: colors.grey,
+                            // borderStyle: "dashed",
+                            zIndex: 3,
+                          }}
+                        /> */}
+                        {/* 
+                        <View
+                          style={{
+                            // height: height * 0.15,
+                            // width: width * 0.3,
+                            height: 120,
+                            width: 130,
+                            borderRadius: 10,
+                            // bottom: 40,
+                            zIndex: 1,
+                            // overflow: "hidden",
+
+                            // marginLeft: 20,
+                            bottom: 70,
+                            position: "absolute",
+                            shadowOffset: { width: 1, height: 1 },
+                            shadowOpacity: 1,
+                            shadowRadius: 3,
+                            elevation: 2,
+                            shadowColor: colors.grey,
+                            backgroundColor: colors.background,
+                          }}
+                        /> */}
+
+                        <View
+                          style={{
+                            height: 20,
+                            // width: 50,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: colors.primary,
+                            position: "absolute",
+                            // right: width * 0.12,
+                            right: 0,
+
+                            // top: 100,
+                            // transform: [{ rotate: "45deg" }],
+                            // borderRadius: 10,
+
+                            borderTopLeftRadius: 10,
+                            bottom: 0,
+                            // borderWidth: 1,
+                            // borderColor: colors.grey,
+                            // borderStyle: "dashed",
+                            zIndex: 3,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: colors.white,
+                              fontWeight: "500",
+                              padding: 2,
+                              paddingHorizontal: 5,
+                            }}
+                          >
+                            cve {formatNumber(item?.price)}
+                          </Text>
+                        </View>
+                        <Image
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            borderRadius: 10,
+
+                            //   borderRadius: 5,
+                          }}
+                          source={{ uri: item?.photo }}
+                        />
+                      </View>
+                      <View
+                        style={{
+                          position: "absolute",
+                          bottom: 10,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            zIndex: 3,
+                            bottom: 10,
+                            fontSize: 14,
+                            fontWeight: "500",
+                            color: colors.primary2,
+                          }}
+                        >
+                          {item?.displayName}
+                        </Text>
+                        <View style={styles.counterView}>
+                          <TouchableOpacity onPress={() => decrease(item)}>
+                            <AntDesign
+                              name="minuscircle"
+                              size={24}
+                              color={colors.darkGrey}
+                            />
+                          </TouchableOpacity>
+                          <Text
+                            style={{
+                              fontSize: 22,
+                              fontWeight: "600",
+                              color: colors.darkGrey,
+                            }}
+                          >
+                            {item?.amount}
+                          </Text>
+                          <TouchableOpacity onPress={() => increase(item)}>
+                            <AntDesign
+                              name="pluscircle"
+                              size={24}
+                              color={colors.primary}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </Animated.View>
+                  );
+                }}
+                ListFooterComponent={<View style={{ marginBottom: 30 }} />}
+              />
+            )}
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
+      {storeSheetUp && (
+        <Animated.View
+          entering={SlideInDown}
+          exiting={SlideOutDown}
+          style={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            height: Platform.OS === "android" ? 55 : 70,
+            backgroundColor: colors.white,
+            position: "absolute",
+            zIndex: 1,
+            bottom: 0,
+            flexDirection: "row",
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity: 1,
+            shadowRadius: 1,
+            elevation: 3,
+            borderTopRightRadius: 15,
+            borderTopLeftRadius: 15,
+            paddingHorizontal: 30,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 19,
+                color: colors.black2,
+                fontWeight: "600",
+                marginRight: 5,
+              }}
+            >
+              Total:
+            </Text>
+            <Text
+              style={{
+                fontSize: 19,
+                color: colors.primary,
+                fontWeight: "600",
+                position: "absolute",
+                left: 50,
+              }}
+            >
+              cve {formatNumber(state?.total)}
+            </Text>
+          </View>
+          <TouchableOpacity
+            // onPress={handlePurchaseSheet}
+            // onPress={handleClick}
+            disabled={state.total == 0 || loading}
+            // onPress={() =>
+            //     onPayment ? buyTickets() : setOnPayment(true)
+            //   }
+            // disabled={blockButtons}
+            // onPress={() =>
+            //   topUp
+            //     ? topUpAccount()
+            //     : onPayment
+            //     ? setTopUp(!topUp)
+            //     : setOnPayment(true)
+            // }
+            onPress={validator}
+            style={{
+              width: 150,
+              height: 40,
+              backgroundColor:
+                state?.total != 0 ? colors.primary : colors.softGrey,
+              zIndex: 1,
+              //   top: 10,
+              // left: 10,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowOffset: { width: 1, height: 1 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 3,
+              shadowColor: colors.dark,
+              flexDirection: "row",
+            }}
+            activeOpacity={0.5}
+          >
+            {loading ? (
+              <ActivityIndicator color={colors.white} />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: colors.white,
+                  fontWeight: "500",
+                  marginRight: 10,
+                }}
+              >
+                {topUp ? "Carregar" : onPayment ? "Pagar" : "Confirmar"}
+              </Text>
+            )}
+            {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
+          </TouchableOpacity>
+        </Animated.View>
+      )}
+    </BottomSheetModalProvider>
+  );
+};
+
+const styles = StyleSheet.create({
+  sheetContainer: {
+    flex: 1,
+    // padding: 24,
+    // justifyContent: "center",
+    backgroundColor: colors.background,
+  },
+  contentContainer: {
+    flex: 1,
+
+    // alignItems: "center",
+    backgroundColor: colors.background,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "500",
+  },
+  map: {
+    width: "100%",
+    // borderRadius: 5,
+    height: height * 0.35,
+    backgroundColor: colors.grey,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    // overflow:"hidden",
+
+    // borderRadius: 10,
+  },
+  separator: {
+    width: "95%",
+    height: 1,
+    backgroundColor: colors.grey,
+    marginBottom: 2,
+    alignSelf: "center",
+  },
+  userCard: {
+    flexDirection: "row",
+    marginBottom: 10,
+    padding: 10,
+
+    // height: 95,
+    backgroundColor: colors.white,
+    overflow: "hidden",
+    width: "95%",
+    alignSelf: "center",
+
+    borderRadius: 10,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 1,
+    // shadowRadius: 1,
+    // elevation: 3,
+  },
+  userName: {
+    fontSize: 14,
+    alignSelf: "flex-start",
+    color: colors.description,
+    fontWeight: "600",
+  },
+  userSearch: {
+    height: 40,
+    width: "90%",
+    alignSelf: "center",
+    backgroundColor: colors.white,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 15,
+    // paddingLeft: 40,
+  },
+  displayName: {
+    alignSelf: "flex-start",
+    fontSize: 19,
+    fontWeight: "600",
+    color: colors.primary,
+    marginTop: 10,
+    marginVertical: 5,
+  },
+  counterView: {
+    flexDirection: "row",
+    // backgroundColor: "red",
+    width: "100%",
+    flex: 1,
+
+    zIndex: 5,
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+});

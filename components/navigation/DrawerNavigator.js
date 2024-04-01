@@ -121,6 +121,28 @@ export function DrawerContent(props) {
           }}
           onPress={() => navigation.navigate("profile")}
         />
+        <DrawerItem
+          style={{}}
+          icon={({ color, size }) => (
+            // <MaterialCommunityIcons
+            //   name="account-outline"
+            //   color={colors.white}
+            //   size={30}
+            // />
+            <Image
+              style={{ height: 30, width: 30 }}
+              source={require("../../assets/coin.png")}
+            />
+          )}
+          label={`Carteira:  ${user?.balance?.amount || 0} esc`}
+          labelStyle={{
+            fontSize: 16,
+            fontWeight: "500",
+            right: 20,
+            color: colors.lightGrey,
+          }}
+          onPress={() => navigation.navigate("profile")}
+        />
         <View style={styles.separator} />
         <DrawerItem
           style={{ left: 2 }}

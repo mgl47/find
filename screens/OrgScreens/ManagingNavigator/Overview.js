@@ -46,7 +46,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
 
   let totalCheckin = 0;
   event?.attendees?.forEach((attendee) => {
-    if (attendee?.checkin) {
+    if (attendee?.checkedIn) {
       totalCheckin += 1;
     }
   });

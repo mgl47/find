@@ -262,7 +262,7 @@ export default TicketPurchaseSheet = ({
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
 
-  const separatedTickets = cartTickets.flatMap((item) => {
+  const separatedTickets = cartTickets?.flatMap((item) => {
     const { amount, ...rest } = item;
     return Array.from({ length: item.amount }, () => ({
       ...rest,
@@ -331,6 +331,7 @@ export default TicketPurchaseSheet = ({
         }
       );
       if (response.status == 200) {
+        // console.log();
         bottomSheetModalRef.current.close();
 
         setPurchaseModalUp(false);

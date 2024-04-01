@@ -208,7 +208,7 @@ export default function HomeScreen({ navigation }) {
           
             </TouchableOpacity> */}
             {/* <Text style={styles.headerText}>Pa bó</Text> */}
-            {myTickets?.length > 0 && (
+            {user && myTickets?.length > 0 && (
               <Animated.View
                 // style={{ marginBottom: 20 }}
                 entering={FadeIn}

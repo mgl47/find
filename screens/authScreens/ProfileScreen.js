@@ -282,7 +282,7 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
       const response = await axios.patch(
         `${apiUrl}/user/current/${user?._id}`,
         {
-          operation: { type: "profileChange", task: "Editing" },
+          operation: { type: "profileChange", task: "editing" },
           updates,
         },
         { headers: { Authorization: headerToken } }

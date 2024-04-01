@@ -47,11 +47,11 @@ export default function OneBigTicket({ uri, tickets, event }) {
       >
         <Text
           style={{
-            color: colors.lightGrey,
+            color: colors.white,
             fontSize: 19,
             fontWeight: "600",
             marginRight: 10,
-            textAlign: "center",
+            // textAlign: "center",
             // top: 30,
             // left: 20,
           }}
@@ -64,12 +64,12 @@ export default function OneBigTicket({ uri, tickets, event }) {
             fontSize: 15,
             fontWeight: "500",
             marginRight: 10,
-            textAlign: "center",
+            // textAlign: "center",
             top: 10,
             // left: 20,
           }}
         >
-          {event?.venue?.displayName}
+          {event?.venue?.displayName+", "+event?.venue?.city}
         </Text>
         {/* <Text
           style={{
