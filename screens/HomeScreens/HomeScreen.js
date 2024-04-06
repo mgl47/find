@@ -208,7 +208,7 @@ export default function HomeScreen({ navigation }) {
           
             </TouchableOpacity> */}
             {/* <Text style={styles.headerText}>Pa bó</Text> */}
-            {user && myTickets?.length > 0 && (
+            {user && myTickets?.length > 0 && differenceInSeconds > 0 && (
               <Animated.View
                 // style={{ marginBottom: 20 }}
                 entering={FadeIn}
@@ -223,47 +223,46 @@ export default function HomeScreen({ navigation }) {
                   }}
                 >
                   <Text style={styles.headerText}>Bu próximo evento</Text>
-                  {differenceInSeconds > 0 && (
-                    <CountDown
-                      size={15}
-                      until={differenceInSeconds}
-                      style={{
-                        alignItems: "center",
-                        // backgroundColor:colors.background,
-                        // left: 10,
-                        top: 10,
 
-                        // position: "absolute",
-                      }}
-                      // onFinish={() => alert('Finished')}
-                      digitStyle={{
-                        backgroundColor: colors.white,
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 1,
-                        elevation: 0.5,
-                      }}
-                      digitTxtStyle={{ color: colors.primary }}
-                      timeLabelStyle={{
-                        color: colors.primary,
-                        fontWeight: "bold",
-                      }}
-                      separatorStyle={{ color: colors.white }}
-                      timeToShow={[
-                        differenceInSeconds > 86000 ? "D" : "",
-                        "H",
-                        "M",
-                        "S",
-                      ]}
-                      timeLabels={{
-                        d: "dias",
-                        h: "horas",
-                        m: "minutos",
-                        s: "segundos",
-                      }}
-                      // showSeparator
-                    />
-                  )}
+                  <CountDown
+                    size={15}
+                    until={differenceInSeconds}
+                    style={{
+                      alignItems: "center",
+                      // backgroundColor:colors.background,
+                      // left: 10,
+                      top: 10,
+
+                      // position: "absolute",
+                    }}
+                    // onFinish={() => alert('Finished')}
+                    digitStyle={{
+                      backgroundColor: colors.white,
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 1,
+                      elevation: 0.5,
+                    }}
+                    digitTxtStyle={{ color: colors.primary }}
+                    timeLabelStyle={{
+                      color: colors.primary,
+                      fontWeight: "bold",
+                    }}
+                    separatorStyle={{ color: colors.white }}
+                    timeToShow={[
+                      differenceInSeconds > 86000 ? "D" : "",
+                      "H",
+                      "M",
+                      "S",
+                    ]}
+                    timeLabels={{
+                      d: "dias",
+                      h: "horas",
+                      m: "minutos",
+                      s: "segundos",
+                    }}
+                    // showSeparator
+                  />
                 </View>
                 <TouchableOpacity
                   activeOpacity={0.8}

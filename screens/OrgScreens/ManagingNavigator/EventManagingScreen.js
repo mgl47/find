@@ -23,6 +23,7 @@ import {
   MaterialIcons,
   Entypo,
   SimpleLineIcons,
+  FontAwesome6,
 } from "@expo/vector-icons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import colors from "../../../components/colors";
@@ -162,20 +163,29 @@ const EventManagingScreen = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          style={{ right: 20 }}
-          // onPress={() => setShowScanModal(true)}
-          onPress={()=>navigation.navigate("qrValidator",selectedEvent)}
-        >
-          <MaterialCommunityIcons
-            name="qrcode-scan"
-            size={24}
-            color={colors.white}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={{ right: 40 }}
+            // onPress={() => setShowScanModal(true)}
+            onPress={() => navigation.navigate("eventStore", selectedEvent)}
+          >
+            <FontAwesome6 name="shop" size={23} color={colors.white} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ right: 20 }}
+            // onPress={() => setShowScanModal(true)}
+            onPress={() => navigation.navigate("qrValidator", selectedEvent)}
+          >
+            <MaterialCommunityIcons
+              name="qrcode-scan"
+              size={24}
+              color={colors.white}
+            />
+          </TouchableOpacity>
+        </View>
       ),
     });
-  }, [navigation]); 
+  }, [navigation]);
 
   useEffect(() => {
     getUpdatedUser();
@@ -197,64 +207,64 @@ const EventManagingScreen = ({
   }
   return (
     <>
-      <View style={{ flex: 1 }}>
-        <Tab.Navigator
-          screenOptions={{
-            tabBarActiveTintColor: colors.primary,
+      {/* <View style={{ flex: 1 }}> */}
+      <Tab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: colors.primary,
 
-            tabBarInactiveTintColor: colors.darkGrey,
-            tabBarIndicatorContainerStyle: {
-              backgroundColor: colors.primary2,
+          tabBarInactiveTintColor: colors.darkGrey,
+          tabBarIndicatorContainerStyle: {
+            backgroundColor: colors.primary2,
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: colors.white_shade,
+            // bottom: 2,
+            height: 4,
+          },
+          tabBarLabelStyle: (active) => ({
+            color: active ? colors.white : colors.lightGrey,
+          }),
+        }}
+      >
+        <Tab.Screen
+          initialParams={item}
+          options={{
+            tabBarLabelStyle: {
+              fontWeight: "600",
+              fontSize: 13,
+              color: colors.white,
             },
-            tabBarIndicatorStyle: {
-              backgroundColor: colors.white,
-              // bottom: 2,
-              height: 4,
-            },
-            tabBarLabelStyle: (active) => ({
-              color: active ? colors.white : colors.lightGrey,
-            }),
           }}
-        >
-          <Tab.Screen
-            initialParams={item}
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
-            name="Overview"
-            component={Overview}
-          />
+          name="Overview"
+          component={Overview}
+        />
 
-          <Tab.Screen
-            initialParams={item}
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
-            name="Attendees"
-            component={Attendees}
-          />
-          <Tab.Screen
-            initialParams={item}
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
-            name="Staff"
-            component={Staff}
-          />
-        </Tab.Navigator>
-      </View>
+        <Tab.Screen
+          initialParams={item}
+          options={{
+            tabBarLabelStyle: {
+              fontWeight: "600",
+              fontSize: 13,
+              color: colors.white,
+            },
+          }}
+          name="Attendees"
+          component={Attendees}
+        />
+        <Tab.Screen
+          initialParams={item}
+          options={{
+            tabBarLabelStyle: {
+              fontWeight: "600",
+              fontSize: 13,
+              color: colors.white,
+            },
+          }}
+          name="Staff"
+          component={Staff}
+        />
+      </Tab.Navigator>
+      {/* </View> */}
       <Modal
         // presentationStyle="formSheet"
         style={{ backgroundColor: colors.background }}

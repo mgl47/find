@@ -36,6 +36,7 @@ import TicketDetails from "../../screens/authScreens/TicketsDetails";
 import MyEvents from "../../screens/OrgScreens/MyEvents";
 import EventManagingScreen from "../../screens/OrgScreens/ManagingNavigator/EventManagingScreen";
 import ValidatorScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/ValidatorScreen";
+import StoreScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/StoreScreen";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -393,6 +394,15 @@ function StackNavigator() {
         }}
         name="qrValidator"
         component={ValidatorScreen}
+      />
+          <Stack.Screen
+        options={{
+
+          headerTitle: "Loja",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="eventStore"
+        component={StoreScreen}
       />
       <Stack.Screen
         options={{

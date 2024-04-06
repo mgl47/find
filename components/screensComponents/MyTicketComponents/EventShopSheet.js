@@ -58,6 +58,19 @@ import axios from "axios";
 import { useData } from "../../hooks/useData";
 import { useAuth } from "../../hooks/useAuth";
 import { cocktails } from "../../Data/cocktails";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  collection,
+  where,
+  orderBy,
+  limit,
+  query,
+  getDocs,
+} from "firebase/firestore";
+import { db } from "../../../firebase";
 
 const { height, width } = Dimensions.get("window");
 
@@ -69,10 +82,18 @@ export default EventShopSheet = ({
   users,
   setUsers,
   filter,
-  eventId,
+
+  ticket,
 }) => {
   // const bottomSheetModalRef = useRef(null);
+  const eventId = ticket?.event?._id;
+  // console.log(
+  //   ticket?.tickets.map((qr) => {
+  //     qr.uuid;
+  //   })
+  // );
 
+  const ticketQrs = ticket?.tickets.map((qr) => qr.uuid);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -222,12 +243,9 @@ export default EventShopSheet = ({
   const [onPayment, setOnPayment] = useState(false);
   const [topUp, setTopUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [emptyCardInfo, setEmptyCardInfo] = useState(false);
-  console.log("total " + state?.total);
-  console.log("user: " + user?.balance?.amount);
+  // const [emptyCardInfo, setEmptyCardInfo] = useState(false);
 
   const validator = async () => {
-    console.log(state?.total);
     if (state?.total == 0) {
       return;
     } else if (!onPayment) {
@@ -249,6 +267,7 @@ export default EventShopSheet = ({
     // }
   };
   const buyProduct = async () => {
+    const orderId = uuid.v4();
     if (user?.balance?.total < state?.total) {
       setTopUp(true);
       return;
@@ -266,6 +285,37 @@ export default EventShopSheet = ({
       );
 
       if (response.status === 200) {
+        const docRef = collection(db, "transactions");
+        const q = query(
+          docRef,
+          where("eventId", "==", eventId),
+          orderBy("time", "desc"),
+          limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+        let orderNum = 1;
+        querySnapshot.forEach((doc) => {
+          const currNumb = doc.data()?.orderNum;
+          if (doc.exists() && currNumb && currNumb < 100) {
+            orderNum = currNumb + 1;
+          }
+        });
+        const hour = new Date()?.getHours();
+        const minutes = new Date()?.getMinutes();
+        await setDoc(doc(db, "transactions", orderId), {
+          orderNum,
+          orderId,
+          eventId,
+          ticketQrs,
+          total: state?.total,
+          orderedBy: user?._id,
+          products: state?.cart?.filter((item) => item?.amount != 0),
+          time: new Date(),
+          hour: `${hour < 10 ? "0" + hour : hour}:${
+            minutes < 10 ? "0" + minutes : minutes
+          }`,
+          status: "pendente",
+        });
         getUpdatedUser();
         clean();
       }
@@ -274,15 +324,16 @@ export default EventShopSheet = ({
     }
     setLoading(false);
   };
+
+  emptyCardInfo =
+    !paymentInfo?.cardInfo?.amount ||
+    Number(paymentInfo?.cardInfo?.amount) <= 0 ||
+    !paymentInfo?.cardInfo?.number ||
+    !paymentInfo?.cardInfo?.ccv ||
+    !paymentInfo?.cardInfo?.date;
+
   const topUpAccount = async () => {
-    if (
-      !paymentInfo?.cardInfo?.amount ||
-      Number(paymentInfo?.cardInfo?.amount) <= 0 ||
-      !paymentInfo?.cardInfo?.number ||
-      !paymentInfo?.cardInfo?.ccv ||
-      !paymentInfo?.cardInfo?.date
-    ) {
-      setEmptyCardInfo(true);
+    if (emptyCardInfo) {
       return;
     }
     setLoading(true);
@@ -315,9 +366,9 @@ export default EventShopSheet = ({
         // style={{backgroundColor:}}
         ref={sheetRef}
         // index={keyboardVisible ? 1 : 0}
-        index={onPayment ? 0 : 1}
+        index={keyboardVisible ? 2 : onPayment ? 0 : 1}
         snapPoints={snapPoints}
-        onChange={handleSheetChanges}
+        onChange={() => setStoreSheetUp(true)}
         onDismiss={clean}
       >
         <BottomSheetView
@@ -887,8 +938,8 @@ export default EventShopSheet = ({
       </BottomSheetModal>
       {storeSheetUp && (
         <Animated.View
-          entering={SlideInDown}
-          exiting={SlideOutDown}
+          entering={SlideInDown.duration(200)}
+          exiting={SlideOutDown.duration(200)}
           style={{
             alignItems: "center",
             justifyContent: "space-between",
@@ -896,7 +947,7 @@ export default EventShopSheet = ({
             height: Platform.OS === "android" ? 55 : 70,
             backgroundColor: colors.white,
             position: "absolute",
-            zIndex: 1,
+            zIndex: 4,
             bottom: 0,
             flexDirection: "row",
             shadowOffset: { width: 1, height: 1 },
