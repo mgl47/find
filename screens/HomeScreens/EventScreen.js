@@ -751,7 +751,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={Event?.artists}
-          keyExtractor={(item) => item?.id}
+          keyExtractor={(item) => item?._id}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity

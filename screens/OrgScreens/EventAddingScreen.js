@@ -15,7 +15,6 @@ import {
   Alert,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
   Text,
   TouchableWithoutFeedback,
   Platform,
@@ -38,7 +37,7 @@ import uuid from "react-native-uuid";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import colors from "../../components/colors";
 import ImageImputList from "../../components/ImageInputs/ImageImputList";
-import { TextInput } from "react-native-paper";
+import { TextInput, ActivityIndicator } from "react-native-paper";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import VideoInputList from "../../components/ImageInputs/VideoInputList";
@@ -57,6 +56,9 @@ import UserSelectorSheetSheet from "../../components/screensComponents/EventAddi
 import AddTicketsSheet from "../../components/screensComponents/EventAddingComponents/AddTicketsSheet";
 import EditTicketsSheet from "../../components/screensComponents/EventAddingComponents/EditTicketsSheet";
 import VenueSelectorSheet from "../../components/screensComponents/EventAddingComponents/VenueSelectorSheet";
+import AddEventStore from "../../components/screensComponents/EventAddingComponents/AddEventStore";
+import { cocktails } from "../../components/Data/cocktails";
+import { useData } from "../../components/hooks/useData";
 
 // import ImageImputList from "../../components/ImagesInput/ImageImputList";
 
@@ -86,13 +88,14 @@ import VenueSelectorSheet from "../../components/screensComponents/EventAddingCo
 // import axios from "axios";
 
 function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
-  const url = process.env.EXPO_PUBLIC_API_URL;
   const { headerToken, user } = useAuth();
+  const { apiUrl } = useData();
   const [ticketsSheetup, setTicketsSheetup] = useState(false);
   const [editTicketsSheetup, setEditTicketsSheetup] = useState(false);
   const [userModalUp, setUserModalUp] = useState(false);
   const [dates, setDates] = useState([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [storeModal, setStoreModal] = useState(false);
 
   const handleConfirm = (selectedDate) => {
     // console.warn("A date has been picked: ", date);
@@ -186,9 +189,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   }, []);
   const handleOrgSheet = useCallback(() => {
     orgSheetModalRef.current?.present();
+    setUserModalUp(true);
   }, []);
   const handleArtSheet = useCallback(() => {
     artSheetModalRef.current?.present();
+    setUserModalUp(true);
   }, []);
 
   const [artists, setArtists] = useState([]);
@@ -232,18 +237,19 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [priceError, setPriceError] = useState(true);
 
   const [freeEvent, setFreeEvent] = useState(false);
+  const [products, setProducts] = useState([]);
 
   const [addPhone, setAddPhone] = useState(false);
   const [loading, setLoading] = useState(false);
   const [blockModal, setBlockModal] = useState(false);
   const uuidKey = uuid.v4();
-  useEffect(() => {
-    if (loading) {
-      setBlockModal(true);
-    } else {
-      setBlockModal(false);
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   if (loading) {
+  //     setBlockModal(true);
+  //   } else {
+  //     setBlockModal(false);
+  //   }
+  // }, [loading]);
   const inputRef1 = useRef(null);
   const handleAddVideo = (uris) => {
     if (videoUris.length < 2) {
@@ -475,12 +481,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     description:
       "Com uma bela vista sobre a praia de Quebra Canela, este é um ótimo local para um lanche e uma cerveja fresca. Comida boa e barata.",
   };
+
   const addEvent = async () => {
     setLoading(true);
     try {
       await uploadPhotos();
 
-      setLoading(false);
+      // setLoading(false);
       if (videoUris?.length > 0) {
         try {
           uploadVideos();
@@ -508,7 +515,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         tickets,
         ticketsLimit: Number(ticketsLimit?.value),
         venue,
-
+        store: products?.length > 0 ? products : [],
         // pushToken: token,
         creatorId: user.uid,
         createdBy: {
@@ -519,17 +526,21 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
       // if (resizedBannerURL && resized1Photo) {
       const result = await axios.post(
-        `${url}/user/event/`,
+        `${apiUrl}/user/event/`,
 
         event,
 
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${headerToken}`,
+            Authorization: `${headerToken}`,
           },
         }
       );
+
+      if (result.status == 200) {
+        goBack();
+      }
       // console.log(result?.status);
       // } else {
       //   console.log("houve um erro");
@@ -557,7 +568,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     setLoading(true);
     try {
       const result = await axios.post(
-        `${url}/user/venue/`,
+        `${apiUrl}/user/venue/`,
 
         venue,
 
@@ -577,32 +588,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       setLoading(false);
     }
   };
-
-  // const addVenue = async () => {
-  //   setLoading(true);
-  //   try {
-
-  //     const result = await axios.post(
-  //       `${url}/user/venue/`,
-
-  //       venues2,
-
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${headerToken}`,
-  //         },
-  //       }
-  //     );
-  //     console.log(result?.status);
-
-  //   } catch (error) {
-
-  //     console.log("houve um erro2");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handlePhoneNumberChange1 = (inputValue) => {
     if (
@@ -843,6 +828,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               Datas
             </Text>
           )}
+
           {dates?.map((date) => (
             <View
               key={date.id}
@@ -851,6 +837,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 alignItems: "center",
                 justifyContent: "space-between",
                 // marginHorizontal: 10,
+                marginBottom: 10,
               }}
             >
               <Text
@@ -878,7 +865,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                     fontWeight: "600",
                   }}
                 >
-                  apagar
+                  remover
                 </Text>
               </TouchableOpacity>
             </View>
@@ -921,7 +908,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           )}
           <View style={[styles.switchContainer]}>
             <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Adicionar Data
+              Datas
             </Text>
             <TouchableOpacity
               style={styles.switch}
@@ -1105,7 +1092,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 <Text
                   style={[styles.switchText, { color: colors.darkSeparator }]}
                 >
-                  Adicionar Bilhete
+                  Bilhetes
                 </Text>
                 <TouchableOpacity
                   style={styles.switch}
@@ -1129,6 +1116,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   </Text>
                 </TouchableOpacity>
               </View>
+
               <RNPickerSelect
                 style={{ left: 40 }}
                 // placeholder={{ label: getMemberPosition(selectedMember) }}
@@ -1200,12 +1188,52 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             </>
           )}
           <View style={styles.separator} />
+          <View style={[styles.switchContainer]}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={[styles.switchText, { color: colors.darkSeparator }]}
+              >
+                Loja
+              </Text>
+              {products?.length > 0 && (
+                <Text style={[styles.switchText, { color: colors.primary }]}>
+                  {"(" + products?.length + ")" + products?.length > 1
+                    ? " produtos"
+                    : " produto"}
+                </Text>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.switch}
+              onPress={() => setStoreModal(true)}
+            >
+              {/* <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          /> */}
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 14,
+                  left: 20,
+                  padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                {products?.length > 0 ? "Alterar" : "Adicionar"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.separator} />
+
           {!venue && (
             <View style={[styles.switchContainer]}>
               <Text
                 style={[styles.switchText, { color: colors.darkSeparator }]}
               >
-                Selecionar Local
+                Local
               </Text>
               <TouchableOpacity
                 style={styles.switch}
@@ -1353,23 +1381,21 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           />
           <View style={styles.separator} />
 
-          {artists?.length > 0 && (
-            <Text
-              style={{
-                fontSize: 19,
-                color: colors.primary,
-                fontWeight: "500",
-                marginLeft: 20,
-                // marginRight: 10,
-                marginBottom: 10,
-              }}
-            >
-              Artistas
-            </Text>
-          )}
+          <Text
+            style={{
+              fontSize: 19,
+              color: colors.primary,
+              fontWeight: "500",
+              marginLeft: 10,
+              // marginRight: 10,
+            }}
+          >
+            Artistas
+          </Text>
+
           <View>
             <FlatList
-              // style={{  height: 300 }}
+              style={{ marginVertical: 10 }}
               horizontal
               showsHorizontalScrollIndicator={false}
               data={artists}
@@ -1392,9 +1418,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         marginBottom: 2,
                         borderWidth: 0.009,
                       }}
-                      source={{
-                        uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                      }}
+                      source={{ uri: item?.photos?.avatar?.[0]?.uri }}
                     />
                     <Text
                       style={{
@@ -1407,18 +1431,41 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   </TouchableOpacity>
                 );
               }}
+              ListFooterComponent={
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: colors.lightGrey,
+                    alignSelf: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 1,
+                    margin: 5,
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    marginBottom: 2,
+                    borderWidth: 0.009,
+                  }}
+                  onPress={handleArtSheet}
+                >
+                  <Ionicons
+                    name={"add-circle-outline"}
+                    size={40}
+                    color={colors.primary}
+                    // style={{ alignSelf: "center", marginBottom: 50 }}
+                  />
+                </TouchableOpacity>
+              }
             />
           </View>
-          <View style={[styles.switchContainer]}>
+          {/* <View style={[styles.switchContainer]}>
             <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Adicionar Artista
+              Artistas
             </Text>
             <TouchableOpacity style={styles.switch} onPress={handleArtSheet}>
-              {/* <Ionicons
-            name={"add-circle-outline"}
-            size={30}
-            color={colors.primary}
-          /> */}
+           
               <Text
                 style={{
                   color: colors.primary,
@@ -1431,29 +1478,56 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 Adicionar
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={styles.separator} />
-          {organizers?.length > 0 && (
-            <Text
-              style={{
-                fontSize: 19,
-                color: colors.primary,
-                fontWeight: "500",
-                marginLeft: 20,
-                // marginRight: 10,
-                marginBottom: 10,
-              }}
-            >
-              Organizadores
-            </Text>
-          )}
+
+          <Text
+            style={{
+              fontSize: 19,
+              color: colors.primary,
+              fontWeight: "500",
+              marginLeft: 10,
+              // marginRight: 10,
+            }}
+          >
+            Organizadores
+          </Text>
 
           <View>
             <FlatList
+              style={{ marginVertical: 10 }}
               horizontal
               showsHorizontalScrollIndicator={false}
               data={organizers}
               keyExtractor={(item) => item?.id}
+              ListHeaderComponent={
+                <View
+                  style={{
+                    padding: 5,
+                    alignItems: "center",
+                    // justifyContent: "center",
+                  }}
+                >
+                  <Image
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 50,
+                      marginBottom: 2,
+                      borderWidth: 0.009,
+                    }}
+                    source={{ uri: user?.photos?.avatar?.[0]?.uri }}
+                  />
+                  <Text
+                    style={{
+                      width: user?.displayName?.length > 15 ? 100 : null,
+                      textAlign: "center",
+                    }}
+                  >
+                    Eu
+                  </Text>
+                </View>
+              }
               renderItem={({ item }) => {
                 return (
                   <TouchableOpacity
@@ -1472,9 +1546,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         marginBottom: 2,
                         borderWidth: 0.009,
                       }}
-                      source={{
-                        uri: "https://i0.wp.com/techweez.com/wp-content/uploads/2022/03/vivo-lowlight-selfie-1-scaled.jpg?fit=2560%2C1920&ssl=1",
-                      }}
+                      source={{ uri: item?.photos?.avatar?.[0]?.uri }}
                     />
                     <Text
                       style={{
@@ -1487,89 +1559,37 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   </TouchableOpacity>
                 );
               }}
+              ListFooterComponent={
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: colors.lightGrey,
+                    alignSelf: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 1,
+                    margin: 5,
+                    height: 50,
+                    width: 50,
+                    borderRadius: 50,
+                    marginBottom: 2,
+                    borderWidth: 0.009,
+                  }}
+                  onPress={handleOrgSheet}
+                >
+                  <Ionicons
+                    name={"add-circle-outline"}
+                    size={40}
+                    color={colors.primary}
+                    // style={{ alignSelf: "center", marginBottom: 50 }}
+                  />
+                </TouchableOpacity>
+              }
             />
           </View>
-          <View style={[styles.switchContainer]}>
-            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Adicionar Organizador
-            </Text>
-            <TouchableOpacity style={styles.switch} onPress={handleOrgSheet}>
-              {/* <Ionicons
-            name={"add-circle-outline"}
-            size={30}
-            color={colors.primary}
-          /> */}
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 14,
-                  left: 20,
-                  padding: 3,
-                  fontWeight: "600",
-                }}
-              >
-                Adicionar
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.separator} />
 
-          {/* <View>
-        <TextInput
-          textColor={colors.black}
-          placeholderTextColor={colors.description}
-          backgroundColor={colors.light2}
-          placeholder={"Preço"}
-          keyboardType={"number-pad"}
-          returnKeyType="done"
-          onChangeText={handlePriceChange}
-          maxLength={11}
-          width={"60%"}
-          padding={15}
-        />
-        {priceError ? (
-          <Text
-            style={{
-              color: "red",
-              fontSize: 12,
-              alignSelf: "center",
-              bottom: -5,
-              position: "absolute",
-            }}
-          >
-            Insira um preço válido
-          </Text>
-        ) : null}
-      </View> */}
-          {/* 
-      <View style={[styles.home, { backgroundColor: colors.light2 }]}>
-        <FontAwesome
-          name={"phone"}
-          size={22}
-          color={colors.secondary}
-          style={[styles.icon, { left: 6 }]}
-        />
-        <Text
-          style={[
-            styles.hometext,
-            {
-              left: 18,
-              color: colors.primary,
-            },
-          ]}
-        >
-          Adicionar número de telefone
-        </Text>
-        <Switch
-          trackColor={{
-            true: colors.primary,
-          }}
-          thumbColor={colors.white}
-          style={styles.switchPhone}
-          value={addPhone}
-          onValueChange={(newValue) => setAddPhone(newValue)}
-        />
-      </View> */}
+          {/* <View style={styles.separator} /> */}
 
           {addPhone && (
             <>
@@ -1690,22 +1710,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           )}
 
           <View>
-            {loading && (
-              <View
-                style={{
-                  flex: 1,
-                  position: "absolute",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  alignSelf: "center",
-                  backgroundColor: "transparent",
-                  zIndex: 1,
-                  top: 10,
-                }}
-              >
-                <ActivityIndicator color={colors.secondary} />
-              </View>
-            )}
             {/* <AppButton
                   alignSelf={"center"}
                   marginTop={50}
@@ -1730,8 +1734,8 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           </View>
         </View>
         <TouchableOpacity
-          // onPress={addEvent}
-          onPress={addVenue}
+          onPress={addEvent}
+          // onPress={addVenue}
           style={{
             alignSelf: "center",
             flexDirection: "row",
@@ -1749,37 +1753,57 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             marginBottom: 15,
           }}
         >
-          <Text
-            style={{
-              color: colors.white,
-              marginLeft: 5,
-              fontSize: 17,
-              fontWeight: "500",
-            }}
-          >
-            Adicionar
-          </Text>
+          {loading ? (
+            <View
+              style={{
+                flex: 1,
+                position: "absolute",
+                justifyContent: "center",
+                alignItems: "center",
+                alignSelf: "center",
+                backgroundColor: "transparent",
+                zIndex: 1,
+              }}
+            >
+              <ActivityIndicator color={colors.white} />
+            </View>
+          ) : (
+            <Text
+              style={{
+                color: colors.white,
+                marginLeft: 5,
+                fontSize: 17,
+                fontWeight: "500",
+              }}
+            >
+              Adicionar
+            </Text>
+          )}
         </TouchableOpacity>
       </KeyboardAwareScrollView>
 
       <UserSelectorSheetSheet
+        userModalUp={userModalUp}
+        setUserModalUp={setUserModalUp}
         type={"artist"}
         users={artists}
         setUsers={setArtists}
         userSheetModalRef={artSheetModalRef}
       />
       <UserSelectorSheetSheet
+        userModalUp={userModalUp}
+        setUserModalUp={setUserModalUp}
         type={"organizer"}
         users={organizers}
         setUsers={setOrganizers}
         userSheetModalRef={orgSheetModalRef}
       />
       <Modal
-        visible={blockModal}
+        visible={loading}
         animationType="slide"
         // presentationStyle="formSheet"
         transparent
-      ></Modal>
+      />
 
       <AddTicketsSheet
         // setTicketsSheetup={setTicketsSheetup}
@@ -1796,6 +1820,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         setSelectedTicket={setSelectedTicket}
         selectedTicket={selectedTicket}
         setTickets={setTickets}
+      />
+      <AddEventStore
+        eventUuid={uuidKey}
+        products={products}
+        setProducts={setProducts}
+        setStoreModal={setStoreModal}
+        storeModal={storeModal}
       />
     </>
   );
@@ -1889,7 +1920,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.grey,
     marginVertical: 5,
     alignSelf: "center",
   },

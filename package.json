@@ -55,7 +55,8 @@
     "react-native-svg": "14.1.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-uuid": "^2.0.2",
-    "react-native-view-more-text": "^2.2.0"
+    "react-native-view-more-text": "^2.2.0",
+    "expo-checkbox": "~2.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

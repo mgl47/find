@@ -35,11 +35,13 @@ import { useNavigation, DrawerActions } from "@react-navigation/native";
 import colors from "../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../hooks/useAuth";
+import { useData } from "../hooks/useData";
 
 export const Drawer = createDrawerNavigator();
 
 export function DrawerContent(props) {
   const { user, setUser } = useAuth();
+  const { formatNumber } = useData();
   const navigation = useNavigation();
 
   return (
@@ -100,6 +102,7 @@ export function DrawerContent(props) {
         {...props}
         contentContainerStyle={{
           paddingTop: 5,
+          width: "100%",
           backgroundColor: colors.primary2,
         }}
       >
@@ -122,7 +125,7 @@ export function DrawerContent(props) {
           onPress={() => navigation.navigate("profile")}
         />
         <DrawerItem
-          style={{}}
+          style={{ width: "100%" }}
           icon={({ color, size }) => (
             // <MaterialCommunityIcons
             //   name="account-outline"
@@ -134,7 +137,9 @@ export function DrawerContent(props) {
               source={require("../../assets/coin.png")}
             />
           )}
-          label={`Carteira:  ${user?.balance?.amount || 0} esc`}
+          // label={`Carteira: ${formatNumber(user?.balance?.amount) || 0} esc`}
+          // label={`Carteira: cve ${formatNumber(10000)}`}
+          label={`Carteira: cve ${formatNumber(user?.balance?.amount) || 0}`}
           labelStyle={{
             fontSize: 16,
             fontWeight: "500",

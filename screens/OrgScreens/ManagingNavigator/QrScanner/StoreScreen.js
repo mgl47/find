@@ -1,4 +1,4 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, StyleSheet, Text, TouchableOpacity, View,FlatList } from "react-native";
 import React, {
   useCallback,
   useEffect,
@@ -7,16 +7,19 @@ import React, {
   useState,
 } from "react";
 import { cocktails } from "../../../../components/Data/cocktails";
-import { FlatList } from "react-native";
+
 import Animated, {
   FadeIn,
   FadeOut,
   SlideInDown,
+  SlideInUp,
+  SlideOutUp,
 } from "react-native-reanimated";
 import { Camera, FlashMode } from "expo-camera";
 import axios from "axios";
 import LottieView from "lottie-react-native";
-import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
+import { ActivityIndicator, Chip } from "react-native-paper";
+import Checkbox from "expo-checkbox";
 
 import { useData } from "../../../../components/hooks/useData";
 import { useAuth } from "../../../../components/hooks/useAuth";
@@ -50,6 +53,7 @@ import {
   BottomSheetScrollView,
   BottomSheetFlatList,
 } from "@gorhom/bottom-sheet";
+import { ScrollView } from "react-native";
 export default function StoreScreen({
   navigation,
   navigation: { goBack },
@@ -61,13 +65,17 @@ export default function StoreScreen({
   const { height, width } = useDesign();
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
-  const [productsModal, setProductsModal] = useState(false);
   const [orders, setOrders] = useState([]);
+  const [pend, setPend] = useState(false);
+  const [prep, setPrep] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [done, setDone] = useState(false);
+
   const [selectedOrder, setSelectedOrder] = useState("");
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validBuyer, setValidBuyer] = useState(2);
-
+  const [validating, setValidating] = useState(false);
   const animation = useRef(null);
   const orderSheetRef = useRef(null);
   const snapPoints = useMemo(() => ["55%", "75%"], []);
@@ -127,6 +135,11 @@ export default function StoreScreen({
   };
   const color = statusColor(sheetOrder?.status);
   const updateOrder = async () => {
+    if (sheetOrder?.status == "pronto") {
+      setValidating(true);
+      return;
+    }
+
     try {
       //   const response = await axios.patch(
       //     `${apiUrl}/user/current/${user?._id}`,
@@ -147,7 +160,7 @@ export default function StoreScreen({
             ? "preparando"
             : status == "preparando"
             ? "pronto"
-            : "Concluído",
+            : "sem estado",
         staff: {
           userId: user?._id,
           displayName: user?.displayName,
@@ -161,6 +174,45 @@ export default function StoreScreen({
     // setLoading(false);
   };
 
+  //   const sortOrders = (item) => {
+  //     let temp = sort;
+  //     if (sort?.includes(item)) {
+  //       temp = sort?.filter((sortItem) => sortItem != item);
+  //       setSort(temp);
+  //       return;
+  //     }
+  //     temp.push(item);
+  //     setSort(temp);
+  //   };
+
+  //   const sort = [1, 4];
+  let filters = [];
+  //   let filteredOrders = orders?.filter((order) => {
+  //     if (pend) {
+  //       return order?.status != "pendente";
+  //     }
+  //     if (prep) {
+  //       return order?.status != "preparando";
+  //     }
+  //     if (ready) {
+  //       return order?.status != "pronto";
+  //     }
+  //     if (done) {
+  //       return order?.status != "concluído";
+  //     }
+  //   });
+  let filteredOrders = orders?.filter((order) => {
+    if (!pend && !prep && !ready && !done) {
+      return order?.status != "concluído";
+    }
+    return (
+      (pend && order?.status === "pendente") ||
+      (prep && order?.status === "preparando") ||
+      (ready && order?.status === "pronto") ||
+      (done && order?.status === "concluído")
+    );
+  });
+
   const validatePurchase = async (item) => {
     if (scanned || sheetOrder?.status == "concluído" || loading) return;
     setScanned(true);
@@ -170,59 +222,48 @@ export default function StoreScreen({
       const docRef = doc(db, "transactions", sheetOrder?.orderId);
 
       await updateDoc(docRef, {
-        status: "Concluído",
+        status: "concluído",
         staff: {
           userId: user?._id,
           displayName: user?.displayName,
         },
       });
 
-      // const result = await axios.patch(
-      //   `${apiUrl}/purchase/${event?._id}`,
-      //   {
-      //     operation: {
-      //       type: "storePurchase",
-      //       task: "purchase",
-      //       eventId: event?._id,
-      //     },
-      //     details: {
-      //       ...sheetOrder,
-      //       status: "Concluído",
-      //       staff: {
-      //         userId: user?._id,
-      //         displayName: user?.displayName,
-      //       },
-      //     },
-      //   },
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: headerToken,
-      //     },
-      //   }
-      // );
       setValidBuyer(1);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setValidBuyer(2);
       orderSheetRef.current.close();
       setScanned(false);
       setLoading(false);
-
+      setValidating(false);
       return;
     }
     setValidBuyer(0);
 
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setValidBuyer(2);
+    // setValidating(false);
 
     setScanned(false);
     setLoading(false);
   };
   return (
     <>
+   
       <FlatList
+      bounces={false}
         ListHeaderComponent={
           <>
+             <View
+        style={{
+          position: "absolute",
+          width: "100%",
+
+          height: 130,
+          backgroundColor: colors.primary2,
+          zIndex: 0,
+        }}
+      />
             <View
               style={{
                 alignItems: "center",
@@ -235,7 +276,7 @@ export default function StoreScreen({
                 style={{
                   fontSize: 18,
                   fontWeight: "500",
-                  color: colors.primary2,
+                  color: colors.white,
                   top: 5,
                   // marginLeft: 30,
                   // marginTop: 10,
@@ -246,7 +287,7 @@ export default function StoreScreen({
               >
                 Produtos
               </Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => setProductsModal(true)}
                 style={{
                   alignItems: "center",
@@ -259,7 +300,7 @@ export default function StoreScreen({
                   style={{
                     fontSize: 13,
                     fontWeight: "600",
-                    color: colors.primary,
+                    color: colors.white,
                     //   top: 5,
                     // marginLeft: 30,
                     // marginTop: 10,
@@ -274,16 +315,16 @@ export default function StoreScreen({
                   // style={{ position: "absolute", bottom: 10, right: 10 }}
                   name="arrow-right"
                   size={20}
-                  color={colors.primary}
+                  color={colors.white}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
 
             <FlatList
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ marginTop: 60 }}
-              data={cocktails}
+              data={event?.store}
               keyExtractor={(item) => item?.id}
               // ListHeaderComponent={<View style={{ padding: 10 }}></View>}
               renderItem={({ item }) => {
@@ -330,8 +371,9 @@ export default function StoreScreen({
                         shadowOpacity: 1,
                         shadowRadius: 3,
                         elevation: 2,
-                        shadowColor: colors.grey,
+                        shadowColor: colors.primary,
                         backgroundColor: colors.background,
+
                       }}
                     >
                       <View
@@ -350,6 +392,8 @@ export default function StoreScreen({
                           // borderRadius: 10,
 
                           borderTopLeftRadius: 10,
+                          borderBottomRightRadius:10,
+
                           bottom: 0,
                           // borderWidth: 1,
                           // borderColor: colors.grey,
@@ -415,227 +459,76 @@ export default function StoreScreen({
                 // left: 10,
               }}
             >
-              {"Pedidos" + " (" + orders?.length + ")"}
+              {"Pedidos" + " (" + filteredOrders?.length + ")"}
             </Text>
-            <Modal
-              visible={productsModal}
-              presentationStyle="pageSheet"
-              animationType="slide"
-              onRequestClose={() => setProductsModal(false)}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 10,
+                // backgroundColor: colors.darkGrey,
+              }}
             >
               <TouchableOpacity
-                onPress={() => {
-                  setProductsModal(false);
-                }}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  alignSelf: "flex-end",
-                  padding: 10,
-                  marginRight: 10,
-                }}
+                activeOpacity={0.6}
+                onPress={() => setPend(!pend)}
+                style={styles.section}
               >
-                <Text
-                  style={{
-                    color: colors.primary,
-                    fontSize: 16,
-                    fontWeight: "500",
-                  }}
-                >
-                  Voltar
-                </Text>
+                <Checkbox
+                  style={styles.checkbox}
+                  value={pend}
+                  onValueChange={setPend}
+                  color={pend ? colors.primary2 : undefined}
+                />
+                <Text style={styles.paragraph}>pendente</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => setPrep(!prep)}
+                style={styles.section}
+              >
+                <Checkbox
+                  style={styles.checkbox}
+                  value={prep}
+                  onValueChange={setPrep}
+                  color={prep ? colors.primary : undefined}
+                />
+                <Text style={styles.paragraph}>preparando</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => setReady(!ready)}
+                style={styles.section}
+              >
+                <Checkbox
+                  style={styles.checkbox}
+                  value={ready}
+                  onValueChange={setReady}
+                  color={ready ? "green" : undefined}
+                />
+                <Text style={styles.paragraph}>pronto</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => setDone(!done)}
+                style={styles.section}
+              >
+                <Checkbox
+                  style={styles.checkbox}
+                  value={done}
+                  onValueChange={setDone}
+                  color={done ? colors.grey : undefined}
+                />
+                <Text style={styles.paragraph}>concluiído</Text>
+              </TouchableOpacity>
+            </ScrollView>
 
-              <FlatList
-                numColumns={2}
-                contentContainerStyle={{ marginTop: 30 }}
-                data={cocktails}
-                keyExtractor={(item) => item?.id}
-                ListHeaderComponent={<View style={{ padding: 10 }}></View>}
-                renderItem={({ item }) => {
-                  return (
-                    <Animated.View
-                      entering={FadeIn}
-                      exiting={FadeOut.duration(10)}
-                      style={{
-                        margin: 10,
-                        marginBottom: 50,
-
-                        alignItems: "center",
-                        backgroundColor: colors.white,
-                        //   width: width * 0.45,
-                        //   height: height * 0.2,
-                        width: width * 0.45,
-                        height: 150,
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.2,
-                        shadowRadius: 1,
-                        elevation: 0.5,
-                        paddingHorizontal: 10,
-                        padding: 10,
-                        //   marginTop: 50,
-                        borderRadius: 10,
-                      }}
-                      // onPress={() => navigation.navigate("addEvent", item)}
-                    >
-                      <View
-                        style={{
-                          // height: height * 0.15,
-                          // width: width * 0.3,
-                          height: 120,
-                          width: 130,
-                          borderRadius: 10,
-                          // bottom: 40,
-                          zIndex: 1,
-                          // overflow: "hidden",
-
-                          // marginLeft: 20,
-                          bottom: 70,
-                          position: "absolute",
-                          shadowOffset: { width: 1, height: 1 },
-                          shadowOpacity: 1,
-                          shadowRadius: 3,
-                          elevation: 2,
-                          shadowColor: colors.grey,
-                          backgroundColor: colors.background,
-                        }}
-                      >
-                        {/* <View
-                  style={{
-                    height: 20,
-                    width: 50,
-                    backgroundColor: colors.primary,
-                    position: "absolute",
-                    // right: width * 0.12,
-                    left: -10,
-  
-                    // top: 100,
-                    transform: [{ rotate: "45deg" }],
-                    borderRadius:10,
-                    borderWidth: 1,
-                    borderColor: colors.grey,
-                    // borderStyle: "dashed",
-                    zIndex: 3,
-                  }}
-                /> */}
-                        {/* 
-                <View
-                  style={{
-                    // height: height * 0.15,
-                    // width: width * 0.3,
-                    height: 120,
-                    width: 130,
-                    borderRadius: 10,
-                    // bottom: 40,
-                    zIndex: 1,
-                    // overflow: "hidden",
-  
-                    // marginLeft: 20,
-                    bottom: 70,
-                    position: "absolute",
-                    shadowOffset: { width: 1, height: 1 },
-                    shadowOpacity: 1,
-                    shadowRadius: 3,
-                    elevation: 2,
-                    shadowColor: colors.grey,
-                    backgroundColor: colors.background,
-                  }}
-                /> */}
-
-                        <View
-                          style={{
-                            height: 20,
-                            // width: 50,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            backgroundColor: colors.primary,
-                            position: "absolute",
-                            // right: width * 0.12,
-                            right: 0,
-
-                            // top: 100,
-                            // transform: [{ rotate: "45deg" }],
-                            // borderRadius: 10,
-
-                            borderTopLeftRadius: 10,
-                            bottom: 0,
-                            // borderWidth: 1,
-                            // borderColor: colors.grey,
-                            // borderStyle: "dashed",
-                            zIndex: 3,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              color: colors.white,
-                              fontWeight: "500",
-                              padding: 2,
-                              paddingHorizontal: 5,
-                            }}
-                          >
-                            cve {formatNumber(item?.price)}
-                          </Text>
-                        </View>
-                        <Image
-                          style={{
-                            height: "100%",
-                            width: "100%",
-                            borderRadius: 10,
-
-                            //   borderRadius: 5,
-                          }}
-                          source={{ uri: item?.photo }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          position: "absolute",
-                          bottom: 10,
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text
-                          style={{
-                            zIndex: 3,
-                            bottom: 10,
-                            fontSize: 14,
-                            fontWeight: "500",
-                            color: colors.primary2,
-                          }}
-                        >
-                          {item?.displayName}
-                        </Text>
-                        <View style={styles.counterView}>
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              fontWeight: "600",
-                              color: colors.dark2,
-                            }}
-                          >
-                            Quantidade:{" " + item?.amount}
-                          </Text>
-                        </View>
-                      </View>
-                    </Animated.View>
-                  );
-                }}
-                //   ItemSeparatorComponent={
-                //     <View
-                //       style={{
-                //         alignSelf: "center",
-                //         width: "95%",
-                //         backgroundColor: colors.grey,
-                //         height: 1,
-                //         marginVertical: 10,
-                //       }}
-                //     />
-                //   }
-              />
-            </Modal>
+           
           </>
         }
-        data={orders}
+        data={filteredOrders}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item?.orderId}
         renderItem={({ item }) => {
@@ -649,7 +542,7 @@ export default function StoreScreen({
             0
           );
           return (
-            orders?.length > 0 && (
+            filteredOrders?.length > 0 && (
               <Animated.View entering={FadeIn.duration(180)}>
                 <TouchableOpacity
                   onPress={() => handleOrderSheet(item)}
@@ -797,7 +690,9 @@ export default function StoreScreen({
           snapPoints={snapPoints}
           //   onChange={handleOrderSheet}
           enablePanDownToClose
-          // onDismiss={{}}
+          onDismiss={() => {
+            setValidating(false);
+          }}
           // backgroundComponent={}
           handleStyle={
             {
@@ -815,119 +710,124 @@ export default function StoreScreen({
               keyExtractor={(item) => item?.id}
               ListHeaderComponent={
                 <View style={{ padding: 10 }}>
-                  <View style={{ padding: 10, borderRadius: 15, zIndex: 5 }}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        //   marginVertical: 10,
-                        position: "absolute",
-                        height: 200,
-                        zIndex: 4,
-                        backgroundColor: colors.primary2,
-
-                        //   marginBottom: 10,
-                      }}
-                    />
-                    <TouchableOpacity
-                      onPress={toggleFlashMode}
-                      style={{
-                        position: "absolute",
-                        bottom: 20,
-                        right: 15,
-                        zIndex: 5,
-
-                        backgroundColor: "transparent",
-                        zIndex: 2,
-                      }}
+                  {validating && (
+                    <Animated.View
+                      style={{ borderRadius: 15, zIndex: 5 }}
+                      entering={FadeIn}
                     >
-                      <MaterialCommunityIcons
-                        name={
-                          flashMode == FlashMode.off
-                            ? "flashlight"
-                            : "flashlight-off"
-                        }
-                        size={30}
-                        color={
-                          flashMode == FlashMode.off
-                            ? colors.white
-                            : colors.white
-                        }
-                      />
-                    </TouchableOpacity>
-                    <Camera
-                      //  flashMode={flashMode}
-                      style={{
-                        height: 250,
-                        width: "100%",
-                        opacity: loading ? 0.7 : 1,
-
-                        // marginTop: 50,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        // shadowOffset: { width: 0.5, height: 0.5 },
-                        // shadowOpacity: 0.3,
-                        // shadowRadius: 1,
-                        // elevation: 2,
-                        overflow: "hidden",
-                        borderRadius: 15,
-                      }}
-                      // flashMode={Camera.Constants.FlashMode.torch}
-                      // flashMode={flashMode}
-
-                      flashMode={flashMode}
-                      onBarCodeScanned={validatePurchase}
-                      type={"back"}
-                      autoFocus={true}
-
-                      // barCodeScannerSettings={{
-                      //   barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
-                      // }}
-                    />
-                    {loading && !(validBuyer == 1 || validBuyer == 0) && (
-                      <ActivityIndicator
-                        size={"large"}
+                      <View
                         style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          //   marginVertical: 10,
                           position: "absolute",
-                          alignSelf: "center",
-                          top: "45%",
-                        }}
-                        color={colors.white}
-                      />
-                    )}
-                    {validBuyer == 1 && (
-                      <LottieView
-                        autoPlay
-                        ref={animation}
-                        style={{
-                          width: 200,
                           height: 200,
-                          position: "absolute",
-                          alignSelf: "center",
-                          top: 30,
-                          //   bottom: -25, // backgroundColor: "#eee",
-                        }}
-                        // Find more Lottie files at https://lottiefiles.com/featured
-                        source={require("../../../../components/animations/check.json")}
-                      />
-                    )}
+                          zIndex: 4,
+                          backgroundColor: colors.primary2,
 
-                    {validBuyer == 0 && (
-                      <LottieView
-                        autoPlay
-                        ref={animation}
-                        style={{
-                          width: 160,
-                          height: 160,
-                          position: "absolute",
-                          alignSelf: "center",
-                          top: 50,
+                          //   marginBottom: 10,
                         }}
-                        // Find more Lottie files at https://lottiefiles.com/featured
-                        source={require("../../../../components/animations/invalid.json")}
                       />
-                    )}
-                  </View>
+                      <TouchableOpacity
+                        onPress={toggleFlashMode}
+                        style={{
+                          position: "absolute",
+                          bottom: 20,
+                          right: 15,
+                          zIndex: 5,
+
+                          backgroundColor: "transparent",
+                          zIndex: 2,
+                        }}
+                      >
+                        <MaterialCommunityIcons
+                          name={
+                            flashMode == FlashMode.off
+                              ? "flashlight"
+                              : "flashlight-off"
+                          }
+                          size={30}
+                          color={
+                            flashMode == FlashMode.off
+                              ? colors.white
+                              : colors.white
+                          }
+                        />
+                      </TouchableOpacity>
+                      <Camera
+                        //  flashMode={flashMode}
+                        style={{
+                          height: 250,
+                          width: "100%",
+                          opacity: loading ? 0.7 : 1,
+
+                          // marginTop: 50,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          // shadowOffset: { width: 0.5, height: 0.5 },
+                          // shadowOpacity: 0.3,
+                          // shadowRadius: 1,
+                          // elevation: 2,
+                          overflow: "hidden",
+                          borderRadius: 15,
+                        }}
+                        // flashMode={Camera.Constants.FlashMode.torch}
+                        // flashMode={flashMode}
+
+                        flashMode={flashMode}
+                        onBarCodeScanned={validatePurchase}
+                        type={"back"}
+                        autoFocus={true}
+
+                        // barCodeScannerSettings={{
+                        //   barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+                        // }}
+                      />
+                      {loading && !(validBuyer == 1 || validBuyer == 0) && (
+                        <ActivityIndicator
+                          size={"large"}
+                          style={{
+                            position: "absolute",
+                            alignSelf: "center",
+                            top: "45%",
+                          }}
+                          color={colors.white}
+                        />
+                      )}
+                      {validBuyer == 1 && (
+                        <LottieView
+                          autoPlay
+                          ref={animation}
+                          style={{
+                            width: 200,
+                            height: 200,
+                            position: "absolute",
+                            alignSelf: "center",
+                            top: 30,
+                            //   bottom: -25, // backgroundColor: "#eee",
+                          }}
+                          // Find more Lottie files at https://lottiefiles.com/featured
+                          source={require("../../../../components/animations/check.json")}
+                        />
+                      )}
+
+                      {validBuyer == 0 && (
+                        <LottieView
+                          autoPlay
+                          ref={animation}
+                          style={{
+                            width: 160,
+                            height: 160,
+                            position: "absolute",
+                            alignSelf: "center",
+                            top: 50,
+                          }}
+                          // Find more Lottie files at https://lottiefiles.com/featured
+                          source={require("../../../../components/animations/invalid.json")}
+                        />
+                      )}
+                    </Animated.View>
+                  )}
                   <View
                     style={{
                       flexDirection: "row",
@@ -961,7 +861,7 @@ export default function StoreScreen({
                         right: 0,
                       }}
                     >
-                      {sheetOrder?.status == "pendente" && (
+                      {/* {sheetOrder?.status == "pendente" && (
                         <TouchableOpacity
                           style={{
                             padding: 5,
@@ -972,8 +872,11 @@ export default function StoreScreen({
                         >
                           <Text style={{ color: colors.white }}>Cancelar</Text>
                         </TouchableOpacity>
-                      )}
+                      )} */}
                       <TouchableOpacity
+                        disabled={
+                          sheetOrder?.status == "concluído" || validating
+                        }
                         onPress={updateOrder}
                         style={{
                           padding: 5,
@@ -981,7 +884,7 @@ export default function StoreScreen({
                           right: 0,
                           backgroundColor:
                             sheetOrder?.status == "pendente"
-                              ? colors.primary
+                              ? colors.primary2
                               : sheetOrder?.status == "preparando"
                               ? "green"
                               : sheetOrder?.status == "pronto"
@@ -992,10 +895,12 @@ export default function StoreScreen({
                       >
                         <Text style={{ color: colors.white }}>
                           {sheetOrder?.status == "pendente"
-                            ? "Aceitar"
+                            ? "preparar"
                             : sheetOrder?.status == "preparando"
-                            ? "Pronto"
-                            : "Concluir"}
+                            ? "pronto"
+                            : sheetOrder?.status == "pronto"
+                            ? "entregar"
+                            : "entregar"}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1217,5 +1122,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.grey,
     marginBottom: 2,
     alignSelf: "center",
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  paragraph: {
+    fontSize: 15,
+  },
+  checkbox: {
+    margin: 8,
   },
 });

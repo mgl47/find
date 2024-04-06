@@ -85,7 +85,11 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
             </TouchableOpacity>
           );
         }}
+        ListFooterComponent={<View         style={{marginBottom:50}}
+        />}
+      
       />
+    
     </View>
   );
 };

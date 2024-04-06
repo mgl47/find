@@ -32,6 +32,7 @@ import {
   Fontisto,
   Feather,
   Foundation,
+  FontAwesome6,
   Ionicons,
 } from "@expo/vector-icons";
 
@@ -50,7 +51,7 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 
-import EventShopSheet from "../../components/screensComponents/MyTicketComponents/EventShopSheet";
+import EventStoreSheet from "../../components/screensComponents/MyTicketComponents/EventStoreSheet";
 import OrderSheet from "../../components/screensComponents/MyTicketComponents/orderSheet";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { db } from "../../firebase";
@@ -64,6 +65,7 @@ import {
 const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   const [index, setIndex] = useState(1);
   const { user } = useAuth();
+  const { events } = useData();
   const { height, width } = useDesign();
   const [mediaIndex, setMediaIndex] = useState(0);
   const bottomSheetModalRef = useRef(null);
@@ -88,13 +90,14 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
 
   const handleOrderSheet = useCallback((item) => {
     setSelectedOrder(item);
-
     orderSheetRef.current?.present();
   }, []);
 
   const handleStoreSheet = useCallback(() => {
     // setSelectedTicket();
     // setStoreSheetUp(true);
+    setStoreSheetUp(true);
+
     eventStoreSheetRef.current?.present();
   }, []);
   useLayoutEffect(() => {
@@ -112,69 +115,6 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
   const ticket = route.params;
   const data = new Date();
-
-  // const orders = [
-  //   {
-  //     id: 1212123,
-  //     number: 78,
-  //     state: "concluído",
-  //     hour: data.getHours() + ":" + data?.getMinutes(),
-  //     products: [
-  //       {
-  //         id: 1122,
-  //         displayName: "Capirinha",
-  //         amount: 2,
-  //         price: 300,
-  //       },
-  //       {
-  //         id: 132,
-  //         displayName: "whiskey",
-  //         amount: 1,
-  //         price: 500,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 12123,
-  //     number: 2,
-  //     state: "pronto",
-  //     hour: data.getHours() + ":" + data?.getMinutes(),
-  //     products: [
-  //       {
-  //         id: 132122,
-  //         displayName: "Kriola",
-  //         amount: 1,
-  //         price: 200,
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 12233,
-  //     number: 12,
-  //     state: "preparando",
-  //     hour: data.getHours() + ":" + data?.getMinutes(),
-  //     products: [
-  //       {
-  //         id: 13123122,
-  //         displayName: "Havana & Cola",
-  //         amount: 2,
-  //         price: 500,
-  //       },
-  //       {
-  //         id: 1312212,
-  //         displayName: "Capirinha",
-  //         amount: 2,
-  //         price: 300,
-  //       },
-  //       {
-  //         id: 131232242,
-  //         displayName: "whiskey & Cola",
-  //         amount: 1,
-  //         price: 700,
-  //       },
-  //     ],
-  //   },
-  // ];
 
   useEffect(() => {
     const q = query(
@@ -196,6 +136,9 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
     // Cleanup function
     return () => unsubscribe();
   }, []);
+  const selectedEvent = events?.filter(
+    (event) => event?._id == ticket?.tickets?.[0]?.eventId
+  )?.[0];
 
   return (
     <>
@@ -214,7 +157,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Text
                   style={{
-                    fontSize: 21,
+                    fontSize: 18,
                     fontWeight: "600",
                     color: colors.white,
                     alignSelf: "center",
@@ -235,12 +178,12 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                   <MaterialCommunityIcons
                     style={{ left: 3 }}
                     name="calendar-month"
-                    size={25}
+                    size={23}
                     color={colors.white}
                   />
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: "600",
                       // width: "80%",
                       color: colors.lightGrey,
@@ -262,19 +205,19 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   <Entypo
-                    style={{ left: 4 }}
+                    style={{ left: 5 }}
                     name="location"
-                    size={22}
+                    size={20}
                     color={colors.white}
                   />
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: "600",
                       //   width: "70%",
                       color: colors.lightGrey,
                       marginLeft: 18,
-                      textDecorationLine: "underline",
+                      // textDecorationLine: "underline",
                     }}
                   >
                     {ticket?.event?.venue?.displayName},
@@ -291,15 +234,16 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   <MaterialCommunityIcons
+                    style={{ left: 2 }}
                     name="account-outline"
-                    size={30}
+                    size={28}
                     color={colors.white}
                   />
                   <Text
                     style={{
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: "600",
-                      color: colors.white,
+                      color: colors.lightGrey,
                       // alignSelf: "flex-start",
                       marginLeft: 10,
                     }}
@@ -318,8 +262,8 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                       position: "absolute",
                       // marginBottom: 40,
                       // top: 40,
-                      right: 5,
-                      bottom: 10,
+                      right: 10,
+                      bottom: -50,
                     }}
                   >
                     {Number(mediaIndex) + 1 + "/" + ticket?.tickets?.length}
@@ -347,7 +291,6 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                 data={ticket?.tickets}
                 keyExtractor={(item) => item?.uuid}
                 renderItem={({ item }) => {
-
                   return (
                     <View
                       style={{
@@ -408,7 +351,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                         >
                           <Text
                             style={{
-                              fontSize: 17,
+                              fontSize: 15,
                               fontWeight: "600",
                               textAlign: "center",
                               color:
@@ -420,11 +363,11 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                               //   textDecorationLine: "underline",
                             }}
                           >
-                            Hora de chegada:{" "}
+                            Check In:{" "}
                           </Text>
                           <Text
                             style={{
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: "600",
                               textAlign: "center",
                               color: "green",
@@ -442,37 +385,54 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                 }}
               />
             </View>
-            {<Button title="open Store" onPress={handleStoreSheet} />}
+            {selectedEvent?.store?.length > 0 && (
+              <View style={{ marginVertical: 10 }}>
+                {orders?.length > 0 && (
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: "500",
+                      color: colors.primary,
+                      marginLeft: 30,
 
-            {/* <BottomSheetModalProvider>
-            <View style={styles.sheetContainer}>
-              <BottomSheetModal
-                ref={bottomSheetModalRef}
-                index={1}
-                snapPoints={snapPoints}
-              >
-                <BottomSheetView style={styles.contentContainer}>
-                  <Text>Awesome 🎉</Text>
-                </BottomSheetView>
-              </BottomSheetModal>
-            </View>
-          </BottomSheetModalProvider> */}
-            <View>
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  color: colors.primary,
-                  marginLeft: 10,
-                  // marginTop: 10,
-                  marginBottom: 10,
+                      marginVertical: 10,
 
-                  // left: 10,
-                }}
-              >
-                Pedidos
-              </Text>
-            </View>
+                      // left: 10,
+                    }}
+                  >
+                    Pedidos
+                  </Text>
+                )}
+                <TouchableOpacity
+                  style={{
+                    position: "absolute",
+                    right: 30,
+                    backgroundColor:colors.white,
+                    borderRadius:10,
+                    height:50,
+                    width:50,
+                    // bottom: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  // onPress={() => setShowScanModal(true)}
+                  onPress={handleStoreSheet}
+                >
+                  <FontAwesome6 name="shop" size={22} color={colors.primary} />
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      color: colors.primary,
+
+                      // left: 10,
+                    }}
+                  >
+                    Loja
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </>
         }
         data={orders}
@@ -491,70 +451,69 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
             }
           };
           const color = statusColor(item);
-          return (
-            orders?.length > 0 && (
-              <Animated.View entering={FadeIn.duration(180)}>
-                <TouchableOpacity
-                  onPress={() => handleOrderSheet(item)}
-                  activeOpacity={0.5}
-                  style={{
-                    shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 1,
-                    elevation: 2,
-                    width: "100%",
-                    // marginTop: 10,
-                  }}
-                  // onPress={() => navigation.navigate("event", item)}
-                >
-                  <Animated.View
-                    style={styles.userCard}
-                    // entering={FadeIn}
-                    // exiting={FadeOut}
+          return selectedEvent?.store?.length > 0
+            ? orders?.length > 0 && (
+                <Animated.View entering={FadeIn.duration(180)}>
+                  <TouchableOpacity
+                    onPress={() => handleOrderSheet(item)}
+                    activeOpacity={0.5}
+                    style={{
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 1,
+                      elevation: 2,
+                      width: "100%",
+                      // marginTop: 10,
+                    }}
+                    // onPress={() => navigation.navigate("event", item)}
                   >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                    <Animated.View
+                      style={styles.userCard}
+                      // entering={FadeIn}
+                      // exiting={FadeOut}
                     >
-                      <Text numberOfLines={2} style={[styles.userName]}>
-                        número:
-                      </Text>
-                      <Text numberOfLines={2} style={[styles.displayName]}>
-                        {item?.orderNum}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        position: "absolute",
-                        left: 120,
-                      }}
-                    >
-                      <Text numberOfLines={2} style={[styles.userName]}>
-                        estado:
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={[styles.displayName, { color }]}
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        {item?.status}
-                      </Text>
-                    </View>
-                  </Animated.View>
-                </TouchableOpacity>
-              </Animated.View>
-            )
-          );
+                        <Text numberOfLines={2} style={[styles.userName]}>
+                          número:
+                        </Text>
+                        <Text numberOfLines={2} style={[styles.displayName]}>
+                          {item?.orderNum}
+                        </Text>
+                      </View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          position: "absolute",
+                          left: 120,
+                        }}
+                      >
+                        <Text numberOfLines={2} style={[styles.userName]}>
+                          estado:
+                        </Text>
+                        <Text
+                          numberOfLines={2}
+                          style={[styles.displayName, { color }]}
+                        >
+                          {item?.status}
+                        </Text>
+                      </View>
+                    </Animated.View>
+                  </TouchableOpacity>
+                </Animated.View>
+              )
+            : null;
         }}
         ListFooterComponent={<View style={{ marginBottom: 20 }} />}
       />
       {
-        <EventShopSheet
-          type={"members"}
+        <EventStoreSheet
           // users={members}
+
           ticket={ticket}
           sheetRef={eventStoreSheetRef}
-
           storeSheetUp={storeSheetUp}
           setStoreSheetUp={setStoreSheetUp}
         />

@@ -46,6 +46,8 @@ const { height, width } = Dimensions.get("window");
 
 export default UserSelectorSheet = ({
   userSheetModalRef,
+  userModalUp,
+  setUserModalUp,
   type,
   users,
   setUsers,
@@ -78,12 +80,18 @@ export default UserSelectorSheet = ({
   const [searched, setSearched] = useState(false);
   const [search, setSearch] = useState("");
   const [searchedUser, setSearchedUSer] = useState(null);
-  const [usersList, setusersList] = useState(users);
+  const [usersList, setUsersList] = useState(users);
+  useEffect(() => {
+    if (userModalUp) setUsersList(users);
+  }, [userModalUp]);
+
+
   const clear = () => {
     setSearched(false);
     setSearchedUSer(null);
     setSearch("");
-    setusersList([]);
+    setUsersList([]);
+    setUserModalUp(false);
   };
 
   const findUser = async () => {
@@ -106,33 +114,45 @@ export default UserSelectorSheet = ({
 
   const addUser = () => {
     // Create a new array with the existing usersList
-    let users = [...usersList];
-    const usersId = users?.map((user) => user?._id);
+    let tempUsers = [...usersList];
+    const usersId = tempUsers?.map((user) => user?._id);
 
     // Check if searchedUser is not already in the list
-    if (!usersId?.includes(searchedUser?._id)) {
-      const newStaff = {
-        ...searchedUser,
-        level: "Colaborador",
-        addedBy: user?.displayName,
-      };
-      users.push(newStaff);
+    if (type == "members") {
+      if (!usersId?.includes(searchedUser?._id)) {
+        const newStaff = {
+          ...searchedUser,
+          level: "Colaborador",
+          addedBy: user?.displayName,
+        };
+        tempUsers.push(newStaff);
+      }
+
+      // Update the state with the new array
+      setUsersList(tempUsers);
+      return;
     }
 
-    // Update the state with the new array
-    setusersList(users);
+    tempUsers.push(searchedUser);
+    setUsersList(tempUsers);
   };
   const removeUser = (selectedUser) => {
-    let users = [...usersList];
-    const newUsers = users?.filter((user) => user?._id != selectedUser?._id);
-    setusersList(newUsers);
+    let tempUsers = [...usersList];
+    const newUsers = tempUsers?.filter(
+      (user) => user?._id != selectedUser?._id
+    );
+    setUsersList(newUsers);
   };
 
   const save = async () => {
     if (type == "members") {
       saveMembers();
+      userSheetModalRef.current.close();
+
+      return;
     }
-    // setUsers(usersList);
+    setUsers(usersList);
+    userSheetModalRef.current.close();
   };
 
   const saveMembers = async () => {

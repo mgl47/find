@@ -9,11 +9,14 @@ import CountDown from "react-native-countdown-component";
 import { Image } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+import { useData } from "../../../components/hooks/useData";
 const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
   const routeEvent = route.params;
   const [index, setIndex] = useState(1);
   const { height, width } = useDesign();
+  const { formatNumber } = useData();
+
   const { user, myEvents } = useAuth();
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
@@ -273,7 +276,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     fontWeight: "600",
                   }}
                 >
-                  cve{" " + item?.price}
+                  cve{" " + formatNumber(item?.price)}
                 </Text>
               </View>
             );

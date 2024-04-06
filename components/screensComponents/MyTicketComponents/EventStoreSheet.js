@@ -74,7 +74,7 @@ import { db } from "../../../firebase";
 
 const { height, width } = Dimensions.get("window");
 
-export default EventShopSheet = ({
+export default EventStoreSheet = ({
   sheetRef,
   storeSheetUp,
   setStoreSheetUp,
@@ -85,14 +85,11 @@ export default EventShopSheet = ({
 
   ticket,
 }) => {
-  // const bottomSheetModalRef = useRef(null);
+  const { getOneEvent } = useData();
   const eventId = ticket?.event?._id;
-  // console.log(
-  //   ticket?.tickets.map((qr) => {
-  //     qr.uuid;
-  //   })
-  // );
-
+  const [event, setEvent] = useState({});
+  const [loading, setLoading] = useState(true);
+  // console.log(eventId);
   const ticketQrs = ticket?.tickets.map((qr) => qr.uuid);
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -122,11 +119,35 @@ export default EventShopSheet = ({
   const purchaseId = uuid.v4();
 
   const initialState = {
-    cart: cocktails,
+    cart: [],
+    // cart: cocktails,
+
     total: 0,
     amount: 0,
   };
   const [state, dispatch] = useReducer(reducer, initialState);
+  // console.log(event);
+
+  const getSelectedEvent = async () => {
+    // if (storeSheetUp) {
+      try {
+        setLoading(true);
+        console.log(eventId);
+
+        const selectedEvent = await getOneEvent(eventId);
+        setEvent(selectedEvent);
+        console.log(selectedEvent);
+        dispatch({ type: "CLEAR", payload: selectedEvent?.store });
+        // dispatch({ type: "CLEAR", payload: cocktails });
+      } catch (error) {
+        console.log(error);
+      }
+    // }
+    setLoading(false);
+  };
+  useEffect(() => {
+    getSelectedEvent();
+  }, []);
 
   function reducer(state, action) {
     switch (action.type) {
@@ -188,7 +209,7 @@ export default EventShopSheet = ({
       }
 
       case "GET_TOTALS": {
-        let { total, amount } = state.cart.reduce(
+        let { total, amount } = state?.cart?.reduce(
           (cartTotal, cartItem) => {
             const { price, amount } = cartItem;
             const itemTotal = price * amount;
@@ -203,7 +224,7 @@ export default EventShopSheet = ({
             amount: 0,
           }
         );
-        total = parseFloat(total.toFixed(2));
+        total = parseFloat(total?.toFixed(2));
         return { ...state, total, amount };
       }
     }
@@ -228,11 +249,9 @@ export default EventShopSheet = ({
       setTopUp(false),
       setFirstRender(true),
       setStoreSheetUp(false);
-    clear(cocktails);
+    clear(event?.store);
     setPaymentInfo({});
     sheetRef?.current?.close();
-
-    // sheetRef?.current?.close();
   };
   const snapPoints = useMemo(() => ["60%", "70%", "90%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -242,7 +261,7 @@ export default EventShopSheet = ({
   const [firstRender, setFirstRender] = useState(true);
   const [onPayment, setOnPayment] = useState(false);
   const [topUp, setTopUp] = useState(false);
-  const [loading, setLoading] = useState(false);
+
   // const [emptyCardInfo, setEmptyCardInfo] = useState(false);
 
   const validator = async () => {
@@ -359,7 +378,38 @@ export default EventShopSheet = ({
     }
     setLoading(false);
   };
-
+  if (loading) {
+    return (
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          // style={{backgroundColor:}}
+          ref={sheetRef}
+          index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+          snapPoints={snapPoints}
+          // onChange={handleSheetChanges}
+          onDismiss={() => {
+            clean();
+          }}
+        >
+          <BottomSheetView style={styles.contentContainer}>
+            <Animated.View
+              style={{
+                // position: "absolute",
+                alignSelf: "center",
+                // top: 10,
+                // zIndex: 2,
+                marginVertical: 20,
+              }}
+              // entering={SlideInUp.duration(300)}
+              // exiting={SlideOutUp.duration(300)}
+            >
+              <ActivityIndicator animating={true} color={colors.primary} />
+            </Animated.View>
+          </BottomSheetView>
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    );
+  }
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -368,7 +418,7 @@ export default EventShopSheet = ({
         // index={keyboardVisible ? 1 : 0}
         index={keyboardVisible ? 2 : onPayment ? 0 : 1}
         snapPoints={snapPoints}
-        onChange={() => setStoreSheetUp(true)}
+        // onChange={() => setStoreSheetUp(true)}
         onDismiss={clean}
       >
         <BottomSheetView
@@ -455,7 +505,7 @@ export default EventShopSheet = ({
                           // left: 20,
                         }}
                       >
-                        {" cve " + user?.balance?.amount || 0}
+                        {" cve " + formatNumber(user?.balance?.amount) || 0}
                       </Text>
                     </View>
                   </View>
@@ -796,48 +846,6 @@ export default EventShopSheet = ({
                           backgroundColor: colors.background,
                         }}
                       >
-                        {/* <View
-                          style={{
-                            height: 20,
-                            width: 50,
-                            backgroundColor: colors.primary,
-                            position: "absolute",
-                            // right: width * 0.12,
-                            left: -10,
-
-                            // top: 100,
-                            transform: [{ rotate: "45deg" }],
-                            borderRadius:10,
-                            borderWidth: 1,
-                            borderColor: colors.grey,
-                            // borderStyle: "dashed",
-                            zIndex: 3,
-                          }}
-                        /> */}
-                        {/* 
-                        <View
-                          style={{
-                            // height: height * 0.15,
-                            // width: width * 0.3,
-                            height: 120,
-                            width: 130,
-                            borderRadius: 10,
-                            // bottom: 40,
-                            zIndex: 1,
-                            // overflow: "hidden",
-
-                            // marginLeft: 20,
-                            bottom: 70,
-                            position: "absolute",
-                            shadowOffset: { width: 1, height: 1 },
-                            shadowOpacity: 1,
-                            shadowRadius: 3,
-                            elevation: 2,
-                            shadowColor: colors.grey,
-                            backgroundColor: colors.background,
-                          }}
-                        /> */}
-
                         <View
                           style={{
                             height: 20,
@@ -854,6 +862,7 @@ export default EventShopSheet = ({
                             // borderRadius: 10,
 
                             borderTopLeftRadius: 10,
+                            borderBottomRightRadius: 10,
                             bottom: 0,
                             // borderWidth: 1,
                             // borderColor: colors.grey,
@@ -936,7 +945,7 @@ export default EventShopSheet = ({
           </View>
         </BottomSheetView>
       </BottomSheetModal>
-      {storeSheetUp && (
+      {state?.total > 0 && (
         <Animated.View
           entering={SlideInDown.duration(200)}
           exiting={SlideOutDown.duration(200)}
@@ -991,17 +1000,6 @@ export default EventShopSheet = ({
             // onPress={handlePurchaseSheet}
             // onPress={handleClick}
             disabled={state.total == 0 || loading}
-            // onPress={() =>
-            //     onPayment ? buyTickets() : setOnPayment(true)
-            //   }
-            // disabled={blockButtons}
-            // onPress={() =>
-            //   topUp
-            //     ? topUpAccount()
-            //     : onPayment
-            //     ? setTopUp(!topUp)
-            //     : setOnPayment(true)
-            // }
             onPress={validator}
             style={{
               width: 150,
@@ -1037,7 +1035,6 @@ export default EventShopSheet = ({
                 {topUp ? "Carregar" : onPayment ? "Pagar" : "Confirmar"}
               </Text>
             )}
-            {/* <Ionicons name="ticket-outline" size={24} color={colors.white} /> */}
           </TouchableOpacity>
         </Animated.View>
       )}

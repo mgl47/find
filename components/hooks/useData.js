@@ -63,10 +63,8 @@ export const DataProvider = ({ children }) => {
       const result = await axios.get(`${apiUrl}/venues/`);
       // console.log(result?.data);
       setVenues(result?.data);
-      
     } catch (error) {
       console.log(error?.response?.data?.msg);
-
     }
   };
 

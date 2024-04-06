@@ -80,13 +80,16 @@ export default TicketPurchaseSheet = ({
 
   const getSelectedEvent = async () => {
     if (purchaseModalUp) {
-      setLoading(true);
-      const event = await getOneEvent(Event?._id);
-      setEvent(event);
-      dispatch({ type: "CLEAR", payload: event?.tickets });
-
-      setLoading(false);
+      try {
+        setLoading(true);
+        const event = await getOneEvent(Event?._id);
+        setEvent(event);
+        dispatch({ type: "CLEAR", payload: event?.tickets });
+      } catch (error) {
+        console.log(error);
+      }
     }
+    setLoading(false);
   };
   const restart = async () => {
     try {
@@ -106,7 +109,7 @@ export default TicketPurchaseSheet = ({
   useEffect(() => {
     getSelectedEvent();
   }, [purchaseModalUp]);
-  console.log(available);
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -305,6 +308,11 @@ export default TicketPurchaseSheet = ({
         `${apiUrl}/purchase/`,
         {
           // cardInfo: paymentInfo,
+          operation: {
+            type: "ticketPurchase",
+            task: "purchase",
+            eventId: event?._id,
+          },
           details: {
             purchaseId,
             buyer: {

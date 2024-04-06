@@ -1,0 +1,143 @@
+Date : 2024-04-06 22:32:02
+Directory : /Users/mgl/Documents/projects/Find/find
+Total : 88 files,  39798 codes, 3220 comments, 1367 blanks, all 44385 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         80 |     23,767 |      3,220 |      1,364 |     28,351 |
+| JSON       |          8 |     16,031 |          0 |          3 |     16,034 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                             | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                |         88 |     39,798 |      3,220 |      1,367 |     44,385 |
+| . (Files)                                                                                                        |          5 |     16,088 |          6 |         10 |     16,104 |
+| components                                                                                                       |         55 |     11,903 |      1,574 |        680 |     14,157 |
+| components (Files)                                                                                               |         10 |        386 |         25 |         42 |        453 |
+| components/Data                                                                                                  |          6 |      1,122 |          6 |         24 |      1,152 |
+| components/ImageInputs                                                                                           |          5 |        401 |         78 |         52 |        531 |
+| components/animations                                                                                            |          5 |          5 |          0 |          0 |          5 |
+| components/backups                                                                                               |          2 |      1,381 |        248 |         59 |      1,688 |
+| components/cards                                                                                                 |          4 |        403 |         58 |         47 |        508 |
+| components/hooks                                                                                                 |          4 |      1,377 |        221 |         94 |      1,692 |
+| components/navigation                                                                                            |          4 |        831 |         87 |         37 |        955 |
+| components/screensComponents                                                                                     |         13 |      5,620 |        579 |        300 |      6,499 |
+| components/screensComponents (Files)                                                                             |          1 |         12 |          1 |          3 |         16 |
+| components/screensComponents/AuthComponents                                                                      |          1 |        119 |          8 |          8 |        135 |
+| components/screensComponents/EventAddingComponents                                                               |          6 |      2,651 |        335 |        155 |      3,141 |
+| components/screensComponents/MyTicketComponents                                                                  |          2 |      1,305 |        135 |         64 |      1,504 |
+| components/screensComponents/eventComponents                                                                     |          2 |      1,352 |         84 |         56 |      1,492 |
+| components/screensComponents/templates                                                                           |          1 |        181 |         16 |         14 |        211 |
+| components/tickets                                                                                               |          2 |        377 |        272 |         25 |        674 |
+| screens                                                                                                          |         28 |     11,807 |      1,640 |        677 |     14,124 |
+| screens (Files)                                                                                                  |          3 |        204 |         81 |         29 |        314 |
+| screens/HomeScreens                                                                                              |         10 |      4,188 |        636 |        191 |      5,015 |
+| screens/HomeScreens (Files)                                                                                      |          5 |      2,905 |        456 |        123 |      3,484 |
+| screens/HomeScreens/ExploreScreens                                                                               |          4 |      1,273 |        180 |         66 |      1,519 |
+| screens/HomeScreens/VenuesScreens                                                                                |          1 |         10 |          0 |          2 |         12 |
+| screens/OrgScreens                                                                                               |          9 |      5,384 |        739 |        336 |      6,459 |
+| screens/OrgScreens (Files)                                                                                       |          2 |      1,766 |        201 |        118 |      2,085 |
+| screens/OrgScreens/ManagingNavigator                                                                             |          7 |      3,618 |        538 |        218 |      4,374 |
+| screens/OrgScreens/ManagingNavigator (Files)                                                                     |          4 |      1,639 |        273 |        102 |      2,014 |
+| screens/OrgScreens/ManagingNavigator/QrScanner                                                                   |          3 |      1,979 |        265 |        116 |      2,360 |
+| screens/authScreens                                                                                              |          6 |      2,031 |        184 |        121 |      2,336 |
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                         | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/mgl/Documents/projects/Find/find/App.js                                                                   | JavaScript |         56 |          6 |          5 |         67 |
+| /Users/mgl/Documents/projects/Find/find/app.json                                                                 | JSON       |         36 |          0 |          1 |         37 |
+| /Users/mgl/Documents/projects/Find/find/babel.config.js                                                          | JavaScript |          6 |          0 |          2 |          8 |
+| /Users/mgl/Documents/projects/Find/find/components/AppInput.js                                                   | JavaScript |         49 |          0 |          5 |         54 |
+| /Users/mgl/Documents/projects/Find/find/components/AppTextInput.js                                               | JavaScript |        116 |          3 |          5 |        124 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/artist.js                                                | JavaScript |         94 |          0 |          2 |         96 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/categories.js                                            | JavaScript |         34 |          4 |          3 |         41 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/cocktails.js                                             | JavaScript |         62 |          0 |          2 |         64 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/markers.js                                               | JavaScript |         19 |          0 |          2 |         21 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/stockEvents.js                                           | JavaScript |        870 |          2 |         14 |        886 |
+| /Users/mgl/Documents/projects/Find/find/components/Data/venue.js                                                 | JavaScript |         43 |          0 |          1 |         44 |
+| /Users/mgl/Documents/projects/Find/find/components/Icons.js                                                      | JavaScript |         57 |          0 |          1 |         58 |
+| /Users/mgl/Documents/projects/Find/find/components/ImageInputs/ImageImput.js                                     | JavaScript |        115 |         27 |         16 |        158 |
+| /Users/mgl/Documents/projects/Find/find/components/ImageInputs/ImageImputList.js                                 | JavaScript |         52 |          5 |          5 |         62 |
+| /Users/mgl/Documents/projects/Find/find/components/ImageInputs/VideoInput.js                                     | JavaScript |        142 |         31 |         18 |        191 |
+| /Users/mgl/Documents/projects/Find/find/components/ImageInputs/VideoInputList.js                                 | JavaScript |         35 |          1 |          4 |         40 |
+| /Users/mgl/Documents/projects/Find/find/components/ImageInputs/photoInput.js                                     | JavaScript |         57 |         14 |          9 |         80 |
+| /Users/mgl/Documents/projects/Find/find/components/ModalScreen.js                                                | JavaScript |         27 |          1 |          6 |         34 |
+| /Users/mgl/Documents/projects/Find/find/components/Screen.js                                                     | JavaScript |         32 |          3 |          9 |         44 |
+| /Users/mgl/Documents/projects/Find/find/components/Screen2.js                                                    | JavaScript |         28 |          1 |          5 |         34 |
+| /Users/mgl/Documents/projects/Find/find/components/animations/attention.json                                     | JSON       |          1 |          0 |          0 |          1 |
+| /Users/mgl/Documents/projects/Find/find/components/animations/check.json                                         | JSON       |          1 |          0 |          0 |          1 |
+| /Users/mgl/Documents/projects/Find/find/components/animations/exit.json                                          | JSON       |          1 |          0 |          0 |          1 |
+| /Users/mgl/Documents/projects/Find/find/components/animations/invalid.json                                       | JSON       |          1 |          0 |          0 |          1 |
+| /Users/mgl/Documents/projects/Find/find/components/animations/reenter.json                                       | JSON       |          1 |          0 |          0 |          1 |
+| /Users/mgl/Documents/projects/Find/find/components/babel.config.js                                               | JavaScript |          9 |          0 |          0 |          9 |
+| /Users/mgl/Documents/projects/Find/find/components/backups/event.js                                              | JavaScript |      1,078 |        191 |         47 |      1,316 |
+| /Users/mgl/Documents/projects/Find/find/components/backups/home.js                                               | JavaScript |        303 |         57 |         12 |        372 |
+| /Users/mgl/Documents/projects/Find/find/components/bottomSheetPreset.js                                          | JavaScript |         23 |          0 |          1 |         24 |
+| /Users/mgl/Documents/projects/Find/find/components/cards/BigCard.js                                              | JavaScript |        128 |          8 |         10 |        146 |
+| /Users/mgl/Documents/projects/Find/find/components/cards/BigCards2.js                                            | JavaScript |         95 |         18 |         10 |        123 |
+| /Users/mgl/Documents/projects/Find/find/components/cards/MediumCard.js                                           | JavaScript |         75 |         20 |         16 |        111 |
+| /Users/mgl/Documents/projects/Find/find/components/cards/SmallCard.js                                            | JavaScript |        105 |         12 |         11 |        128 |
+| /Users/mgl/Documents/projects/Find/find/components/colors.js                                                     | JavaScript |         26 |         17 |          7 |         50 |
+| /Users/mgl/Documents/projects/Find/find/components/hooks/EventScreen.js                                          | JavaScript |      1,080 |        199 |         44 |      1,323 |
+| /Users/mgl/Documents/projects/Find/find/components/hooks/useAuth.js                                              | JavaScript |        127 |          7 |         24 |        158 |
+| /Users/mgl/Documents/projects/Find/find/components/hooks/useData.js                                              | JavaScript |        113 |         10 |         16 |        139 |
+| /Users/mgl/Documents/projects/Find/find/components/hooks/useDesign.js                                            | JavaScript |         57 |          5 |         10 |         72 |
+| /Users/mgl/Documents/projects/Find/find/components/navigation/DrawerNavigator.js                                 | JavaScript |        288 |         16 |         12 |        316 |
+| /Users/mgl/Documents/projects/Find/find/components/navigation/Header.js                                          | JavaScript |         81 |         10 |          6 |         97 |
+| /Users/mgl/Documents/projects/Find/find/components/navigation/StackNavigator.js                                  | JavaScript |        384 |         56 |         13 |        453 |
+| /Users/mgl/Documents/projects/Find/find/components/navigation/TabNavigator.js                                    | JavaScript |         78 |          5 |          6 |         89 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/AuthComponents/AuthBottomSheet.js           | JavaScript |        119 |          8 |          8 |        135 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/BlockModal.js                               | JavaScript |         12 |          1 |          3 |         16 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/AddEventStore.js      | JavaScript |        506 |         37 |         27 |        570 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/AddTicketsSheet.js    | JavaScript |        348 |         62 |         26 |        436 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/EditTicketsSheet.js   | JavaScript |        309 |         70 |         22 |        401 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/UserManagerSheet.js   | JavaScript |        393 |         51 |         25 |        469 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/UserSelectorSheet.js  | JavaScript |        392 |         50 |         29 |        471 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/EventAddingComponents/VenueSelectorSheet.js | JavaScript |        703 |         65 |         26 |        794 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/MyTicketComponents/EventStoreSheet.js       | JavaScript |        985 |        101 |         47 |      1,133 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/MyTicketComponents/orderSheet.js            | JavaScript |        320 |         34 |         17 |        371 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/eventComponents/TicketGiftSheet.js          | JavaScript |        429 |         27 |         15 |        471 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/eventComponents/TicketPurchaseSheet.js      | JavaScript |        923 |         57 |         41 |      1,021 |
+| /Users/mgl/Documents/projects/Find/find/components/screensComponents/templates/bottomSheet.js                    | JavaScript |        181 |         16 |         14 |        211 |
+| /Users/mgl/Documents/projects/Find/find/components/tickets/BigTicket.js                                          | JavaScript |        192 |        247 |         17 |        456 |
+| /Users/mgl/Documents/projects/Find/find/components/tickets/OneBigTicket.js                                       | JavaScript |        185 |         25 |          8 |        218 |
+| /Users/mgl/Documents/projects/Find/find/components/toast.js                                                      | JavaScript |         19 |          0 |          3 |         22 |
+| /Users/mgl/Documents/projects/Find/find/package-lock.json                                                        | JSON       |     15,925 |          0 |          1 |     15,926 |
+| /Users/mgl/Documents/projects/Find/find/package.json                                                             | JSON       |         65 |          0 |          1 |         66 |
+| /Users/mgl/Documents/projects/Find/find/screens/ChatsScreen.js                                                   | JavaScript |         11 |          0 |          8 |         19 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/ArtistScreen.js                                      | JavaScript |        405 |         69 |         13 |        487 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/EventScreen.js                                       | JavaScript |      1,081 |        199 |         48 |      1,328 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/ExploreScreens/CalendarScreen.js                     | JavaScript |        228 |         39 |         18 |        285 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/ExploreScreens/ExploreScreens.js                     | JavaScript |        245 |         14 |         13 |        272 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/ExploreScreens/SearchScreen.js                       | JavaScript |        297 |         71 |         13 |        381 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/ExploreScreens/VenuesExplorer.js                     | JavaScript |        503 |         56 |         22 |        581 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/HomeScreen.js                                        | JavaScript |        301 |         57 |         13 |        371 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/SearchScreen2.js                                     | JavaScript |        605 |         94 |         29 |        728 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/VenueScreen.js                                       | JavaScript |        513 |         37 |         20 |        570 |
+| /Users/mgl/Documents/projects/Find/find/screens/HomeScreens/VenuesScreens/FavVenues.js                           | JavaScript |         10 |          0 |          2 |         12 |
+| /Users/mgl/Documents/projects/Find/find/screens/NotificationScreen.js                                            | JavaScript |         12 |          0 |          7 |         19 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/EventAddingScreen.js                                  | JavaScript |      1,636 |        193 |         99 |      1,928 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/Attendees.js                        | JavaScript |        186 |         23 |         11 |        220 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/EventManagingScreen.js              | JavaScript |        625 |         72 |         38 |        735 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/Overview.js                         | JavaScript |        301 |        146 |         22 |        469 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/QrScanner/BarScreen.js              | JavaScript |        459 |         54 |         35 |        548 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/QrScanner/StoreScreen.js            | JavaScript |        930 |        154 |         53 |      1,137 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/QrScanner/ValidatorScreen.js        | JavaScript |        590 |         57 |         28 |        675 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/ManagingNavigator/Staff.js                            | JavaScript |        527 |         32 |         31 |        590 |
+| /Users/mgl/Documents/projects/Find/find/screens/OrgScreens/MyEvents.js                                           | JavaScript |        130 |          8 |         19 |        157 |
+| /Users/mgl/Documents/projects/Find/find/screens/SandBox.js                                                       | JavaScript |        181 |         81 |         14 |        276 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/AuthScreens.js                                       | JavaScript |         56 |          5 |         11 |         72 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/MyTickets.js                                         | JavaScript |        128 |          8 |         16 |        152 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/ProfileScreen.js                                     | JavaScript |        865 |        105 |         36 |      1,006 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/SignInScreen.js                                      | JavaScript |        247 |         10 |         11 |        268 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/SignUpScreen.js                                      | JavaScript |        216 |          9 |         16 |        241 |
+| /Users/mgl/Documents/projects/Find/find/screens/authScreens/TicketsDetails.js                                    | JavaScript |        519 |         47 |         31 |        597 |
+| Total                                                                                                            |            |     39,798 |      3,220 |      1,367 |     44,385 |
++------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
