@@ -775,44 +775,16 @@ export default EventStoreSheet = ({
                                 label="Data de validade"
                                 defaultValue={paymentInfo?.cardInfo?.date}
                                 activeUnderlineColor={colors.primary}
-                                keyboardType="number-pad"
-                                onKeyPress={({ nativeEvent }) => {
-                                  nativeEvent.key === "Backspace" &&
-                                  paymentInfo?.cardInfo?.date?.length == 5
-                                    ? paymentInfo?.cardInfo?.date?.slice(2)
-                                    : null;
-                                }}
                                 value={paymentInfo?.cardInfo?.date}
-                                onChangeText={(text) => {
-                                  return setPaymentInfo({
+                                onChangeText={(text) =>
+                                  setPaymentInfo({
                                     ...paymentInfo,
                                     cardInfo: {
                                       ...paymentInfo?.cardInfo,
-                                      date:
-                                        paymentInfo?.cardInfo?.date?.length ==
-                                          1 &&
-                                        text.length === 2 &&
-                                        text.charAt(1) === "/"
-                                          ? text + " / "
-                                          : text,
+                                      date: text,
                                     },
-                                  });
-                                }}
-                                // onChange={({
-                                //   nativeEvent: { eventCount, target, text },
-                                // }) =>
-                                //   setPaymentInfo({
-                                //     ...paymentInfo,
-                                //     cardInfo: {
-                                //       ...paymentInfo?.cardInfo,
-                                //       date:
-                                //         paymentInfo?.cardInfo?.date?.length ==
-                                //           1 && nativeEvent.key != "Backspace"
-                                //           ? text + " / "
-                                //           : text,
-                                //     },
-                                //   })
-                                // }
+                                  })
+                                }
                               />
                               <TextInput
                                 error={

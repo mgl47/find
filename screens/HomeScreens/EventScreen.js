@@ -56,7 +56,6 @@ import ImageView from "react-native-image-viewing";
 import { useDesign } from "../../components/hooks/useDesign";
 
 import TicketPurchaseSheet from "../../components/screensComponents/eventComponents/TicketPurchaseSheet";
-import TicketGiftSheet from "../../components/screensComponents/eventComponents/TicketGiftSheet";
 import { LinearGradient } from "expo-linear-gradient";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
@@ -70,7 +69,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
-  const [GiftModalUp, setGiftModalUp] = useState(false);
+  const [gift, setGift] = useState(false);
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
@@ -106,13 +105,17 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const bottomSheetModalRef = useRef(null);
   const bottomSheetModalRef2 = useRef(null);
 
-  const handlePurchaseSheet = useCallback(() => {
+  const handlePurchaseSheet = useCallback((gift) => {
+    console.log(gift);
+    if (gift) {
+      setGift(true);
+    }
     setPurchaseModalUp(true);
 
     bottomSheetModalRef.current?.present();
   }, []);
   const handleGiftSheet = useCallback(() => {
-    setGiftModalUp(true);
+    setGift(true);
 
     bottomSheetModalRef2.current?.present();
   }, []);
@@ -472,12 +475,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               // bottom: 0,
             }}
           /> */}
-          <Text style={{ fontSize: 20, fontWeight: "500", marginBottom: 5 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "500",
+              marginBottom: 5,
+              color: colors.primary2,
+            }}
+          >
             {Event?.title}
           </Text>
           <View
             style={{
               flexDirection: "row",
+              width,
               alignItems: "center",
               justifyContent: "space-between",
             }}
@@ -496,16 +507,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   flexDirection: "row",
                   alignItems: "center",
                   marginBottom: 7,
+                  width: "100%",
                 }}
               >
-                <Entypo
-                  name="location"
-                  size={15}
-                  color={colors.darkSeparator}
-                />
+                <Entypo name="location" size={17} color={colors.primary2} />
                 <Text
                   style={{
-                    fontSize: 15,
+                    fontSize: 16,
                     fontWeight: "500",
                     width: "70%",
                     color: colors.darkSeparator,
@@ -513,32 +521,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   {Event?.venue?.displayName}, {Event?.venue?.address?.city}
-                </Text>
-              </View>
-
-              <View style={{ position: "absolute", right: 0 }}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "500",
-                    // width: "80%",
-                    color: colors.darkGrey,
-                    // marginLeft: 5,
-                    textAlign: "right",
-                  }}
-                >
-                  {Event?.tickets?.length > 1 ? "apartir de " : ""}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "500",
-                    // width: "80%",
-                    color: colors.primary,
-                    // marginLeft: 5,
-                  }}
-                >
-                  cve {formatNumber(Event?.tickets[0]?.price)}
                 </Text>
               </View>
             </View>
@@ -552,12 +534,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           >
             <MaterialCommunityIcons
               name="calendar-month"
-              size={15}
-              color={colors.darkSeparator}
+              size={19}
+              color={colors.primary2}
             />
             <Text
               style={{
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: "500",
                 // width: "80%",
                 color: colors.primary,
@@ -567,61 +549,39 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               {Event?.dates[Event?.dates?.length - 1]?.displayDate}
             </Text>
           </View>
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 2,
-              right: 3,
-              // justifyContent: "center",
-            }}
-          >
-            <MaterialCommunityIcons
-              name="lightning-bolt-outline"
-              size={22}
-              color={colors.primary}
-            />
-            <Text
+          {Event?.goingUsers?.length > 0 && (
+            <View
               style={{
-                fontSize: 14,
-                fontWeight: "500",
-                // width: "70%",
-                color: colors.darkGrey,
-              }}
-            >
-              {Event?.goingUsers?.length}
-              {Event?.goingUsers?.length > 1 ? " Pessoas vão!" : " Pessoa vai!"}
-            </Text>
-          </View>
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            {/* <TouchableOpacity
-              onPress={() => {
-                setInterested(!interested), setGoing(false);
-              }}
-              style={{
+                width: "100%",
                 flexDirection: "row",
                 alignItems: "center",
-                backgroundColor: interested ? colors.primary : colors.white,
-                // paddingHorizontal: 2,
-                marginRight: 10,
-                borderRadius: 12,
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
-                padding:5
+                marginTop: 2,
+                // right: 3,
+                // justifyContent: "center",
               }}
             >
               <MaterialCommunityIcons
-                name="calendar-heart"
-                color={interested ? colors.white : colors.black}
-                size={20}
+                name="lightning-bolt-outline"
+                size={23}
+                color={colors.primary2}
               />
-              <Text style={{ color: interested ? colors.white : colors.black }}>
-                Interressado
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "500",
+                  // width: "70%",
+                  color: colors.darkGrey,
+                }}
+              >
+                {Event?.goingUsers?.length}
+                {Event?.goingUsers?.length > 1
+                  ? " Pessoas vão!"
+                  : " Pessoa vai!"}
               </Text>
-            </TouchableOpacity> */}
+            </View>
+          )}
+          <View style={{ flexDirection: "row", marginVertical: 5 }}>
+            
             <Chip
               // elevated
 
@@ -704,11 +664,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               renderViewLess={renderViewLess}
               textStyle={{ textAlign: "left" }}
             >
-              <Text style={{ fontSize: 15 }}>{Event?.description}</Text>
+              <Text style={{ fontSize: 15, color: colors.black2 }}>
+                {Event?.description}
+              </Text>
             </ViewMoreText>
           </View>
           <View
-            style={[styles.separator, { marginTop: 20, marginBottom: 5 }]}
+            style={[styles.separator, { marginTop: 10, marginBottom: 5 }]}
           />
           <View
             style={{
@@ -751,7 +713,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           horizontal
           showsHorizontalScrollIndicator={false}
           data={Event?.artists}
-          keyExtractor={(item) => item?._id}
+          keyExtractor={(item) => item?.id}
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
@@ -798,10 +760,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               marginBottom: 5,
             }}
           >
-            Espaço
+            Local
           </Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("venue")}
+            activeOpacity={0.6}
+            onPress={() => navigation.navigate("venue",Event?.venue)}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -873,7 +836,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.011,
               }}
-              provider="google"
+              // provider="google"
               mapType="standard"
               style={styles.map}
             >
@@ -885,9 +848,57 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 }}
                 //listing?.latitude listing?.longitude
               />
+              {/* <Marker
+                coordinate={{
+                  latitude: Event?.venue?.lat,
+                  longitude: Event?.venue?.long,
+                }}
+              >
+                <View
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 2,
+                  }}
+                >
+                  <View
+                    style={{
+                      backgroundColor: colors.white,
+                      borderWidth: 0.2,
+                      borderColor: colors.darkGrey,
+                      padding: 3,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 5,
+                      bottom: 2,
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: "500" }}>
+                      {Event?.venue?.displayName}
+                    </Text>
+                  </View>
+                  <Image
+                    // resizeMode="contain"
+                    style={{
+                      height: 50,
+                      width: 50,
+                      // borderRadius: 10,
+                      borderRadius: 50,
+
+                      borderWidth: 0.2,
+                      borderColor: colors.darkGrey,
+                      backgroundColor: colors.grey,
+                    }}
+                    // source={{ uri: Event?.venue?.photos?.[0]?.uri }}
+
+                    source={{ uri: Event?.venue?.uri }}
+                  />
+                </View>
+              </Marker> */}
             </MapView>
 
             <TouchableOpacity
+              activeOpacity={0.6}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -1163,25 +1174,21 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         setPurchaseModalUp={setPurchaseModalUp}
         purchaseModalUp={purchaseModalUp}
         Event={Event}
+        setGift={setGift}
+        gift={gift}
       />
 
-      <TicketGiftSheet
-        bottomSheetModalRef2={bottomSheetModalRef2}
-        setGiftModalUp={setGiftModalUp}
-        Event={Event}
-      />
-
-      {!inFullscreen && !purchaseModalUp && !GiftModalUp && (
+      {!inFullscreen && !purchaseModalUp && !gift && (
         <Animated.View
           entering={!firstMount && SlideInDown}
           exiting={SlideOutDown}
           style={{
             justifyContent: "space-around",
             width: "100%",
-            height: Platform.OS === "android" ? 55 : 70,
+            height: isIPhoneWithNotch ? 80 : 55,
             backgroundColor: colors.white,
             position: "absolute",
-            zIndex: 1,
+            zIndex: 3,
             bottom: 0,
             flexDirection: "row",
             shadowOffset: { width: 1, height: 1 },
@@ -1190,78 +1197,118 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             elevation: 3,
             borderTopRightRadius: 15,
             borderTopLeftRadius: 15,
-            paddingHorizontal: 20,
+            // paddingHorizontal: 10,
+            // padding: 10,
           }}
         >
-          <TouchableOpacity
-            onPress={handleGiftSheet}
-            style={{
-              width: 150,
-              height: 40,
-              backgroundColor: colors.white, // position: "absolute",
-              zIndex: 1,
-              top: 10,
-              // left: 10,
-              borderRadius: 10,
-              borderWidth: 1,
-              borderColor: colors.primary,
-              alignItems: "center",
-              justifyContent: "center",
-              shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 3,
-              shadowColor: colors.dark,
-              flexDirection: "row",
-            }}
-            activeOpacity={0.5}
+          <View
+            style={{ top: Event?.tickets?.length > 1 ? 5 : 0, padding: 10 }}
           >
             <Text
               style={{
-                fontSize: 15,
-                color: colors.primary,
+                fontSize: Event?.tickets?.length > 1 ? 14 : 15,
                 fontWeight: "500",
-                marginRight: 10,
+                // width: "80%",
+                color: colors.primary2,
+                // marginLeft: 5,
+                textAlign: "center",
               }}
             >
-              Presentear
+              {Event?.tickets?.length > 1 ? "apartir de " : ""}
             </Text>
-            <Feather name="gift" size={24} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handlePurchaseSheet}
-            // onPress={handleClick}
-            style={{
-              width: 150,
-              height: 40,
-              backgroundColor: colors.primary, // position: "absolute",
-              zIndex: 1,
-              top: 10,
-              // left: 10,
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center",
-              shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 3,
-              shadowColor: colors.dark,
-              flexDirection: "row",
-            }}
-            activeOpacity={0.5}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={{
+                  fontSize: 17,
+                  fontWeight: "600",
+                  // width: "80%",
+                  color: colors.primary2,
+                  textAlign: "center",
+                  marginRight: 2,
+                  // top:2
+                  // marginLeft: 5,
+                }}
+              >
+                cve
+              </Text>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "600",
+                  // width: "80%",
+                  color: colors.primary,
+                  textAlign: "center",
+                  // marginLeft: 5,
+                }}
+              >
+                {formatNumber(Event?.tickets[0]?.price)}
+              </Text>
+            </View>
+          </View>
+          <View
+            style={{ flexDirection: "row", alignItems: "center", bottom: 5 }}
           >
-            <Text
+            <TouchableOpacity
+              // onPress={handleGiftSheet}
+              onPress={() => handlePurchaseSheet(true)}
               style={{
-                fontSize: 15,
-                color: colors.white,
-                fontWeight: "500",
+                width: 38,
+                // padding:5,
+                height: 38,
+                backgroundColor: colors.white, // position: "absolute",
+                zIndex: 1,
                 marginRight: 10,
+                // left: 10,
+                borderRadius: 10,
+                borderWidth: 1.3,
+                borderColor: colors.primary,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 3,
+                shadowColor: colors.dark,
+                flexDirection: "row",
               }}
+              activeOpacity={0.5}
             >
-              Comprar
-            </Text>
-            <Ionicons name="ticket-outline" size={24} color={colors.white} />
-          </TouchableOpacity>
+              <Feather name="gift" size={24} color={colors.primary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handlePurchaseSheet()}
+              style={{
+                width: 150,
+                height: 40,
+                backgroundColor: colors.primary, // position: "absolute",
+                zIndex: 1,
+                // left: 10,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 3,
+                shadowColor: colors.dark,
+                flexDirection: "row",
+              }}
+              activeOpacity={0.5}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: colors.white,
+                  fontWeight: "500",
+                  marginRight: 10,
+                }}
+              >
+                Comprar
+              </Text>
+              <Ionicons name="ticket-outline" size={24} color={colors.white} />
+            </TouchableOpacity>
+          </View>
         </Animated.View>
       )}
     </>

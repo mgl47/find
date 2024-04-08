@@ -70,30 +70,17 @@ export default orderSheet = ({ sheetRef, order }) => {
   const handleSheetChanges = useCallback((index) => {}, []);
   const [loading, setLoading] = useState(false);
   const statusColor = () => {
-    if (order?.state == "preparando") {
+    if (order?.status == "preparando") {
       return colors.primary;
-    } else if (order?.state == "pendente") {
-      return "orange";
-    } else if (order?.state == "pronto") {
+    } else if (order?.status == "pronto") {
       return "green";
-    } else if (order?.state == "concluído") {
+    } else if (order?.status == "concluído") {
       return colors.darkGrey;
-    } else if (order?.state == "cancelado") {
-      return colors.darkRed;
+    } else {
+      return colors.primary2;
     }
   };
-  //   function totalCalculator() {
-  //     const total = order?.products?.reduce((cartTotal, cartItem) => {
-  //       const { price, amount } = cartItem;
-  //       const itemTotal = price * amount;
 
-  //       cartTotal.total += itemTotal;
-  //       cartTotal.amount += amount;
-
-  //       return cartTotal;
-  //     });
-  //     return (total = parseFloat(total.toFixed(2)));
-  //   }
   const total = order?.products?.reduce(
     (acc, val) => acc + val?.price * val?.amount,
     0
@@ -122,7 +109,7 @@ export default orderSheet = ({ sheetRef, order }) => {
           }
         }
       >
-        <BottomSheetView style={styles.contentContainer}>
+
           <BottomSheetFlatList
             style={{ padding: 10 }}
             data={order?.products}
@@ -175,7 +162,7 @@ export default orderSheet = ({ sheetRef, order }) => {
                       alignSelf: "flex-start",
                       fontSize: 17,
                       fontWeight: "400",
-                      color: color,
+                      color,
                       marginVertical: 3,
                     }}
                   >
@@ -307,7 +294,7 @@ export default orderSheet = ({ sheetRef, order }) => {
               </View>
             }
           />
-        </BottomSheetView>
+
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );

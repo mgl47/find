@@ -30,17 +30,34 @@ import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
 import { Chip } from "react-native-paper";
 import { ImageBackground } from "react-native";
+import { useData } from "../../components/hooks/useData";
+import { useDesign } from "../../components/hooks/useDesign";
+import axios from "axios";
+import uuid from "react-native-uuid";
+
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
-  const { width, height } = Dimensions.get("window");
-const item=route.params
+  const { width, height } = useDesign();
+  const { apiUrl } = useData();
+  const item = route.params;
   const [venue, setVenue] = useState(item);
+  //  console.log(uuid.v4());
+  const getVenues = async () => {
+    try {
+      const result = await axios.get(`${apiUrl}/venues/?&filter=${item?.uuid}`);
+
+      console.log(result?.data);
+      setVenue(result?.data?.[0]);
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    }
+  };
+  useEffect(() => {
+    getVenues();
+  }, []);
 
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
-  // const handleScroll = (event) => {
-  //   setScrolling(event.nativeEvent.contentOffset.y > 200);
-  //   console.log(event.nativeEvent.contentOffset.y);
-  // };
+
   const [scrollingPos, setScrollingPos] = useState(0);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
@@ -331,7 +348,7 @@ const item=route.params
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.011,
                   }}
-                  provider="google"
+                  // provider="google"
                   mapType="standard"
                   style={styles.map}
                 >

@@ -157,7 +157,7 @@ const CalendarScreen = () => {
       style={{ flex: 1, backgroundColor: colors.background }}
       data={calendarEvents}
       showsVerticalScrollIndicator={false}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item._id}
       ListHeaderComponent={
         <View
           style={{
@@ -234,8 +234,10 @@ const CalendarScreen = () => {
         </View>
       }
       renderItem={({ item }) => {
+
         return !loading ? (
           <TouchableOpacity
+          onPress={()=>navigation.navigate("event",item)}
             activeOpacity={0.8}
             style={{
               // shadowOffset: { width: 0.5, height: 0.5 },
@@ -251,7 +253,7 @@ const CalendarScreen = () => {
             }}
             // onPress={() => navigation.navigate("event", item)}
           >
-            <SmallCard {...item} />
+            <SmallCard {...item} selectedDay={selectedDay} />
           </TouchableOpacity>
         ) : null;
       }}

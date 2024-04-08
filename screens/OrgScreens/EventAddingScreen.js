@@ -668,7 +668,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   //         "http://213.22.163.212/post",
   //         "${HEROKU_URL}/Market/newMarket",
 
-  const phoneWifi = "172.20.10.8";
+  // const phoneWifi = "172.20.10.8";
 
   return (
     <>

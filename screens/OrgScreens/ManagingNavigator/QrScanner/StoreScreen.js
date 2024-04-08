@@ -1,4 +1,11 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View,FlatList } from "react-native";
+import {
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from "react-native";
 import React, {
   useCallback,
   useEffect,
@@ -86,7 +93,6 @@ export default function StoreScreen({
     );
   };
   const handleOrderSheet = useCallback((item) => {
-    console.log(item?.orderId);
     setSelectedOrder(item);
 
     orderSheetRef.current?.present();
@@ -95,23 +101,24 @@ export default function StoreScreen({
     (order) => order?.orderId == selectedOrder?.orderId
   )?.[0];
   useEffect(() => {
-    const q = query(
-      collection(db, "transactions"),
+    if (event?._id) {
+      const q = query(
+        collection(db, "transactions"),
 
-      where("eventId", "==", event._id),
-      orderBy("time", "asc")
-    );
+        where("eventId", "==", event?._id),
+        orderBy("time", "asc")
+      );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const newOrders = [];
-      querySnapshot.forEach((doc) => {
-        newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const newOrders = [];
+        querySnapshot.forEach((doc) => {
+          newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
+        });
+
+        setOrders(newOrders);
       });
+    }
 
-      setOrders(newOrders);
-    });
-
-    // Cleanup function
     return () => unsubscribe();
   }, []);
 
@@ -126,11 +133,9 @@ export default function StoreScreen({
     } else if (item?.status == "pronto") {
       return "green";
     } else if (item?.status == "concluído") {
-      return colors.grey;
-    } else if (item?.status == "cancelado") {
-      return colors.darkRed;
+      return colors.softGrey;
     } else {
-      return colors.darkSeparator;
+      return colors.primary2;
     }
   };
   const color = statusColor(sheetOrder?.status);
@@ -141,16 +146,6 @@ export default function StoreScreen({
     }
 
     try {
-      //   const response = await axios.patch(
-      //     `${apiUrl}/user/current/${user?._id}`,
-      //     {
-      //       operation: { type: "accountBalance", task: "charge" },
-      //       amount: Number(state?.total),
-      //     },
-      //     { headers: { Authorization: headerToken } }
-      //   );
-
-      //   if (response.status === 200) {
       const status = sheetOrder?.status;
       const docRef = doc(db, "transactions", sheetOrder?.orderId);
 
@@ -174,33 +169,8 @@ export default function StoreScreen({
     // setLoading(false);
   };
 
-  //   const sortOrders = (item) => {
-  //     let temp = sort;
-  //     if (sort?.includes(item)) {
-  //       temp = sort?.filter((sortItem) => sortItem != item);
-  //       setSort(temp);
-  //       return;
-  //     }
-  //     temp.push(item);
-  //     setSort(temp);
-  //   };
-
-  //   const sort = [1, 4];
   let filters = [];
-  //   let filteredOrders = orders?.filter((order) => {
-  //     if (pend) {
-  //       return order?.status != "pendente";
-  //     }
-  //     if (prep) {
-  //       return order?.status != "preparando";
-  //     }
-  //     if (ready) {
-  //       return order?.status != "pronto";
-  //     }
-  //     if (done) {
-  //       return order?.status != "concluído";
-  //     }
-  //   });
+
   let filteredOrders = orders?.filter((order) => {
     if (!pend && !prep && !ready && !done) {
       return order?.status != "concluído";
@@ -249,21 +219,20 @@ export default function StoreScreen({
   };
   return (
     <>
-   
       <FlatList
-      bounces={false}
+        bounces={false}
         ListHeaderComponent={
           <>
-             <View
-        style={{
-          position: "absolute",
-          width: "100%",
+            <View
+              style={{
+                position: "absolute",
+                width: "100%",
 
-          height: 130,
-          backgroundColor: colors.primary2,
-          zIndex: 0,
-        }}
-      />
+                height: 130,
+                backgroundColor: colors.primary2,
+                zIndex: 0,
+              }}
+            />
             <View
               style={{
                 alignItems: "center",
@@ -373,7 +342,6 @@ export default function StoreScreen({
                         elevation: 2,
                         shadowColor: colors.primary,
                         backgroundColor: colors.background,
-
                       }}
                     >
                       <View
@@ -392,7 +360,7 @@ export default function StoreScreen({
                           // borderRadius: 10,
 
                           borderTopLeftRadius: 10,
-                          borderBottomRightRadius:10,
+                          borderBottomRightRadius: 10,
 
                           bottom: 0,
                           // borderWidth: 1,
@@ -524,8 +492,6 @@ export default function StoreScreen({
                 <Text style={styles.paragraph}>concluiído</Text>
               </TouchableOpacity>
             </ScrollView>
-
-           
           </>
         }
         data={filteredOrders}

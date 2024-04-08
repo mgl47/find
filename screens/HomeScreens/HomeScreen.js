@@ -80,6 +80,7 @@ export default function HomeScreen({ navigation }) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          marginBottom:5
           // backgroundColor: colors.primary2,
         }}
       >

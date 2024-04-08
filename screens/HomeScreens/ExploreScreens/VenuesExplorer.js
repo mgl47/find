@@ -33,7 +33,7 @@ import {
 import { Tab } from "@rneui/base";
 import {
   BottomSheetModal,
-  BottomSheetView,
+  BottomSheetFlatList,
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import Animated, {
@@ -245,8 +245,12 @@ const VenuesExplorer = () => {
                   // onPress={handleMarkerPress}
                   onPress={async () => {
                     const newRegion = {
-                      latitude: item?.address?.lat - 0.004,
-                      longitude: item?.address?.long,
+
+                      latitude: item?.address?.lat - 0.008,
+
+                      longitude: item?.address?.long+0.00001,
+                      // latitudeDelta: 0.01,
+                      // longitudeDelta: 0.011,
                       latitudeDelta: 0.01,
                       longitudeDelta: 0.011,
                     };
@@ -322,13 +326,10 @@ const VenuesExplorer = () => {
               snapPoints={snapPoints}
               onChange={handleSheetChanges}
             >
-              <BottomSheetView
-                style={styles.contentContainer}
-                // BottomSheetModalProvider
-              >
-                <>
-                  {/* <View style={styles.separator}/> */}
-                  {venueDetails && !loading && (
+              <BottomSheetFlatList
+                ListHeaderComponent={
+                  <>
+                    {venueDetails && !loading && (
                     <View
                       style={{
                         backgroundColor: colors.white,
@@ -438,106 +439,105 @@ const VenuesExplorer = () => {
                       )}
                     </View>
                   )}
-                  <FlatList
-                    style={{
-                      backgroundColor: colors.background,
-                      padding: Platform?.OS === "ios" ? 0 : 10,
-                      overflow: "hidden",
-                    }}
-                    data={
-                      tabIndex == 1 ? favVenues : venueDetails ? events : venues
-                    }
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item._id}
-                    ListHeaderComponent={
+                    {loading && (
+                      <Animated.View
+                        style={{
+                          // position: "absolute",
+                          alignSelf: "center",
+                          // top: 10,
+                          // zIndex: 2,
+                          marginVertical: 20,
+                        }}
+                        // entering={SlideInUp.duration(300)}
+                        // exiting={SlideOutUp.duration(300)}
+                      >
+                        <ActivityIndicator
+                          animating={true}
+                          color={colors.primary}
+                        />
+                      </Animated.View>
+                    )}
+                    {venueDetails && !loading && (
                       <>
-                        {loading && (
-                          <Animated.View
-                            style={{
-                              // position: "absolute",
-                              alignSelf: "center",
-                              // top: 10,
-                              // zIndex: 2,
-                              marginVertical: 20,
-                            }}
-                            // entering={SlideInUp.duration(300)}
-                            // exiting={SlideOutUp.duration(300)}
-                          >
-                            <ActivityIndicator
-                              animating={true}
-                              color={colors.primary}
-                            />
-                          </Animated.View>
-                        )}
-                        {venueDetails && !loading && (
-                          <>
-                            <Text
-                              style={{
-                                fontSize: 18,
-                                fontWeight: "500",
-                                // width: "80%",
-                                color: colors.primary,
-                                marginLeft: Platform?.OS === "ios" ? 20 : 10,
-                                marginTop: Platform?.OS === "ios" ? 10 : 0,
-                                // marginBottom: 5,
-                              }}
-                            >
-                              Próximos Eventos
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 16,
-                                fontWeight: "500",
-                                // width: "80%",
-                                color: colors.black2,
-                                marginLeft: Platform?.OS === "ios" ? 20 : 10,
-                                marginTop: 5,
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontWeight: "500",
+                            // width: "80%",
+                            color: colors.primary,
+                            marginLeft: Platform?.OS === "ios" ? 20 : 10,
+                            marginTop: Platform?.OS === "ios" ? 10 : 0,
+                            // marginBottom: 5,
+                          }}
+                        >
+                          Próximos Eventos
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontWeight: "500",
+                            // width: "80%",
+                            color: colors.black2,
+                            marginLeft: Platform?.OS === "ios" ? 20 : 10,
+                            marginTop: 5,
 
-                                // marginBottom: 5,
-                              }}
-                            >
-                              {recommendedEvents?.length > 1
-                                ? recommendedEvents?.length + " Eventos"
-                                : recommendedEvents?.length > 0
-                                ? recommendedEvents?.length + " Evento"
-                                : ""}
-                            </Text>
-                          </>
-                        )}
+                            // marginBottom: 5,
+                          }}
+                        >
+                          {recommendedEvents?.length > 1
+                            ? recommendedEvents?.length + " Eventos"
+                            : recommendedEvents?.length > 0
+                            ? recommendedEvents?.length + " Evento"
+                            : ""}
+                        </Text>
                       </>
-                    }
-                    renderItem={({ item }) => {
-                      return !loading && !venueDetails ? (
-                        <VenuesList {...item} />
-                      ) : (
-                        !loading && (
-                          <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={{
-                              shadowOffset: { width: 0.5, height: 0.5 },
-                              shadowOpacity: 0.1,
-                              shadowRadius: 1,
-                              elevation: 1,
-                              // padding: 10,
-                              marginTop: 10,
-                              paddingHorizontal:
-                                Platform?.OS === "ios" ? 10 : 0,
-                            }}
-                            // onPress={() => navigation.navigate("event", item)}
-                          >
-                            <SmallCard {...item} />
-                          </TouchableOpacity>
-                        )
-                      );
-                    }}
-                    ListFooterComponent={<View style={{ marginBottom: 10 }} />}
-                  />
-                </>
-              </BottomSheetView>
+                    )}
+                  </>
+                }
+
+                style={{
+                  backgroundColor: colors.background,
+                  padding: Platform?.OS === "ios" ? 0 : 10,
+                  overflow: "hidden",
+                }}
+                data={
+                  tabIndex == 1 ? favVenues : venueDetails ? events : venues
+                }
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item._id}
+                renderItem={({ item }) => {
+                  return !loading && !venueDetails ? (
+                    <VenuesList {...item} />
+                  ) : (
+                    !loading && (
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        style={{
+                          shadowOffset: { width: 0.5, height: 0.5 },
+                          shadowOpacity: 0.1,
+                          shadowRadius: 1,
+                          elevation: 1,
+                          // padding: 10,
+                          marginTop: 10,
+                          paddingHorizontal:
+                            Platform?.OS === "ios" ? 10 : 0,
+                        }}
+                        // onPress={() => navigation.navigate("event", item)}
+                      >
+                        <SmallCard {...item} />
+                      </TouchableOpacity>
+                    )
+                  );
+                }}
+                ListFooterComponent={<View style={{ marginBottom: 10 }} />}
+
+
+              />
+           
+
             </BottomSheetModal>
           </View>
         </BottomSheetModalProvider>
-
         <></>
       </Animated.View>
     </TouchableWithoutFeedback>
@@ -548,13 +548,13 @@ export default VenuesExplorer;
 
 const styles = StyleSheet.create({
   sheetContainer: {
-    flex: 1,
+    // flex: 1,
     // padding: 24,
     // justifyContent: "center",
     backgroundColor: colors.background,
   },
   contentContainer: {
-    flex: 1,
+    // flex: 1,
 
     // alignItems: "center",
     backgroundColor: colors.background,
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     // borderRadius: 5,
-    height: "100%",
+    height,
     backgroundColor: colors.grey,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

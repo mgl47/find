@@ -137,8 +137,6 @@ export function DrawerContent(props) {
               source={require("../../assets/coin.png")}
             />
           )}
-          // label={`Carteira: ${formatNumber(user?.balance?.amount) || 0} esc`}
-          // label={`Carteira: cve ${formatNumber(10000)}`}
           label={`Carteira: cve ${formatNumber(user?.balance?.amount) || 0}`}
           labelStyle={{
             fontSize: 16,

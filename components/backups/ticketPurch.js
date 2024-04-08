@@ -31,9 +31,7 @@ import colors from "../../colors";
 import Animated, {
   FadeIn,
   FadeInRight,
-  FadeOut,
   FadeOutLeft,
-  SlideInDown,
   SlideInLeft,
   SlideInRight,
   SlideOutLeft,
@@ -61,17 +59,13 @@ export default TicketPurchaseSheet = ({
   bottomSheetModalRef,
   setPurchaseModalUp,
   purchaseModalUp,
-  gift,
-  setGift,
 }) => {
   const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
   const { isIPhoneWithNotch } = useDesign();
   const [event, setEvent] = useState(Event);
   const [available, setAvailable] = useState([]);
-  const [searched, setSearched] = useState(false);
-  const [search, setSearch] = useState("");
-  const [searchedUser, setSearchedUSer] = useState(null);
+
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const TL = event?.tickets?.length;
   const customSnap = `${
@@ -82,7 +76,6 @@ export default TicketPurchaseSheet = ({
   const [firstRender, setFirstRender] = useState(true);
   const [onPayment, setOnPayment] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
-  const [userLoading, setUserLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const purchaseId = uuid.v4();
   const initialState = {
@@ -108,6 +101,9 @@ export default TicketPurchaseSheet = ({
   const restart = async () => {
     try {
       setLoading(true);
+      // setOnPayment(false), setFirstRender(true);
+      // setAvailable([]);
+      // setLimitReached(false);
       const event = await getOneEvent(Event?._id);
       setEvent(event);
       dispatch({ type: "CLEAR", payload: event?.tickets });
@@ -120,24 +116,7 @@ export default TicketPurchaseSheet = ({
   useEffect(() => {
     getSelectedEvent();
   }, [purchaseModalUp]);
-  const findUser = async () => {
-    setUserLoading(true);
-    setSearched(false);
-    setSearchedUSer(null);
-    try {
-      const response = await axios.get(
-        `${apiUrl}/users/?&search=${search?.toLowerCase()}`
-      );
-      if (response.status === 200) {
-        setSearchedUSer(response?.data);
-      }
-    } catch (error) {
-      console.log(error?.response?.data?.msg);
-      console.log(error);
-    }
-    setSearched(true);
-    setUserLoading(false);
-  };
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -308,11 +287,6 @@ export default TicketPurchaseSheet = ({
     dispatch({ type: "CLEAR", payload: item });
   };
   const clean = () => {
-    setSearch("");
-    setSearchedUSer(null);
-    setSearched(false);
-    setGift(false);
-    setPurchaseModalUp(false);
     setOnPayment(false), setFirstRender(true);
     setAvailable([]);
     setLimitReached(false);
@@ -396,11 +370,8 @@ export default TicketPurchaseSheet = ({
       if (response.status == 200) {
         // console.log();
         bottomSheetModalRef.current.close();
-        // setSearchedUSer(null)
-        // setSearched(false)
-        // setPurchaseModalUp(false);
-        // setGift(false);
-        clean();
+
+        setPurchaseModalUp(false);
         getUpdatedUser();
       }
     } catch (error) {
@@ -423,7 +394,7 @@ export default TicketPurchaseSheet = ({
     (props) => (
       <BottomSheetFooter {...props}>
         <Animated.View
-          entering={firstRender ? SlideInDown : null}
+          entering={firstRender ? FadeIn : null}
           // exiting={SlideOutLeft}
           style={{
             alignItems: "center",
@@ -471,7 +442,7 @@ export default TicketPurchaseSheet = ({
             </Text>
           </View>
           <TouchableOpacity
-            disabled={state.total == 0 || (gift && !searchedUser)}
+            disabled={state.total == 0}
             onPress={() =>
               onPayment
                 ? buyTickets()
@@ -481,9 +452,7 @@ export default TicketPurchaseSheet = ({
               width: 150,
               height: 40,
               backgroundColor:
-                (gift && searchedUser == null) || state?.total == 0
-                  ? colors.darkGrey
-                  : colors.primary, // position: "absolute",
+                state?.total != 0 ? colors.primary : colors.darkGrey, // position: "absolute",
               zIndex: 1,
               // top: 10,
               // left: 10,
@@ -513,7 +482,7 @@ export default TicketPurchaseSheet = ({
         </Animated.View>
       </BottomSheetFooter>
     ),
-    [state?.amount, loading, onPayment, firstRender, searchedUser, gift]
+    [state?.amount, loading, onPayment, firstRender]
   );
   const renderBackdrop = useCallback(
     (props) => (
@@ -521,10 +490,12 @@ export default TicketPurchaseSheet = ({
         {...props}
         disappearsOnIndex={1}
         appearsOnIndex={2}
+        
       />
     ),
     []
   );
+  
   if (loading) {
     return (
       <BottomSheetModalProvider>
@@ -536,8 +507,7 @@ export default TicketPurchaseSheet = ({
           snapPoints={snapPoints}
           onChange={handleSheetChanges}
           onDismiss={() => {
-            // setPurchaseModalUp(false)
-            clean();
+            setPurchaseModalUp(false), clean();
           }}
         >
           <BottomSheetView style={styles.contentContainer}>
@@ -565,14 +535,16 @@ export default TicketPurchaseSheet = ({
         // style={{backgroundColor:}}
         ref={bottomSheetModalRef}
         backdropComponent={renderBackdrop}
+
         index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+
         // index={onPayment ? 0 : 1}
         keyboardBehavior={"interactive"}
+        
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          // setPurchaseModalUp(false),
-          clean();
+          setPurchaseModalUp(false), clean();
         }}
         footerComponent={renderFooter}
       >
@@ -580,6 +552,7 @@ export default TicketPurchaseSheet = ({
           style={{ backgroundColor: colors.background }}
           entering={firstRender ? null : SlideInLeft}
           exiting={SlideOutLeft}
+        
           data={state?.cart}
           keyExtractor={(item) => item?.id}
           renderItem={({ item }) => {
@@ -595,9 +568,9 @@ export default TicketPurchaseSheet = ({
                   activeOpacity={0.5}
                   style={{
                     shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.1,
+                    shadowOpacity: 0.3,
                     shadowRadius: 1,
-                    elevation: 1,
+                    elevation: 2,
                     width: "100%",
                   }}
                   // onPress={() => navigation.navigate("event", item)}
@@ -697,165 +670,7 @@ export default TicketPurchaseSheet = ({
           }}
           ListHeaderComponent={
             <BottomSheetView style={styles.contentContainer}>
-              {!onPayment && gift ? (
-                <View
-                  style={{ padding: 10 }}
-                  // entering={firstRender ? null : SlideInRight}
-                  // exiting={SlideOutRight}
-                >
-                  <Animated.View
-                    entering={firstRender ? null : SlideInLeft}
-                    // exiting={userLoading ? FadeOut :SlideOutLeft}
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: 10,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 17,
-                        fontWeight: "500",
-                        // alignSelf: "center",
-                        color:colors.primary2,
-                        left: 10,
-                      }}
-                    >
-                      Encontrar amigo
-                    </Text>
-                    <TouchableOpacity
-                      // disabled={!searchedUser}
-                      disabled={true}
-                      // onPress={save}
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        // opacity: searchedUser ? 1 : 0,
-                        opacity: 0,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: colors.primary,
-                          fontSize: 16,
-                          fontWeight: "600",
-                        }}
-                      >
-                        Avançar
-                      </Text>
-                      <MaterialCommunityIcons
-                        style={{ top: 1 }}
-                        name="arrow-right"
-                        size={22}
-                        color={colors.primary}
-                      />
-                    </TouchableOpacity>
-                  </Animated.View>
-                  {!onPayment && searched && !searchedUser && !userLoading && (
-                    <Text
-                      style={{
-                        color: colors.darkGrey,
-                        alignSelf: "center",
-                        // bottom: -10,
-                        top: 30,
-                        right: 10,
-                        position: "absolute",
-                      }}
-                    >
-                      {" Este usuário não existe!"}
-                    </Text>
-                  )}
-                  <Animated.View
-                    entering={firstRender ? null : SlideInLeft}
-                    exiting={ SlideOutLeft}
-                  >
-                    <TextInput
-                      // error={!searchText}
-                      style={{
-                        marginBottom: 10,
-                        backgroundColor: colors.background,
-                        borderRadius: 20,
-                      }}
-                      // autoFocus
-                      outlineStyle={{ borderRadius: 10, borderWidth: 1.3 }}
-                      underlineStyle={{ backgroundColor: colors.primary }}
-                      // contentStyle={{
-                      //   backgroundColor: colors.background,
-                      //   fontWeight: "500",
-                      // }}
-
-                      outlineColor={colors.primary}
-                      mode="outlined"
-                      // placeholder="Pesquise por um usuário"
-                      activeOutlineColor={colors.primary}
-                      label="Nome de usuário"
-                      activeUnderlineColor={colors.primary}
-                      returnKeyType="search"
-                      value={search}
-                      cursorColor={colors.primary}
-                      // onChangeText={(text) => setPerson({ ...person, email: text })}
-                      onChangeText={setSearch}
-                      onSubmitEditing={findUser}
-                    />
-                  </Animated.View>
-                  {!onPayment && !userLoading && searchedUser ? (
-                    <Animated.View
-                      entering={firstRender ? null : SlideInLeft}
-                      exiting={SlideOutLeft}
-                    >
-                      <View
-                        // onPress={addUser}
-
-                        style={{
-                          shadowOffset: { width: 0.5, height: 0.5 },
-                          shadowOpacity: 0.3,
-                          shadowRadius: 1,
-                          elevation: 2,
-                          width: "100%",
-                          marginTop: 10,
-                        }}
-                        // onPress={() => navigation.navigate("event", item)}
-                      >
-                        <Animated.View
-                          style={styles.userCard}
-                          entering={FadeIn}
-                          exiting={FadeOut}
-                        >
-                          <Image
-                            source={{
-                              uri: searchedUser?.photos?.avatar?.[0]?.uri,
-                            }}
-                            style={{
-                              width: 70,
-                              height: 70,
-                              borderRadius: 50,
-
-                              // marginLeft: 20,
-                              // position: "absolute",
-                            }}
-
-                            // resizeMode="contain"
-                          />
-                          <View
-                            style={{ alignItems: "center", marginLeft: 10 }}
-                          >
-                            <Text
-                              numberOfLines={2}
-                              style={[styles.displayName]}
-                            >
-                              {searchedUser?.displayName}
-                            </Text>
-                            <Text numberOfLines={2} style={[styles.userName]}>
-                              @{searchedUser?.username}
-                            </Text>
-                          </View>
-                        </Animated.View>
-                      </View>
-                    </Animated.View>
-                  ) : null}
-                </View>
-              ) : onPayment ? (
+              {onPayment ? (
                 <>
                   <Animated.View
                     style={{ flex: 1 }}
@@ -869,60 +684,29 @@ export default TicketPurchaseSheet = ({
                         justifyContent: "space-between",
                       }}
                     >
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
+                      <TouchableOpacity
+                        onPress={() => setOnPayment(false)}
+                        style={{
+                          padding: 10,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
                       >
-                        <TouchableOpacity
-                          onPress={() => setOnPayment(false)}
+                        <MaterialCommunityIcons
+                          name="arrow-left"
+                          size={20}
+                          color={colors.primary}
+                        />
+                        <Text
                           style={{
-                            padding: 10,
-                            flexDirection: "row",
-                            alignItems: "center",
+                            color: colors.primary,
+                            fontSize: 16,
+                            fontWeight: "500",
                           }}
                         >
-                          <MaterialCommunityIcons
-                            name="arrow-left"
-                            size={20}
-                            color={colors.primary}
-                          />
-                          <Text
-                            style={{
-                              color: colors.primary,
-                              fontSize: 16,
-                              fontWeight: "500",
-                            }}
-                          >
-                            Voltar
-                          </Text>
-                        </TouchableOpacity>
-                        {gift && searchedUser && (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              marginLeft: 10,
-                            }}
-                          >
-                            <Feather
-                              name="gift"
-                              size={20}
-                              color={colors.primary2}
-                            />
-
-                            <Text
-                              style={{
-                                fontWeight: "500",
-                                fontSize: 15,
-                                marginRight: 20,
-                                marginLeft: 2,
-                                color: colors.primary2,
-                              }}
-                            >
-                              @{searchedUser?.username}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
+                          Voltar
+                        </Text>
+                      </TouchableOpacity>
 
                       {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text
@@ -1094,7 +878,6 @@ export default TicketPurchaseSheet = ({
                           ?.map((ticket) => {
                             return (
                               <View
-                                key={ticket.id}
                                 style={{
                                   flexDirection: "row",
                                   alignItems: "center",
@@ -1273,107 +1056,4 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     // paddingLeft: 40,
   },
-  userCard: {
-    flexDirection: "row",
-    marginBottom: 10,
-    padding: 10,
-
-    // height: 95,
-    backgroundColor: colors.white,
-    overflow: "hidden",
-    width: "95%",
-    alignSelf: "center",
-
-    borderRadius: 10,
-    // shadowOffset: { width: 1, height: 1 },
-    // shadowOpacity: 1,
-    // shadowRadius: 1,
-    // elevation: 3,
-  },
 });
-
-{
-  /*
-
-: gift ? (
-                    <Animated.View
-                      entering={firstRender ? null : SlideInLeft}
-                      exiting={SlideOutLeft}
-                      style={{
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 1,
-                        elevation: 1,
-                        backgroundColor: colors.white,
-                        padding: 10,
-                        borderRadius: 10,
-                      }}
-                    >
-                      {userLoading && (
-                        <Animated.View
-                          style={{
-                            // position: "absolute",
-                            alignSelf: "center",
-                            // top: 10,
-                            // zIndex: 4,
-                            left: 18,
-                            top: 13,
-                            // bottom: 5,
-                            zIndex: 3,
-                            padding: 10,
-                            position: "absolute",
-                          }}
-                          // entering={SlideInUp.duration(300)}
-                          // exiting={SlideOutUp.duration(300)}
-                        >
-                          <ActivityIndicator
-                            animating={true}
-                            color={colors.primary}
-                          />
-                        </Animated.View>
-                      )}
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          // marginBottom: 5,
-                          left: 2,
-                        }}
-                      >
-                        <View
-                          style={{
-                            height: 50,
-                            width: 50,
-                            backgroundColor: colors.grey,
-                            borderRadius: 50,
-                            left: 4,
-                          }}
-                        />
-                        <View style={{ marginLeft: 10 }}>
-                          <View
-                            style={{
-                              height: 18,
-                              width: 100,
-                              backgroundColor: colors.grey,
-                              borderRadius: 20,
-                              marginBottom: 5,
-                              // left: 4,
-                              // top: 4,
-                            }}
-                          />
-                          <View
-                            style={{
-                              height: 15,
-                              width: 80,
-                              backgroundColor: colors.grey,
-                              borderRadius: 20,
-                              // left: 4,
-                              // top: 4,
-                            }}
-                          />
-                        </View>
-                      </View>
-                    </Animated.View>
-                  )
-*/
-}

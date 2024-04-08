@@ -56,6 +56,7 @@ const AuthBottomSheet = ({ Event, authSheetRef, setAuthModalUp }) => {
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
+      // keyboardBehavior=""
         ref={authSheetRef}
         // index={keyboardVisible ? 1 : 0}
         index={1}

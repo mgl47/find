@@ -75,7 +75,12 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   const [orders, setOrders] = useState([]);
   const [members, setMembers] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
-
+  const uuidKey = uuid.v4();
+  const ticket = route.params;
+  const data = new Date();
+  const selectedEvent = events?.filter(
+    (event) => event?._id == ticket?.tickets?.[0]?.eventId
+  )?.[0];
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -103,18 +108,40 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          style={{ right: 20 }}
-          onPress={handlePresentModalPress}
-        >
-          <Feather name="info" size={24} color={colors.white} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {selectedEvent?.store?.length > 0 && (
+            <TouchableOpacity
+              style={{
+                // position: "absolute",
+                // right: 30,
+
+                // height: 50,
+                // width: 50,
+                // bottom: 10,
+                // alignItems: "center",
+                // justifyContent: "center",
+                // shadowOffset: { width: 1, height: 1 },
+                // shadowOpacity: 1,
+                // shadowRadius: 1,
+                // elevation: 3,
+                right: 35,
+              }}
+              // onPress={() => setShowScanModal(true)}
+              onPress={handleStoreSheet}
+            >
+              <FontAwesome6 name="shop" size={22} color={colors.white} />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={{ right: 20 }}
+            onPress={handlePresentModalPress}
+          >
+            <Feather name="info" size={24} color={colors.lightGrey} />
+          </TouchableOpacity>
+        </View>
       ),
     });
   }, [navigation]);
-  const uuidKey = uuid.v4();
-  const ticket = route.params;
-  const data = new Date();
 
   useEffect(() => {
     const q = query(
@@ -136,9 +163,6 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
     // Cleanup function
     return () => unsubscribe();
   }, []);
-  const selectedEvent = events?.filter(
-    (event) => event?._id == ticket?.tickets?.[0]?.eventId
-  )?.[0];
 
   return (
     <>
@@ -403,34 +427,6 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                     Pedidos
                   </Text>
                 )}
-                <TouchableOpacity
-                  style={{
-                    position: "absolute",
-                    right: 30,
-                    backgroundColor:colors.white,
-                    borderRadius:10,
-                    height:50,
-                    width:50,
-                    // bottom: 10,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  // onPress={() => setShowScanModal(true)}
-                  onPress={handleStoreSheet}
-                >
-                  <FontAwesome6 name="shop" size={22} color={colors.primary} />
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "500",
-                      color: colors.primary,
-
-                      // left: 10,
-                    }}
-                  >
-                    Loja
-                  </Text>
-                </TouchableOpacity>
               </View>
             )}
           </>
@@ -445,9 +441,9 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
             } else if (item?.status == "pronto") {
               return "green";
             } else if (item?.status == "concluído") {
-              return colors.darkGrey;
-            } else if (item?.status == "cancelado") {
-              return colors.darkRed;
+              return colors.softGrey;
+            } else {
+              return colors.primary2;
             }
           };
           const color = statusColor(item);

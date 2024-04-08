@@ -2,31 +2,61 @@ import React from "react";
 import { View, StyleSheet, Image, Text } from "react-native";
 import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-function SmallCard({ title, dates, photos, venue, city }) {
+function SmallCard({ title, dates, photos, venue, selectedDay }) {
   // const title = "Sessão anual da literatura caboverdiana sd g das ag dsag das";
+  console.log(selectedDay);
+
+  const chosenDay = dates?.find(
+    (date) => date?.calendarDate == selectedDay
+  )?.displayDate;
+
+  console.log(chosenDay);
+
   return (
     <View style={styles.card}>
-      <Image style={styles.image} source={{ uri: photos[2]?.[0]?.uri }} />
+      <Image style={styles.image} source={{ uri: photos[0]?.[0]?.uri }} />
       <View style={{ width: "100%" }}>
         <View style={{ padding: 10 }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text
-              style={[
-                styles.date,
-                {
-                  fontWeight: "600",
-                  color: colors.dark,
-                  fontSize: 16,
-                  // marginBottom: title?.length > 27 ? 3 : 0,
-                  bottom: 2,
-                },
-              ]}
-            >
-              {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] + ", "}
-            </Text>
-            <Text style={[styles.date, { color: "#585858" }]}>
-              {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] + " - "}
-            </Text>
+            {selectedDay ? (
+              <Text
+                style={[
+                  styles.date,
+                  {
+                    fontWeight: "600",
+                    color:colors.primary2,
+                    fontSize: 16,
+                    // marginBottom: title?.length > 27 ? 3 : 0,
+                    // bottom: 1,
+                  },
+                ]}
+              >
+                {chosenDay + " - "}
+              </Text>
+            ) : (
+              <>
+                <Text
+                  style={[
+                    styles.date,
+                    {
+                      fontWeight: "600",
+                      color:colors.primary2,
+                      fontSize: 16,
+                      // marginBottom: title?.length > 27 ? 3 : 0,
+                      bottom: 1.5,
+                    },
+                  ]}
+                >
+                  {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
+                    ", "}
+                </Text>
+                <Text style={[styles.date, {                    color:colors.primary2,
+}]}>
+                  {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] +
+                    " - "}
+                </Text>
+              </>
+            )}
             <Text style={[styles.date, { color: "#585858" }]}>
               {dates?.[0]?.hour}
             </Text>
@@ -91,10 +121,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   venue: {
+    // fontSize: 14.5,
+    // alignSelf: "flex-start",
+    // fontWeight: "600",
     fontSize: 14.5,
     alignSelf: "flex-start",
-    fontWeight: "600",
-    // marginLeft: 3,
+    fontWeight: "500",
+    color:colors.primary2
+
   },
   title: {
     alignSelf: "flex-start",
@@ -103,13 +137,14 @@ const styles = StyleSheet.create({
     color: colors.primary,
     lineHeight: 30,
     width: "70%",
-    marginVertical:5
+    marginVertical: 5,
   },
 
   date: {
     fontSize: 15,
     alignSelf: "flex-start",
-    fontWeight: "600",
+    fontWeight: "500",
+
 
     // marginTop: 3,
   },
