@@ -82,7 +82,9 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
   };
 
   return (
-    <View
+    <TouchableOpacity
+    activeOpacity={0.7}
+      onPress={handlePress}
       style={[
         styles.container,
         {
@@ -97,14 +99,14 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
       ]}
     >
       {!imageUri && (
-        <TouchableOpacity onPress={handlePress}>
+        <View>
           <Ionicons
             name={"add-circle-outline"}
             size={40}
             color={colors.primary}
             style={styles.icon}
           />
-        </TouchableOpacity>
+        </View>
       )}
       {imageUri && (
         <>
@@ -130,7 +132,7 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
           <Image style={styles.photos} source={{ uri: imageUri }} />
         </>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
 

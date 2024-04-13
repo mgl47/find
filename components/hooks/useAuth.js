@@ -65,29 +65,61 @@ export const AuthProvider = ({ children }) => {
     }
   }, [cacheChecked]);
 
-  const getUpdatedUser = async (id,token) => {
-
+  const getUpdatedUser = async (id, token) => {
     try {
       // if (headerToken) {
-        const response = await axios.get(
-          `${apiUrl}/user/current/${id??user?._id}`,
-          {
-            headers: {
-              Authorization:token?? headerToken,
-            },
-          }
-        );
+      const response = await axios.get(
+        `${apiUrl}/user/current/${id ?? user?._id}`,
+        {
+          headers: {
+            Authorization: token ?? headerToken,
+          },
+        }
+      );
 
-        setMyEvents(response?.data?.events);
-        setMyTickets(response?.data?.tickets);
-        setUser(response?.data?.user);
+      setMyEvents(response?.data?.events);
+      setMyTickets(response?.data?.tickets);
+      setUser(response?.data?.user);
 
-        const jsonValue = JSON.stringify(response.data?.user);
-        await AsyncStorage.setItem("user", jsonValue);
+      const jsonValue = JSON.stringify(response.data?.user);
+      await AsyncStorage.setItem("user", jsonValue);
       // }
     } catch (error) {
       console.log(error?.response?.data?.msg);
+    }
+  };
+  const followVenue2 = async (venue) => {
+    let updateFollowedVenue = [];
 
+    updateFollowedVenue = user?.followedVenues || [];
+
+    const index = updateFollowedVenue.indexOf(venue?._id);
+    if (user?.followedVenues?.includes(venue?._id) && index !== -1) {
+      updateFollowedVenue.splice(index, 1);
+    } else {
+      updateFollowedVenue.push(venue?._id);
+    }
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: {
+            type: "follow",
+            task: "venue",
+            target: venue?._id,
+          },
+          updates: {
+            followedVenues: updateFollowedVenue,
+          },
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      // console.log(response?.data);
+      await getUpdatedUser();
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    } finally {
     }
   };
 
@@ -117,6 +149,7 @@ export const AuthProvider = ({ children }) => {
       setHeaderToken,
       getUpdatedUser,
       logOut,
+      followVenue2,
     }),
     [headerToken, user, AuthModalUp, authSheetRef]
   );

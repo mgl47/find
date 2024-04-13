@@ -40,12 +40,21 @@ import Screen from "../../components/Screen";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { ActivityIndicator } from "react-native-paper";
 import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
-const { width, height } = Dimensions.get("window");
 import OneBigTicket from "../../components/tickets/OneBigTicket";
 import CountDown from "react-native-countdown-component";
+import { TouchableWithoutFeedback } from "react-native";
+const { width, height } = Dimensions.get("window");
+import {
+  Placeholder,
+  PlaceholderMedia,
+  PlaceholderLine,
+  Fade,
+} from "rn-placeholder";
+import { useDesign } from "../../components/hooks/useDesign";
 export default function HomeScreen({ navigation }) {
   const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
+  const { isIPhoneWithNotch } = useDesign();
   const { events, getEvents } = useData();
   const [refreshing, setRefreshing] = useState(false);
   const [scrolling, setScrolling] = useState(false);
@@ -56,14 +65,7 @@ export default function HomeScreen({ navigation }) {
   const carouselRef = useRef(null);
   // const user = false;
   _renderItem = ({ item, index }) => {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.95}
-        onPress={() => navigation.navigate("event", item)}
-      >
-        <BigCard {...item} />
-      </TouchableOpacity>
-    );
+    return <BigCard {...item} />;
   };
   const currentDate = new Date();
   // Target date
@@ -80,7 +82,7 @@ export default function HomeScreen({ navigation }) {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginBottom:5
+          marginBottom: 5,
           // backgroundColor: colors.primary2,
         }}
       >
@@ -163,6 +165,65 @@ export default function HomeScreen({ navigation }) {
                 itemWidth={width * 0.8}
               />
             ) : (
+              // <Animated.View
+              //   style={{ flex: 1 }}
+              //   entering={FadeIn}
+              //   // exiting={FadeOut}
+              // >
+              //   <Placeholder
+              //     Animation={Fade}
+
+              //     // Left={PlaceholderMedia}
+              //     // Right={PlaceholderMedia}
+              //   >
+              //     <ActivityIndicator
+              //       style={{
+              //         position: "absolute",
+              //         zIndex: 2,
+              //         alignSelf: "center",
+              //         paddingTop: isIPhoneWithNotch ? 60 : 10,
+              //       }}
+              //       animating={true}
+              //       color={colors.light2}
+              //     />
+
+              //     <PlaceholderLine
+              //       style={{
+              //         borderRadius: 0,
+              //         height: 270,
+              //         width,
+              //         backgroundColor: colors.black2,
+              //       }}
+              //     >
+              //       <View style={{ zIndex: 4 }}>
+              //         <PlaceholderLine
+              //           style={{
+              //             borderRadius: 20,
+              //             height: 15,
+              //             width: "90%",
+              //             marginTop: 10,
+              //           }}
+              //         />
+              //         <PlaceholderLine
+              //           style={{
+              //             borderRadius: 20,
+              //             height: 15,
+              //             width: "90%",
+              //             bottom: 2,
+              //           }}
+              //         />
+              //         <PlaceholderLine
+              //           style={{
+              //             borderRadius: 20,
+              //             height: 15,
+              //             width: "70%",
+              //             bottom: 2,
+              //           }}
+              //         />
+              //       </View>
+              //     </PlaceholderLine>
+              //   </Placeholder>
+              // </Animated.View>
               <Animated.View
                 style={{
                   // position: "absolute",
@@ -182,33 +243,6 @@ export default function HomeScreen({ navigation }) {
                 />
               </Animated.View>
             )}
-
-            {/* <Text style={styles.headerText}>Bu próximo evento</Text>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation?.navigate("event", trendingEvents[1])}
-              style={{
-                shadowOffset: { width: 1, height: 1 },
-                shadowOpacity: 1,
-                shadowRadius: 1,
-                elevation: 3,
-                marginVertical: 10,
-              }}
-            >
-              <BigCard2
-                title={trendingEvents[1]?.title}
-                date={trendingEvents[1]?.date}
-                venue={{
-                  displayName: trendingEvents[1]?.venue?.displayName,
-                  city: trendingEvents[1]?.venue?.city,
-                }}
-                image={{
-                  uri: trendingEvents[1]?.photos[0]?.[0]?.uri,
-                }}
-              />
-          
-            </TouchableOpacity> */}
-            {/* <Text style={styles.headerText}>Pa bó</Text> */}
             {user && myTickets?.length > 0 && differenceInSeconds > 0 && (
               <Animated.View
                 // style={{ marginBottom: 20 }}
@@ -240,7 +274,7 @@ export default function HomeScreen({ navigation }) {
                     digitStyle={{
                       backgroundColor: colors.white,
                       shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.3,
+                      shadowOpacity: 0.2,
                       shadowRadius: 1,
                       elevation: 0.5,
                     }}
@@ -262,15 +296,18 @@ export default function HomeScreen({ navigation }) {
                       m: "minutos",
                       s: "segundos",
                     }}
-                    // showSeparator
                   />
                 </View>
                 <TouchableOpacity
-                  activeOpacity={0.8}
+                  activeOpacity={0.95}
                   style={{ padding: 10 }}
-                  onPress={() =>
-                    navigation.navigate("ticketDetails", myTickets?.[0])
+                  // onPress={() =>
+                  //   navigation.navigate("ticketDetails", myTickets?.[0])
+                  // }
+                      onPress={() =>
+                    navigation.navigate("addArtist")
                   }
+                  
                 >
                   <OneBigTicket {...myTickets?.[0]} />
                 </TouchableOpacity>
@@ -298,7 +335,7 @@ export default function HomeScreen({ navigation }) {
                       marginTop: 10,
                     }}
                     // onPress={() => navigation.navigate("addEvent", item)}
-                    onPress={() => navigation.navigate("manageEvent", item)}
+                    onPress={() => navigation.navigate("addVenue")}
                   >
                     <SmallCard {...item} />
                   </TouchableOpacity>

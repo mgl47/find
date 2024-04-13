@@ -118,15 +118,18 @@ export default TicketPurchaseSheet = ({
     }
   };
   useEffect(() => {
-    getSelectedEvent();
+    if (purchaseModalUp) {
+      getSelectedEvent();
+    }
   }, [purchaseModalUp]);
+
   const findUser = async () => {
     setUserLoading(true);
     setSearched(false);
     setSearchedUSer(null);
     try {
       const response = await axios.get(
-        `${apiUrl}/users/?&search=${search?.toLowerCase()}`
+        `${apiUrl}/users/?username=${search?.toLowerCase()}`
       );
       if (response.status === 200) {
         setSearchedUSer(response?.data);
@@ -313,7 +316,7 @@ export default TicketPurchaseSheet = ({
     setSearched(false);
     setGift(false);
     setPurchaseModalUp(false);
-    setOnPayment(false), setFirstRender(true);
+    setFirstRender(true);
     setAvailable([]);
     setLimitReached(false);
   };
@@ -340,6 +343,7 @@ export default TicketPurchaseSheet = ({
     },
   });
   const buyTickets = async () => {
+    setLoading(true);
     let updateInterested = [];
     let updatedGoing = [];
     updatedGoing = user?.goingToEvents || [];
@@ -394,14 +398,15 @@ export default TicketPurchaseSheet = ({
         }
       );
       if (response.status == 200) {
-        // console.log();
-        bottomSheetModalRef.current.close();
+        console.log("fsdf");
         // setSearchedUSer(null)
         // setSearched(false)
         // setPurchaseModalUp(false);
         // setGift(false);
-        clean();
         getUpdatedUser();
+        await bottomSheetModalRef.current.close();
+        clean();
+        setOnPayment(false);
       }
     } catch (error) {
       if (error?.response?.data?.restart) {
@@ -416,6 +421,8 @@ export default TicketPurchaseSheet = ({
       });
       console.log(error?.response?.data?.invalidTickets);
       console.log(error?.response?.data?.msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -482,7 +489,7 @@ export default TicketPurchaseSheet = ({
               height: 40,
               backgroundColor:
                 (gift && searchedUser == null) || state?.total == 0
-                  ? colors.darkGrey
+                  ? colors.description2
                   : colors.primary, // position: "absolute",
               zIndex: 1,
               // top: 10,
@@ -499,16 +506,23 @@ export default TicketPurchaseSheet = ({
             }}
             activeOpacity={0.5}
           >
-            <Text
-              style={{
-                fontSize: 15,
-                color: colors.white,
-                fontWeight: "500",
-                marginRight: 10,
-              }}
-            >
-              {onPayment ? "Pagar" : "Confirmar"}
-            </Text>
+            {loading ? (
+              <ActivityIndicator
+                style={{ position: "absolute" }}
+                color={colors.white}
+              />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: colors.white,
+                  fontWeight: "500",
+                  marginRight: 10,
+                }}
+              >
+                {onPayment ? "Pagar" : "Confirmar"}
+              </Text>
+            )}
           </TouchableOpacity>
         </Animated.View>
       </BottomSheetFooter>
@@ -525,40 +539,40 @@ export default TicketPurchaseSheet = ({
     ),
     []
   );
-  if (loading) {
-    return (
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          // style={{backgroundColor:}}
+  // if (loading) {
+  //   return (
+  //     <BottomSheetModalProvider>
+  //       <BottomSheetModal
+  //         // style={{backgroundColor:}}
 
-          ref={bottomSheetModalRef}
-          index={keyboardVisible ? 2 : onPayment ? 0 : 1}
-          snapPoints={snapPoints}
-          onChange={handleSheetChanges}
-          onDismiss={() => {
-            // setPurchaseModalUp(false)
-            clean();
-          }}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <Animated.View
-              style={{
-                // position: "absolute",
-                alignSelf: "center",
-                // top: 10,
-                // zIndex: 2,
-                marginVertical: 20,
-              }}
-              // entering={SlideInUp.duration(300)}
-              // exiting={SlideOutUp.duration(300)}
-            >
-              <ActivityIndicator animating={true} color={colors.primary} />
-            </Animated.View>
-          </BottomSheetView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-    );
-  }
+  //         ref={bottomSheetModalRef}
+  //         index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+  //         snapPoints={snapPoints}
+  //         onChange={handleSheetChanges}
+  //         onDismiss={() => {
+  //           // setPurchaseModalUp(false)
+  //           clean();
+  //         }}
+  //       >
+  //         <BottomSheetView style={styles.contentContainer}>
+  //           <Animated.View
+  //             style={{
+  //               // position: "absolute",
+  //               alignSelf: "center",
+  //               // top: 10,
+  //               // zIndex: 2,
+  //               marginVertical: 20,
+  //             }}
+  //             // entering={SlideInUp.duration(300)}
+  //             // exiting={SlideOutUp.duration(300)}
+  //           >
+  //             <ActivityIndicator animating={true} color={colors.primary} />
+  //           </Animated.View>
+  //         </BottomSheetView>
+  //       </BottomSheetModal>
+  //     </BottomSheetModalProvider>
+  //   );
+  // }
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
@@ -573,6 +587,7 @@ export default TicketPurchaseSheet = ({
         onDismiss={() => {
           // setPurchaseModalUp(false),
           clean();
+          setOnPayment(false);
         }}
         footerComponent={renderFooter}
       >
@@ -708,7 +723,7 @@ export default TicketPurchaseSheet = ({
                     // exiting={userLoading ? FadeOut :SlideOutLeft}
                     style={{
                       flexDirection: "row",
-                      justifyContent: "space-between",
+                      // justifyContent: "space-between",
                       alignItems: "center",
                       marginBottom: 10,
                     }}
@@ -718,12 +733,15 @@ export default TicketPurchaseSheet = ({
                         fontSize: 17,
                         fontWeight: "500",
                         // alignSelf: "center",
-                        color:colors.primary2,
+                        color: colors.primary2,
                         left: 10,
+                        marginRight: 15,
                       }}
                     >
-                      Encontrar amigo
+                      Presentear
                     </Text>
+
+                    <Feather name="gift" size={20} color={colors.primary} />
                     <TouchableOpacity
                       // disabled={!searchedUser}
                       disabled={true}
@@ -768,7 +786,7 @@ export default TicketPurchaseSheet = ({
                   )}
                   <Animated.View
                     entering={firstRender ? null : SlideInLeft}
-                    exiting={ SlideOutLeft}
+                    exiting={SlideOutLeft}
                   >
                     <TextInput
                       // error={!searchText}
@@ -895,33 +913,6 @@ export default TicketPurchaseSheet = ({
                             Voltar
                           </Text>
                         </TouchableOpacity>
-                        {gift && searchedUser && (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              marginLeft: 10,
-                            }}
-                          >
-                            <Feather
-                              name="gift"
-                              size={20}
-                              color={colors.primary2}
-                            />
-
-                            <Text
-                              style={{
-                                fontWeight: "500",
-                                fontSize: 15,
-                                marginRight: 20,
-                                marginLeft: 2,
-                                color: colors.primary2,
-                              }}
-                            >
-                              @{searchedUser?.username}
-                            </Text>
-                          </View>
-                        )}
                       </View>
 
                       {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -954,7 +945,7 @@ export default TicketPurchaseSheet = ({
                           style={{
                             fontSize: 17,
                             fontWeight: "500",
-                            color: colors.black,
+                            color: colors.primary2,
 
                             // left: 10,
                           }}
@@ -976,6 +967,49 @@ export default TicketPurchaseSheet = ({
                         </Text>
                       </View>
                     </View>
+                    {gift && searchedUser && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginLeft: 10,
+                          marginTop: 5,
+                        }}
+                      >
+                        <Feather
+                          name="gift"
+                          size={20}
+                          color={colors.primary2}
+                        />
+
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            fontSize: 15,
+                            marginRight: 5,
+                            marginLeft: 2,
+                            top: 2,
+                            color: colors.primary2,
+                          }}
+                        >
+                          Presente para:
+                        </Text>
+
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            fontSize: 15,
+                            marginRight: 20,
+                            // marginLeft: 2,
+                            top: 2,
+
+                            color: colors.primary,
+                          }}
+                        >
+                          @{searchedUser?.username}
+                        </Text>
+                      </View>
+                    )}
                     <View
                       style={{
                         flex: 1,
@@ -1087,54 +1121,94 @@ export default TicketPurchaseSheet = ({
                           </View>
                         </View>
                       )}
+                      <Animated.FlatList
+                        entering={FadeIn}
+                        exiting={FadeOut}
+                        data={state?.cart?.filter((item) => item?.amount != 0)}
+                        keyExtractor={(item) => item?.id}
+                        ListHeaderComponent={
+                          <Text
+                            style={{
+                              fontSize: 17,
+                              fontWeight: "500",
+                              color: colors.primary,
+                              // marginLeft: 10,
+                              // marginTop: 10,
+                              marginBottom: 10,
+                              marginTop: gift ? 5 : 0,
 
-                      <View>
-                        {state?.cart
-                          ?.filter((item) => item?.amount != 0)
-                          ?.map((ticket) => {
-                            return (
-                              <View
-                                key={ticket.id}
+                              // left: 10,
+                            }}
+                          >
+                            {state?.cart?.filter((item) => item?.amount != 0)
+                              ?.amount > 1
+                              ? " Bilhetes selecionados:"
+                              : " Bilhete selecionado:"}
+                          </Text>
+                        }
+                        ItemSeparatorComponent={
+                          <View
+                            style={{
+                              alignSelf: "center",
+                              width: "95%",
+                              backgroundColor: colors.grey,
+                              height: 1,
+                              marginVertical: 10,
+                            }}
+                          />
+                        }
+                        renderItem={({ item }) => {
+                          return (
+                            <View
+                              key={item.id}
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                marginLeft: 5,
+                              }}
+                            >
+                              <Text
                                 style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
+                                  fontSize: 17,
+                                  fontWeight: "500",
+                                  color: colors.primary,
+                                  // left: 10,
                                 }}
                               >
-                                <Text
-                                  style={{
-                                    fontSize: 17,
-                                    fontWeight: "500",
-                                    color: colors.primary,
-                                    // left: 10,
-                                  }}
-                                >
-                                  {ticket?.amount}x
-                                </Text>
+                                {item?.amount}x
+                              </Text>
 
-                                <Text
-                                  style={{
-                                    fontSize: 15,
-                                    fontWeight: "500",
-                                    color: colors.darkSeparator,
-                                    top: 2,
-                                    position: "absolute",
-                                    left: 20,
-                                  }}
-                                >
-                                  {(ticket?.amount > 1
-                                    ? " Bilhetes "
-                                    : " Bilhete ") +
-                                    '"' +
-                                    ticket?.category +
-                                    '"' +
-                                    (ticket?.amount > 1
-                                      ? " selecionados!"
-                                      : " selecionado!")}
-                                </Text>
-                              </View>
-                            );
-                          })}
-                      </View>
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontWeight: "500",
+                                  color: colors.primary2,
+                                  top: 2,
+                                  position: "absolute",
+                                  left: 20,
+                                  // fontSize: 17,
+                                  // fontWeight: "500",
+                                  // color: colors.primary,
+                                  // marginLeft: 10,
+                                  // // marginTop: 10,
+                                  // marginBottom: 10,
+                                }}
+                              >
+                                {(item?.amount > 1
+                                  ? " Bilhetes "
+                                  : " Bilhete ") +
+                                  '"' +
+                                  item?.category +
+                                  '"' +
+                                  (item?.amount > 1
+                                    ? " selecionados!"
+                                    : " selecionado!")}
+                              </Text>
+                            </View>
+                          );
+                        }}
+                      />
+                      <View></View>
                     </View>
                   </Animated.View>
                 </>

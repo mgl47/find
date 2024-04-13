@@ -43,13 +43,7 @@ export default function OneBigTicket({ uri, tickets, event }) {
       }}
     >
       <View
-        style={{
-          left: "24%",
-          width: "80%",
-          padding: 12,
-          zIndex: 2,
-          top: 20,
-        }}
+        style={{ left: "24%", width: "80%", padding: 12, zIndex: 2, top: 20 }}
       >
         <Text
           style={{
@@ -57,7 +51,6 @@ export default function OneBigTicket({ uri, tickets, event }) {
             fontSize: 19,
             fontWeight: "600",
             marginRight: 10,
-
             // textAlign: "center",
             // top: 30,
             // left: 20,
@@ -76,7 +69,7 @@ export default function OneBigTicket({ uri, tickets, event }) {
             // left: 20,
           }}
         >
-          {event?.venue?.displayName + ", " + event?.venue?.city}
+          {event?.venue?.displayName+", "+event?.venue?.city}
         </Text>
         {/* <Text
           style={{
@@ -185,9 +178,9 @@ export default function OneBigTicket({ uri, tickets, event }) {
         <Text
           style={{
             color: colors.grey,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: "600",
-            marginRight: 2,
+            marginRight: 5,
             // left: 20,
           }}
         >
@@ -195,7 +188,7 @@ export default function OneBigTicket({ uri, tickets, event }) {
         </Text>
         <MaterialCommunityIcons
           name="arrow-right"
-          size={18}
+          size={20}
           color={colors.grey}
         />
       </View>

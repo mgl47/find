@@ -492,41 +492,41 @@ export default EventStoreSheet = ({
     ),
     []
   );
-  if (loading) {
-    return (
-      <BottomSheetModalProvider>
-        <BottomSheetModal
-          // style={{backgroundColor:}}
+  // if (loading) {
+  //   return (
+  //     <BottomSheetModalProvider>
+  //       <BottomSheetModal
+  //         // style={{backgroundColor:}}
 
-          ref={sheetRef}
-          index={keyboardVisible ? 2 : onPayment ? 0 : 1}
-          snapPoints={snapPoints}
-          // onChange={handleSheetChanges}
-          onDismiss={() => {
-            clean();
-          }}
-        >
-          <BottomSheetView style={styles.contentContainer}>
-            <Animated.View
-              style={{
-                // position: "absolute",
-                alignSelf: "center",
-                // top: 10,
-                // zIndex: 2,
-                marginVertical: 20,
-              }}
-              // entering={SlideInUp.duration(300)}
-              // exiting={SlideOutUp.duration(300)}
-            >
-              <ActivityIndicator animating={true} color={colors.primary} />
-            </Animated.View>
-          </BottomSheetView>
-        </BottomSheetModal>
-      </BottomSheetModalProvider>
-    );
-  }
+  //         ref={sheetRef}
+  //         index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+  //         snapPoints={snapPoints}
+  //         // onChange={handleSheetChanges}
+  //         onDismiss={() => {
+  //           clean();
+  //         }}
+  //       >
+  //         <BottomSheetView style={styles.contentContainer}>
+  //           <Animated.View
+  //             style={{
+  //               // position: "absolute",
+  //               alignSelf: "center",
+  //               // top: 10,
+  //               // zIndex: 2,
+  //               marginVertical: 20,
+  //             }}
+  //             // entering={SlideInUp.duration(300)}
+  //             // exiting={SlideOutUp.duration(300)}
+  //           >
+  //             <ActivityIndicator animating={true} color={colors.primary} />
+  //           </Animated.View>
+  //         </BottomSheetView>
+  //       </BottomSheetModal>
+  //     </BottomSheetModalProvider>
+  //   );
+  // }
 
-  return (
+  if(event?.store?.length>0)return (
     <BottomSheetModalProvider>
       <BottomSheetModal
         // style={{backgroundColor:}}
@@ -621,7 +621,7 @@ export default EventStoreSheet = ({
                         style={{
                           fontSize: 17,
                           fontWeight: "500",
-                          color: colors.black,
+                          color: colors.primary2,
 
                           // left: 10,
                         }}

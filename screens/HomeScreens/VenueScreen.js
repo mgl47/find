@@ -11,9 +11,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Animated, { FadeIn, SlideOutUp } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut, SlideOutUp } from "react-native-reanimated";
 import React, { useEffect, useState } from "react";
 import colors from "../../components/colors";
+import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
+
 import {
   MaterialCommunityIcons,
   MaterialIcons,
@@ -28,44 +30,119 @@ import { LinearGradient } from "expo-linear-gradient";
 import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
-import { Chip } from "react-native-paper";
+
 import { ImageBackground } from "react-native";
 import { useData } from "../../components/hooks/useData";
 import { useDesign } from "../../components/hooks/useDesign";
 import axios from "axios";
 import uuid from "react-native-uuid";
+import {
+  Placeholder,
+  PlaceholderMedia,
+  PlaceholderLine,
+  Fade,
+} from "rn-placeholder";
+import ImageView from "react-native-image-viewing";
+import { useAuth } from "../../components/hooks/useAuth";
 
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
-  const { width, height } = useDesign();
+  const { width, height, isIPhoneWithNotch } = useDesign();
+  const { user, headerToken, getUpdatedUser } = useAuth();
+
   const { apiUrl } = useData();
   const item = route.params;
-  const [venue, setVenue] = useState(item);
+  const [venue, setVenue] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [mediaIndex, setMediaIndex] = useState(0);
+  const [imageVisible, setImageVisible] = useState(false);
+  const [currentImageIndex, setImageIndex] = useState(0);
+  const [following, setFollowing] = useState(false);
+  const [followBlock, setFollowBlock] = useState(false);
+
   //  console.log(uuid.v4());
   const getVenues = async () => {
     try {
       const result = await axios.get(`${apiUrl}/venues/?&filter=${item?.uuid}`);
 
       console.log(result?.data);
-      setVenue(result?.data?.[0]);
+      if (result?.data?.length > 0) {
+        setVenue(result?.data?.[0]);
+
+        setLoading(false);
+      }
     } catch (error) {
       console.log(error?.response?.data?.msg);
+    } finally {
     }
   };
   useEffect(() => {
     getVenues();
   }, []);
+  useEffect(() => {
+    if (user?.followedVenues?.includes(venue?._id)) setFollowing(true);
+  }, [venue]);
 
+  const followVenue = async () => {
+    setFollowBlock(true);
+    let updateFollowedVenue = [];
+
+    updateFollowedVenue = user?.followedVenues || [];
+
+    const index = updateFollowedVenue.indexOf(venue?._id);
+    if (user?.followedVenues?.includes(venue?._id) && index !== -1) {
+      setFollowing(false);
+
+      updateFollowedVenue.splice(index, 1);
+    } else {
+      setFollowing(true);
+
+      updateFollowedVenue.push(venue?._id);
+    }
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: {
+            type: "follow",
+            task: "venue",
+            target: venue?._id,
+          },
+          updates: {
+            followedVenues: updateFollowedVenue,
+          },
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      // console.log(response?.data);
+      await getUpdatedUser();
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    } finally {
+      setFollowBlock(false);
+    }
+  };
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
-
+  const onShowGallery = (index) => {
+    setImageIndex(index);
+    setImageVisible(true);
+  };
   const [scrollingPos, setScrollingPos] = useState(0);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 200);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
+
+  function handleMediaScroll(event) {
+    setMediaIndex(
+      parseInt(
+        event.nativeEvent.contentOffset.x / Dimensions.get("window").width
+      ).toFixed()
+    );
+  }
   const [inFullscreen, setInFullsreen] = useState(false);
 
-  const [liked, setLiked] = useState(false);
   const renderViewMore = (onPress) => {
     return (
       <TouchableOpacity style={styles.more} onPress={onPress}>
@@ -129,8 +206,50 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           />
         </TouchableOpacity>
       ),
-      headerRight: () => null,
-
+      headerRight: () =>
+        !inFullscreen &&
+        !scrolling &&
+        venue && (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              // zIndex: 3,
+              // position: "absolute",
+              right: 10,
+              // opacity: indexVisible ? 0 : 1,
+              // top: height * 0.33,
+              // top: height * 0.05,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+          >
+            <MaterialIcons
+              style={{
+                right: 30,
+                // shadowOffset: { width: 0.5, height: 0.5 },
+                // shadowOpacity: 0.3,
+                // shadowRadius: 1,
+                // elevation: 2,
+                position: "absolute",
+              }}
+              name="photo-library"
+              size={20}
+              color={colors.white}
+            />
+            <Text
+              style={{
+                color: colors.white,
+                fontSize: 14,
+                fontWeight: "600",
+              }}
+            >
+              {Number(mediaIndex) + 1 + "/" + Number(venue?.photos?.[1]?.length)}
+            </Text>
+          </View>
+        ),
       headerTitle: () =>
         scrolling ? (
           <Text
@@ -145,7 +264,114 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           </Text>
         ) : null,
     });
-  }, [scrolling]);
+  }, [scrolling, mediaIndex, venue]);
+
+  if (loading) {
+    return (
+      <Animated.View
+        style={{ flex: 1 }}
+        entering={FadeIn}
+        // exiting={FadeOut}
+      >
+        <Placeholder
+          Animation={Fade}
+
+          // Left={PlaceholderMedia}
+          // Right={PlaceholderMedia}
+        >
+          <ActivityIndicator
+            style={{
+              position: "absolute",
+              zIndex: 2,
+              alignSelf: "center",
+              paddingTop: isIPhoneWithNotch ? 60 : 10,
+            }}
+            animating={true}
+            color={colors.light2}
+          />
+          <PlaceholderLine style={{ borderRadius: 0, height: 270, width }} />
+          <View style={{ padding: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <PlaceholderLine
+                style={{
+                  borderRadius: 20,
+                  height: 30,
+                  width: "27%",
+                  marginRight: 10,
+                  // marginHorizontal: 10,
+                }}
+              />
+              <Animated.View
+                style={{
+                  // position: "absolute",
+                  alignSelf: "center",
+                  // top: 10,
+                  // zIndex: 2,
+                  marginVertical: 20,
+                }}
+                // entering={SlideInUp.duration(300)}
+                // exiting={SlideOutUp.duration(300)}
+              ></Animated.View>
+
+              <PlaceholderLine
+                style={{ borderRadius: 20, height: 30, width: "27%" }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 5,
+                  height: 30,
+                  width: 45,
+                  position: "absolute",
+                  right: 10,
+                  bottom: 3,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 5,
+                  height: 30,
+                  width: 45,
+                  position: "absolute",
+                  right: 70,
+                  bottom: 3,
+                }}
+              />
+            </View>
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "90%",
+                marginTop: 10,
+              }}
+            />
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 15, width: "90%", bottom: 2 }}
+            />
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 15, width: "70%", bottom: 2 }}
+            />
+            <PlaceholderLine
+              style={{
+                width: "100%",
+                marginTop: 10,
+                // borderRadius: 5,
+                height: 250,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 20,
+                width: "30%",
+                marginTop: 10,
+              }}
+            />
+          </View>
+        </Placeholder>
+      </Animated.View>
+    );
+  }
   return (
     <>
       {scrolling && (
@@ -163,7 +389,8 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         />
       )}
 
-      <FlatList
+      <Animated.FlatList
+        entering={FadeIn.duration(400)}
         data={venue?.upcomingEvents}
         keyExtractor={(item) => item?.id}
         scrollEventThrottle={16}
@@ -188,41 +415,47 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               {venue?.displayName}
             </Text>
             <FlatList
+              style={{ backgroundColor: colors.grey }}
               showsHorizontalScrollIndicator={false}
               pagingEnabled
               horizontal
+              onScroll={(e) => handleMediaScroll(e)}
               scrollEventThrottle={20}
-              data={venue?.photos}
+              data={venue?.photos?.[1]}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => {
+              renderItem={({ item, index }) => {
                 {
                   return (
-                    <ImageBackground
-                      source={{ uri: item?.uri }}
-                      style={{ width: initialWidth, height: 270 }}
+                    <TouchableOpacity
+                      activeOpacity={0.95}
+                      onPress={() => onShowGallery(index)}
                     >
-                      <LinearGradient
-                        colors={[
-                          "transparent",
-                          "transparent",
-                          "transparent",
-                          "transparent",
-                          colors.dark2,
-                        ]}
-                        //                         colors={["#00000000", "#0000000000", "#000000000"]}
+                      <ImageBackground
+                        source={{ uri: item?.uri }}
+                        style={{ width: initialWidth, height: 270 }}
+                      >
+                        <LinearGradient
+                          colors={[
+                            "transparent",
+                            "transparent",
+                            "transparent",
+                            "transparent",
+                            colors.dark2,
+                          ]}
+                          //                         colors={["#00000000", "#0000000000", "#000000000"]}
 
-                        style={{ height: "100%", width: "100%" }}
-                      ></LinearGradient>
+                          style={{ height: "100%", width: "100%" }}
+                        ></LinearGradient>
 
-                      {/* <Image
-                      style={{ width: initialWidth, height: 270 }}
-                      source={{ uri: item?.uri }}
-                      blurRadius={scrollingPos}
-
-
-                    /> */}
-                      {/* </LinearGradient> */}
-                    </ImageBackground>
+                        <ImageView
+                          // images={savingMode ? listing?.thumb : listing?.photos}
+                          images={venue?.photos?.[1]}
+                          imageIndex={currentImageIndex}
+                          onRequestClose={() => setImageVisible(false)}
+                          visible={imageVisible}
+                        />
+                      </ImageBackground>
+                    </TouchableOpacity>
                   );
                 }
               }}
@@ -240,23 +473,27 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   elevation={1}
                   icon={() => (
                     <MaterialCommunityIcons
-                      name={!liked ? "heart" : "heart-outline"}
-                      color={!liked ? colors.white : colors.black2}
+                      name={following ? "heart" : "heart-outline"}
+                      color={following ? colors.white : colors.black2}
                       size={20}
                     />
                   )}
                   textStyle={{
-                    color: !liked ? colors.white : colors.black,
+                    color: following ? colors.white : colors.black,
                   }}
                   style={{
-                    backgroundColor: !liked ? colors.primary : colors.white,
+                    backgroundColor: following ? colors.primary : colors.white,
                     // paddingHorizontal: 2,
-                    marginRight: 10,
+                    marginRight: 0,
                     borderRadius: 12,
+                    width: 110,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                  onPress={() => console.log("Pressed")}
+                  disabled={followBlock}
+                  onPress={followVenue}
                 >
-                  Seguindo
+                  {following ? "Seguindo" : "Seguir"}
                 </Chip>
 
                 <Chip
@@ -523,6 +760,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           );
         }}
       />
+      {/* </SkeletonContent> */}
     </>
   );
 };

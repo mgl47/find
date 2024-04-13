@@ -68,7 +68,6 @@ export default UserManagerSheet = ({
   type,
   users,
   setUsers,
-  filter,
   eventId,
 }) => {
   // const bottomSheetModalRef = useRef(null);
@@ -104,14 +103,16 @@ export default UserManagerSheet = ({
     setSearch("");
   };
 
+  const filter = {};
+
+
+
   const findUser = async () => {
     setLoading(true);
     setSearched(false);
     setSearchedUSer(null);
     try {
-      const response = await axios.get(
-        `${apiUrl}/users/?filter=${filter}&search=${search?.toLowerCase()}`
-      );
+      const response = await axios.get(`${apiUrl}/users/?username=${search?.toLowerCase()}`);
       if (response.status === 200) {
         setSearchedUSer(response?.data);
       }

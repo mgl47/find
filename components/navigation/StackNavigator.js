@@ -37,6 +37,8 @@ import MyEvents from "../../screens/OrgScreens/MyEvents";
 import EventManagingScreen from "../../screens/OrgScreens/ManagingNavigator/EventManagingScreen";
 import ValidatorScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/ValidatorScreen";
 import StoreScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/StoreScreen";
+import AddVenueScreen from "../../screens/AdminScreens/AddVenueScreen";
+import AddArtistScreen from "../../screens/AdminScreens/AddArtistScreen";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -378,6 +380,22 @@ function StackNavigator() {
       />
       <Stack.Screen
         options={{
+          headerTitle: "Adicionar Local",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="addVenue"
+        component={AddVenueScreen}
+      />
+      <Stack.Screen
+        options={{
+          headerTitle: "Adicionar Local",
+          headerTitleStyle: { color: colors.white },
+        }}
+        name="addArtist"
+        component={AddArtistScreen}
+      />
+      <Stack.Screen
+        options={{
           // headerTransparent: true,
           // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
           headerTitle: "Gerenciar Evento",
@@ -386,18 +404,16 @@ function StackNavigator() {
         name="manageEvent"
         component={EventManagingScreen}
       />
-        <Stack.Screen
+      <Stack.Screen
         options={{
-
           headerTitle: "Validar",
           headerTitleStyle: { color: colors.white },
         }}
         name="qrValidator"
         component={ValidatorScreen}
       />
-          <Stack.Screen
+      <Stack.Screen
         options={{
-
           headerTitle: "Loja",
           headerTitleStyle: { color: colors.white },
         }}

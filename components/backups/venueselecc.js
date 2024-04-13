@@ -1,130 +1,128 @@
 import {
-  Button,
-  Dimensions,
-  FlatList,
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetModalProvider,
-  BottomSheetScrollView,
-} from "@gorhom/bottom-sheet";
-import MapView, { Marker } from "react-native-maps";
-//   import {
-//     MaterialCommunityIcons,
-//     MaterialIcons,
-//     Entypo,
-//     FontAwesome5,
-//     Feather,
-//     Ionicons,
-//     AntDesign,
-//   } from "@expo/vector-icons";
-
-import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
-
-import { markers } from "../../Data/markers";
-
-import uuid from "react-native-uuid";
-import colors from "../../colors";
-import Animated, {
-  FadeIn,
-  FadeOut,
-  SlideInDown,
-} from "react-native-reanimated";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { TextInput } from "react-native-paper";
-import { useData } from "../../hooks/useData";
-
-const { height, width } = Dimensions.get("window");
-
-export default VenueSelectorSheet = ({
-  venueModal,
-  setVenueModal,
-  venue,
-  setVenue,
-}) => {
-  const mapViewRef = useRef(null);
-
-  const [loading, setLoading] = useState(false);
-  const { venues } = useData();
-  const [search, setSearch] = useState("");
-  const [searchResult, setSearchResult] = useState("");
-  const [region, setRegion] = useState({
-    latitude: 14.905696,
-    longitude: -23.519001,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  });
-  //   const [venue, setVenue] = useState("");
-  const [onAddNewVenue, setOnAddNewVenue] = useState(false);
-  const [newMarker, setNewMarker] = useState(0);
-
-  const [newVenue, setNewVenue] = useState("");
-
-  const [addedNewVenue, setAddedNewVenue] = useState("");
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const getResults = async () => {
-    // setVenueDetails(null)
-    setLoading(true);
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 700);
+    Button,
+    Dimensions,
+    FlatList,
+    Image,
+    Keyboard,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View,
+  } from "react-native";
+  import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+  } from "react";
+  import {
+    BottomSheetModal,
+    BottomSheetView,
+    BottomSheetModalProvider,
+    BottomSheetScrollView,
+  } from "@gorhom/bottom-sheet";
+  import MapView, { Marker } from "react-native-maps";
+  //   import {
+  //     MaterialCommunityIcons,
+  //     MaterialIcons,
+  //     Entypo,
+  //     FontAwesome5,
+  //     Feather,
+  //     Ionicons,
+  //     AntDesign,
+  //   } from "@expo/vector-icons";
+  
+  import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
+  
+  import { markers } from "../../Data/markers";
+  
+  import uuid from "react-native-uuid";
+  import colors from "../../colors";
+  import Animated, {
+    FadeIn,
+    FadeOut,
+    SlideInDown,
+  } from "react-native-reanimated";
+  import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+  import { TextInput } from "react-native-paper";
+  
+  const { height, width } = Dimensions.get("window");
+  
+  export default VenueSelectorSheet = ({
+    venueModal,
+    setVenueModal,
+    venue,
+    setVenue,
+  }) => {
+    const mapViewRef = useRef(null);
+  
+    const [loading, setLoading] = useState(false);
+  
+    const [search, setSearch] = useState("");
+    const [searchResult, setSearchResult] = useState("");
+    const [region, setRegion] = useState({
+      latitude: 14.905696,
+      longitude: -23.519001,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
     });
-    setSearchResult(markers?.reverse());
-
-    setLoading(false);
-  };
-  console.log(newVenue);
-
-  const addVenue = () => {
-    let venue = newVenue;
-    venue.id = uuid.v4();
-    venue.address.lat = newMarker?.latitude;
-    venue.address.long = newMarker?.longitude;
-    (venue.photos = [
-      {
-        id: 1,
-        uri: "https://scontent.fopo3-2.fna.fbcdn.net/v/t31.18172-8/13220730_1347686511913909_1118731680861521309_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=4dc865&_nc_eui2=AeHynjX1ye85plORdI-EY4s7-9foNdj7fU371-g12Pt9TWRIT-0ZBtFlguV4yzjJISh8S4V0Axsi1rxa25KNSVPM&_nc_ohc=vi-qKdNEL0EAX9tox6R&_nc_ht=scontent.fopo3-2.fna&oh=00_AfCQUJ24zOBjvG7fCHW1FcHxapBhxQ7GeTLNdU4aqBy2oQ&oe=660CA567",
-      },
-      {
-        id: 2,
-        uri: "https://lh5.googleusercontent.com/p/AF1QipNUHVeb6i6i0_73l32v7lM3cC1AX63xiZz4vnbd=s1600",
-      },
-      {
-        id: 3,
-        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfESMUWnwWeRqQ3LL4bVbdLlOgjF_dCNdtpU5yEWCUw&s",
-      },
-    ]),
-      (venue.phone = []);
-
-    console.log(venue);
-
-    setSelectedVenue(null);
-    setAddedNewVenue(venue);
-    setNewVenue("");
-    setOnAddNewVenue(false);
-  };
-  return (
-    <Modal animationType="slide" visible={venueModal} style={{}}>
-      <View style={{ backgroundColor: colors.background }}>
-        <KeyboardAwareScrollView contentContainerStyle={{}}>
+    //   const [venue, setVenue] = useState("");
+    const [onAddNewVenue, setOnAddNewVenue] = useState(false);
+    const [newMarker, setNewMarker] = useState(0);
+  
+    const [newVenue, setNewVenue] = useState("");
+  
+    const [addedNewVenue, setAddedNewVenue] = useState("");
+  
+    const getResults = async () => {
+      // setVenueDetails(null)
+      setLoading(true);
+      await new Promise((resolve, reject) => {
+        setTimeout(resolve, 700);
+      });
+      setSearchResult(markers?.reverse());
+  
+      setLoading(false);
+    };
+    console.log(newVenue);
+  
+    const addVenue = () => {
+      let venue = newVenue;
+      venue.id = uuid.v4();
+      venue.address.lat = newMarker?.latitude;
+      venue.address.long = newMarker?.longitude;
+      (venue.photos = [
+        {
+          id: 1,
+          uri: "https://scontent.fopo3-2.fna.fbcdn.net/v/t31.18172-8/13220730_1347686511913909_1118731680861521309_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=4dc865&_nc_eui2=AeHynjX1ye85plORdI-EY4s7-9foNdj7fU371-g12Pt9TWRIT-0ZBtFlguV4yzjJISh8S4V0Axsi1rxa25KNSVPM&_nc_ohc=vi-qKdNEL0EAX9tox6R&_nc_ht=scontent.fopo3-2.fna&oh=00_AfCQUJ24zOBjvG7fCHW1FcHxapBhxQ7GeTLNdU4aqBy2oQ&oe=660CA567",
+        },
+        {
+          id: 2,
+          uri: "https://lh5.googleusercontent.com/p/AF1QipNUHVeb6i6i0_73l32v7lM3cC1AX63xiZz4vnbd=s1600",
+        },
+        {
+          id: 3,
+          uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfESMUWnwWeRqQ3LL4bVbdLlOgjF_dCNdtpU5yEWCUw&s",
+        },
+      ]),
+        (venue.phone = []);
+  
+      console.log(venue);
+      // setSelectedVenue(venue);
+      setAddedNewVenue(venue);
+      setNewVenue("");
+      setOnAddNewVenue(false);
+    };
+    return (
+      <Modal animationType="slide" visible={venueModal} style={{ flex: 1 }}>
+        {/* <Screen /> */}
+        <KeyboardAwareScrollView contentContainerStyle={{ flex: 1 }}>
           <View
             style={{
               flexDirection: "row",
@@ -134,7 +132,6 @@ export default VenueSelectorSheet = ({
               marginHorizontal: 20,
               marginTop: 40,
               marginBottom: 10,
-              backgroundColor: colors.background,
             }}
           >
             <Text
@@ -165,11 +162,10 @@ export default VenueSelectorSheet = ({
               </Text>
             </TouchableOpacity>
           </View>
-
+  
           <FlatList
-            contentContainerStyle={{ backgroundColor: colors.background }}
-            // data={searchResult ? searchResult : markers}
-            data={venues?.filter((sel) => sel?._id != selectedVenue?._id)}
+            style={{ backgroundColor: colors.background }}
+            data={searchResult ? searchResult : markers}
             // data={venueDetails ? recommendedEvents.slice(1, 3).reverse() : markers}
             showsVerticalScrollIndicator={false}
             keyExtractor={(item) => item.id}
@@ -178,11 +174,11 @@ export default VenueSelectorSheet = ({
                 <View
                   style={{
                     shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.1,
+                    shadowOpacity: 0.3,
                     shadowRadius: 1,
                     elevation: 2,
                     // padding: 10,
-
+  
                     // position: "absolute",
                     width: "100%",
                     // borderRadius: 5,
@@ -192,7 +188,7 @@ export default VenueSelectorSheet = ({
                   }}
                 >
                   {/* <Button title="close" onPress={() => setVenueModal(false)} /> */}
-
+  
                   <MapView
                     // onPress={() => setVenueDetails(false)}
                     onPress={(e) =>
@@ -222,75 +218,15 @@ export default VenueSelectorSheet = ({
                       />
                     )}
                     {!onAddNewVenue &&
-                      venues?.map((item) => {
-                        console.log(item);
+                      markers?.map((item) => {
                         return (
-                          // <Marker
-                          //   key={item.id}
-                          //   // onPress={handleMarkerPress}
-                          //   onPress={async () => {
-                          //     const newRegion = {
-                          //       latitude: item?.lat,
-                          //       longitude: item?.long,
-                          //       latitudeDelta: 0.01,
-                          //       longitudeDelta: 0.011,
-                          //     };
-                          //     if (Platform.OS === "ios") {
-                          //       mapViewRef.current.animateToRegion(
-                          //         newRegion,
-                          //         200
-                          //       );
-                          //     } else {
-                          //       setRegion(newRegion);
-                          //     }
-                          //     getResults(item);
-                          //   }}
-                          //   coordinate={{
-                          //     latitude: item?.lat,
-                          //     longitude: item?.long,
-                          //   }}
-                          // >
-                          //   <View
-                          //     style={{
-                          //       justifyContent: "center",
-                          //       alignItems: "center",
-                          //       zIndex: item?.lat == region?.latitude ? 2 : 1,
-                          //     }}
-                          //   >
-                          //     <View
-                          //       style={{
-                          //         backgroundColor: colors.white,
-                          //         borderWidth: 0.2,
-                          //         borderColor: colors.darkGrey,
-                          //         padding: 5,
-                          //         alignItems: "center",
-                          //         justifyContent: "center",
-                          //         borderRadius: 10,
-                          //       }}
-                          //     >
-                          //       <Text style={{ fontSize: 11, fontWeight: "500" }}>
-                          //         {item?.displayName}
-                          //       </Text>
-                          //     </View>
-                          //     <Image
-                          //       resizeMode="contain"
-                          //       style={{
-                          //         height: item?.lat == region?.latitude ? 80 : 50,
-                          //         width: item?.lat == region?.latitude ? 80 : 50,
-                          //         borderRadius: 10,
-                          //         borderWidth: 0.2,
-                          //         borderColor: colors.darkGrey,
-                          //       }}
-                          //       source={{ uri: item?.uri }}
-                          //     />
-                          //   </View>
-                          // </Marker>
                           <Marker
-                            key={item._id}
+                            key={item.id}
+                            // onPress={handleMarkerPress}
                             onPress={async () => {
                               const newRegion = {
-                                latitude: item?.address?.lat,
-                                longitude: item?.address?.long,
+                                latitude: item?.lat,
+                                longitude: item?.long,
                                 latitudeDelta: 0.01,
                                 longitudeDelta: 0.011,
                               };
@@ -302,22 +238,18 @@ export default VenueSelectorSheet = ({
                               } else {
                                 setRegion(newRegion);
                               }
-                              setSelectedVenue(item);
                               getResults(item);
                             }}
                             coordinate={{
-                              latitude: item?.address?.lat,
-                              longitude: item?.address?.long,
+                              latitude: item?.lat,
+                              longitude: item?.long,
                             }}
                           >
                             <View
                               style={{
                                 justifyContent: "center",
                                 alignItems: "center",
-                                zIndex:
-                                  item?.address?.lat == region?.latitude
-                                    ? 2
-                                    : 1,
+                                zIndex: item?.lat == region?.latitude ? 2 : 1,
                               }}
                             >
                               <View
@@ -325,46 +257,26 @@ export default VenueSelectorSheet = ({
                                   backgroundColor: colors.white,
                                   borderWidth: 0.2,
                                   borderColor: colors.darkGrey,
-                                  padding: 3,
+                                  padding: 5,
                                   alignItems: "center",
                                   justifyContent: "center",
-                                  borderRadius: 5,
-                                  bottom: 2,
-                                  // backgroundColor: colors.white,
-                                  // borderWidth: 0.2,
-                                  // borderColor: colors.darkGrey,
-                                  // padding: 5,
-                                  // alignItems: "center",
-                                  // justifyContent: "center",
-                                  // borderRadius: 10,
+                                  borderRadius: 10,
                                 }}
                               >
-                                <Text
-                                  style={{ fontSize: 11, fontWeight: "500" }}
-                                >
+                                <Text style={{ fontSize: 11, fontWeight: "500" }}>
                                   {item?.displayName}
                                 </Text>
                               </View>
                               <Image
-                                // resizeMode="contain"
+                                resizeMode="contain"
                                 style={{
-                                  height:
-                                    item?.address?.lat == region?.latitude
-                                      ? 80
-                                      : 50,
-                                  width:
-                                    item?.address?.lat == region?.latitude
-                                      ? 80
-                                      : 50,
-                                  // borderRadius: 10,
-                                  borderRadius: 50,
-
+                                  height: item?.lat == region?.latitude ? 80 : 50,
+                                  width: item?.lat == region?.latitude ? 80 : 50,
+                                  borderRadius: 10,
                                   borderWidth: 0.2,
                                   borderColor: colors.darkGrey,
-                                  backgroundColor: colors.grey,
                                 }}
-                                source={{ uri: item?.photos?.[0]?.uri }}
-                                // source={{ uri: item?.uri }}
+                                source={{ uri: item?.uri }}
                               />
                             </View>
                           </Marker>
@@ -385,9 +297,7 @@ export default VenueSelectorSheet = ({
                     <Text
                       style={{
                         color:
-                          newMarker != 0
-                            ? colors.darkSeparator
-                            : colors.darkRed,
+                          newMarker != 0 ? colors.darkSeparator : colors.darkRed,
                         fontSize: 15,
                         fontWeight: "500",
                         opacity: onAddNewVenue ? 1 : 0,
@@ -421,20 +331,17 @@ export default VenueSelectorSheet = ({
                       </Text>
                     </TouchableOpacity>
                   </View>
-
+  
                   {!onAddNewVenue && (
                     <TextInput
                       //   error={!amount}
-                      style={{
-                        marginBottom: 5,
-                        backgroundColor: colors.background,
-                      }}
+                      style={{ marginBottom: 5 }}
                       // autoFocus
                       underlineStyle={{ backgroundColor: colors.primary }}
-                      // contentStyle={{ backgroundColor:"transparent" }}
+                      //   contentStyle={{ borderRadius: 20 }}
                       outlineColor={colors.primary}
                       mode="outlined"
-                      outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
+                      outlineStyle={{ borderRadius: 10 }}
                       activeOutlineColor={colors.primary}
                       label="pesquisar"
                       activeUnderlineColor={colors.primary}
@@ -566,7 +473,7 @@ export default VenueSelectorSheet = ({
                       </TouchableOpacity>
                     </>
                   )}
-
+  
                   {loading && (
                     <Animated.View
                       style={{
@@ -585,7 +492,7 @@ export default VenueSelectorSheet = ({
                       />
                     </Animated.View>
                   )}
-                  {(addedNewVenue || (selectedVenue && !loading)) && (
+                  {addedNewVenue && (
                     <View
                       style={{
                         // padding: 10,
@@ -608,10 +515,7 @@ export default VenueSelectorSheet = ({
                         <TouchableOpacity
                           onPress={() => {
                             {
-                              setVenue(
-                                selectedVenue ? selectedVenue : addedNewVenue
-                              ),
-                                setVenueModal(false);
+                              setVenue(addedNewVenue), setVenueModal(false);
                             }
                           }}
                           style={{
@@ -631,8 +535,7 @@ export default VenueSelectorSheet = ({
                               padding: 5,
                             }}
                           >
-                            {(selectedVenue?.photos?.[0]?.uri ||
-                              addedNewVenue?.uri) && (
+                            {addedNewVenue?.uri && (
                               <Image
                                 style={{
                                   width: 40,
@@ -641,9 +544,7 @@ export default VenueSelectorSheet = ({
                                   borderWidth: 0.1,
                                 }}
                                 source={{
-                                  uri: selectedVenue
-                                    ? selectedVenue?.photos?.[0]?.uri
-                                    : addedNewVenue?.uri,
+                                  uri: addedNewVenue?.uri,
                                 }}
                               />
                             )}
@@ -654,12 +555,10 @@ export default VenueSelectorSheet = ({
                                 marginLeft: 10,
                               }}
                             >
-                              {selectedVenue
-                                ? selectedVenue?.displayName
-                                : addedNewVenue?.displayName}
+                              {addedNewVenue?.displayName}
                             </Text>
                           </View>
-
+  
                           <Text
                             style={{
                               color: colors.primary,
@@ -668,35 +567,23 @@ export default VenueSelectorSheet = ({
                               padding: 3,
                               fontWeight: "600",
                               paddingHorizontal:
-                                (venue?.id == addedNewVenue?.id ||
-                                  selectedVenue?._id == venue?._id) == 1
-                                  ? 5
-                                  : 0,
+                                (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
                               borderRadius:
-                                (venue?.id == addedNewVenue?.id ||
-                                  selectedVenue?._id == venue?._id) == 1
-                                  ? 5
-                                  : 0,
+                                (venue?.id == addedNewVenue?.id) == 1 ? 5 : 0,
                               borderWidth:
-                                (venue?.id == addedNewVenue?.id ||
-                                  selectedVenue?._id == venue?._id) == 1
-                                  ? 1
-                                  : 0,
+                                (venue?.id == addedNewVenue?.id) == 1 ? 1 : 0,
                               borderColor: colors.primary,
                             }}
                           >
-                            {venue?._id == addedNewVenue?._id ||
-                            selectedVenue?._id == venue?._id
+                            {venue?.id == addedNewVenue?.id
                               ? "Selecionado"
                               : "Selecionar"}
                           </Text>
                         </TouchableOpacity>
-                        {(addedNewVenue?.description ||
-                          selectedVenue?.description) && (
+                        {addedNewVenue?.description && (
                           <View style={styles.separator} />
                         )}
-                        {(addedNewVenue?.description ||
-                          selectedVenue?.description) && (
+                        {addedNewVenue?.description && (
                           <View style={{ padding: 10 }}>
                             <Text
                               style={{
@@ -705,9 +592,7 @@ export default VenueSelectorSheet = ({
                                 color: colors.darkGrey,
                               }}
                             >
-                              {selectedVenue
-                                ? selectedVenue?.description
-                                : addedNewVenue?.description}
+                              {addedNewVenue?.description}
                             </Text>
                           </View>
                         )}
@@ -725,10 +610,10 @@ export default VenueSelectorSheet = ({
                     borderBottomRightRadius: 10,
                     borderBottomLeftRadius: 10,
                     shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.1,
+                    shadowOpacity: 0.3,
                     shadowRadius: 1,
                     elevation: 2,
-                    // marginVertical: 7,
+                    marginVertical: 7,
                   }}
                 >
                   <View
@@ -769,9 +654,7 @@ export default VenueSelectorSheet = ({
                             borderWidth: 0.1,
                           }}
                           source={{
-                            // uri: item?.uri,
-
-                            uri: item?.photos?.[0]?.uri,
+                            uri: item?.uri,
                           }}
                         />
                         <Text
@@ -783,12 +666,12 @@ export default VenueSelectorSheet = ({
                           {item?.displayName}
                         </Text>
                       </View>
-
+  
                       {/* <Entypo
-                      name="chevron-right"
-                      size={24}
-                      color={colors.primary}
-                    /> */}
+                        name="chevron-right"
+                        size={24}
+                        color={colors.primary}
+                      /> */}
                       <Text
                         style={{
                           color: colors.primary,
@@ -796,14 +679,13 @@ export default VenueSelectorSheet = ({
                           right: 10,
                           padding: 3,
                           fontWeight: "600",
-                          paddingHorizontal:
-                            (venue?.id == item?.id) == 1 ? 5 : 0,
+                          paddingHorizontal: (venue?.id == item?.id) == 1 ? 5 : 0,
                           borderRadius: (venue?.id == item?.id) == 1 ? 5 : 0,
                           borderWidth: (venue?.id == item?.id) == 1 ? 1 : 0,
                           borderColor: colors.primary,
                         }}
                       >
-                        {venue?._id == item?._id ? "Selecionado" : "Selecionar"}
+                        {venue?.id == item?.id ? "Selecionado" : "Selecionar"}
                       </Text>
                     </TouchableOpacity>
                     {item?.description && <View style={styles.separator} />}
@@ -827,86 +709,86 @@ export default VenueSelectorSheet = ({
             ListFooterComponent={<View style={{ marginBottom: 10 }} />}
           />
         </KeyboardAwareScrollView>
-      </View>
-    </Modal>
-  );
-};
-
-const styles = StyleSheet.create({
-  sheetContainer: {
-    flex: 1,
-    // padding: 24,
-    // justifyContent: "center",
-    backgroundColor: colors.background,
-  },
-  contentContainer: {
-    flex: 1,
-
-    // alignItems: "center",
-    backgroundColor: colors.background,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "500",
-  },
-  map: {
-    width: "100%",
-    // borderRadius: 5,
-    height: height * 0.35,
-    backgroundColor: colors.grey,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    // overflow:"hidden",
-
-    // borderRadius: 10,
-  },
-  separator: {
-    width: "95%",
-    height: 1,
-    backgroundColor: colors.grey,
-    marginBottom: 2,
-    alignSelf: "center",
-  },
-  userCard: {
-    flexDirection: "row",
-    marginBottom: 10,
-    padding: 10,
-
-    // height: 95,
-    backgroundColor: colors.white,
-    overflow: "hidden",
-    width: "95%",
-    alignSelf: "center",
-
-    borderRadius: 10,
-    // shadowOffset: { width: 1, height: 1 },
-    // shadowOpacity: 1,
-    // shadowRadius: 1,
-    // elevation: 3,
-  },
-  userName: {
-    fontSize: 14,
-    alignSelf: "flex-start",
-    color: colors.description,
-    fontWeight: "600",
-  },
-  userSearch: {
-    height: 40,
-    width: "90%",
-    alignSelf: "center",
-    backgroundColor: colors.white,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 20,
-    borderRadius: 15,
-    // paddingLeft: 40,
-  },
-  displayName: {
-    alignSelf: "flex-start",
-    fontSize: 19,
-    fontWeight: "600",
-    color: colors.primary,
-    marginTop: 10,
-    marginVertical: 5,
-  },
-});
+      </Modal>
+    );
+  };
+  
+  const styles = StyleSheet.create({
+    sheetContainer: {
+      flex: 1,
+      // padding: 24,
+      // justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+    contentContainer: {
+      flex: 1,
+  
+      // alignItems: "center",
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "500",
+    },
+    map: {
+      width: "100%",
+      // borderRadius: 5,
+      height: height * 0.35,
+      backgroundColor: colors.grey,
+      borderTopLeftRadius: 10,
+      borderTopRightRadius: 10,
+      // overflow:"hidden",
+  
+      // borderRadius: 10,
+    },
+    separator: {
+      width: "95%",
+      height: 1,
+      backgroundColor: colors.grey,
+      marginBottom: 2,
+      alignSelf: "center",
+    },
+    userCard: {
+      flexDirection: "row",
+      marginBottom: 10,
+      padding: 10,
+  
+      // height: 95,
+      backgroundColor: colors.white,
+      overflow: "hidden",
+      width: "95%",
+      alignSelf: "center",
+  
+      borderRadius: 10,
+      // shadowOffset: { width: 1, height: 1 },
+      // shadowOpacity: 1,
+      // shadowRadius: 1,
+      // elevation: 3,
+    },
+    userName: {
+      fontSize: 14,
+      alignSelf: "flex-start",
+      color: colors.description,
+      fontWeight: "600",
+    },
+    userSearch: {
+      height: 40,
+      width: "90%",
+      alignSelf: "center",
+      backgroundColor: colors.white,
+      padding: 10,
+      marginTop: 10,
+      marginBottom: 20,
+      borderRadius: 15,
+      // paddingLeft: 40,
+    },
+    displayName: {
+      alignSelf: "flex-start",
+      fontSize: 19,
+      fontWeight: "600",
+      color: colors.primary,
+      marginTop: 10,
+      marginVertical: 5,
+    },
+  });
+  

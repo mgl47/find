@@ -86,6 +86,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
+
   };
 
   function handleMediaScroll(event) {
@@ -368,6 +369,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         scrollEventThrottle={16}
         scrollEnabled={!inFullscreen}
         onScroll={handleScroll}
+        
         bounces={false}
       >
         <FlatList
@@ -581,7 +583,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             </View>
           )}
           <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            
             <Chip
               // elevated
 
@@ -764,7 +765,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </Text>
           <TouchableOpacity
             activeOpacity={0.6}
-            onPress={() => navigation.navigate("venue",Event?.venue)}
+            onPress={() => navigation.navigate("venue", Event?.venue)}
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -1185,7 +1186,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           style={{
             justifyContent: "space-around",
             width: "100%",
-            height: isIPhoneWithNotch ? 80 : 55,
+            height: isIPhoneWithNotch ? 70 : 55,
             backgroundColor: colors.white,
             position: "absolute",
             zIndex: 3,
@@ -1202,7 +1203,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         >
           <View
-            style={{ top: Event?.tickets?.length > 1 ? 5 : 0, padding: 10 }}
+            style={{ top: Event?.tickets?.length > 1 ? 0 : -5, padding: 10 }}
           >
             <Text
               style={{
@@ -1211,7 +1212,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 // width: "80%",
                 color: colors.primary2,
                 // marginLeft: 5,
-                textAlign: "center",
+                // textAlign: "center",
               }}
             >
               {Event?.tickets?.length > 1 ? "apartir de " : ""}
@@ -1224,8 +1225,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   // width: "80%",
                   color: colors.primary2,
                   textAlign: "center",
-                  marginRight: 2,
-                  // top:2
+                  marginRight: 3,
+                  top: 1,
                   // marginLeft: 5,
                 }}
               >
@@ -1233,8 +1234,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               </Text>
               <Text
                 style={{
-                  fontSize: 18,
-                  fontWeight: "600",
+                  fontSize: 20,
+                  fontWeight: "700",
                   // width: "80%",
                   color: colors.primary,
                   textAlign: "center",
@@ -1265,7 +1266,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 alignItems: "center",
                 justifyContent: "center",
                 shadowOffset: { width: 1, height: 1 },
-                shadowOpacity: 0.3,
+                shadowOpacity: 0.2,
                 shadowRadius: 1,
                 elevation: 3,
                 shadowColor: colors.dark,
@@ -1279,7 +1280,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <TouchableOpacity
               onPress={() => handlePurchaseSheet()}
               style={{
-                width: 150,
+                width: 140,
                 height: 40,
                 backgroundColor: colors.primary, // position: "absolute",
                 zIndex: 1,

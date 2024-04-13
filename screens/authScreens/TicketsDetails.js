@@ -504,7 +504,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
         }}
         ListFooterComponent={<View style={{ marginBottom: 20 }} />}
       />
-      {
+      
         <EventStoreSheet
           // users={members}
 
@@ -513,7 +513,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
           storeSheetUp={storeSheetUp}
           setStoreSheetUp={setStoreSheetUp}
         />
-      }
+
       <OrderSheet
         order={selectedOrder}
         setUsers={setMembers}

@@ -78,12 +78,15 @@ const SignInScreen = () => {
             "headerToken",
             "Bearer " + response.data.token
           );
-          
+
           const jsonValue = JSON.stringify(response.data.user);
           await AsyncStorage.setItem("user", jsonValue);
           authSheetRef?.current?.close();
           navigation.openDrawer();
-          getUpdatedUser(response.data.user?._id,"Bearer " + response.data.token);
+          getUpdatedUser(
+            response.data.user?._id,
+            "Bearer " + response.data.token
+          );
         }
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
@@ -242,20 +245,23 @@ const SignInScreen = () => {
               color={colors.white}
             />
 
-            <Animated.Text
-              entering={firstMount ? null : SlideInRight.duration(500)}
-              exiting={firstMount ? null : SlideOutRight.duration(500)}
-              style={{
-                color: colors.white,
-                marginLeft: 5,
-                fontSize: 17,
-                fontWeight: "500",
-              }}
-            >
-              {!onPassRecovery ? "Entrar" : "Recuperar"}
-            </Animated.Text>
+            {!loading ? (
+              <ActivityIndicator color={colors.primary} />
+            ) : (
+              <Animated.Text
+                entering={firstMount ? null : SlideInRight.duration(500)}
+                exiting={firstMount ? null : SlideOutRight.duration(500)}
+                style={{
+                  color: colors.white,
+                  marginLeft: 5,
+                  fontSize: 17,
+                  fontWeight: "500",
+                }}
+              >
+                {!onPassRecovery ? "Entrar" : "Recuperar"}
+              </Animated.Text>
+            )}
           </TouchableOpacity>
-          {loading && <ActivityIndicator color={colors.primary} />}
         </View>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>

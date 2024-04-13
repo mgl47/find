@@ -90,6 +90,11 @@ export const DataProvider = ({ children }) => {
       return parts[0];
     }
   }
+
+  // const venues2 = memo(() => {
+
+
+  // }, [is_wishlist]); 
   const memoedValue = useMemo(
     () => ({
       events,

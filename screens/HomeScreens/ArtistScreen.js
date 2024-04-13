@@ -24,6 +24,7 @@ import {
   Feather,
   Ionicons,
 } from "@expo/vector-icons";
+
 import { Video, ResizeMode } from "expo-av";
 import VideoPlayer from "expo-video-player";
 import { TouchableWithoutFeedback } from "react-native";
@@ -31,29 +32,107 @@ import * as ScreenOrientation from "expo-screen-orientation";
 import ViewMoreText from "react-native-view-more-text";
 import MapView, { Marker } from "react-native-maps";
 import { venues } from "../../components/Data/venue";
-import { Chip } from "react-native-paper";
+import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 import { artist as arti } from "../../components/Data/artist";
 import SmallCard from "../../components/cards/SmallCard";
 import ImageView from "react-native-image-viewing";
-
+import { useDesign } from "../../components/hooks/useDesign";
+import { useData } from "../../components/hooks/useData";
+import {
+  Placeholder,
+  PlaceholderMedia,
+  PlaceholderLine,
+  Fade,
+} from "rn-placeholder";
+import axios from "axios";
+import { useAuth } from "../../components/hooks/useAuth";
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
-  const { width, height } = Dimensions.get("window");
-  const Event = route.params;
-  const[artist,setArtist]=useState(arti[0])
+  const { width, height, isIPhoneWithNotch } = useDesign();
+  const { apiUrl } = useData();
+  const item = route.params;
+  const [artist, setArtist] = useState(null);
   const [avatarVisible, setAvatarVisible] = useState(false);
   const [coverVisible, setCoverVisible] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [following, setFollowing] = useState(false);
   const videoRef = React.useRef(null);
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
   const [scrolling, setScrolling] = useState(false);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > 120);
-    console.log(event.nativeEvent.contentOffset.y);
+    // console.log(event.nativeEvent.contentOffset.y);
   };
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
-  const [liked, setLiked] = useState(false);
+  const [followBlock, setFollowBlock] = useState(false);
+
+  const { user, headerToken, getUpdatedUser } = useAuth();
+  const findUser = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${apiUrl}/users/?username=${item?.username?.toLowerCase()}`
+      );
+      if (response.status === 200) {
+        console.log(response?.data);
+        setArtist(response?.data);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    }
+    // setSearched(true);
+  };
+  useEffect(() => {
+    findUser();
+  }, []);
+
+  useEffect(() => {
+    if (user?.followedArtists?.includes(artist?._id)) setFollowing(true);
+  }, [artist]);
+
+  const followUser = async () => {
+    setFollowBlock(true);
+    let updateFollowedArtist = [];
+
+    updateFollowedArtist = user?.followedArtists || [];
+
+    const index = updateFollowedArtist.indexOf(artist?._id);
+    if (user?.followedArtists?.includes(artist?._id) && index !== -1) {
+      setFollowing(false);
+
+      updateFollowedArtist.splice(index, 1);
+    } else {
+      setFollowing(true);
+
+      updateFollowedArtist.push(artist?._id);
+    }
+
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/current/${user?._id}`,
+        {
+          operation: {
+            type: "follow",
+            task: "artist",
+            target: artist?._id,
+          },
+          updates: {
+            followedArtists: updateFollowedArtist,
+          },
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      // console.log(response?.data);
+      await getUpdatedUser();
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    } finally {
+      setFollowBlock(false);
+    }
+  };
   const renderViewMore = (onPress) => {
     return (
       <TouchableOpacity style={styles.more} onPress={onPress}>
@@ -121,12 +200,153 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         ) : null,
     });
   }, [scrolling]);
-  let displayCover=[]
-  const coverIndex = artist?.photos?.cover[2]||[];
-   displayCover?.push(coverIndex);
-  let displayAvatar=[]
-  const avatarIndex = artist?.photos?.avatar[2]||[];
+  let displayCover = [];
+  const coverIndex = artist?.photos?.cover[2] || [];
+  displayCover?.push(coverIndex);
+  let displayAvatar = [];
+  const avatarIndex = artist?.photos?.avatar[2] || [];
   displayAvatar?.push(avatarIndex);
+  if (loading) {
+    return (
+      <Animated.View
+        style={{ flex: 1 }}
+        entering={FadeIn}
+        // exiting={FadeOut}
+      >
+        <Placeholder
+          Animation={Fade}
+
+          // Left={PlaceholderMedia}
+          // Right={PlaceholderMedia}
+        >
+          <ActivityIndicator
+            style={{
+              position: "absolute",
+              zIndex: 2,
+              alignSelf: "center",
+              paddingTop: isIPhoneWithNotch ? 60 : 10,
+            }}
+            animating={true}
+            color={colors.light2}
+          />
+          <PlaceholderLine style={{ borderRadius: 0, height: 150, width }} />
+          <PlaceholderLine
+            style={{
+              height: 100,
+              width: 100,
+              borderRadius: 100,
+              // position: "absolute",
+              zIndex: 2,
+              bottom: 50,
+              marginLeft: 10,
+            }}
+          />
+
+          <View style={{ padding: 10 }}>
+            <View
+              style={{
+                position: "absolute",
+                flexDirection: "row",
+                alignItems: "center",
+                top: -110,
+                width,
+                left: 120,
+              }}
+            >
+              <PlaceholderLine
+                style={{
+                  borderRadius: 20,
+                  height: 30,
+                  width: "27%",
+                  marginRight: 20,
+                  // marginHorizontal: 10,
+                }}
+              />
+              <PlaceholderLine
+                style={{ borderRadius: 20, height: 30, width: "27%" }}
+              />
+            </View>
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 25,
+                width: "35%",
+                marginRight: 20,
+                bottom: 60,
+                // marginHorizontal: 10,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "90%",
+                marginTop: 10,
+                bottom: 60,
+              }}
+            />
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 15, width: "90%", bottom: 60 }}
+            />
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 15, width: "70%", bottom: 60 }}
+            />
+            <View
+              style={{
+                flexDirection: "row",
+
+                width,
+                // marginLeft: 10,
+                marginTop: 10,
+              }}
+            >
+              <PlaceholderLine
+                style={{
+                  borderRadius: 5,
+                  height: 40,
+                  width: 45,
+                  // position: "absolute",
+                  // right: 70,
+                  bottom: 70,
+                  marginTop: 10,
+                  marginRight: 15,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 5,
+                  height: 40,
+                  width: 45,
+                  // position: "absolute",
+                  // right: 70,
+                  bottom: 70,
+                  marginTop: 10,
+                  marginRight: 15,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 5,
+                  height: 40,
+                  width: 45,
+                  // position: "absolute",
+                  // right: 70,
+                  bottom: 70,
+                  marginTop: 10,
+                }}
+              />
+            </View>
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 20, width: "35%", bottom: 60 }}
+            />
+            <PlaceholderLine
+              style={{ borderRadius: 20, height: 15, width: "30%", bottom: 60 }}
+            />
+          </View>
+        </Placeholder>
+      </Animated.View>
+    );
+  }
   return (
     <>
       {scrolling && (
@@ -143,14 +363,15 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         />
       )}
-    
-      <FlatList
+
+      <Animated.FlatList
+        entering={FadeIn.duration(400)}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         bounces={false}
         data={artist?.upcomingEvents}
         keyExtractor={(item) => item?.id}
-        style={{backgroundColor:colors.background}}
+        style={{ backgroundColor: colors.background }}
         ListHeaderComponent={
           <>
             <ImageView
@@ -159,15 +380,18 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               onRequestClose={() => setCoverVisible(false)}
               visible={coverVisible}
             />
-            <TouchableOpacity                 onPress={() => setCoverVisible(true)}
- activeOpacity={0.9}>
+            <TouchableOpacity
+              onPress={() => setCoverVisible(true)}
+              activeOpacity={0.9}
+              style={{ backgroundColor: colors.grey }}
+            >
               <Image
                 style={{ height: 150, width: "100%" }}
-                source={{ uri: artist?.cover }}
+                source={{ uri: artist?.photos?.cover?.[2]?.uri }}
               />
             </TouchableOpacity>
             <View style={{ flexDirection: "row" }}>
-            <ImageView
+              <ImageView
                 images={displayAvatar}
                 imageIndex={0}
                 onRequestClose={() => setAvatarVisible(false)}
@@ -191,7 +415,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     borderRadius: 100,
                     //   marginTop: 100,
                   }}
-                  source={{ uri: artist?.avatar }}
+                  source={{ uri: artist?.photos?.avatar?.[1]?.uri }}
                 />
               </TouchableHighlight>
               <View
@@ -207,23 +431,27 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   elevation={1}
                   icon={() => (
                     <MaterialCommunityIcons
-                      name={!liked ? "heart" : "heart-outline"}
-                      color={!liked ? colors.white : colors.black2}
+                      name={following ? "heart" : "heart-outline"}
+                      color={following ? colors.white : colors.black2}
                       size={20}
                     />
                   )}
                   textStyle={{
-                    color: !liked ? colors.white : colors.black,
+                    color: following ? colors.white : colors.black,
                   }}
                   style={{
-                    backgroundColor: !liked ? colors.primary : colors.white,
+                    backgroundColor: following ? colors.primary : colors.white,
                     // paddingHorizontal: 2,
                     marginRight: 10,
                     borderRadius: 12,
+                    width: 110,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
-                  onPress={() => console.log("Pressed")}
+                  disabled={followBlock}
+                  onPress={followUser}
                 >
-                  Seguindo
+                  {following ? "Seguindo" : "Seguir"}
                 </Chip>
 
                 <Chip
@@ -255,7 +483,12 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
             {/* </View> */}
             <View style={styles.container}>
               <Text
-                style={{ fontSize: 21, fontWeight: "600", marginBottom: 5 }}
+                style={{
+                  fontSize: 21,
+                  fontWeight: "600",
+                  marginBottom: 5,
+                  color: colors.primary2,
+                }}
               >
                 {artist?.displayName}
               </Text>
@@ -359,9 +592,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 shadowRadius: 1,
                 elevation: 0.5,
                 paddingHorizontal: 10,
-                marginTop:10,
+                marginTop: 10,
                 bottom: 50,
-
               }}
               // onPress={() => navigation.navigate("event", item)}
             >
@@ -432,7 +664,7 @@ const styles = StyleSheet.create({
     padding: 10,
     flex: 1,
     bottom: 50,
-     backgroundColor: colors.background,
+    backgroundColor: colors.background,
   },
   headerContainer: {
     position: "absolute",

@@ -671,16 +671,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   // const phoneWifi = "172.20.10.8";
 
   return (
-    <>
+    <View style={{ backgroundColor: colors.background }}>
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
+        style={{ backgroundColor: colors.background }}
         enableOnAndroid={true}
-        contentContainerStyle={
-          [
-            // styles.container,
-            // { backgroundColor: colors.light },
-          ]
-        }
+        contentContainerStyle={{ backgroundColor: colors.background }}
         extraScrollHeight={100}
         keyboardShouldPersistTaps={"handled"}
       >
@@ -1268,7 +1263,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
                   shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
+                  shadowOpacity: 0.1,
                   shadowRadius: 1,
                   elevation: 2,
                   marginVertical: 7,
@@ -1278,7 +1273,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   style={{
                     backgroundColor: colors.white,
                     borderRadius: 10,
-                    // padding: 5,
+                    padding: 5,
                   }}
                 >
                   <TouchableOpacity
@@ -1303,7 +1298,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         alignItems: "center",
                       }}
                     >
-                      {venue?.uri && (
+                      {venue?.photos?.[0]?.uri && (
                         <Image
                           style={{
                             width: 40,
@@ -1312,7 +1307,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                             borderWidth: 0.1,
                           }}
                           source={{
-                            uri: venue?.uri,
+                            uri: venue?.photos?.[0]?.uri,
                           }}
                         />
                       )}
@@ -1375,8 +1370,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           <VenueSelectorSheet
             venueModal={venueModal}
             setVenueModal={setVenueModal}
-            setVen
-            ue={setVenue}
+            setVenue={setVenue}
             venue={venue}
           />
           <View style={styles.separator} />
@@ -1828,7 +1822,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         setStoreModal={setStoreModal}
         storeModal={storeModal}
       />
-    </>
+    </View>
   );
 }
 
