@@ -126,6 +126,9 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
     const dateWeekDay = selectedDate?.getDay();
     const dateMonth = selectedDate?.getMonth();
 
+
+
+    
     const date = {
       id: uuid.v4(),
       date: selectedDate,
@@ -510,7 +513,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         clicks: 0,
         photos,
         videos,
-        organizers,
+        organizers: [user, ...organizers],
         artists,
         tickets,
         ticketsLimit: Number(ticketsLimit?.value),

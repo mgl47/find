@@ -149,87 +149,94 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
   }
   return (
     <View style={{ flex: 1 }}>
-      <View style={[styles.switchContainer]}>
-        <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-          Membros{" "}
-        </Text>
-        <TouchableOpacity style={styles.switch} onPress={handleMembersSheet}>
-          {/* <Ionicons
-            name={"add-circle-outline"}
-            size={30}
-            color={colors.primary}
-          /> */}
-          <Text
-            style={{
-              color: colors.primary,
-              fontSize: 14,
-              left: 20,
-              padding: 3,
-              fontWeight: "600",
-            }}
-          >
-            Adicionar
-          </Text>
-        </TouchableOpacity>
-      </View>
       <FlatList
         data={members}
         keyExtractor={(item) => item?._id}
         ListHeaderComponent={
-          <TouchableOpacity
-            onPress={getUpdatedUser}
-            activeOpacity={0.5}
-            style={{
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-              width: "100%",
-              marginBottom: 10,
-            }}
-            // onPress={() => navigation.navigate("event", item)}
-          >
-            <Animated.View
-              style={styles.userCard}
-              entering={FadeIn}
-              exiting={FadeOut}
-            >
-              <Image
-                source={{
-                  uri: event?.createdBy?.avatar,
-                }}
-                style={{
-                  width: 70,
-                  height: 70,
-                  borderRadius: 50,
-
-                  // marginLeft: 20,
-                  // position: "absolute",
-                }}
-
-                // resizeMode="contain"
-              />
-              <View style={{ alignItems: "center", marginLeft: 10 }}>
-                <Text numberOfLines={2} style={[styles.displayName]}>
-                  {event?.createdBy?.displayName}
-                </Text>
-                <Text numberOfLines={2} style={[styles.userName]}>
-                  @{event?.createdBy?.username}
-                </Text>
+          <>
+            <View style={[styles.switchContainer]}>
+              <Text
+                style={[styles.switchText, { color: colors.darkSeparator }]}
+              >
+                Membros{" "}
+              </Text>
+              <TouchableOpacity
+                style={styles.switch}
+                onPress={handleMembersSheet}
+              >
+                {/* <Ionicons
+              name={"add-circle-outline"}
+              size={30}
+              color={colors.primary}
+            /> */}
                 <Text
-                  numberOfLines={2}
                   style={{
-                    alignItems: "center",
-                    fontSize: 16.5,
-                    color: colors.darkSeparator,
-                    fontWeight: "500",
+                    color: colors.primary,
+                    fontSize: 14,
+                    left: 20,
+                    padding: 3,
+                    fontWeight: "600",
                   }}
                 >
-                  Criador{" "}
+                  Adicionar
                 </Text>
-              </View>
-            </Animated.View>
-          </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              onPress={getUpdatedUser}
+              activeOpacity={0.5}
+              style={{
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+                width: "100%",
+                marginBottom: 10,
+              }}
+              // onPress={() => navigation.navigate("event", item)}
+            >
+              <Animated.View
+                style={styles.userCard}
+                entering={FadeIn}
+                exiting={FadeOut}
+              >
+                <Image
+                  source={{
+                    uri: event?.createdBy?.avatar,
+                  }}
+                  style={{
+                    width: 70,
+                    height: 70,
+                    borderRadius: 50,
+
+                    // marginLeft: 20,
+                    // position: "absolute",
+                  }}
+
+                  // resizeMode="contain"
+                />
+                <View style={{ alignItems: "center", marginLeft: 10 }}>
+                  <Text numberOfLines={2} style={[styles.displayName]}>
+                    {event?.createdBy?.displayName}
+                  </Text>
+                  <Text numberOfLines={2} style={[styles.userName]}>
+                    @{event?.createdBy?.username}
+                  </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={{
+                      alignItems: "center",
+                      fontSize: 16.5,
+                      color: colors.darkSeparator,
+                      fontWeight: "500",
+                    }}
+                  >
+                    Criador{" "}
+                  </Text>
+                </View>
+              </Animated.View>
+            </TouchableOpacity>
+          </>
         }
         renderItem={({ item }) => {
           return (

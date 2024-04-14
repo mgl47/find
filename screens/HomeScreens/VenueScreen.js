@@ -44,6 +44,7 @@ import {
 } from "rn-placeholder";
 import ImageView from "react-native-image-viewing";
 import { useAuth } from "../../components/hooks/useAuth";
+import SmallCard from "../../components/cards/SmallCard";
 
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
@@ -58,13 +59,13 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [currentImageIndex, setImageIndex] = useState(0);
   const [following, setFollowing] = useState(false);
   const [followBlock, setFollowBlock] = useState(false);
+  const [events, setEvents] = useState([]);
 
   //  console.log(uuid.v4());
   const getVenues = async () => {
     try {
       const result = await axios.get(`${apiUrl}/venues/?&filter=${item?.uuid}`);
 
-      console.log(result?.data);
       if (result?.data?.length > 0) {
         setVenue(result?.data?.[0]);
 
@@ -75,12 +76,23 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     } finally {
     }
   };
+  const getEvents = async () => {
+    const result = await axios.get(`${apiUrl}/events/?venue=${venue?.uuid}`);
+    // console.log(result?.data);
+    setEvents(result?.data);
+  };
+
   useEffect(() => {
     getVenues();
   }, []);
   useEffect(() => {
     if (user?.followedVenues?.includes(venue?._id)) setFollowing(true);
+
+    if (venue) {
+      getEvents();
+    }
   }, [venue]);
+
 
   const followVenue = async () => {
     setFollowBlock(true);
@@ -246,7 +258,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontWeight: "600",
               }}
             >
-              {Number(mediaIndex) + 1 + "/" + Number(venue?.photos?.[1]?.length)}
+              {Number(mediaIndex) +
+                1 +
+                "/" +
+                Number(venue?.photos?.[1]?.length)}
             </Text>
           </View>
         ),
@@ -390,9 +405,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
       )}
 
       <Animated.FlatList
+        showsVerticalScrollIndicator={false}
         entering={FadeIn.duration(400)}
-        data={venue?.upcomingEvents}
-        keyExtractor={(item) => item?.id}
+        data={events}
+        keyExtractor={(item) => item?.uuid}
         scrollEventThrottle={16}
         scrollEnabled={!inFullscreen}
         onScroll={handleScroll}
@@ -415,6 +431,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               {venue?.displayName}
             </Text>
             <FlatList
+              scrollEnabled={venue?.photos?.[0]?.length > 1}
               style={{ backgroundColor: colors.grey }}
               showsHorizontalScrollIndicator={false}
               pagingEnabled
@@ -689,20 +706,19 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 19,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.black2,
+                  color: colors.primary2,
                   marginLeft: 5,
                   marginTop: 5,
-                  marginBottom: 5,
                 }}
               >
-                {venue?.upcomingEvents?.length > 1
-                  ? venue?.upcomingEvents?.length + " Eventos"
-                  : venue?.upcomingEvents?.length > 0
-                  ? venue?.upcomingEvents?.length + " Evento"
+                {events?.length > 1
+                  ? events?.length + " Eventos"
+                  : events?.length > 0
+                  ? events?.length + " Evento"
                   : ""}
               </Text>
 
-              <View style={{ marginBottom: 100 }} />
+              {/* <View style={{ marginBottom: 100 }} /> */}
             </View>
           </>
         }
@@ -710,57 +726,30 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         renderItem={({ item, index }) => {
           // console.log(index);
           return (
-            <TouchableOpacity
-              style={{
-                borderRadius: 10,
-                padding: 10,
-                marginBottom: 10,
-                backgroundColor: colors.white,
-                shadowOffset: { width: 1, height: 1 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 1,
-                bottom: 100,
-                width: "95%",
-                alignSelf: "center",
-              }}
-            >
-              <Text
+            events?.length > 0 && (
+              <TouchableOpacity
+                activeOpacity={0.8}
                 style={{
-                  color: colors.black,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 15,
+                  // shadowOffset: { width: 0.5, height: 0.5 },
+                  // shadowOpacity: 0.3,
+                  // shadowRadius: 1,
+                  // elevation: 2,
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 1,
+                  elevation: 0.5,
+                  paddingHorizontal: 10,
+                  marginTop: 10,
                 }}
+                onPress={() => navigation.navigate("event", item)}
               >
-                {item?.date}
-              </Text>
-              <Text
-                style={{
-                  color: colors.primary,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 16,
-                }}
-              >
-                {item?.title}
-              </Text>
-
-              <Text
-                style={{
-                  color: colors.black2,
-                  marginBottom: 3,
-                  fontWeight: "500",
-                  fontSize: 15,
-                }}
-              >
-                {item?.promoter}
-              </Text>
-            </TouchableOpacity>
+                <SmallCard {...item} />
+              </TouchableOpacity>
+            )
           );
         }}
+        ListFooterComponent={<View style={{ marginBottom: 50 }} />}
       />
-      {/* </SkeletonContent> */}
     </>
   );
 };

@@ -51,8 +51,6 @@ export const DataProvider = ({ children }) => {
         }
       );
 
-      // getOneEvent
-      // console.log(result?.data);
       return result?.data;
     } catch (error) {
       console.log(error?.response?.data?.msg);
@@ -61,7 +59,7 @@ export const DataProvider = ({ children }) => {
   const getVenues = async () => {
     try {
       const result = await axios.get(`${apiUrl}/venues/`);
-      // console.log(result?.data);
+
       setVenues(result?.data);
     } catch (error) {
       console.log(error?.response?.data?.msg);
@@ -93,8 +91,7 @@ export const DataProvider = ({ children }) => {
 
   // const venues2 = memo(() => {
 
-
-  // }, [is_wishlist]); 
+  // }, [is_wishlist]);
   const memoedValue = useMemo(
     () => ({
       events,

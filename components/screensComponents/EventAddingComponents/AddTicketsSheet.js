@@ -27,16 +27,18 @@ import {
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import RNPickerSelect from "react-native-picker-select";
+
 import MapView, { Marker } from "react-native-maps";
-//   import {
-//     MaterialCommunityIcons,
-//     MaterialIcons,
-//     Entypo,
-//     FontAwesome5,
-//     Feather,
-//     Ionicons,
-//     AntDesign,
-//   } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  MaterialIcons,
+  Entypo,
+  FontAwesome5,
+  Feather,
+  Ionicons,
+  AntDesign,
+} from "@expo/vector-icons";
 
 import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 
@@ -68,7 +70,7 @@ export default AddTicketsSheet = ({
   const [price, setPrice] = useState("");
   const [available, setAvailable] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState({ label: "0", value: "0" });
   const [ticketDates, setTicketDates] = useState([]);
 
   // console.log(selectedTicket);
@@ -107,7 +109,7 @@ export default AddTicketsSheet = ({
       amount: 0,
 
       description,
-      category: category,
+      category: category?.label,
       id: uuid.v4(),
       dates: ticketDates,
     });
@@ -192,6 +194,7 @@ export default AddTicketsSheet = ({
               {
                 color: colors.primary,
                 marginVertical: 10,
+                marginRight:10,
                 alignSelf: "flex-end",
                 fontWeight: "500",
               },
@@ -221,7 +224,7 @@ export default AddTicketsSheet = ({
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setPrice}
           />
-          <TextInput
+          {/* <TextInput
             error={!category}
             style={{ marginBottom: 5, backgroundColor: colors.background }}
             // autoFocus
@@ -242,7 +245,86 @@ export default AddTicketsSheet = ({
             cursorColor={colors.primary}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setCategory}
-          />
+          /> */}
+          <RNPickerSelect
+            style={{ left: 40 }}
+            // placeholder={{ label: getMemberPosition(selectedMember) }}
+            placeholder={{}}
+            value={category?.value}
+            // onValueChange={(value) => setTicketsLimit({ value })}
+            onValueChange={(value, label) => setCategory({ value, label })}
+            items={[
+              { label: "Promo", value: "Promo" },
+              { label: "Normal", value: "Normal" },
+              { label: "VIP", value: "VIP" },
+              { label: "1 Dia", value: "1 Dia" },
+              { label: "2 Dias", value: "2 Dias" },
+              { label: "3 Dias", value: "3 Dias" },
+              { label: "Promo 1", value: "Promo 1" },
+              { label: "Promo 2", value: "Promo 2" },
+              { label: "Promo 3", value: "Promo 3" },
+              { label: "Normal 1", value: "Normal 1" },
+              { label: "Normal 2", value: "Normal 2" },
+              { label: "Normal 3", value: "Normal 3" },
+              { label: "VIP 1", value: "VIP 1" },
+              { label: "VIP 2", value: "VIP 2" },
+              { label: "VIP 3", value: "VIP 3" },
+              { label: "1 Dia - 1", value: "1 Dia - 1" },
+              { label: "1 Dia - 2", value: "1 Dia - 2" },
+              { label: "1 Dia - 3", value: "1 Dia - 3" },
+              { label: "2 Dias - 1", value: "2 Dias - 1" },
+              { label: "2 Dias - 2", value: "2 Dias - 2" },
+              { label: "2 Dias - 3", value: "2 Dias - 3" },
+              { label: "3 Dias - 1", value: "3 Dias - 1" },
+              { label: "3 Dias - 2", value: "3 Dias - 2" },
+              { label: "3 Dias - 3", value: "3 Dias - 3" },
+            ]}
+          >
+            <View style={[styles.switchContainer, {}]}>
+              <Text
+                style={[styles.switchText, { color: colors.darkSeparator }]}
+              >
+                Categoria
+              </Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  numberOfLines={2}
+                  style={{
+                    alignSelf: "flex-start",
+                    fontSize: 17,
+                    fontWeight: "400",
+                    color: colors.primary2,
+                    marginVertical: 3,
+                    marginLeft: 30,
+                  }}
+                >
+                  {category?.value}
+                </Text>
+
+                <MaterialCommunityIcons
+                  style={{ position: "absolute", right: -30 }}
+                  name="unfold-more-horizontal"
+                  size={26}
+                  color={colors.primary}
+                />
+              </View>
+              {/* <Text
+                numberOfLines={2}
+                style={{
+                  // alignSelf: "flex-start",
+                  fontSize: 15,
+                  fontWeight: "400",
+                  color: colors.darkGrey,
+                  marginVertical: 3,
+                  marginLeft: 10,
+                  position: "absolute",
+                  right: 0,
+                }}
+              >
+                sem limite: 0{" "}
+              </Text> */}
+            </View>
+          </RNPickerSelect>
           <TextInput
             error={!description}
             style={{ marginBottom: 5, backgroundColor: colors.background }}
@@ -431,5 +513,26 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: 10,
     marginVertical: 5,
+  }, switchContainer: {
+    flexDirection: "row",
+    marginVertical: 15,
+    // height: 40,
+    width: "100%",
+    // backgroundColor: colors.light2,
+    alignItems: "center",
+    // paddingHorizontal: 20,
+
+    //padding: 10,
+  },
+  switch: {
+    position: "absolute",
+
+    right: 20,
+  },
+  switchText: {
+    fontSize: 15,
+    fontWeight: "500",
+    alignSelf: "center",
+    left: 10,
   },
 });

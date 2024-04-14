@@ -4,13 +4,10 @@ import colors from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 function SmallCard({ title, dates, photos, venue, selectedDay }) {
   // const title = "Sessão anual da literatura caboverdiana sd g das ag dsag das";
-  console.log(selectedDay);
 
   const chosenDay = dates?.find(
     (date) => date?.calendarDate == selectedDay
   )?.displayDate;
-
-  console.log(chosenDay);
 
   return (
     <View style={styles.card}>
@@ -24,7 +21,7 @@ function SmallCard({ title, dates, photos, venue, selectedDay }) {
                   styles.date,
                   {
                     fontWeight: "600",
-                    color:colors.primary2,
+                    color: colors.primary2,
                     fontSize: 16,
                     // marginBottom: title?.length > 27 ? 3 : 0,
                     // bottom: 1,
@@ -40,18 +37,17 @@ function SmallCard({ title, dates, photos, venue, selectedDay }) {
                     styles.date,
                     {
                       fontWeight: "600",
-                      color:colors.primary2,
+                      color: colors.primary2,
                       fontSize: 16,
                       // marginBottom: title?.length > 27 ? 3 : 0,
-                      bottom: 1.5,
+                      bottom: 1,
                     },
                   ]}
                 >
                   {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
                     ", "}
                 </Text>
-                <Text style={[styles.date, {                    color:colors.primary2,
-}]}>
+                <Text style={[styles.date, { color: colors.primary2 }]}>
                   {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] +
                     " - "}
                 </Text>
@@ -127,8 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 14.5,
     alignSelf: "flex-start",
     fontWeight: "500",
-    color:colors.primary2
-
+    color: colors.primary2,
   },
   title: {
     alignSelf: "flex-start",
@@ -144,7 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     alignSelf: "flex-start",
     fontWeight: "500",
-
 
     // marginTop: 3,
   },

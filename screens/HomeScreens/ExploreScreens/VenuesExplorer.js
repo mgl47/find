@@ -20,7 +20,7 @@ import React, {
 
 import { Calendar, LocaleConfig } from "react-native-calendars";
 
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import {
   MaterialCommunityIcons,
   MaterialIcons,
@@ -60,86 +60,84 @@ import { TouchableWithoutFeedback } from "react-native";
 import { useData } from "../../../components/hooks/useData";
 import { useAuth } from "../../../components/hooks/useAuth";
 import axios from "axios";
+import * as Location from "expo-location";
+
 const { height, width } = Dimensions.get("window");
 
 const VenuesExplorer = () => {
   const navigation = useNavigation();
   const { events, apiUrl } = useData();
 
-  const { followVenue2, user } = useAuth();
+  const { followVenue2, user, userLocation, getLocation } = useAuth();
 
   const mapViewRef = useRef(null);
   const [tabIndex, setTabIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [venueDetails, setVenueDetails] = useState("");
-  const [favVenues, setFavVenues] = useState(markers);
 
   const [venues, setVenues] = useState([]);
-  const [currentIsland, setCurrentIsland] = useState("");
+
   // const [region, setRegion] = useState({
-  //   latitude: 14.905696 - 0.004,
-  //   longitude: -23.519001,
-  //   latitudeDelta: 0.0922,
-  //   longitudeDelta: 0.0421,
+  //   ...userLocation,
+  //   latitude: userLocation.latitude - 0.002,
+  //   latitudeDelta: 0.01,
+  //   longitudeDelta: 0.011,
   // });
+
   const [region, setRegion] = useState({
     latitude: 14.905696 - 0.004,
     longitude: -23.519001,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const prevRegionRef = useRef();
+  const regionChangeThreshold = 0.3;
 
-  function isPointInsidePolygon(point, polygon) {
-    let inside = false;
-    const [x, y] = point;
+  const calculateDistance = (point1, point2) => {
+    return Math.sqrt(
+      Math.pow(point2.latitude - point1.latitude, 2) +
+        Math.pow(point2.longitude - point1.longitude, 2)
+    );
+  };
 
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i][0],
-        yi = polygon[i][1];
-      const xj = polygon[j][0],
-        yj = polygon[j][1];
-
-      const intersect =
-        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-      if (intersect) inside = !inside;
-    }
-
-    return inside;
-  }
-
-  const point = [region?.latitude + 0.04, region.longitude];
-
-  let activeIsland = null;
-
-  islands.forEach((item) => {
-    if (isPointInsidePolygon(point, item.coord)) {
-      console.log(item.label);
-      activeIsland = { label: item.label, code: item.code };
-    }
-  });
-
-  const getVenues = async (code) => {
+  const getVenues = async () => {
     try {
-      const result = await axios.get(`${apiUrl}/venues/?island=${code}`);
+      const result = await axios.get(
+        `${apiUrl}/venues/near/?long=${region?.longitude}&&lat=${region.latitude}`
+      );
       console.log("rrefef");
       setVenues(result?.data);
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
   };
-  // useEffect(() => {
-  //   getVenues(activeIsland?.code);
-  // }, []);
-  useEffect(() => {
-    if (activeIsland?.code && activeIsland?.code != currentIsland) {
-      getVenues(activeIsland?.code);
-      console.log("currentIsland");
 
-      setCurrentIsland(activeIsland?.code);
+  const currentLocation = async () => {
+    if (prevRegionRef.current) {
+      const distance = calculateDistance(region, prevRegionRef.current);
+
+      if (distance > regionChangeThreshold) {
+        const cityName = await Location.reverseGeocodeAsync(region);
+        const country = cityName?.[0]?.country;
+        if (country != null) {
+          getVenues();
+          console.log("refetch");
+
+          prevRegionRef.current = region;
+        }
+      }
     }
-  }, [region]);
+  };
+  useEffect(() => {
+    // Check if the previous region is set
+    currentLocation();
 
+    // Update the previous region ref with the current region
+  }, [region]);
+  useEffect(() => {
+    getVenues();
+    prevRegionRef.current = region;
+  }, []);
   const getResults = async (item) => {
     setVenueDetails(null);
     setLoading(true);
@@ -161,6 +159,35 @@ const VenuesExplorer = () => {
   useEffect(() => {
     bottomSheetModalRef.current?.present();
   }, []);
+
+  const [onMarkerSize, onSetMarkerSize] = useState(20);
+  let markerSize = 30;
+
+  const setMarkerSize = (a) => {
+    const scaleFactor = 0.3;
+    markerSize = ((3 / a.latitudeDelta) * scaleFactor).toFixed();
+
+
+    // onSetMarkerSize(markerSize);
+    onSetMarkerSize(Math.min(60, Math.max(25, markerSize)));
+
+    // console.log("Marker Size:", markerSize);
+    // console.log("Marker Size:", markerSize);
+  };
+  console.log("Marker Size:", onMarkerSize / 4);
+
+  // if (
+  //   region?.latitudeDelta * 25000 >= 25 &&
+  //   region?.latitudeDelta * 25000 <= 50
+  // ) {
+  //   markerSize * 25000;
+  // } else if (region?.latitudeDelta * 25000 > 50) {
+  //   markerSize = 25;
+  // } else if (region?.latitudeDelta * 25000 < 25) {
+  //   markerSize = 50;
+  // }
+
+  // console.log(region?.latitudeDelta * 250);
 
   const handleSheetChanges = useCallback((index) => {
     // consol
@@ -191,6 +218,7 @@ const VenuesExplorer = () => {
           }}
         >
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={() => {
               navigation.navigate("venue", item);
             }}
@@ -220,48 +248,36 @@ const VenuesExplorer = () => {
                   uri: item?.photos[3]?.[0]?.uri,
                 }}
               />
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "500",
-                }}
-              >
-                {item?.displayName}
-              </Text>
-              <TouchableOpacity
-                onPress={() => followVenue2(item)}
-                style={{
-                  padding: 2,
-                  paddingHorizontal: tabIndex == 1 ? 5 : 0,
-                  left: 10,
-                  borderRadius: tabIndex == 1 ? 5 : 0,
-                  borderWidth: tabIndex == 1 ? 1 : 0,
-                  borderColor: colors.primary,
-                  // alignSelf: "flex-end",
-                  // position: "absolute",
-                  // marginBottom: 10,
-                }}
-              >
+              <View>
                 <Text
                   style={{
-                    color: colors.primary,
-                    fontSize: 14,
-                    fontWeight: "600",
+                    fontSize: 15,
+                    fontWeight: "500",
                   }}
                 >
-                  {user?.followedVenues?.includes(item?._id)
-                    ? "Seguindo"
-                    : "Seguir"}
+                  {item?.displayName}
                 </Text>
-              </TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontWeight: "500",
+                    color: colors.darkGrey,
+                    left: 1,
+                  }}
+                >
+                  {item?.address?.zone + ", " + item?.address?.city}
+                </Text>
+              </View>
             </View>
 
             <Entypo name="chevron-right" size={24} color={colors.primary} />
           </TouchableOpacity>
+
           {item?.description && <View style={styles.separator} />}
           {item?.description && (
             <View style={{ padding: 10 }}>
               <Text
+                numberOfLines={2}
                 style={{
                   fontSize: 13,
                   fontWeight: "500",
@@ -304,6 +320,7 @@ const VenuesExplorer = () => {
                 }}
               >
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   onPress={() => {
                     navigation.navigate("venue", venueDetails);
                   }}
@@ -335,38 +352,31 @@ const VenuesExplorer = () => {
                         uri: venueDetails?.photos[3]?.[0]?.uri,
                       }}
                     />
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: "500",
-                        // color: colors.white,
-                      }}
-                    >
-                      {venueDetails?.displayName}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => followVenue2(venueDetails)}
-                      style={{
-                        // padding: 10,
-                        left: 10,
-                        // alignSelf: "flex-end",
-                        // position: "absolute",
-                        // marginBottom: 10,
-                      }}
-                    >
+                    <View>
                       <Text
                         style={{
-                          color: colors.primary,
-                          fontSize: 14,
-                          fontWeight: "600",
+                          fontSize: 15,
+                          fontWeight: "500",
+                          // color: colors.white,
                         }}
                       >
-                        {user?.followedVenues?.includes(venueDetails?._id)
-                          ? "Seguindo"
-                          : "Seguir"}
+                        {venueDetails?.displayName}
                       </Text>
-                    </TouchableOpacity>
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: "500",
+                          color: colors.darkGrey,
+                          left: 1,
+                        }}
+                      >
+                        {venueDetails?.address?.zone +
+                          ", " +
+                          venueDetails?.address?.city}
+                      </Text>
+                    </View>
                   </View>
+
                   <Entypo
                     style={{ right: 10 }}
                     name="chevron-right"
@@ -389,6 +399,7 @@ const VenuesExplorer = () => {
                     />
                     <View style={{ paddingHorizontal: 10 }}>
                       <Text
+                        numberOfLines={5}
                         style={{
                           fontSize: 13,
                           fontWeight: "500",
@@ -453,7 +464,7 @@ const VenuesExplorer = () => {
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => {
-          console.log("rrefef");
+          // console.log("rrefef");
 
           return !venueDetails ? (
             <VenuesList {...item} />
@@ -478,7 +489,7 @@ const VenuesExplorer = () => {
         ListFooterComponent={<View style={{ marginBottom: 10 }} />}
       />
     );
-  }, [venues, venueDetails]);
+  }, [venues, venueDetails, user]);
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -498,88 +509,162 @@ const VenuesExplorer = () => {
             height: "80%",
           }}
         >
+          <TouchableOpacity
+            style={{
+              // left: 8,
+              alignSelf: "flex-end",
+              position: "absolute",
+              backgroundColor: colors.white,
+              padding: 7,
+              borderRadius: 5,
+              top: 60,
+              right: 5,
+              zIndex: 2,
+              // padding: 10,
+            }}
+            onPress={async () => {
+              const newRegion = {
+                ...userLocation,
+                latitude: userLocation.latitude - 0.002,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.011,
+              };
+
+              if (Platform.OS === "ios") {
+                mapViewRef.current.animateToRegion(newRegion, 200);
+                // setRegion(newRegion);
+              } else {
+                setRegion(newRegion);
+              }
+            }}
+          >
+            <MaterialIcons
+              name="my-location"
+              size={24}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
           <MapView
             onPress={() => setVenueDetails(null)}
             ref={mapViewRef}
             region={region}
-            //   provider="google"
             mapType="standard"
+            // provider="google"
             style={[styles.map, {}]}
             showsUserLocation={true}
             onRegionChangeComplete={setRegion}
+            // onRegionChange={(a) => {
+            //   console.log((a?.latitudeDelta * 2500).toFixed());
+            //   markerSize = (a?.latitudeDelta * 2500).toFixed();
+            // }}
+            onRegionChange={(a) => {
+              setMarkerSize(a);
+            }}
+            maxDelta={0.5}
+            // customMapStyle={mapCustomStyle}
+            // provider={PROVIDER_GOOGLE}
           >
             {venues?.map((item) => {
+              console.log(region.latitude == item?.address?.latitude);
               return (
-                <Animated.View key={item._id} entering={FadeIn}>
-                  <Marker
-                    onPress={async () => {
-                      const newRegion = {
-                        latitude: item?.address?.lat - 0.008,
-
-                        longitude: item?.address?.long + 0.00001,
-
-                        latitudeDelta: 0.01,
-                        longitudeDelta: 0.011,
-                      };
-                      if (Platform.OS === "ios") {
-                        mapViewRef.current.animateToRegion(newRegion, 200);
-                      } else {
-                        setRegion(newRegion);
-                      }
-                      getResults(item);
-                    }}
-                    coordinate={{
-                      latitude: item?.address?.lat,
-                      longitude: item?.address?.long,
-                    }}
-                  >
-                    <View
+                item?.location?.coordinates && (
+                  <Animated.View key={item._id} entering={FadeIn}>
+                    <Marker
                       style={{
-                        justifyContent: "center",
-                        alignItems: "center",
-                        zIndex: item?.lat == region?.latitude ? 2 : 1,
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.5,
+                        shadowRadius: 3,
+                        elevation: 0.5,
+                      }}
+                      onPress={async () => {
+                        const newRegion = {
+                          latitude: item?.location?.coordinates?.[1] - 0.0075,
+
+                          longitude: item?.location?.coordinates?.[0] + 0.00001,
+
+                          latitudeDelta: 0.01,
+                          longitudeDelta: 0.011,
+                        };
+                        if (Platform.OS === "ios") {
+                          mapViewRef.current.animateToRegion(newRegion, 200);
+                        } else {
+                          setRegion(newRegion);
+                        }
+                        getResults(item);
+                      }}
+                      coordinate={{
+                        latitude: item?.location?.coordinates?.[1],
+                        longitude: item?.location?.coordinates?.[0],
                       }}
                     >
                       <View
                         style={{
-                          backgroundColor: colors.white,
-                          borderWidth: 0.2,
-                          borderColor: colors.darkGrey,
-                          padding: 3,
-                          alignItems: "center",
                           justifyContent: "center",
-                          borderRadius: 5,
-                          bottom: 2,
-                          // backgroundColor: colors.white,
-                          // borderWidth: 0.2,
-                          // borderColor: colors.darkGrey,
-                          // padding: 5,
-                          // alignItems: "center",
-                          // justifyContent: "center",
-                          // borderRadius: 10,
+                          alignItems: "center",
+                          zIndex: item?.lat == region?.latitude ? 2 : 1,
                         }}
                       >
-                        <Text style={{ fontSize: 11, fontWeight: "500" }}>
-                          {item?.displayName}
-                        </Text>
-                      </View>
-                      <Image
-                        // resizeMode="contain"
-                        style={{
-                          height: item?.lat == region?.latitude ? 80 : 50,
-                          width: item?.lat == region?.latitude ? 80 : 50,
-                          // borderRadius: 10,
-                          borderRadius: 50,
+                        {onMarkerSize / 4 - 4 > 7 && (
+                          <Animated.View
+                            entering={FadeIn}
+                            exiting={FadeOut}
+                            style={{
+                              position: "absolute",
+                              top: -25,
+                              backgroundColor: colors.white,
+                              borderWidth: 0.2,
+                              borderColor: colors.darkGrey,
+                              height: 20,
+                              alignItems: "center",
+                              justifyContent: "center",
+                              borderRadius: 5,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 11,
+                                fontWeight: "500",
+                                padding: 3,
+                                // marginHorizontal: 10,
 
-                          borderWidth: 0.2,
-                          borderColor: colors.darkGrey,
-                          backgroundColor: colors.grey,
-                        }}
-                        source={{ uri: item?.photos?.[3]?.[0]?.uri }}
-                      />
-                    </View>
-                  </Marker>
-                </Animated.View>
+                                width: "100%",
+
+                                color: colors.primary2,
+                              }}
+                            >
+                              {item?.displayName}
+                            </Text>
+                          </Animated.View>
+                        )}
+
+                        <Image
+                          // resizeMode="contain"
+                          style={{
+                            height:
+                              item?.uuid == venueDetails?.uuid
+                                ? onMarkerSize+10
+                                : onMarkerSize,
+                            width:
+                              item?.uuid == venueDetails?.uuid
+                                ? onMarkerSize+10
+                                : onMarkerSize,
+                            // borderRadius: 10,
+                            borderRadius: 100,
+
+                            borderWidth: 0.2,
+                            borderColor: colors.darkGrey,
+                            backgroundColor: colors.grey,
+                          }}
+                          source={{
+                            uri: item?.photos?.[2]?.[
+                              item?.photos?.[3]?.length - 1
+                            ]?.uri,
+                          }}
+                        />
+                      </View>
+                    </Marker>
+                  </Animated.View>
+                )
               );
             })}
           </MapView>

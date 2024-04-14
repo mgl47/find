@@ -43,7 +43,8 @@ import AuthBottomSheet from "../../components/screensComponents/AuthComponents/A
 import OneBigTicket from "../../components/tickets/OneBigTicket";
 import CountDown from "react-native-countdown-component";
 import { TouchableWithoutFeedback } from "react-native";
-const { width, height } = Dimensions.get("window");
+import {  useIsFocused } from '@react-navigation/native';
+
 import {
   Placeholder,
   PlaceholderMedia,
@@ -54,10 +55,13 @@ import { useDesign } from "../../components/hooks/useDesign";
 export default function HomeScreen({ navigation }) {
   const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
-  const { isIPhoneWithNotch } = useDesign();
+  const { isIPhoneWithNotch, width, height } = useDesign();
   const { events, getEvents } = useData();
   const [refreshing, setRefreshing] = useState(false);
   const [scrolling, setScrolling] = useState(false);
+  const homeTabRef = useRef(null);
+  const isFocused = useIsFocused();
+
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     // setScrollingPos(event.nativeEvent.contentOffset.y / 20);
@@ -75,6 +79,16 @@ export default function HomeScreen({ navigation }) {
   // Convert milliseconds to seconds
   const differenceInSeconds = differenceInMilliseconds / 1000;
 
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("tabPress", (e) => {
+      if (isFocused) {
+        homeTabRef.current?.scrollToOffset({ offset: 0, animated: true });
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation,isFocused]);
   return (
     <Screen style={[styles.container]}>
       <View
@@ -140,6 +154,7 @@ export default function HomeScreen({ navigation }) {
         contentContainerStyle={{ backgroundColor: colors.background }}
         onRefresh={getEvents}
         bounces={false}
+        ref={homeTabRef}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         refreshing={refreshing}
@@ -304,10 +319,7 @@ export default function HomeScreen({ navigation }) {
                   // onPress={() =>
                   //   navigation.navigate("ticketDetails", myTickets?.[0])
                   // }
-                      onPress={() =>
-                    navigation.navigate("addArtist")
-                  }
-                  
+                  onPress={() => navigation.navigate("addArtist")}
                 >
                   <OneBigTicket {...myTickets?.[0]} />
                 </TouchableOpacity>

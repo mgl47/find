@@ -381,6 +381,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               visible={coverVisible}
             />
             <TouchableOpacity
+              disabled={!artist?.photos?.cover?.[0]?.uri}
               onPress={() => setCoverVisible(true)}
               activeOpacity={0.9}
               style={{ backgroundColor: colors.grey }}
@@ -487,6 +488,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 21,
                   fontWeight: "600",
                   marginBottom: 5,
+                  marginLeft:artist?.displayName?.length<10?20:0,
                   color: colors.primary2,
                 }}
               >

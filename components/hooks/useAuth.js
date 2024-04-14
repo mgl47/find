@@ -11,6 +11,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -25,6 +26,7 @@ import { useNavigation, DrawerActions } from "@react-navigation/native";
 import colors from "../colors";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import * as Location from "expo-location";
 
 const AuthContext = createContext();
 
@@ -35,7 +37,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false);
   const authSheetRef = useRef(null);
-
+  const [userLocation, setUserLocation] = useState({
+    latitude: 14.905696 - 0.004,
+    longitude: -23.519001,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
   const [headerToken, setHeaderToken] = useState("");
   const [myEvents, setMyEvents] = useState([]);
   const [myTickets, setMyTickets] = useState([]);
@@ -51,8 +58,15 @@ export const AuthProvider = ({ children }) => {
       }
 
       setCacheChecked(true);
-
-      console.log("before uppdate");
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        // do something when permission is denied
+        return;
+      }
+      const lastLocation = await AsyncStorage.getItem("lastLocation");
+      if (lastLocation !== null) {
+        setUserLocation(JSON.parse(lastLocation));
+      }
     } catch (e) {}
   };
 
@@ -136,6 +150,43 @@ export const AuthProvider = ({ children }) => {
 
     navigation.dispatch(DrawerActions.closeDrawer());
   };
+
+  const getLocation = async () => {
+    // if (!cacheChecked) {
+    //   const lastLocation = await AsyncStorage.getItem("lastLocation");
+
+    //   if (lastLocation !== null) {
+    //     setUserLocation(lastLocation);
+    //   }
+    // } else {
+    // permissions check
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      // do something when permission is denied
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync();
+
+    setUserLocation({
+      latitude: location.coords.latitude - 0.004,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+    const jsonValue = JSON.stringify({
+      latitude: location.coords.latitude - 0.004,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    });
+
+    await AsyncStorage.setItem("lastLocation", jsonValue);
+    // }
+  };
+  useLayoutEffect(() => {
+    getLocation();
+  }, []);
+
   const memoedValue = useMemo(
     () => ({
       headerToken,
@@ -150,8 +201,10 @@ export const AuthProvider = ({ children }) => {
       getUpdatedUser,
       logOut,
       followVenue2,
+      getLocation,
+      userLocation,
     }),
-    [headerToken, user, AuthModalUp, authSheetRef]
+    [headerToken, user, AuthModalUp, authSheetRef, userLocation]
   );
 
   return (

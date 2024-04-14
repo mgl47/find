@@ -587,6 +587,7 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
             mode="outlined"
             activeOutlineColor={colors.primary}
             label="Descrição"
+            multiline
             activeUnderlineColor={colors.primary}
             value={newVenue?.description}
             cursorColor={colors.primary}

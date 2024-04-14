@@ -16,6 +16,7 @@ import {
 import Animated, {
   FadeIn,
   SlideInDown,
+  SlideInUp,
   SlideOutDown,
   SlideOutUp,
 } from "react-native-reanimated";
@@ -86,7 +87,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
-
   };
 
   function handleMediaScroll(event) {
@@ -221,20 +221,21 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </View>
         ),
       headerTitle: () =>
-        scrolling ? (
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 17,
-              fontWeight: "500",
-              // top: 40,
-              // width:"100%",
-              color: colors.white,
-            }}
-          >
-            {Event?.title}
-          </Text>
-        ) : null,
+        // scrolling ? (
+        //   <Text
+        //     numberOfLines={1}
+        //     style={{
+        //       fontSize: 17,
+        //       fontWeight: "500",
+        //       // top: 40,
+        //       // width:"100%",
+        //       color: colors.white,
+        //     }}
+        //   >
+        //     {Event?.title}
+        //   </Text>
+        // ) :
+        null,
     });
   }, [scrolling, inFullscreen, mediaIndex]);
   useEffect(() => {
@@ -341,12 +342,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.log(error?.response?.data?.msg);
     }
   };
-
   return (
     <>
       {scrolling && (
         <Animated.View
-          entering={FadeIn.duration(200)}
+          entering={SlideInUp.duration(300)}
           // exiting={FadeOutUp.duration(200)}
           exiting={SlideOutUp.duration(500)}
           style={{
@@ -361,7 +361,26 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             shadowOpacity: 0.3,
             shadowRadius: 1,
           }}
-        />
+        >
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 17,
+              fontWeight: "500",
+              position: "absolute",
+              bottom: 10,
+              // marginLeft:70,
+              marginLeft: 50,
+
+              textAlign: "center",
+              // width:"100%",
+              color: colors.white,
+              width: "75%",
+            }}
+          >
+            {Event?.title}
+          </Text>
+        </Animated.View>
       )}
 
       <ScrollView
@@ -369,7 +388,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         scrollEventThrottle={16}
         scrollEnabled={!inFullscreen}
         onScroll={handleScroll}
-        
         bounces={false}
       >
         <FlatList
@@ -465,391 +483,380 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             }
           }}
         />
-
-        <View style={styles.container}>
-          {/* <LinearGradient
-            // colors={["#00000000", "#000000"]}
-            colors={[ colors.black,colors.black,"transparent",]}
-            style={{
-              height: 100,
-              width: width,
-              position: "absolute",
-              // bottom: 0,
-            }}
-          /> */}
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "500",
-              marginBottom: 5,
-              color: colors.primary2,
-            }}
-          >
-            {Event?.title}
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              width,
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+        <View style={{}}>
+          <View style={styles.container}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "500",
+                marginBottom: 5,
+                color: colors.primary2,
+              }}
+            >
+              {Event?.title}
+            </Text>
             <View
               style={{
                 flexDirection: "row",
-                // alignItems: "center",
+                width,
+                alignItems: "center",
                 justifyContent: "space-between",
-                width: "100%",
-                // marginBottom: 0,
               }}
             >
               <View
                 style={{
                   flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 7,
+                  // alignItems: "center",
+                  justifyContent: "space-between",
                   width: "100%",
+                  // marginBottom: 0,
                 }}
               >
-                <Entypo name="location" size={17} color={colors.primary2} />
-                <Text
+                <View
                   style={{
-                    fontSize: 16,
-                    fontWeight: "500",
-                    width: "70%",
-                    color: colors.darkSeparator,
-                    marginLeft: 5,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 7,
+                    width: "100%",
                   }}
                 >
-                  {Event?.venue?.displayName}, {Event?.venue?.address?.city}
-                </Text>
+                  <Entypo name="location" size={17} color={colors.primary2} />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "500",
+                      width: "70%",
+                      color: colors.darkSeparator,
+                      marginLeft: 5,
+                    }}
+                  >
+                    {Event?.venue?.displayName}, {Event?.venue?.address?.city}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 3,
-            }}
-          >
-            <MaterialCommunityIcons
-              name="calendar-month"
-              size={19}
-              color={colors.primary2}
-            />
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: "500",
-                // width: "80%",
-                color: colors.primary,
-                marginLeft: 5,
-              }}
-            >
-              {Event?.dates[Event?.dates?.length - 1]?.displayDate}
-            </Text>
-          </View>
-          {Event?.goingUsers?.length > 0 && (
             <View
               style={{
-                width: "100%",
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 2,
-                // right: 3,
-                // justifyContent: "center",
+                marginBottom: 3,
               }}
             >
               <MaterialCommunityIcons
-                name="lightning-bolt-outline"
-                size={23}
+                name="calendar-month"
+                size={19}
                 color={colors.primary2}
               />
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: "500",
-                  // width: "70%",
-                  color: colors.darkGrey,
-                }}
-              >
-                {Event?.goingUsers?.length}
-                {Event?.goingUsers?.length > 1
-                  ? " Pessoas vão!"
-                  : " Pessoa vai!"}
-              </Text>
-            </View>
-          )}
-          <View style={{ flexDirection: "row", marginVertical: 5 }}>
-            <Chip
-              // elevated
-
-              elevation={1}
-              icon={() => (
-                <MaterialCommunityIcons
-                  name="calendar-heart"
-                  color={interested ? colors.white : colors.black}
-                  size={20}
-                />
-              )}
-              textStyle={{
-                color: interested ? colors.white : colors.black,
-              }}
-              style={{
-                backgroundColor: interested ? colors.primary : colors.white,
-                // paddingHorizontal: 2,
-                marginRight: 10,
-                borderRadius: 12,
-              }}
-              onPress={() => {
-                // setInterested(!interested),
-                likeEvent();
-                // getUpdatedUser();
-              }}
-            >
-              Interressado
-            </Chip>
-            <Chip
-              elevation={1}
-              icon={() => (
-                <Ionicons
-                  name="ticket-outline"
-                  size={20}
-                  color={going ? colors.white : colors.black}
-                />
-              )}
-              textStyle={{
-                color: going ? colors.white : colors.black,
-              }}
-              style={{
-                backgroundColor: going ? colors.primary : colors.white,
-                // paddingHorizontal: 2,
-                borderRadius: 12,
-              }}
-              onPress={goingtoEvent}
-            >
-              Vou
-            </Chip>
-            <Chip
-              elevation={1}
-              icon={() => (
-                <MaterialIcons
-                  name="ios-share"
-                  size={20}
-                  color={colors.black2}
-                />
-              )}
-              textStyle={
-                {
-                  // color: colors.white,
-                }
-              }
-              style={{
-                backgroundColor: colors.white,
-                // paddingHorizontal: 2,
-                marginHorizontal: 10,
-                borderRadius: 12,
-              }}
-              onPress={() => console.log("Pressed")}
-            >
-              Partilhar
-            </Chip>
-          </View>
-          <View style={[styles.separator, { marginVertical: 10 }]} />
-          <View>
-            <ViewMoreText
-              numberOfLines={6}
-              renderViewMore={renderViewMore}
-              renderViewLess={renderViewLess}
-              textStyle={{ textAlign: "left" }}
-            >
-              <Text style={{ fontSize: 15, color: colors.black2 }}>
-                {Event?.description}
-              </Text>
-            </ViewMoreText>
-          </View>
-          <View
-            style={[styles.separator, { marginTop: 10, marginBottom: 5 }]}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "500",
-                left: 10,
-                // width: "80%",
-                color: colors.primary,
-                // marginLeft: 5,
-                marginTop: 10,
-              }}
-            >
-              Artistas
-            </Text>
-            <TouchableOpacity>
               <Text
                 style={{
                   fontSize: 15,
                   fontWeight: "500",
                   // width: "80%",
                   color: colors.primary,
+                  marginLeft: 5,
+                }}
+              >
+                {Event?.dates[Event?.dates?.length - 1]?.displayDate}
+              </Text>
+            </View>
+            {Event?.goingUsers?.length > 0 && (
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 2,
+                  // right: 3,
+                  // justifyContent: "center",
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="lightning-bolt-outline"
+                  size={23}
+                  color={colors.primary2}
+                />
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "500",
+                    // width: "70%",
+                    color: colors.darkGrey,
+                  }}
+                >
+                  {Event?.goingUsers?.length}
+                  {Event?.goingUsers?.length > 1
+                    ? " Pessoas vão!"
+                    : " Pessoa vai!"}
+                </Text>
+              </View>
+            )}
+            <View style={{ flexDirection: "row", marginVertical: 5 }}>
+              <Chip
+                // elevated
+
+                elevation={1}
+                icon={() => (
+                  <MaterialCommunityIcons
+                    name="calendar-heart"
+                    color={interested ? colors.white : colors.black}
+                    size={20}
+                  />
+                )}
+                textStyle={{
+                  color: interested ? colors.white : colors.black,
+                }}
+                style={{
+                  backgroundColor: interested ? colors.primary : colors.white,
+                  // paddingHorizontal: 2,
+                  marginRight: 10,
+                  borderRadius: 12,
+                }}
+                onPress={() => {
+                  // setInterested(!interested),
+                  likeEvent();
+                  // getUpdatedUser();
+                }}
+              >
+                Interressado
+              </Chip>
+              <Chip
+                elevation={1}
+                icon={() => (
+                  <Ionicons
+                    name="ticket-outline"
+                    size={20}
+                    color={going ? colors.white : colors.black}
+                  />
+                )}
+                textStyle={{
+                  color: going ? colors.white : colors.black,
+                }}
+                style={{
+                  backgroundColor: going ? colors.primary : colors.white,
+                  // paddingHorizontal: 2,
+                  borderRadius: 12,
+                }}
+                onPress={goingtoEvent}
+              >
+                Vou
+              </Chip>
+              <Chip
+                elevation={1}
+                icon={() => (
+                  <MaterialIcons
+                    name="ios-share"
+                    size={20}
+                    color={colors.black2}
+                  />
+                )}
+                textStyle={
+                  {
+                    // color: colors.white,
+                  }
+                }
+                style={{
+                  backgroundColor: colors.white,
+                  // paddingHorizontal: 2,
+                  marginHorizontal: 10,
+                  borderRadius: 12,
+                }}
+                onPress={() => console.log("Pressed")}
+              >
+                Partilhar
+              </Chip>
+            </View>
+            <View style={[styles.separator, { marginVertical: 10 }]} />
+            <View>
+              <ViewMoreText
+                numberOfLines={6}
+                renderViewMore={renderViewMore}
+                renderViewLess={renderViewLess}
+                textStyle={{ textAlign: "left" }}
+              >
+                <Text style={{ fontSize: 15, color: colors.black2 }}>
+                  {Event?.description}
+                </Text>
+              </ViewMoreText>
+            </View>
+            <View
+              style={[styles.separator, { marginTop: 10, marginBottom: 5 }]}
+            />
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "500",
+                  left: 10,
+                  // width: "80%",
+                  color: colors.primary,
                   // marginLeft: 5,
                   marginTop: 10,
                 }}
               >
-                Ver todos
+                Artistas
               </Text>
-            </TouchableOpacity>
+              <TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "500",
+                    // width: "80%",
+                    color: colors.primary,
+                    // marginLeft: 5,
+                    marginTop: 10,
+                  }}
+                >
+                  Ver todos
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <FlatList
-          style={{ backgroundColor: colors.background }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={Event?.artists}
-          keyExtractor={(item) => item?.id}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                style={{
-                  padding: 5,
-                  alignItems: "center",
-                  // justifyContent: "center",
-                }}
-                onPress={() => navigation.navigate("artist", item)}
-              >
+          <FlatList
+            style={{ backgroundColor: colors.background, bottom: 10 }}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            data={Event?.artists}
+            keyExtractor={(item) => item?.uuid}
+            renderItem={({ item }) => {
+              return (
+                <TouchableOpacity
+                  style={{
+                    padding: 5,
+                    alignItems: "center",
+                    // justifyContent: "center",
+                  }}
+                  onPress={() => navigation.navigate("artist", item)}
+                >
+                  <Image
+                    style={{
+                      height: 55,
+                      width: 55,
+                      borderRadius: 50,
+                      marginBottom: 2,
+                      borderWidth: 0.009,
+                      backgroundColor: colors.darkGrey,
+                    }}
+                    source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                  />
+                  <Text
+                    style={{
+                      width: item?.displayName?.length > 15 ? 100 : null,
+                      textAlign: "center",
+                    }}
+                  >
+                    {item?.displayName}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+          <View style={styles.container}>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "500",
+                left: 10,
+
+                color: colors.primary,
+
+                marginBottom: 5,
+              }}
+            >
+              Local
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => navigation.navigate("venue", Event?.venue)}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: colors.white,
+                marginTop: 5,
+                borderTopRightRadius: 10,
+                borderTopLeftRadius: 10,
+                // shadowOffset: { width: 0.5, height: 0.5 },
+                // shadowOpacity: 0.3,
+                // shadowRadius: 1,
+                // elevation: 2,
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.1,
+                shadowRadius: 1,
+                elevation: 0.5,
+                height: 50,
+                padding: 10,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Image
                   style={{
-                    height: 55,
-                    width: 55,
+                    width: 40,
+                    height: 40,
                     borderRadius: 50,
-                    marginBottom: 2,
-                    borderWidth: 0.009,
-                    backgroundColor: colors.darkGrey,
+                    borderWidth: 0.1,
+                    marginRight: 10,
                   }}
-                  source={{ uri: item?.avatar }}
+                  source={{
+                    uri: Event?.venue?.photos?.[2]?.[0]?.uri,
+                  }}
                 />
                 <Text
                   style={{
-                    width: item?.displayName?.length > 15 ? 100 : null,
-                    textAlign: "center",
+                    fontSize: 15,
+                    fontWeight: "500",
+                    // color: colors.white,
                   }}
                 >
-                  {item?.displayName}
+                  {Event?.venue?.displayName}
                 </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-        <View style={styles.container}>
-          {/* <View style={styles.separator} /> */}
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "500",
-              left: 10,
-
-              color: colors.primary,
-
-              marginBottom: 5,
-            }}
-          >
-            Local
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => navigation.navigate("venue", Event?.venue)}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              backgroundColor: colors.white,
-              marginTop: 5,
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10,
-              // shadowOffset: { width: 0.5, height: 0.5 },
-              // shadowOpacity: 0.3,
-              // shadowRadius: 1,
-              // elevation: 2,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.1,
-              shadowRadius: 1,
-              elevation: 0.5,
-              height: 50,
-              padding: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 50,
-                  borderWidth: 0.1,
-                  marginRight: 10,
-                }}
-                source={{
-                  uri: Event?.venue?.uri,
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "500",
-                  // color: colors.white,
-                }}
-              >
-                {Event?.venue?.displayName}
-              </Text>
-            </View>
-            <Entypo name="chevron-right" size={24} color={colors.primary} />
-          </TouchableOpacity>
-          <View
-            style={{
-              // height: 200,
-              backgroundColor: colors.white,
-              //   padding: 10,
-              alignItems: "center",
-              borderBottomRightRadius: 10,
-              borderBottomLeftRadius: 10,
-              // shadowOffset: { width: 0.5, height: 0.5 },
-              // shadowOpacity: 0.3,
-              // shadowRadius: 1,
-              // elevation: 2,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.1,
-              shadowRadius: 1,
-              elevation: 0.5,
-              // shadowColor: colors.light2,
-            }}
-          >
-            <MapView
-              initialRegion={{
-                latitude: Event?.venue?.lat,
-                longitude: Event?.venue?.long,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.011,
+              </View>
+              <Entypo name="chevron-right" size={24} color={colors.primary} />
+            </TouchableOpacity>
+            <View
+              style={{
+                // height: 200,
+                backgroundColor: colors.white,
+                //   padding: 10,
+                alignItems: "center",
+                borderBottomRightRadius: 10,
+                borderBottomLeftRadius: 10,
+                // shadowOffset: { width: 0.5, height: 0.5 },
+                // shadowOpacity: 0.3,
+                // shadowRadius: 1,
+                // elevation: 2,
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.1,
+                shadowRadius: 1,
+                elevation: 0.5,
+                // shadowColor: colors.light2,
               }}
-              // provider="google"
-              mapType="standard"
-              style={styles.map}
             >
-              <Marker
-                pinColor={colors.primary}
-                coordinate={{
-                  latitude: Event?.venue?.lat,
-                  longitude: Event?.venue?.long,
+              <MapView
+                initialRegion={{
+                  latitude: Event?.venue?.location?.coordinates?.[1] + 0.001,
+                  longitude: Event?.venue?.location?.coordinates?.[0] - 0.001,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.011,
                 }}
-                //listing?.latitude listing?.longitude
-              />
-              {/* <Marker
+                // provider="google"
+                mapType="standard"
+                style={styles.map}
+              >
+                <Marker
+                  pinColor={colors.primary}
+                  coordinate={{
+                    latitude: Event?.venue?.location?.coordinates?.[1],
+                    longitude: Event?.venue?.location?.coordinates?.[0],
+                  }}
+                  //listing?.latitude listing?.longitude
+                />
+                {/* <Marker
                 coordinate={{
                   latitude: Event?.venue?.lat,
                   longitude: Event?.venue?.long,
@@ -896,41 +903,48 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   />
                 </View>
               </Marker> */}
-            </MapView>
+              </MapView>
 
-            <TouchableOpacity
-              activeOpacity={0.6}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                marginTop: 5,
-                padding: 10,
-              }}
-            >
-              <View>
-                <Text
-                  style={{ fontSize: 15, fontWeight: "500", marginBottom: 3 }}
-                >
-                  Direções
-                </Text>
-                <Text>
-                  {Event?.venue?.displayName}, {Event?.venue?.city}
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <FontAwesome5 name="walking" size={20} color={colors.primary} />
-                <Text style={{ fontSize: 22, color: colors.black2 }}> | </Text>
-                <MaterialCommunityIcons
-                  name="car"
-                  size={25}
-                  color={colors.primary}
-                />
-              </View>
-            </TouchableOpacity>
-            {/* <View style={styles.separator} /> */}
-            {/* <TouchableOpacity
+              <TouchableOpacity
+                activeOpacity={0.6}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  marginTop: 5,
+                  padding: 10,
+                }}
+              >
+                <View>
+                  <Text
+                    style={{ fontSize: 15, fontWeight: "500", marginBottom: 3 }}
+                  >
+                    Direções
+                  </Text>
+                  <Text>
+                    {Event?.venue?.address?.zone}, {Event?.venue?.address?.city}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <FontAwesome5
+                    name="walking"
+                    size={20}
+                    color={colors.primary}
+                  />
+                  <Text style={{ fontSize: 22, color: colors.black2 }}>
+                    {" "}
+                    |{" "}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="car"
+                    size={25}
+                    color={colors.primary}
+                  />
+                </View>
+              </TouchableOpacity>
+              {/* <View style={styles.separator} /> */}
+              {/* <TouchableOpacity
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -956,218 +970,145 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color={colors.primary}
               />
             </TouchableOpacity> */}
-          </View>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "500",
-              left: 10,
-              color: colors.primary,
+            </View>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "500",
+                left: 10,
+                color: colors.primary,
 
-              marginVertical: 10,
-            }}
-          >
-            Organizado por
-          </Text>
+                marginVertical: 10,
+              }}
+            >
+              Organizado por
+            </Text>
 
-          <FlatList
-            data={Event?.organizers}
-            horizontal={Event?.organizers?.length > 1}
-            keyExtractor={(item) => item?.id}
-            renderItem={({ item }) => {
-              return Event?.organizers?.length > 1 ? (
-                <TouchableOpacity
-                  style={{
-                    padding: 5,
-                    alignItems: "center",
-                    // justifyContent: "center",
-                  }}
-                  onPress={() => navigation.navigate("artist", item)}
-                >
-                  <Image
-                    style={{
-                      height: 65,
-                      width: 65,
-                      borderRadius: 20,
-                      marginBottom: 2,
-                      borderWidth: 0.009,
-                      backgroundColor: colors.darkGrey,
-                    }}
-                    source={{ uri: item?.avatar }}
-                  />
-                  <Text
-                    style={{
-                      width: item?.displayName?.length > 15 ? 100 : null,
-                      textAlign: "center",
-                      fontSize: 14,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {item?.displayName}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
-                <View
-                  style={{
-                    backgroundColor: colors.white,
-
-                    borderRadius: 10,
-                    // shadowOffset: { width: 0.5, height: 0.5 },
-                    // shadowOpacity: 0.3,
-                    // shadowRadius: 1,
-                    // elevation: 2,
-                    shadowOffset: { width: 0.5, height: 0.5 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 1,
-                    elevation: 0.5,
-                  }}
-                >
+            <FlatList
+              data={Event?.organizers}
+              horizontal={Event?.organizers?.length > 1}
+              keyExtractor={(item) => item?.uuid}
+              renderItem={({ item }) => {
+                return Event?.organizers?.length > 1 ? (
                   <TouchableOpacity
                     style={{
-                      flexDirection: "row",
+                      padding: 5,
                       alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: 10,
-                      alignItems: "center",
-
-                      // height: 50,
-                      // padding: 5,
+                      // justifyContent: "center",
                     }}
+                    onPress={() => navigation.navigate("artist", item)}
                   >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                    <Image
+                      style={{
+                        height: 65,
+                        width: 65,
+                        borderRadius: 20,
+                        marginBottom: 2,
+                        borderWidth: 0.009,
+                        backgroundColor: colors.darkGrey,
+                      }}
+                      source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                    />
+                    <Text
+                      style={{
+                        width: item?.displayName?.length > 15 ? 100 : null,
+                        textAlign: "center",
+                        fontSize: 14,
+                        fontWeight: "500",
+                      }}
                     >
-                      <Image
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 50,
-                          marginRight: 10,
-                          borderWidth: 0.1,
-                        }}
-                        source={{
-                          uri: item.avatar,
-                        }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          fontWeight: "500",
-                          // color: colors.white,
-                        }}
-                      >
-                        {item.displayName}
-                      </Text>
-                    </View>
-                    <Entypo
-                      name="chevron-right"
-                      size={24}
-                      color={colors.primary}
-                    />
+                      {item?.displayName}
+                    </Text>
                   </TouchableOpacity>
-                  <View style={[styles.separator, { width: "90%" }]} />
-
-                  <TouchableOpacity
+                ) : (
+                  <View
                     style={{
-                      padding: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      width: "100%",
-                      // marginVertical: 5,
+                      backgroundColor: colors.white,
+
+                      borderRadius: 10,
+                      // shadowOffset: { width: 0.5, height: 0.5 },
+                      // shadowOpacity: 0.3,
+                      // shadowRadius: 1,
+                      // elevation: 2,
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 1,
+                      elevation: 0.5,
                     }}
                   >
-                    <View>
-                      <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                        Telefonar
-                      </Text>
-                      <Text>{item.phone1}</Text>
-                    </View>
-                    <MaterialCommunityIcons
-                      name="phone"
-                      size={25}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-              );
-            }}
-          />
-          {/* <View
-            style={{
-              backgroundColor: colors.white,
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("artist", item)}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: 10,
+                        alignItems: "center",
 
-              borderRadius: 10,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-            }}
-          >
-            <TouchableOpacity
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: 10,
-                alignItems: "center",
+                        // height: 50,
+                        // padding: 5,
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <Image
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 50,
+                            marginRight: 10,
+                            borderWidth: 0.1,
+                          }}
+                          source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                        />
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: "500",
+                            // color: colors.white,
+                          }}
+                        >
+                          {item.displayName}
+                        </Text>
+                      </View>
+                      <Entypo
+                        name="chevron-right"
+                        size={24}
+                        color={colors.primary}
+                      />
+                    </TouchableOpacity>
+                    <View style={[styles.separator, { width: "90%" }]} />
 
-                // height: 50,
-                // padding: 5,
+                    <TouchableOpacity
+                      style={{
+                        padding: 10,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        width: "100%",
+                        // marginVertical: 5,
+                      }}
+                    >
+                      <View>
+                        <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                          Telefonar
+                        </Text>
+                        <Text>{item.phone1}</Text>
+                      </View>
+                      <MaterialCommunityIcons
+                        name="phone"
+                        size={25}
+                        color={colors.primary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                );
               }}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Image
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 50,
-                    marginRight: 10,
-                    borderWidth: 0.1,
-                  }}
-                  source={{
-                    uri: Event?.promoter?.avatar,
-                  }}
-                />
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "500",
-                    // color: colors.white,
-                  }}
-                >
-                  {Event?.promoter?.displayName}
-                </Text>
-              </View>
-              <Entypo name="chevron-right" size={24} color={colors.primary} />
-            </TouchableOpacity>
-            <View style={[styles.separator, { width: "90%" }]} />
+            />
 
-            <TouchableOpacity
-              style={{
-                padding: 10,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                // marginVertical: 5,
-              }}
-            >
-              <View>
-                <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                  Telefonar
-                </Text>
-                <Text>{Event?.promoter?.phone1}</Text>
-              </View>
-              <MaterialCommunityIcons
-                name="phone"
-                size={25}
-                color={colors.primary}
-              />
-            </TouchableOpacity>
-          </View> */}
-
-          <View style={{ marginBottom: 100 }} />
+            <View style={{ marginBottom: 100 }} />
+          </View>
         </View>
       </ScrollView>
       <TicketPurchaseSheet
@@ -1321,6 +1262,10 @@ export default EventScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    bottom: 10,
+    borderRadius: 10,
+
+    overflow: "hidden",
     flex: 1,
     backgroundColor: colors.background,
   },

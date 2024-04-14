@@ -28,6 +28,7 @@
     "expo-checkbox": "~2.7.0",
     "expo-image-picker": "~14.7.1",
     "expo-linear-gradient": "~12.7.2",
+    "expo-location": "~16.5.5",
     "expo-screen-orientation": "^6.4.1",
     "expo-status-bar": "~1.11.1",
     "expo-video-player": "^2.2.0",
@@ -43,6 +44,7 @@
     "react-native-gesture-handler": "~2.14.0",
     "react-native-hole-view": "^3.0.0-alpha4",
     "react-native-image-colors": "^2.4.0",
+    "react-native-image-header-scroll-view": "^1.0.0",
     "react-native-image-viewing": "^0.2.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
@@ -60,8 +62,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-uuid": "^2.0.2",
     "react-native-view-more-text": "^2.2.0",
-    "rn-placeholder": "^3.0.3",
-    "expo-location": "~16.5.5"
+    "rn-placeholder": "^3.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

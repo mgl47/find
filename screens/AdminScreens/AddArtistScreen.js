@@ -76,12 +76,16 @@ const AddArtistScreen = ({ navigation: { goBack } }) => {
 
   const [newArtist, setNewArtist] = useState({
     displayName: "",
-    userDescription:"",
-    password:"pKJtRwQxES47UkMFfq6mvh",
+    userDescription: "",
+    password: "pKJtRwQxES47UkMFfq6mvh",
 
     photos: {
       avatar: [],
-      cover:[],
+      cover: [],
+    },
+    uuid: uuidKey,
+    status: {
+      label: "artist",
     },
     socials: {
       face: "",
@@ -206,7 +210,7 @@ const AddArtistScreen = ({ navigation: { goBack } }) => {
       console.log("hghfcs");
 
       if (response.status === 200) {
-        // goBack();
+        goBack();
       }
     } catch (error) {
       console.log(error);
