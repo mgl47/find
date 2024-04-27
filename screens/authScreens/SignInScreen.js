@@ -81,8 +81,10 @@ const SignInScreen = () => {
 
           const jsonValue = JSON.stringify(response.data.user);
           await AsyncStorage.setItem("user", jsonValue);
-          authSheetRef?.current?.close();
           navigation.openDrawer();
+
+             authSheetRef?.current?.close();
+          await   new Promise((resolve, reject) => setTimeout(resolve, 500));
           getUpdatedUser(
             response.data.user?._id,
             "Bearer " + response.data.token

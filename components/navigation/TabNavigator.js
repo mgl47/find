@@ -12,8 +12,13 @@ import { useAuth } from "../hooks/useAuth";
 
 const Tab = createMaterialBottomTabNavigator();
 const isIPhoneWithNotch =
-Platform.OS === 'ios' &&
-(Dimensions.get('window').height === 852 ||Dimensions.get('window').height === 844 ||Dimensions.get('window').height === 812 || Dimensions.get('window').height === 896||Dimensions.get('window').height === 926||Dimensions.get('window').height === 932 );
+  Platform.OS === "ios" &&
+  (Dimensions.get("window").height === 852 ||
+    Dimensions.get("window").height === 844 ||
+    Dimensions.get("window").height === 812 ||
+    Dimensions.get("window").height === 896 ||
+    Dimensions.get("window").height === 926 ||
+    Dimensions.get("window").height === 932);
 
 const TabNavigator = () => {
   const { AuthModalUp } = useAuth();
@@ -29,8 +34,9 @@ const TabNavigator = () => {
         // borderTopWidth: 0.2,
         // borderColor: darkColors.primary2,
         // marginBottom: Platform.OS == "ios" ? -30 : -10,
-        marginBottom:isIPhoneWithNotch?-33:-13,
-        display: AuthModalUp ? "none" : "flex",
+        marginBottom: isIPhoneWithNotch ? -33 : -13,
+        // display: AuthModalUp ? "none" : "flex",
+
         //         marginBottom: -10,
       }}
       backBehavior="initialRoute"
@@ -55,7 +61,6 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="início"
-        
         component={HomeScreen}
         options={{
           headerShown: false,

@@ -269,6 +269,8 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
         await uploadPhoto(fileName, "cover", coverUri);
       }
 
+      await new Promise((resolve) => setTimeout(resolve, 8000));
+
       // Add any necessary delay or wait for the upload to complete
 
       let resizedAvatar, resizedCover;
@@ -621,29 +623,36 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
             Editar Perfil
           </Text>
           {/* {(userInitialInfo != userInfo || avatarUri || coverUri) && ( */}
-          <TouchableOpacity
-            disabled={!(userInitialInfo != userInfo || avatarUri || coverUri)}
-            onPress={saveChanges}
-            style={{
-              padding: 10,
-              right: 10,
-              alignSelf: "flex-end",
-              // position: "absolute",
-              // marginBottom: 10,
-              opacity:
-                userInitialInfo != userInfo || avatarUri || coverUri ? 1 : 0,
-            }}
-          >
-            <Text
+          {loading ? (
+            <ActivityIndicator
+              style={{ padding: 10, alignSelf: "flex-end" ,width:80}}
+              color={colors.primary}
+            />
+          ) : (
+            <TouchableOpacity
+              disabled={!(userInitialInfo != userInfo || avatarUri || coverUri)}
+              onPress={saveChanges}
               style={{
-                color: colors.primary,
-                fontSize: 16,
-                fontWeight: "600",
+                padding: 10,
+                right: 10,
+                alignSelf: "flex-end",
+                // position: "absolute",
+                // marginBottom: 10,
+                opacity:
+                  userInitialInfo != userInfo || avatarUri || coverUri ? 1 : 0,
               }}
             >
-              Guardar
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: colors.primary,
+                  fontSize: 16,
+                  fontWeight: "600",
+                }}
+              >
+                Guardar
+              </Text>
+            </TouchableOpacity>
+          )}
           {/* )} */}
         </View>
         <ScrollView

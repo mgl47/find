@@ -172,7 +172,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
             <TouchableOpacity
               disabled={
                 !item?.role ||
-                item?.role == "Criador" ||
+                item?.role == "Organizador" ||
                 (currentMember?.role != "Administração" && !isOrganizer) ||
                 item?._id == user?._id ||
                 (currentMember?.role == "Administração" &&
@@ -227,7 +227,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    {item?.role || "Criador"}
+                    {item?.role || "Organizador"}
                   </Text>
                 </View>
               </Animated.View>

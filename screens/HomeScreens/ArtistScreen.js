@@ -211,7 +211,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const coverIndex = artist?.photos?.cover[2] || [];
   displayCover?.push(coverIndex);
   let displayAvatar = [];
-  const avatarIndex = artist?.photos?.avatar[2] || [];
+  const avatarIndex = artist?.photos?.avatar[3] || [];
   displayAvatar?.push(avatarIndex);
   if (loading) {
     return (

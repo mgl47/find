@@ -56,6 +56,7 @@ import uuid from "react-native-uuid";
 import toast from "../../toast";
 import { useDesign } from "../../hooks/useDesign";
 import { useNavigation } from "@react-navigation/native";
+import formattedDates from "../../formattedDates";
 export default TicketPurchaseSheet = ({
   Event,
   bottomSheetModalRef,
@@ -66,6 +67,7 @@ export default TicketPurchaseSheet = ({
 }) => {
   const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
+  const purchaseDates = formattedDates();
   const { isIPhoneWithNotch } = useDesign();
   const [event, setEvent] = useState(Event);
   const [available, setAvailable] = useState([]);
@@ -84,6 +86,7 @@ export default TicketPurchaseSheet = ({
   const [limitReached, setLimitReached] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [purchaseDone, setPurchaseDone] = useState(false);
   const purchaseId = uuid.v4();
   const initialState = {
     cart: event?.tickets,
@@ -322,18 +325,23 @@ export default TicketPurchaseSheet = ({
     setFirstRender(true);
     setAvailable([]);
     setLimitReached(false);
+    setPurchaseDone(false);
   };
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
-
   const separatedTickets = cartTickets?.flatMap((item) => {
     const { amount, ...rest } = item;
     return Array.from({ length: item.amount }, () => ({
       ...rest,
       uuid: uuid.v4(),
-      username: user?.username,
-      displayName: user?.displayName,
+      username: gift ? searchedUser?.username : user?.username,
+      displayName: gift ? searchedUser?.displayName : user?.displayName,
       purchaseId,
+      purchaseDate: {
+        date: purchaseDates?.date,
+        displayDate: purchaseDates?.displayDate,
+        hour: purchaseDates?.hour,
+      },
       eventId: event?._id,
     }));
   });
@@ -400,7 +408,11 @@ export default TicketPurchaseSheet = ({
             },
             event: filteredEvent,
             cardDetails: paymentInfo?.cardInfo,
-            purchaseDate: new Date(),
+            purchaseDate: {
+              date: purchaseDates?.date,
+              displayDate: purchaseDates?.displayDate,
+              hour: purchaseDates?.hour,
+            },
             tickets: separatedTickets,
             total: state.total,
             uri: event?.photos[0]?.[0]?.uri,
@@ -414,16 +426,22 @@ export default TicketPurchaseSheet = ({
           headers: { Authorization: headerToken },
         }
       );
+      await new Promise((resolve, reject) => setTimeout(resolve, 2000));
+
       if (response.status == 200) {
+        setPurchaseDone(true);
+
         await bottomSheetModalRef.current.close();
 
-        console.log("fsdf");
+        await new Promise((resolve, reject) => setTimeout(resolve, 500));
+
         if (!gift) {
           navigation.navigate("ticketDetails", response?.data);
         }
         getUpdatedUser();
-        setOnPayment(false);
         clean();
+
+        setOnPayment(false);
       }
     } catch (error) {
       console.log(error);
@@ -445,107 +463,110 @@ export default TicketPurchaseSheet = ({
   };
 
   const renderFooter = useCallback(
-    (props) =>
-      purchaseModalUp && (
-        <BottomSheetFooter {...props}>
-          <Animated.View
-            entering={firstRender ? SlideInDown : null}
-            // exiting={SlideOutLeft}
+    (props) => (
+      // purchaseModalUp &&
+
+      <BottomSheetFooter {...props}>
+        <Animated.View
+          // entering={firstRender ? SlideInDown : null}
+          // exiting={SlideOutLeft}
+          style={{
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            height: isIPhoneWithNotch ? 80 : 55,
+            backgroundColor: colors.white,
+            // position: "absolute",
+            zIndex: 4,
+            bottom: 0,
+            flexDirection: "row",
+            shadowOffset: { width: 1, height: 1 },
+            shadowOpacity: 1,
+            shadowRadius: 1,
+            elevation: 3,
+            borderTopRightRadius: 15,
+            borderTopLeftRadius: 15,
+            paddingHorizontal: 30,
+          }}
+        >
+          <View
             style={{
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              height: isIPhoneWithNotch ? 80 : 55,
-              backgroundColor: colors.white,
-              // position: "absolute",
-              zIndex: 4,
-              bottom: 0,
               flexDirection: "row",
-              shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 1,
-              shadowRadius: 1,
-              elevation: 3,
-              borderTopRightRadius: 15,
-              borderTopLeftRadius: 15,
-              paddingHorizontal: 30,
+              alignItems: "center",
             }}
           >
-            <View
+            <Text
               style={{
-                flexDirection: "row",
-                alignItems: "center",
+                fontSize: 19,
+                color: colors.black2,
+                fontWeight: "600",
+                marginRight: 5,
               }}
             >
-              <Text
-                style={{
-                  fontSize: 19,
-                  color: colors.black2,
-                  fontWeight: "600",
-                  marginRight: 5,
-                }}
-              >
-                Total:
-              </Text>
-              <Text
-                style={{
-                  fontSize: 19,
-                  color: colors.primary,
-                  fontWeight: "600",
-                }}
-              >
-                cve {formatNumber(state?.total)}
-              </Text>
-            </View>
-            <TouchableOpacity
-              disabled={state.total == 0 || (gift && !searchedUser)}
-              onPress={() =>
-                onPayment
-                  ? buyTickets()
-                  : (setOnPayment(true), setFirstRender(false))
-              }
+              Total:
+            </Text>
+            <Text
               style={{
-                width: 150,
-                height: 40,
-                backgroundColor:
-                  (gift && searchedUser == null) || state?.total == 0
-                    ? colors.description2
-                    : colors.primary, // position: "absolute",
-                zIndex: 1,
-                // top: 10,
-                // left: 10,
-                borderRadius: 10,
-                alignItems: "center",
-                justifyContent: "center",
-                shadowOffset: { width: 1, height: 1 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 3,
-                shadowColor: colors.dark,
-                flexDirection: "row",
+                fontSize: 19,
+                color: colors.primary,
+                fontWeight: "600",
               }}
-              activeOpacity={0.5}
             >
-              {loading ? (
-                <ActivityIndicator
-                  style={{ position: "absolute" }}
-                  color={colors.white}
-                />
-              ) : (
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: colors.white,
-                    fontWeight: "500",
-                    marginRight: 10,
-                  }}
-                >
-                  {onPayment ? "Pagar" : "Confirmar"}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </Animated.View>
-        </BottomSheetFooter>
-      ),
+              cve {formatNumber(state?.total)}
+            </Text>
+          </View>
+          <TouchableOpacity
+            disabled={
+              state.total == 0 || (gift && !searchedUser) || purchaseDone
+            }
+            onPress={() =>
+              onPayment
+                ? buyTickets()
+                : (setOnPayment(true), setFirstRender(false))
+            }
+            style={{
+              width: 150,
+              height: 40,
+              backgroundColor:
+                (gift && searchedUser == null) || state?.total == 0
+                  ? colors.description2
+                  : colors.primary, // position: "absolute",
+              zIndex: 1,
+              // top: 10,
+              // left: 10,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowOffset: { width: 1, height: 1 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 3,
+              shadowColor: colors.dark,
+              flexDirection: "row",
+            }}
+            activeOpacity={0.5}
+          >
+            {loading ? (
+              <ActivityIndicator
+                style={{ position: "absolute" }}
+                color={colors.white}
+              />
+            ) : (
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: colors.white,
+                  fontWeight: "500",
+                  marginRight: 10,
+                }}
+              >
+                {onPayment ? "Pagar" : "Confirmar"}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </Animated.View>
+      </BottomSheetFooter>
+    ),
     [
       state?.amount,
       !firstRender ? loading : null,
@@ -553,7 +574,7 @@ export default TicketPurchaseSheet = ({
       firstRender,
       searchedUser,
       gift,
-      purchaseModalUp,
+      // purchaseModalUp,
     ]
   );
   const renderBackdrop = useCallback(

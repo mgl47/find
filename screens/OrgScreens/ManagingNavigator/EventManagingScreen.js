@@ -75,12 +75,12 @@ const EventManagingScreen = ({
   const { apiUrl } = useData();
   const { isIPhoneWithNotch } = useDesign();
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const { status } = await Camera.requestCameraPermissionsAsync();
+  //     setHasPermission(status === "granted");
+  //   })();
+  // }, []);
 
   const selectedEvent = myEvents?.filter(
     (myEvent) => myEvent?._id == item?._id
@@ -159,7 +159,6 @@ const EventManagingScreen = ({
     setScanned(false);
     // navigation.goBack();
   };
-  console.log(statusCode);
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -195,16 +194,16 @@ const EventManagingScreen = ({
       flashMode == FlashMode.torch ? FlashMode.off : FlashMode.torch
     );
   };
-  if (!permission) {
-    return (
-      <View style={styles.container}>
-        <Button
-          title="Permitir acceso a la cámara"
-          onPress={requestPermission}
-        />
-      </View>
-    );
-  }
+  // if (!permission) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <Button
+  //         title="Permitir acceso a la cámara"
+  //         onPress={requestPermission}
+  //       />
+  //     </View>
+  //   );
+  // }
   return (
     <>
       {/* <View style={{ flex: 1 }}> */}

@@ -175,16 +175,16 @@ import {
         flashMode == FlashMode.torch ? FlashMode.off : FlashMode.torch
       );
     };
-    if (!permission) {
-      return (
-        <View style={styles.container}>
-          <Button
-            title="Permitir acceso a la cámara"
-            onPress={requestPermission}
-          />
-        </View>
-      );
-    }
+    // if (!permission) {
+    //   return (
+    //     <View style={styles.container}>
+    //       <Button
+    //         title="Permitir acceso a la cámara"
+    //         onPress={requestPermission}
+    //       />
+    //     </View>
+    //   );
+    // }
     return (
       <View
         style={{

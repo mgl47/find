@@ -46,6 +46,7 @@ import LottieView from "lottie-react-native";
 import { useAuth } from "../../../../components/hooks/useAuth";
 
 import { useDesign } from "../../../../components/hooks/useDesign";
+import formattedDates from "../../../../components/formattedDates";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -88,6 +89,7 @@ export default function ValidatorScreen({
   };
 
   const scanQr = async (item) => {
+    const selectedDate = formattedDates();
     if (scanned) return;
     setScanned(true);
     setLoading(true);
@@ -95,7 +97,12 @@ export default function ValidatorScreen({
     try {
       const result = await axios.patch(
         `${apiUrl}/purchase/checkin/${selectedEvent?._id}`,
-        { uuid: item?.data, exiting: index == 1 },
+        {
+          uuid: item?.data,
+          exiting: index == 1,
+          exitingTime: selectedDate?.displayDate + " às " + selectedDate?.hour,
+          checkedAt: selectedDate?.displayDate + " às " + selectedDate?.hour,
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -142,16 +149,16 @@ export default function ValidatorScreen({
       flashMode == FlashMode.torch ? FlashMode.off : FlashMode.torch
     );
   };
-  if (!permission) {
-    return (
-      <View style={styles.container}>
-        <Button
-          title="Permitir acceso a la cámara"
-          onPress={requestPermission}
-        />
-      </View>
-    );
-  }
+  // if (!permission) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <Button
+  //         title="Permitir acceso a la cámara"
+  //         onPress={requestPermission}
+  //       />
+  //     </View>
+  //   );
+  // }
 
   return (
     <View
@@ -449,73 +456,82 @@ export default function ValidatorScreen({
                         : "green"
                     }
                   />
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "600",
-                      marginLeft: 5,
-                      color:
-                        statusCode == 202 || statusCode == 203
-                          ? colors.primary
-                          : statusCode == 201
-                          ? "#ff8000"
-                          : "green",
-                    }}
-                  >
-                    {statusCode == 201
-                      ? "Este bilhete já foi escaneado às: "
-                      : statusCode == 200
-                      ? "CHECK IN: "
-                      : statusCode == 202
-                      ? "Saída: "
-                      : statusCode == 203
-                      ? "Primeiro checkIn: "
-                      : ""}
-                  </Text>
-
-                  {scannedTicket?.checkedAt && (
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: "600",
-                        //   marginLeft: 8,
-                        color: colors.darkGrey,
-                      }}
+                  <View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      {`${
-                        statusCode == 202
-                          ? scannedTicket?.leftAt
-                          : scannedTicket?.checkedAt
-                      }.`}
-                    </Text>
-                  )}
-                  {statusCode == 203 && (
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        fontWeight: "600",
-                        marginLeft: 5,
-                        color:
-                          statusCode == 202 || statusCode == 203
-                            ? colors.primary
-                            : statusCode == 201
-                            ? "#ff8000"
-                            : "green",
-                      }}
-                    >
-                      {"Saiu às "}
                       <Text
                         style={{
                           fontSize: 15,
                           fontWeight: "600",
-                          marginLeft: 8,
-                          color: colors.darkGrey,
+                          marginLeft: 5,
+                          color:
+                            statusCode == 202 || statusCode == 203
+                              ? colors.primary
+                              : statusCode == 201
+                              ? "#ff8000"
+                              : "green",
                         }}
                       >
-                        {scannedTicket?.lastLeftAt}.
+                        {statusCode == 201
+                          ? "Escaneado: "
+                          : statusCode == 200
+                          ? "CHECK IN: "
+                          : statusCode == 202
+                          ? "Saída: "
+                          : statusCode == 203
+                          ? "Checked In: "
+                          : ""}
                       </Text>
-                    </Text>
-                  )}
+                      {scannedTicket?.checkedAt && (
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: "600",
+                            //   marginLeft: 8,
+                            color: colors.primary2,
+                          }}
+                        >
+                          {`${
+                            statusCode == 202
+                              ? scannedTicket?.leftAt
+                              : scannedTicket?.checkedAt
+                          }.`}
+                        </Text>
+                      )}
+                    </View>
+                    {statusCode == 203 && (
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: "600",
+                            marginLeft: 5,
+                            color:
+                              statusCode == 202 || statusCode == 203
+                                ? colors.primary
+                                : statusCode == 201
+                                ? "#ff8000"
+                                : "green",
+                          }}
+                        >
+                          {"Saída: "}
+                          <Text
+                            style={{
+                              fontSize: 15,
+                              fontWeight: "600",
+                              marginLeft: 8,
+                              color: colors.primary2,
+                            }}
+                          >
+                            {scannedTicket?.lastLeftAt}.
+                          </Text>
+                        </Text>
+                      </View>
+                    )}
+                  </View>
                 </View>
                 <Text
                   style={{
@@ -613,36 +629,35 @@ export default function ValidatorScreen({
             )}
           </TouchableOpacity>
         </Animated.View>
-          <TouchableOpacity
-            onPress={() => {
-              setScanned(false),
-                setScannedTicket(""),
-                setStatusCode(0),
-                setLoading(false);
-            }}
-            activeOpacity={0.5}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              alignSelf: "flex-end",
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 0.5,
-              width: 50,
-              height: 50,
-              marginRight: 10,
-              marginTop: 10,
-              zIndex: 2,
-              backgroundColor: colors.white,
-              borderRadius: 10,
-            }}
-            // onPress={() => navigation.navigate("addEvent", item)}
-            // onPress={() => navigation.navigate("manageEvent", item)}
-          >
-            <FontAwesome name="refresh" size={24} color={colors.primary} />
-          </TouchableOpacity>
-
+        <TouchableOpacity
+          onPress={() => {
+            setScanned(false),
+              setScannedTicket(""),
+              setStatusCode(0),
+              setLoading(false);
+          }}
+          activeOpacity={0.5}
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            alignSelf: "flex-end",
+            shadowOffset: { width: 0.5, height: 0.5 },
+            shadowOpacity: 0.3,
+            shadowRadius: 1,
+            elevation: 0.5,
+            width: 50,
+            height: 50,
+            marginRight: 10,
+            marginTop: 10,
+            zIndex: 2,
+            backgroundColor: colors.white,
+            borderRadius: 10,
+          }}
+          // onPress={() => navigation.navigate("addEvent", item)}
+          // onPress={() => navigation.navigate("manageEvent", item)}
+        >
+          <FontAwesome name="refresh" size={24} color={colors.primary} />
+        </TouchableOpacity>
       </View>
     </View>
   );

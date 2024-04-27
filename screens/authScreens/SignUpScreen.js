@@ -85,9 +85,9 @@ const SignUpScreen = () => {
 
         setUser(response.data.user);
         await AsyncStorage.setItem("headerToken", "Bearer "+response.data.token);
-        authSheetRef?.current?.close()
-
         navigation.openDrawer();
+
+             authSheetRef?.current?.close();
       }
     } catch (error) {
       if (error.response) {

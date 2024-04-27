@@ -127,6 +127,7 @@ export default function HomeScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("tabPress", (e) => {
+      authSheetRef?.current?.close();
       if (isFocused) {
         homeTabRef.current?.scrollToOffset({ offset: 0, animated: true });
       }
