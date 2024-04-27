@@ -239,27 +239,29 @@ const SignInScreen = () => {
               marginBottom: 15,
             }}
           >
-            <MaterialCommunityIcons
-              name="account-outline"
-              size={24}
-              color={colors.white}
-            />
-
-            {!loading ? (
-              <ActivityIndicator color={colors.primary} />
+            {loading ? (
+              <ActivityIndicator color={colors.white} />
             ) : (
-              <Animated.Text
-                entering={firstMount ? null : SlideInRight.duration(500)}
-                exiting={firstMount ? null : SlideOutRight.duration(500)}
-                style={{
-                  color: colors.white,
-                  marginLeft: 5,
-                  fontSize: 17,
-                  fontWeight: "500",
-                }}
-              >
-                {!onPassRecovery ? "Entrar" : "Recuperar"}
-              </Animated.Text>
+              <>
+                <MaterialCommunityIcons
+                  name="account-outline"
+                  size={24}
+                  color={colors.white}
+                />
+
+                <Animated.Text
+                  entering={firstMount ? null : SlideInRight.duration(500)}
+                  exiting={firstMount ? null : SlideOutRight.duration(500)}
+                  style={{
+                    color: colors.white,
+                    marginLeft: 5,
+                    fontSize: 17,
+                    fontWeight: "500",
+                  }}
+                >
+                  {!onPassRecovery ? "Entrar" : "Recuperar"}
+                </Animated.Text>
+              </>
             )}
           </TouchableOpacity>
         </View>

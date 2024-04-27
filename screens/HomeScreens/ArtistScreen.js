@@ -66,7 +66,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [inFullscreen, setInFullsreen] = useState(false);
   const [isMute, setIsMute] = useState(true);
   const [followBlock, setFollowBlock] = useState(false);
-
+  const [events, setEvents] = useState([]);
   const { user, headerToken, getUpdatedUser } = useAuth();
   const findUser = async () => {
     setLoading(true);
@@ -76,7 +76,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         `${apiUrl}/users/?username=${item?.username?.toLowerCase()}`
       );
       if (response.status === 200) {
-        console.log(response?.data);
+        // console.log(response?.data);
         setArtist(response?.data);
       }
       setLoading(false);
@@ -87,7 +87,14 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   };
   useEffect(() => {
     findUser();
+    getEvents();
   }, []);
+  console.log(item?.uuid);
+  const getEvents = async () => {
+    const result = await axios.get(`${apiUrl}/events/?artist=${item?.uuid}`);
+    // console.log(result?.data);
+    setEvents(result?.data);
+  };
 
   useEffect(() => {
     if (user?.followedArtists?.includes(artist?._id)) setFollowing(true);
@@ -365,12 +372,12 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
       )}
 
       <Animated.FlatList
-        entering={FadeIn.duration(400)}
+        entering={FadeIn.duration(300)}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         bounces={false}
-        data={artist?.upcomingEvents}
-        keyExtractor={(item) => item?.id}
+        data={events}
+        keyExtractor={(item) => item?.uuid}
         style={{ backgroundColor: colors.background }}
         ListHeaderComponent={
           <>
@@ -488,7 +495,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 21,
                   fontWeight: "600",
                   marginBottom: 5,
-                  marginLeft:artist?.displayName?.length<10?20:0,
+                  marginLeft: artist?.displayName?.length < 10 ? 20 : 0,
                   color: colors.primary2,
                 }}
               >
@@ -509,6 +516,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   flexDirection: "row",
                   alignItems: "center",
                   marginVertical: 10,
+                  marginLeft:10,
+                  flexWrap:1
                 }}
               >
                 <TouchableOpacity style={{ marginRight: 15 }}>
@@ -545,6 +554,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     color={colors.primary}
                   />
                 </TouchableOpacity>
+              
               </View>
               <View style={styles.separator} />
               <Text
@@ -567,14 +577,14 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   // width: "80%",
                   color: colors.black2,
                   marginLeft: 5,
-                  marginTop: 5,
+                  // marginTop: 5,
                   // marginBottom: 5,
                 }}
               >
-                {artist?.upcomingEvents?.length > 1
-                  ? artist?.upcomingEvents?.length + " Eventos"
-                  : artist?.upcomingEvents?.length > 0
-                  ? artist?.upcomingEvents?.length + " Evento"
+                {events?.length > 1
+                  ? events?.length + " Eventos"
+                  : events?.length > 0
+                  ? events?.length + " Evento"
                   : ""}
               </Text>
             </View>
@@ -594,10 +604,10 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 shadowRadius: 1,
                 elevation: 0.5,
                 paddingHorizontal: 10,
-                marginTop: 10,
+                marginBottom: 10,
                 bottom: 50,
               }}
-              // onPress={() => navigation.navigate("event", item)}
+              onPress={() => navigation.navigate("event", item)}
             >
               <SmallCard {...item} />
             </TouchableOpacity>

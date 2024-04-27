@@ -40,12 +40,16 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
   const [loading, setLoading] = useState(true);
   const [event, setEvent] = useState(null);
   const [members, setMembers] = useState([]);
+  const currentMember = members?.staff?.filter(
+    (member) => member?._id == user?._id
+  )[0];
+  const isOrganizer = event?.organizers?.find((org) => org?._id == user?._id);
 
   const getSelectedEvent = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setEvent(myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]);
     setMembers(
-      myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]?.staff
+      myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]
     );
 
     setLoading(false);
@@ -56,10 +60,10 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
   }, [myEvents]);
 
   const [selectedMember, setSelectedMember] = useState(null);
-  const [position, setPosition] = useState(selectedMember?.level);
+  const [position, setPosition] = useState(selectedMember?.role);
 
   useEffect(() => {
-    setPosition({ value: selectedMember?.level, label: selectedMember?.level });
+    setPosition({ value: selectedMember?.role, label: selectedMember?.role });
   }, [selectedMember]);
 
   const membersSheetRef = useRef(null);
@@ -76,21 +80,16 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
   const snapPoints = useMemo(() => ["55%", "75%"], []);
 
   const removeMember = async () => {
-    let users = [...members];
-    const newStaff = users?.filter((user) => user?._id != selectedMember?._id);
-    setMembers(newStaff);
-    const newStaffId = newStaff?.map((item) => item?._id);
-
     try {
       const response = await axios.patch(
         `${apiUrl}/user/event/${event?._id}`,
         {
           operation: {
             type: "eventStatus",
-            task: "staff",
+            task: "removeStaff",
             eventId: event?._id,
           },
-          updates: { newStaffId, newStaff },
+          updates: { oldStaff: selectedMember },
         },
         { headers: { Authorization: headerToken } }
       );
@@ -102,34 +101,21 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
     }
   };
 
-  // const
   const updateMember = async () => {
-    let users = [...members];
-    // const newStaff = users?.filter((user) => user?._id != selectedMember?._id);
-
-    const newStaff = users?.map((member) => {
-      if (member?._id == selectedMember?._id) {
-        return { ...member, level: position?.value };
-      } else {
-        return member;
-      }
-    });
-    const newStaffId = newStaff?.map((item) => item?._id);
-
-    // console.log(newStaffId);
-
-    // setMembers(newStaff);
-
+    if (position?.value == selectedMember?.role) {
+      manageMembersSheetRef.current?.close();
+      return;
+    }
     try {
       const response = await axios.patch(
         `${apiUrl}/user/event/${event?._id}`,
         {
           operation: {
             type: "eventStatus",
-            task: "staff",
+            task: "updateStaff",
             eventId: event?._id,
           },
-          updates: { newStaffId, newStaff },
+          updates: { role: position?.value, uuid: selectedMember?.uuid },
         },
         { headers: { Authorization: headerToken } }
       );
@@ -148,9 +134,9 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
     );
   }
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
-        data={members}
+        data={members?.organizers?.concat(members?.staff)}
         keyExtractor={(item) => item?._id}
         ListHeaderComponent={
           <>
@@ -160,96 +146,48 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 Membros{" "}
               </Text>
-              <TouchableOpacity
-                style={styles.switch}
-                onPress={handleMembersSheet}
-              >
-                {/* <Ionicons
-              name={"add-circle-outline"}
-              size={30}
-              color={colors.primary}
-            /> */}
-                <Text
-                  style={{
-                    color: colors.primary,
-                    fontSize: 14,
-                    left: 20,
-                    padding: 3,
-                    fontWeight: "600",
-                  }}
+              {(currentMember?.role == "Administração" || isOrganizer) && (
+                <TouchableOpacity
+                  style={styles.switch}
+                  onPress={handleMembersSheet}
                 >
-                  Adicionar
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              onPress={getUpdatedUser}
-              activeOpacity={0.5}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
-                shadowRadius: 1,
-                elevation: 2,
-                width: "100%",
-                marginBottom: 10,
-              }}
-              // onPress={() => navigation.navigate("event", item)}
-            >
-              <Animated.View
-                style={styles.userCard}
-                entering={FadeIn}
-                exiting={FadeOut}
-              >
-                <Image
-                  source={{
-                    uri: event?.createdBy?.avatar,
-                  }}
-                  style={{
-                    width: 70,
-                    height: 70,
-                    borderRadius: 50,
-
-                    // marginLeft: 20,
-                    // position: "absolute",
-                  }}
-
-                  // resizeMode="contain"
-                />
-                <View style={{ alignItems: "center", marginLeft: 10 }}>
-                  <Text numberOfLines={2} style={[styles.displayName]}>
-                    {event?.createdBy?.displayName}
-                  </Text>
-                  <Text numberOfLines={2} style={[styles.userName]}>
-                    @{event?.createdBy?.username}
-                  </Text>
                   <Text
-                    numberOfLines={2}
                     style={{
-                      alignItems: "center",
-                      fontSize: 16.5,
-                      color: colors.darkSeparator,
-                      fontWeight: "500",
+                      color: colors.primary,
+                      fontSize: 14,
+                      left: 20,
+                      padding: 3,
+                      fontWeight: "600",
                     }}
                   >
-                    Criador{" "}
+                    Adicionar
                   </Text>
-                </View>
-              </Animated.View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+              )}
+            </View>
           </>
         }
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
+              disabled={
+                !item?.role ||
+                item?.role == "Criador" ||
+                (currentMember?.role != "Administração" && !isOrganizer) ||
+                item?._id == user?._id ||
+                (currentMember?.role == "Administração" &&
+                  item?.role == "Administração")
+                  
+              }
               onPress={() => handleManageMembers(item)}
               activeOpacity={0.5}
               style={{
                 shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.3,
+                shadowOpacity: 0.2,
                 shadowRadius: 1,
-                elevation: 2,
+                elevation: 0.5,
                 width: "100%",
-                // marginTop: 10,
+                marginHorizontal: 0.1,
               }}
               // onPress={() => navigation.navigate("event", item)}
             >
@@ -289,7 +227,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "500",
                     }}
                   >
-                    {item?.level}
+                    {item?.role || "Criador"}
                   </Text>
                 </View>
               </Animated.View>
@@ -496,7 +434,8 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
       </BottomSheetModalProvider>
       <UserSelectorSheet
         type={"members"}
-        users={members}
+        users={members?.staff}
+        // setUserModalUp={setUserModalUp}
         setUsers={setMembers}
         userSheetModalRef={membersSheetRef}
         eventId={event?._id}

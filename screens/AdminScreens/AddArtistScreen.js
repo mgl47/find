@@ -107,14 +107,16 @@ const AddArtistScreen = ({ navigation: { goBack } }) => {
       let resized1Name, resized2Name, resized3Name, resized4Name;
 
       if (type === "avatar") {
-        resized1Name = `${fileName}_100x100`;
-        resized2Name = `${fileName}_200x200`;
-        resized3Name = `${fileName}_800x800`;
-        resized4Name = `${fileName}_1000x1000`;
+        resized1Name = `${fileName}_1000x1000`;
+        resized2Name = `${fileName}_800x800`;
+        resized3Name = `${fileName}_200x200`;
+
+        resized4Name = `${fileName}_100x100`;
       } else {
-        resized1Name = `${fileName}_200x200`;
+        resized1Name = `${fileName}_1000x1000`;
         resized2Name = `${fileName}_300x300`;
-        resized3Name = `${fileName}_1000x1000`;
+
+        resized3Name = `${fileName}_200x200`;
         // resized4Name = `${fileName}_1200x1200`;
       }
 
@@ -224,7 +226,7 @@ const AddArtistScreen = ({ navigation: { goBack } }) => {
       <KeyboardAwareScrollView
         style={{ backgroundColor: colors.background, flex: 1 }}
       >
-        <Text
+        {/* <Text
           style={{
             fontSize: 19,
             fontWeight: "600",
@@ -235,7 +237,7 @@ const AddArtistScreen = ({ navigation: { goBack } }) => {
           }}
         >
           Fotos
-        </Text>
+        </Text> */}
         <View>
           <TouchableOpacity
             onPress={() => photoInput(setCoverUri)}

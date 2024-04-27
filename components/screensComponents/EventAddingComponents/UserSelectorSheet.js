@@ -46,12 +46,11 @@ const { height, width } = Dimensions.get("window");
 
 export default UserSelectorSheet = ({
   userSheetModalRef,
-  userModalUp,
-  setUserModalUp,
   type,
   users,
   setUsers,
-
+  setUserModalUp,
+  userModalUp,
   eventId,
 }) => {
   // const bottomSheetModalRef = useRef(null);
@@ -83,23 +82,26 @@ export default UserSelectorSheet = ({
   const [usersList, setUsersList] = useState(users);
   useEffect(() => {
     if (userModalUp) setUsersList(users);
-  }, [userModalUp]);
+  }, [userModalUp, users, userSheetModalRef]);
 
   const clear = () => {
     setSearched(false);
     setSearchedUSer(null);
     setSearch("");
     setUsersList([]);
-    setUserModalUp(false);
+    if (type != "members") {
+      setUserModalUp(false);
+    }
   };
-
 
   const findUser = async () => {
     setLoading(true);
     setSearched(false);
     setSearchedUSer(null);
     try {
-      const response = await axios.get(`${apiUrl}/users/?username=${search?.toLowerCase()}`);
+      const response = await axios.get(
+        `${apiUrl}/users/?username=${search?.toLowerCase().trim()}`
+      );
       if (response.status === 200) {
         setSearchedUSer(response?.data);
       }
@@ -111,29 +113,49 @@ export default UserSelectorSheet = ({
   };
 
   const addUser = () => {
-    // Create a new array with the existing usersList
     let tempUsers = [...usersList];
-    const usersId = tempUsers?.map((user) => user?._id);
-
-    // Check if searchedUser is not already in the list
-    if (type == "members") {
-      if (!usersId?.includes(searchedUser?._id)) {
-        const newStaff = {
-          ...searchedUser,
-          level: "Colaborador",
-          addedBy: user?.displayName,
-        };
-        tempUsers.push(newStaff);
-      }
-
-      // Update the state with the new array
-      setUsersList(tempUsers);
+    if (tempUsers?.find((user) => user?._id == searchedUser?._id)) {
       return;
     }
-
     tempUsers.push(searchedUser);
     setUsersList(tempUsers);
   };
+
+  const addMember = async () => {
+    if (users?.find((user) => user?.username == search.toLowerCase())) {
+      retur;
+    }
+    setLoading(true);
+    const newStaff = {
+      ...searchedUser,
+      role: "Colaborador",
+      addedBy: user?.displayName,
+    };
+
+    const newStaffId = newStaff?._id;
+    try {
+      const response = await axios.patch(
+        `${apiUrl}/user/event/${eventId}`,
+        {
+          operation: {
+            type: "eventStatus",
+            task: "addStaff",
+            eventId: eventId,
+          },
+          updates: { newStaffId, newStaff },
+        },
+        { headers: { Authorization: headerToken } }
+      );
+      if (response?.status == 200) {
+        getUpdatedUser(), userSheetModalRef.current?.close();
+      }
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const removeUser = (selectedUser) => {
     let tempUsers = [...usersList];
     const newUsers = tempUsers?.filter(
@@ -143,44 +165,17 @@ export default UserSelectorSheet = ({
   };
 
   const save = async () => {
-    if (type == "members") {
-      saveMembers();
-      userSheetModalRef.current.close();
-
-      return;
-    }
     setUsers(usersList);
     userSheetModalRef.current.close();
   };
 
-  const saveMembers = async () => {
-    const newStaffId = usersList?.map((item) => item?._id);
-    try {
-      const response = await axios.patch(
-        `${apiUrl}/user/event/${eventId}`,
-        {
-          operation: {
-            type: "eventStatus",
-            task: "staff",
-            eventId: eventId,
-          },
-          updates: { newStaffId, newStaff: usersList },
-        },
-        { headers: { Authorization: headerToken } }
-      );
-      if (response?.status == 200) {
-        getUpdatedUser(), userSheetModalRef.current?.close();
-      }
-    } catch (error) {
-      console.log(error?.response?.data?.msg);
-    }
-  };
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
         // style={{backgroundColor:}}
         ref={userSheetModalRef}
         // index={keyboardVisible ? 1 : 0}
+        enablePanDownToClose
         index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
@@ -210,17 +205,19 @@ export default UserSelectorSheet = ({
                   ? "Adiconar Membro"
                   : "Adicionar Organizador"}
               </Text>
-              <TouchableOpacity onPress={save}>
-                <Text
-                  style={{
-                    color: colors.primary,
-                    fontSize: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  Guardar
-                </Text>
-              </TouchableOpacity>
+              {type != "members" && (
+                <TouchableOpacity onPress={save}>
+                  <Text
+                    style={{
+                      color: colors.primary,
+                      fontSize: 16,
+                      fontWeight: "600",
+                    }}
+                  >
+                    Guardar
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
             <View>
               <TextInput
@@ -259,7 +256,7 @@ export default UserSelectorSheet = ({
                 </Text>
               )}
 
-              {loading && (
+              {loading&& type!="members" && (
                 <Animated.View
                   style={{
                     // position: "absolute",
@@ -277,7 +274,7 @@ export default UserSelectorSheet = ({
               )}
             </View>
             {!loading && searchedUser && (
-              <TouchableOpacity
+              <View
                 onPress={addUser}
                 activeOpacity={0.5}
                 style={{
@@ -290,81 +287,129 @@ export default UserSelectorSheet = ({
                 }}
                 // onPress={() => navigation.navigate("event", item)}
               >
-                <Animated.View
-                  style={styles.userCard}
-                  entering={FadeIn}
-                  exiting={FadeOut}
-                >
-                  <Image
-                    source={{
-                      uri: searchedUser?.photos?.avatar?.[0]?.uri,
-                    }}
-                    style={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: 50,
+                <Animated.View entering={FadeIn} exiting={FadeOut}>
+                  <View style={styles.userCard}>
+                    <Image
+                      source={{
+                        uri: searchedUser?.photos?.avatar?.[0]?.uri,
+                      }}
+                      style={{
+                        width: 70,
+                        height: 70,
+                        borderRadius: 50,
 
-                      // marginLeft: 20,
-                      // position: "absolute",
-                    }}
+                        // marginLeft: 20,
+                        // position: "absolute",
+                      }}
 
-                    // resizeMode="contain"
-                  />
-                  <View style={{ alignItems: "center", marginLeft: 10 }}>
-                    <Text numberOfLines={2} style={[styles.displayName]}>
-                      {searchedUser?.displayName}
-                    </Text>
-                    <Text numberOfLines={2} style={[styles.userName]}>
-                      @{searchedUser?.username}
-                    </Text>
+                      // resizeMode="contain"
+                    />
+                    <View style={{ alignItems: "center", marginLeft: 10 }}>
+                      <Text numberOfLines={2} style={[styles.displayName]}>
+                        {searchedUser?.displayName}
+                      </Text>
+                      <Text numberOfLines={2} style={[styles.userName]}>
+                        @{searchedUser?.username}
+                      </Text>
+                    </View>
                   </View>
+
+                  <TouchableOpacity
+                    onPress={type == "members" ? addMember : addUser}
+                    activeOpacity={0.7}
+                    style={{
+                      alignSelf: "center",
+                      flexDirection: "row",
+                      height: 50,
+                      width: "90%",
+                      backgroundColor: colors.primary,
+                      borderRadius: 10,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      shadowOffset: { width: 0.5, height: 0.5 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 1,
+                      elevation: 2,
+                      marginTop: 5,
+                      marginBottom: 15,
+                    }}
+                  >
+                    {loading ? (
+                      <View
+                        style={{
+                          flex: 1,
+                          position: "absolute",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          alignSelf: "center",
+                          backgroundColor: "transparent",
+                          zIndex: 1,
+                        }}
+                      >
+                        <ActivityIndicator color={colors.white} />
+                      </View>
+                    ) : (
+                      <Text
+                        style={{
+                          color: colors.white,
+                          marginLeft: 5,
+                          fontSize: 17,
+                          fontWeight: "500",
+                        }}
+                      >
+                        Adicionar
+                      </Text>
+                    )}
+                  </TouchableOpacity>
                 </Animated.View>
-              </TouchableOpacity>
+              </View>
             )}
 
             <View>
-              <FlatList
-                style={{ top: loading && 110 }}
-                // numColumns={5}
+              {type != "members" && (
+                <FlatList
+                  style={{ top: loading && 110 }}
+                  // numColumns={5}
 
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                data={usersList}
-                keyExtractor={(item) => item?._id}
-                renderItem={({ item }) => {
-                  return (
-                    <TouchableOpacity
-                      style={{
-                        padding: 5,
-                        alignItems: "center",
-                        // justifyContent: "center",
-                      }}
-                      onPress={() => removeUser(item)}
-                    >
-                      <Image
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  data={usersList}
+                  keyExtractor={(item) => item?._id}
+                  renderItem={({ item }) => {
+                    return (
+                      <TouchableOpacity
                         style={{
-                          height: 60,
-                          width: 60,
-                          borderRadius: 50,
-                          marginBottom: 2,
-                          borderWidth: 0.009,
+                          padding: 5,
+                          alignItems: "center",
+                          // justifyContent: "center",
                         }}
-                        source={{
-                          uri: item?.photos?.avatar?.[0]?.uri,
-                        }}
-                      />
-                      <Text
-                        style={{
-                          width: item?.displayName?.length > 15 ? 100 : null,
-                          textAlign: "center",
-                        }}
+                        onPress={() => removeUser(item)}
                       >
-                        {item?.displayName}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                }}
-              />
+                        <Image
+                          style={{
+                            height: 60,
+                            width: 60,
+                            borderRadius: 50,
+                            marginBottom: 2,
+                            borderWidth: 0.009,
+                          }}
+                          source={{
+                            uri: item?.photos?.avatar?.[0]?.uri,
+                          }}
+                        />
+                        <Text
+                          style={{
+                            width: item?.displayName?.length > 15 ? 100 : null,
+                            textAlign: "center",
+                          }}
+                        >
+                          {item?.displayName}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                />
+              )}
             </View>
             {/* <Text
                 style={[

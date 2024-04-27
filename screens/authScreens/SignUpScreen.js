@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import uuid from "react-native-uuid";
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -72,6 +73,7 @@ const SignUpScreen = () => {
             username: person.username.toLocaleLowerCase(),
             email: person.email.toLocaleLowerCase(),
             password: person.confPassword.toLocaleLowerCase(),
+            uuid:uuid.v4()
           },
           {
             headers: {

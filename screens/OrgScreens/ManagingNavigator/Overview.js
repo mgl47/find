@@ -73,7 +73,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   return (
     <Animated.ScrollView
     showsVerticalScrollIndicator={false}
-      style={{ padding: 10 }}
+      style={{ padding: 10 ,backgroundColor:colors.background }}
       entering={FadeIn}
       exiting={FadeOut}
     >
@@ -83,7 +83,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         style={{
           backgroundColor: colors.white,
           shadowOffset: { width: 0.5, height: 0.5 },
-          shadowOpacity: 0.3,
+          shadowOpacity: 0.2,
           shadowRadius: 1,
           elevation: 0.5,
           paddingHorizontal: 10,
@@ -140,7 +140,11 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         <View style={{ bottom: 50 }}>
           <View style={{ marginLeft: 20, top: 20 }}>
             <Text style={styles.section}>Local:</Text>
-            <Text style={styles.sectionText}>
+            <Text style={{    color: colors.black2,
+    fontSize: 17,
+    fontWeight: "500",
+    marginTop: 3,
+    marginBottom: 15,}}>
               {event?.venue?.displayName +
                 ", " +
                 event?.venue?.address?.zone +
@@ -199,7 +203,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         style={{
           backgroundColor: colors.white,
           shadowOffset: { width: 0.5, height: 0.5 },
-          shadowOpacity: 0.3,
+          shadowOpacity: 0.2,
           shadowRadius: 1,
           elevation: 0.5,
           paddingHorizontal: 10,
@@ -211,11 +215,15 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
       >
         <Text
           style={[
-            styles.sectionText,
             {
               textAlign: "center",
               fontWeight: "500",
               color: colors.darkSeparator,
+              color: colors.black2,
+              fontSize: 17,
+              fontWeight: "500",
+              marginTop: 3,
+              marginBottom: 15,
             },
           ]}
         >
@@ -296,6 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   sectionText: {
+    maxWidth:"99.75%",
     color: colors.black2,
     fontSize: 17,
     fontWeight: "500",

@@ -6,6 +6,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Modal,
+  PixelRatio,
   Platform,
   ScrollView,
   StyleSheet,
@@ -36,15 +37,15 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import MapView, { Marker, Polygon } from "react-native-maps";
-//   import {
-//     MaterialCommunityIcons,
-//     MaterialIcons,
-//     Entypo,
-//     FontAwesome5,
-//     Feather,
-//     Ionicons,
-//     AntDesign,
-//   } from "@expo/vector-icons";
+import {
+  MaterialCommunityIcons,
+  MaterialIcons,
+  Entypo,
+  FontAwesome5,
+  Feather,
+  Ionicons,
+  AntDesign,
+} from "@expo/vector-icons";
 
 import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 import * as Location from "expo-location";
@@ -64,224 +65,70 @@ import ImageImputList from "../../components/ImageInputs/ImageImputList";
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 import { useAuth } from "../../components/hooks/useAuth";
+import { captureRef } from "react-native-view-shot";
+
 const { height, width } = Dimensions.get("window");
 
 const AddVenueScreen = ({ navigation: { goBack } }) => {
   const [loading, setLoading] = useState(false);
   const { apiUrl } = useData();
-  const { headerToken } = useAuth();
+  const { headerToken, userLocation } = useAuth();
+  const [newMarker, setNewMarker] = useState(0);
+  const uuidKey = uuid.v4();
+
+  const [newVenue, setNewVenue] = useState({ uuid: uuid.v4() });
+  const [imageUris, setImageUris] = useState([]);
+
+  const mapViewRef = useRef(null);
+  const [mapLocation, setMapLocation] = useState({});
   const [region, setRegion] = useState({
     latitude: 14.905696,
     longitude: -23.519001,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const [userLocation, setUserLocation] = useState(null);
+  const [print, setPrint] = useState(null);
+  const mapPrintRef = useRef(null);
+  const takePrint = async () => {
+    // const targetWidth = 1920; // Full HD width
+    // const targetHeight = 1080; // Full HD height
+    const targetWidth = 5200; // Full HD width
+    const targetHeight = 4100; // Full HD height
+    const pixelRatio = PixelRatio.get(); // The pixel ratio of the device
 
+    // Calculate the target width and height based on the device's pixel ratio
+    const width = targetWidth / pixelRatio;
+    const height = targetHeight / pixelRatio;
+
+    const result = await captureRef(mapViewRef, {
+      result: "tmpfile",
+      width: width,
+      height: height,
+      quality: 1,
+      format: "jpg",
+    });
+    setPrint(result);
+  };
+  // setRegion(userLocation);
+  useEffect(() => {
+    takePrint();
+  }, [region]);
   const getLocation = async () => {
-    // permissions check
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      // do something when permission is denied
-      return;
-    }
-
-    const location = await Location.getCurrentPositionAsync();
-
-    setRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
+    const location = await Location.reverseGeocodeAsync(region);
+    const country = location?.[0]?.country;
+    setMapLocation(location);
+    setNewVenue({
+      ...newVenue,
+      address: { ...newVenue?.address, city: location?.[0]?.city },
+    });
+    setNewVenue({
+      ...newVenue,
+      address: { ...newVenue?.address, country: location?.[0]?.country },
     });
   };
   useEffect(() => {
     getLocation();
-  }, []);
-
-  function adjustCoordinates() {
-    // Extract original coordinates and deltas
-    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
-
-    // Calculate the ratio between the desired and original deltas
-    const latRatio = latitudeDelta;
-    const longRatio = longitudeDelta;
-
-    // Adjust latitude and longitude values
-    const adjustedLatitude = latitude + (latitudeDelta * latRatio) / 2;
-    const adjustedLongitude = longitude + (longitudeDelta * longRatio) / 2;
-
-    // Return adjusted coordinates with desired deltas
-    return {
-      latitude: adjustedLatitude,
-      // latitudeDelta: desiredLatitudeDelta,
-      longitude: adjustedLongitude,
-      // longitudeDelta: desiredLongitudeDelta
-    };
-  }
-
-  // Example usage:
-  const originalCoordinates = {
-    latitude: region.latitude,
-    longitude: region.longitude,
-  };
-
-  const desiredLatitudeDelta = 0.0922;
-  const desiredLongitudeDelta = 0.0421;
-
-  // useEffect(() => {
-  //   const sad = async () => {
-  //     const island = adjustCoordinates();
-
-  //     // console.log(region);
-
-  //     const cityName = await Location.reverseGeocodeAsync(region);
-  //     setUserLocation(cityName);
-  //     // console.log(cityName?.[0]);
-
-  //     // console.log(cityName?.[0]?.name);
-  //   };
-  //   sad();
-  // }, [region]);
-
-  function isPointInsidePolygon(point, polygon) {
-    let inside = false;
-    const [x, y] = point;
-
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const xi = polygon[i][0],
-        yi = polygon[i][1];
-      const xj = polygon[j][0],
-        yj = polygon[j][1];
-
-      const intersect =
-        yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-      if (intersect) inside = !inside;
-    }
-
-    return inside;
-  }
-
-  const islands = [
-    {
-      label: "Santiago",
-
-      code: "st",
-
-      coord: [
-        [15.335325, -23.906599],
-        [15.373932, -23.414524],
-        [14.887208, -23.389862],
-        [14.858075, -23.880366],
-      ],
-    },
-    {
-      label: "Fogo",
-      code: "fg",
-
-      coord: [
-        [15.068971, -24.546793],
-        [15.078312, -24.251275],
-        [14.799444, -24.239883],
-        [14.789142, -24.538828],
-      ],
-    },
-    {
-      label: "Brava",
-      code: "b",
-
-      coord: [
-        [14.912453, -24.77822],
-        [14.920581, -24.653388],
-        [14.793573, -24.648494],
-        [14.794527, -24.771866],
-      ],
-    },
-    {
-      label: "Maio",
-      code: "m",
-
-      coord: [
-        [15.350471, -23.291103],
-        [15.365836, -23.056888],
-        [15.099833, -23.050231],
-        [15.104522, -23.29165],
-      ],
-    },
-    {
-      label: "Boa Vista",
-      code: "bv",
-
-      coord: [
-        [16.286075, -23.012087],
-        [16.315193, -22.6272],
-        [15.928413, -22.622871],
-        [15.915565, -23.034866],
-      ],
-    },
-    {
-      label: "Sal",
-      code: "s",
-
-      coord: [
-        [16.860699, -23.077491],
-        [16.877457, -22.836549],
-        [16.566173, -22.824829],
-        [16.560389, -23.050031],
-      ],
-    },
-    {
-      label: "São Nicolau",
-      code: "sv",
-
-      coord: [
-        [16.70191, -24.455292],
-        [16.703959, -23.969864],
-        [16.434735, -23.967408],
-        [16.44736, -24.461661],
-      ],
-    },
-    {
-      label: "São Vicente",
-      code: "sv",
-
-      coord: [
-        [16.95194, -25.094532],
-        [16.952165, -24.829182],
-        [16.739114, -24.830783],
-        [16.739144, -25.138558],
-      ],
-    },
-    {
-      label: "Santo Antão",
-      code: "sa",
-
-      coord: [
-        [17.241995, -25.419333],
-        [17.277087, -24.922825],
-        [16.979204, -24.912664],
-        [16.898801, -25.435666],
-      ],
-    },
-  ];
-
-  const point = [region?.latitude, region.longitude];
-
-  let activeIsland = null;
-
-  islands.forEach((item) => {
-    if (isPointInsidePolygon(point, item.coord)) {
-      activeIsland = { label: item.label, code: item.code };
-    }
-  });
-
-  const [newMarker, setNewMarker] = useState(0);
-
-  const [newVenue, setNewVenue] = useState({ uuid: uuid.v4() });
-  const [imageUris, setImageUris] = useState([]);
-
-  const mapViewRef = useRef(null);
+  }, [region]);
 
   let venue = newVenue;
 
@@ -291,8 +138,6 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
   let resized2 = "";
   let resized3 = "";
   let resized4 = "";
-
-  const uuidKey = uuid.v4();
 
   const updatePhotos = async () => {
     try {
@@ -401,11 +246,22 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
       for (let i = 0; i < imageUris.length; i++) {
         const fileName = imageUris[i].split("/").pop();
         const storageRef = ref(storage, `venues/${uuidKey}/photos/${fileName}`);
+
         const blob = await fetch(imageUris[i]).then((response) =>
           response.blob()
         );
+
         const uploadTask = uploadBytesResumable(storageRef, blob);
       }
+      const storageMapRef = ref(
+        storage,
+        `venues/${uuidKey}/mapSnap/${uuid.v4()}`
+      );
+
+      const mapBlob = await fetch(print).then((response) => response.blob());
+      const uploadTask = uploadBytesResumable(storageMapRef, mapBlob);
+      const resizedUrl = await getDownloadURL(storageMapRef);
+      return resizedUrl;
     } catch (error) {
       console.log(error);
       console.log("erro ao processarr");
@@ -431,25 +287,22 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
   const addVenue = async () => {
     setLoading(true);
     try {
-      await uploadPhotos();
+      const mapSnap =  await uploadPhotos();
       await new Promise((resolve) => setTimeout(resolve, 8000));
-      await updatePhotos();
+   await  updatePhotos();
       let venue = {
         ...newVenue,
         uuid: uuidKey,
         photos,
+        mapSnap,
         location: {
           type: "Point",
           coordinates: [newMarker?.longitude, newMarker?.latitude],
         },
-        address: {
-          ...newVenue.address,
-          lat: newMarker?.latitude,
-          long: newMarker?.longitude,
-          island: activeIsland,
-          islandLabel: activeIsland?.label,
-          islandCode: activeIsland?.code,
-        },
+        // address: {
+        //   ...newVenue.address,
+
+        // },
       };
 
       const result = await axios.post(
@@ -465,35 +318,22 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
         }
       );
       if (result.status == 200) {
-        goBack();
+        console.log(uuidKey);
+        // goBack();
       }
     } catch (error) {
-      console.log(error.data.msg);
+      console.log(error?.data?.msg);
     } finally {
       setLoading(false);
     }
   };
-  // const [currentPosition, setCurrentPosition] = useState(null);
-  // const [isWithinRange, setIsWithinRange] = useState(false);
-  // const calculateDistance = (lat1, lon1, lat2, lon2) => {
-  //   const R = 6371; // Earth's radius in kilometers
-  //   const dLat = (lat2 - lat1) * Math.PI / 180;
-  //   const dLon = (lon2 - lon1) * Math.PI / 180;
-  //   const a =
-  //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-  //     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-  //     Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  //   const distance = R * c;
-  //   return distance;
-  // };
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <KeyboardAwareScrollView
         style={{ backgroundColor: colors.background, flex: 1 }}
       >
-        <Text
+        {/* <Text
           style={{
             fontSize: 19,
             fontWeight: "600",
@@ -504,7 +344,7 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
           }}
         >
           Fotos
-        </Text>
+        </Text> */}
 
         <ImageImputList
           // handleImageScroll={handleImageScroll}
@@ -512,7 +352,7 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
           onAddImage={handleAdd}
           onRemoveImage={handleRemove}
         />
-        <Text
+        {/* <Text
           style={{
             fontSize: 19,
             fontWeight: "600",
@@ -523,20 +363,66 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
           }}
         >
           Mapa
-        </Text>
+        </Text> */}
         <View style={{ padding: 10 }}>
+          <Image
+            // resizeMode="contain"
+            source={{ uri: print }}
+            style={{
+              width: "100%",
+              // borderRadius: 5,
+              height: height * 0.35,
+              marginTop: 90,
+            }}
+          />
+          <TouchableOpacity
+            style={{
+              // left: 8,
+              alignSelf: "flex-end",
+              position: "absolute",
+              backgroundColor: colors.white,
+              padding: 7,
+              borderRadius: 5,
+              top: 60,
+              right: 15,
+              zIndex: 2,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+            }}
+            onPress={async () => {
+              const newRegion = {
+                ...userLocation,
+                latitude: userLocation.latitude + 0.004,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.011,
+              };
+
+              if (Platform.OS === "ios") {
+                mapViewRef.current.animateToRegion(newRegion, 200);
+                // setRegion(newRegion);
+              } else {
+                setRegion(newRegion);
+              }
+            }}
+          >
+            <MaterialIcons
+              name="my-location"
+              size={24}
+              color={colors.primary}
+            />
+          </TouchableOpacity>
           <MapView
             // onPress={() => setVenueDetails(false)}
             onPress={(e) => setNewMarker(e.nativeEvent.coordinate)}
             ref={mapViewRef}
             // region={region}
-            showsUserLocation={true}
+            // showsUserLocation={true}
             //   followsUserLocation={true}
             // onRegionChange={setRegion}
 
-            onRegionChangeComplete={(w) =>
-              setRegion({ ...w, latitudeDelta: 0.0922, longitudeDelta: 0.0421 })
-            }
+            onRegionChangeComplete={setRegion}
             initialRegion={region}
             //   provider="google"
             mapType="terrain"
@@ -635,7 +521,6 @@ const AddVenueScreen = ({ navigation: { goBack } }) => {
                 address: { ...newVenue?.address, city: text },
               })
             }
-    
           />
           <TextInput
             //   error={!amount}

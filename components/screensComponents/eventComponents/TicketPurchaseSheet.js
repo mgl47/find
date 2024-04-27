@@ -26,7 +26,7 @@ import BottomSheet, {
   BottomSheetFlatList,
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
-import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import colors from "../../colors";
 import Animated, {
   FadeIn,
@@ -55,7 +55,7 @@ import { useAuth } from "../../hooks/useAuth";
 import uuid from "react-native-uuid";
 import toast from "../../toast";
 import { useDesign } from "../../hooks/useDesign";
-
+import { useNavigation } from "@react-navigation/native";
 export default TicketPurchaseSheet = ({
   Event,
   bottomSheetModalRef,
@@ -91,7 +91,7 @@ export default TicketPurchaseSheet = ({
     amount: 0,
   };
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const navigation = useNavigation();
   const getSelectedEvent = async () => {
     if (purchaseModalUp) {
       try {
@@ -120,6 +120,9 @@ export default TicketPurchaseSheet = ({
   useEffect(() => {
     if (purchaseModalUp) {
       getSelectedEvent();
+    }
+    if (!purchaseModalUp) {
+      bottomSheetModalRef.current.close();
     }
   }, [purchaseModalUp]);
 
@@ -203,12 +206,12 @@ export default TicketPurchaseSheet = ({
           return state;
         }
         const cartHasNonVipItem = state.cart?.some(
-          (item) => item?.amount > 0 && !item?.category.startsWith("VIP")
+          (item) => item?.amount > 0 && !item?.category?.startsWith("VIP")
         );
         const cartHasVipItem = state.cart?.some(
-          (item) => item?.amount > 0 && item?.category.startsWith("VIP")
+          (item) => item?.amount > 0 && item?.category?.startsWith("VIP")
         );
-        const payloadHasVipItem = action?.payload?.category.startsWith("VIP");
+        const payloadHasVipItem = action?.payload?.category?.startsWith("VIP");
         if (
           (cartHasNonVipItem && payloadHasVipItem) ||
           (cartHasVipItem && !payloadHasVipItem)
@@ -369,17 +372,31 @@ export default TicketPurchaseSheet = ({
           // cardInfo: paymentInfo,
           operation: {
             type: "ticketPurchase",
-            task: "purchase",
+            task: gift ? "gift" : "purchase",
             eventId: event?._id,
           },
           details: {
             purchaseId,
-            buyer: {
-              userId: user?._id,
-              username: user?.username,
-              email: user?.email,
-              displayName: user?.displayName,
-              uri: user?.photos?.avatar?.[0]?.uri,
+            gift,
+            user: {
+              endUser: {
+                userId: gift ? searchedUser?._id : user?._id,
+                username: gift ? searchedUser?.username : user?.username,
+                email: gift ? searchedUser?.email : user?.email,
+                displayName: gift
+                  ? searchedUser?.displayName
+                  : user?.displayName,
+                uri: gift
+                  ? searchedUser?.photos?.avatar?.[0]?.uri
+                  : user?.photos?.avatar?.[0]?.uri,
+              },
+              buyer: {
+                userId: user?._id,
+                username: user?.username,
+                email: user?.email,
+                displayName: user?.displayName,
+                uri: user?.photos?.avatar?.[0]?.uri,
+              },
             },
             event: filteredEvent,
             cardDetails: paymentInfo?.cardInfo,
@@ -398,17 +415,18 @@ export default TicketPurchaseSheet = ({
         }
       );
       if (response.status == 200) {
-        console.log("fsdf");
-        // setSearchedUSer(null)
-        // setSearched(false)
-        // setPurchaseModalUp(false);
-        // setGift(false);
-        getUpdatedUser();
         await bottomSheetModalRef.current.close();
-        clean();
+
+        console.log("fsdf");
+        if (!gift) {
+          navigation.navigate("ticketDetails", response?.data);
+        }
+        getUpdatedUser();
         setOnPayment(false);
+        clean();
       }
     } catch (error) {
+      console.log(error);
       if (error?.response?.data?.restart) {
         restart();
       }
@@ -427,107 +445,116 @@ export default TicketPurchaseSheet = ({
   };
 
   const renderFooter = useCallback(
-    (props) => (
-      <BottomSheetFooter {...props}>
-        <Animated.View
-          entering={firstRender ? SlideInDown : null}
-          // exiting={SlideOutLeft}
-          style={{
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            height: isIPhoneWithNotch ? 80 : 55,
-            backgroundColor: colors.white,
-            // position: "absolute",
-            zIndex: 4,
-            bottom: 0,
-            flexDirection: "row",
-            shadowOffset: { width: 1, height: 1 },
-            shadowOpacity: 1,
-            shadowRadius: 1,
-            elevation: 3,
-            borderTopRightRadius: 15,
-            borderTopLeftRadius: 15,
-            paddingHorizontal: 30,
-          }}
-        >
-          <View
+    (props) =>
+      purchaseModalUp && (
+        <BottomSheetFooter {...props}>
+          <Animated.View
+            entering={firstRender ? SlideInDown : null}
+            // exiting={SlideOutLeft}
             style={{
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              height: isIPhoneWithNotch ? 80 : 55,
+              backgroundColor: colors.white,
+              // position: "absolute",
+              zIndex: 4,
+              bottom: 0,
               flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 19,
-                color: colors.black2,
-                fontWeight: "600",
-                marginRight: 5,
-              }}
-            >
-              Total:
-            </Text>
-            <Text
-              style={{
-                fontSize: 19,
-                color: colors.primary,
-                fontWeight: "600",
-              }}
-            >
-              cve {formatNumber(state?.total)}
-            </Text>
-          </View>
-          <TouchableOpacity
-            disabled={state.total == 0 || (gift && !searchedUser)}
-            onPress={() =>
-              onPayment
-                ? buyTickets()
-                : (setOnPayment(true), setFirstRender(false))
-            }
-            style={{
-              width: 150,
-              height: 40,
-              backgroundColor:
-                (gift && searchedUser == null) || state?.total == 0
-                  ? colors.description2
-                  : colors.primary, // position: "absolute",
-              zIndex: 1,
-              // top: 10,
-              // left: 10,
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center",
               shadowOffset: { width: 1, height: 1 },
-              shadowOpacity: 0.3,
+              shadowOpacity: 1,
               shadowRadius: 1,
               elevation: 3,
-              shadowColor: colors.dark,
-              flexDirection: "row",
+              borderTopRightRadius: 15,
+              borderTopLeftRadius: 15,
+              paddingHorizontal: 30,
             }}
-            activeOpacity={0.5}
           >
-            {loading ? (
-              <ActivityIndicator
-                style={{ position: "absolute" }}
-                color={colors.white}
-              />
-            ) : (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
               <Text
                 style={{
-                  fontSize: 15,
-                  color: colors.white,
-                  fontWeight: "500",
-                  marginRight: 10,
+                  fontSize: 19,
+                  color: colors.black2,
+                  fontWeight: "600",
+                  marginRight: 5,
                 }}
               >
-                {onPayment ? "Pagar" : "Confirmar"}
+                Total:
               </Text>
-            )}
-          </TouchableOpacity>
-        </Animated.View>
-      </BottomSheetFooter>
-    ),
-    [state?.amount, loading, onPayment, firstRender, searchedUser, gift]
+              <Text
+                style={{
+                  fontSize: 19,
+                  color: colors.primary,
+                  fontWeight: "600",
+                }}
+              >
+                cve {formatNumber(state?.total)}
+              </Text>
+            </View>
+            <TouchableOpacity
+              disabled={state.total == 0 || (gift && !searchedUser)}
+              onPress={() =>
+                onPayment
+                  ? buyTickets()
+                  : (setOnPayment(true), setFirstRender(false))
+              }
+              style={{
+                width: 150,
+                height: 40,
+                backgroundColor:
+                  (gift && searchedUser == null) || state?.total == 0
+                    ? colors.description2
+                    : colors.primary, // position: "absolute",
+                zIndex: 1,
+                // top: 10,
+                // left: 10,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                shadowOffset: { width: 1, height: 1 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 3,
+                shadowColor: colors.dark,
+                flexDirection: "row",
+              }}
+              activeOpacity={0.5}
+            >
+              {loading ? (
+                <ActivityIndicator
+                  style={{ position: "absolute" }}
+                  color={colors.white}
+                />
+              ) : (
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: colors.white,
+                    fontWeight: "500",
+                    marginRight: 10,
+                  }}
+                >
+                  {onPayment ? "Pagar" : "Confirmar"}
+                </Text>
+              )}
+            </TouchableOpacity>
+          </Animated.View>
+        </BottomSheetFooter>
+      ),
+    [
+      state?.amount,
+      !firstRender ? loading : null,
+      onPayment,
+      firstRender,
+      searchedUser,
+      gift,
+      purchaseModalUp,
+    ]
   );
   const renderBackdrop = useCallback(
     (props) => (
@@ -840,6 +867,35 @@ export default TicketPurchaseSheet = ({
                           entering={FadeIn}
                           exiting={FadeOut}
                         >
+                          <View
+                            style={{
+                              backgroundColor: colors.primary,
+                              width: 100,
+                              height: 40,
+                              position: "absolute",
+                              alignItems: "center",
+                              right: -40,
+                              top: 0,
+                              zIndex: 1,
+                              shadowOffset: { width: 0.5, height: 0.5 },
+                              shadowOpacity: 0.5,
+                              shadowRadius: 1,
+                              elevation: 2,
+
+                              transform: [{ rotate: "45deg" }],
+                            }}
+                          >
+                            <FontAwesome
+                              style={{
+                                top: 10,
+                                right: 5,
+                                transform: [{ rotate: "-45deg" }],
+                              }}
+                              name="check-circle"
+                              size={24}
+                              color={colors.white}
+                            />
+                          </View>
                           <Image
                             source={{
                               uri: searchedUser?.photos?.avatar?.[0]?.uri,

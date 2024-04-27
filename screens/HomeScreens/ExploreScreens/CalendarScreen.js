@@ -48,6 +48,8 @@ import Screen from "../../../components/Screen";
 import axios from "axios";
 import { useAuth } from "../../../components/hooks/useAuth";
 import { useData } from "../../../components/hooks/useData";
+import { useDesign } from "../../../components/hooks/useDesign";
+
 const { height, width } = Dimensions.get("window");
 
 const CalendarScreen = () => {
@@ -110,16 +112,12 @@ const CalendarScreen = () => {
   };
   LocaleConfig.defaultLocale = "pt";
   const navigation = useNavigation();
-  const { events } = useData();
-
+  // const { height, width }=useDesign()
+  const { calDays, apiUrl } = useData();
+  const [events, setEvents] = useState([]);
   const [selectedDay, setSelectedDay] = useState("");
   const [calendarEvents, setCalendarEvents] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  let calDays = [];
-  let a = events?.map((item) =>
-    item?.dates?.forEach((item) => calDays.push(item?.calendarDate))
-  );
 
   const filteredDays = calDays?.map((item) => {
     return {
@@ -135,27 +133,49 @@ const CalendarScreen = () => {
     return { ...acc, ...curr };
   }, {});
 
+  const getVenues = async () => {
+    try {
+      const result = await axios.get(`${apiUrl}/events/?date=${selectedDay}`);
+      // console.log(result?.data);
+      setEvents(result?.data);
+      console.log("rrefef");
+      if (result?.data != venues) setEvents(result?.data);
+    } catch (error) {
+      console.log(error?.response?.data?.msg);
+    }
+  };
+
   const getCalendarEvents = async (day) => {
+    if (day?.dateString == selectedDay || !calDays?.includes(day?.dateString))
+      return;
+
     setLoading(true);
     setSelectedDay(day.dateString);
     let arr = [];
-    events?.filter((item) =>
-      item?.dates.forEach((item2) => {
-        if (item2?.calendarDate == day?.dateString) arr.push(item);
-      })
-    );
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 500);
-    });
+    // events?.filter((item) =>
+    //   item?.dates.forEach((item2) => {
+    //     if (item2?.calendarDate == day?.dateString) arr.push(item);
+    //   })
+    // );
+
+    const result = await axios.get(`${apiUrl}/events/?date=${day.dateString}`);
+    // console.log(result?.data);
+    console.log(result?.data);
+
+    setEvents(result?.data);
+    // await new Promise((resolve, reject) => {
+    //   setTimeout(resolve, 1000);
+    // });
     setCalendarEvents(arr);
     setLoading(false);
   };
+
   return (
     <Animated.FlatList
       entering={SlideInDown}
       exiting={SlideOutDown}
       style={{ flex: 1, backgroundColor: colors.background }}
-      data={calendarEvents}
+      data={events}
       showsVerticalScrollIndicator={false}
       keyExtractor={(item) => item._id}
       ListHeaderComponent={
@@ -234,10 +254,9 @@ const CalendarScreen = () => {
         </View>
       }
       renderItem={({ item }) => {
-
         return !loading ? (
           <TouchableOpacity
-          onPress={()=>navigation.navigate("event",item)}
+            onPress={() => navigation.navigate("event", item)}
             activeOpacity={0.8}
             style={{
               // shadowOffset: { width: 0.5, height: 0.5 },
@@ -248,7 +267,7 @@ const CalendarScreen = () => {
               shadowOpacity: 0.1,
               shadowRadius: 1,
               elevation: 2,
-              
+
               padding: 7,
             }}
             // onPress={() => navigation.navigate("event", item)}
@@ -268,7 +287,6 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     // borderRadius: 5,
-    height: height * 0.35,
     backgroundColor: colors.grey,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,

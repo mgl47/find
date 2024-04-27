@@ -110,8 +110,8 @@ const AddEventStore = ({
       let resized1, resized2;
       let resized1Name, resized2Name;
 
-      resized1Name = `${fileName}_100x100`;
-      resized2Name = `${fileName}_200x200`;
+      resized1Name = `${fileName}_200x200`;
+      resized2Name = `${fileName}_100x100`;
 
       const resized1Storage = ref(
         storage,

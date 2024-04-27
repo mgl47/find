@@ -3,6 +3,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  PixelRatio,
   Platform,
   Pressable,
   SafeAreaView,
@@ -58,13 +59,34 @@ import { useDesign } from "../../components/hooks/useDesign";
 
 import TicketPurchaseSheet from "../../components/screensComponents/eventComponents/TicketPurchaseSheet";
 import { LinearGradient } from "expo-linear-gradient";
+import { captureRef } from "react-native-view-shot";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
+  const [print, setPrint] = useState(null);
+  const mapPrintRef = useRef(null);
+  const takePrint = async () => {
+    const targetPixelCount = 1080; // If you want full HD pictures
+    const pixelRatio = PixelRatio.get(); // The pixel ratio of the device
+    // pixels * pixelratio = targetPixelCount, so pixels = targetPixelCount / pixelRatio
+    const pixels = targetPixelCount / pixelRatio;
 
+    const result = await captureRef(mapPrintRef, {
+      result: "tmpfile",
+      // height: pixels,
+      // width: pixels,
+      height: 1080,
+      width: 1920,
+      quality: 1,
+      format: "png",
+    });
+    setPrint(result);
+  };
+  // console.log(print);
   const [firstMount, setFirstMount] = useState(true);
   useEffect(() => {
     setFirstMount(false);
+    // takePrint();
   }, []);
 
   const Event = route.params;
@@ -107,7 +129,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const bottomSheetModalRef2 = useRef(null);
 
   const handlePurchaseSheet = useCallback((gift) => {
-    console.log(gift);
     if (gift) {
       setGift(true);
     }
@@ -390,6 +411,17 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         onScroll={handleScroll}
         bounces={false}
       >
+        {/* <Image
+          resizeMode="contain"
+          source={{ uri: print }}
+          style={{
+            width: "100%",
+            // borderRadius: 5,
+            height: 150,
+            marginTop: 90,
+          }}
+        /> */}
+
         <FlatList
           showsHorizontalScrollIndicator={false}
           pagingEnabled
@@ -473,7 +505,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <Image
                       style={{ width: initialWidth, height: height * 0.37 }}
                       source={{ uri: item?.uri }}
-                      blurRadius={scrollingPos}
+                      // blurRadius={scrollingPos}
                     />
                   </TouchableOpacity>
                 </>
@@ -483,7 +515,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             }
           }}
         />
-        <View style={{}}>
+        <View style={{ backgroundColor: colors.background }}>
           <View style={styles.container}>
             <Text
               style={{
@@ -701,20 +733,22 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               >
                 Artistas
               </Text>
-              <TouchableOpacity>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "500",
-                    // width: "80%",
-                    color: colors.primary,
-                    // marginLeft: 5,
-                    marginTop: 10,
-                  }}
-                >
-                  Ver todos
-                </Text>
-              </TouchableOpacity>
+              {Event?.artists?.length > 5 && (
+                <TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      // width: "80%",
+                      color: colors.primary,
+                      // marginLeft: 5,
+                      marginTop: 10,
+                    }}
+                  >
+                    Ver todos
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
           <FlatList
@@ -726,6 +760,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             renderItem={({ item }) => {
               return (
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   style={{
                     padding: 5,
                     alignItems: "center",
@@ -803,7 +838,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     marginRight: 10,
                   }}
                   source={{
-                    uri: Event?.venue?.photos?.[2]?.[0]?.uri,
+                    uri: Event?.venue?.photos?.[2]?.[
+                      Event?.venue?.photos[3]?.length - 1
+                    ]?.uri,
                   }}
                 />
                 <Text
@@ -838,6 +875,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               }}
             >
               <MapView
+                scrollEnabled={false}
+                zoomEnabled={false}
+                ref={mapPrintRef}
                 initialRegion={{
                   latitude: Event?.venue?.location?.coordinates?.[1] + 0.001,
                   longitude: Event?.venue?.location?.coordinates?.[0] - 0.001,
@@ -971,144 +1011,144 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               />
             </TouchableOpacity> */}
             </View>
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "500",
-                left: 10,
-                color: colors.primary,
+          </View>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "500",
+              left: 20,
+              color: colors.primary,
 
-                marginVertical: 10,
-              }}
-            >
-              Organizado por
-            </Text>
+              marginVertical: 10,
+            }}
+          >
+            {Event?.organizers?.length > 1 ? "Organizadores" : "Organizador"}
+          </Text>
 
-            <FlatList
-              data={Event?.organizers}
-              horizontal={Event?.organizers?.length > 1}
-              keyExtractor={(item) => item?.uuid}
-              renderItem={({ item }) => {
-                return Event?.organizers?.length > 1 ? (
+          <FlatList
+            contentContainerStyle={{ backgroundColor: colors.background }}
+            data={Event?.organizers}
+            horizontal={Event?.organizers?.length > 1}
+            keyExtractor={(item) => item?.uuid}
+            renderItem={({ item }) => {
+              return Event?.organizers?.length > 1 ? (
+                <TouchableOpacity
+                  style={{
+                    padding: 5,
+                    alignItems: "center",
+                    // justifyContent: "center",
+                  }}
+                  onPress={() => navigation.navigate("artist", item)}
+                >
+                  <Image
+                    style={{
+                      height: 65,
+                      width: 65,
+                      borderRadius: 20,
+                      marginBottom: 2,
+                      borderWidth: 0.009,
+                      backgroundColor: colors.darkGrey,
+                    }}
+                    source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                  />
+                  <Text
+                    style={{
+                      width: item?.displayName?.length > 15 ? 100 : null,
+                      textAlign: "center",
+                      fontSize: 14,
+                      fontWeight: "500",
+                    }}
+                  >
+                    {item?.displayName}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View
+                  style={{
+                    backgroundColor: colors.white,
+
+                    borderRadius: 10,
+                    // shadowOffset: { width: 0.5, height: 0.5 },
+                    // shadowOpacity: 0.3,
+                    // shadowRadius: 1,
+                    // elevation: 2,
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 1,
+                    elevation: 0.5,
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("artist", item)}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: 10,
+                      alignItems: "center",
+
+                      // height: 50,
+                      // padding: 5,
+                    }}
+                  >
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Image
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 50,
+                          marginRight: 10,
+                          borderWidth: 0.1,
+                        }}
+                        source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                          // color: colors.white,
+                        }}
+                      >
+                        {item.displayName}
+                      </Text>
+                    </View>
+                    <Entypo
+                      name="chevron-right"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                  <View style={[styles.separator, { width: "90%" }]} />
+
                   <TouchableOpacity
                     style={{
-                      padding: 5,
+                      padding: 10,
+                      flexDirection: "row",
                       alignItems: "center",
-                      // justifyContent: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      // marginVertical: 5,
                     }}
-                    onPress={() => navigation.navigate("artist", item)}
                   >
-                    <Image
-                      style={{
-                        height: 65,
-                        width: 65,
-                        borderRadius: 20,
-                        marginBottom: 2,
-                        borderWidth: 0.009,
-                        backgroundColor: colors.darkGrey,
-                      }}
-                      source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+                    <View>
+                      <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                        Telefonar
+                      </Text>
+                      <Text>{item.phone1}</Text>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="phone"
+                      size={25}
+                      color={colors.primary}
                     />
-                    <Text
-                      style={{
-                        width: item?.displayName?.length > 15 ? 100 : null,
-                        textAlign: "center",
-                        fontSize: 14,
-                        fontWeight: "500",
-                      }}
-                    >
-                      {item?.displayName}
-                    </Text>
                   </TouchableOpacity>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: colors.white,
-
-                      borderRadius: 10,
-                      // shadowOffset: { width: 0.5, height: 0.5 },
-                      // shadowOpacity: 0.3,
-                      // shadowRadius: 1,
-                      // elevation: 2,
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 1,
-                      elevation: 0.5,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate("artist", item)}
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: 10,
-                        alignItems: "center",
-
-                        // height: 50,
-                        // padding: 5,
-                      }}
-                    >
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <Image
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 50,
-                            marginRight: 10,
-                            borderWidth: 0.1,
-                          }}
-                          source={{ uri: item?.photos?.avatar?.[0]?.uri }}
-                        />
-                        <Text
-                          style={{
-                            fontSize: 15,
-                            fontWeight: "500",
-                            // color: colors.white,
-                          }}
-                        >
-                          {item.displayName}
-                        </Text>
-                      </View>
-                      <Entypo
-                        name="chevron-right"
-                        size={24}
-                        color={colors.primary}
-                      />
-                    </TouchableOpacity>
-                    <View style={[styles.separator, { width: "90%" }]} />
-
-                    <TouchableOpacity
-                      style={{
-                        padding: 10,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        // marginVertical: 5,
-                      }}
-                    >
-                      <View>
-                        <Text style={{ fontSize: 15, fontWeight: "500" }}>
-                          Telefonar
-                        </Text>
-                        <Text>{item.phone1}</Text>
-                      </View>
-                      <MaterialCommunityIcons
-                        name="phone"
-                        size={25}
-                        color={colors.primary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                );
-              }}
-            />
-
-            <View style={{ marginBottom: 100 }} />
-          </View>
+                </View>
+              );
+            }}
+          />
+          <View style={{ marginBottom: 100 }} />
         </View>
       </ScrollView>
       <TicketPurchaseSheet

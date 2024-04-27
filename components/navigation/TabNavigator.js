@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Appbar, Avatar } from "react-native-paper";
 import NotificationScreen from "../../screens/NotificationScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
-import colors from "../colors";
+import colors, { darkColors } from "../colors";
 import { Dimensions, Platform } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 // import StackNavigator from "./StackNavigator";
@@ -26,8 +26,8 @@ const TabNavigator = () => {
       // inactiveColor="#3e2465"
       barStyle={{
         backgroundColor: colors.white,
-        borderTopWidth: 0.2,
-        borderColor: colors.grey,
+        // borderTopWidth: 0.2,
+        // borderColor: darkColors.primary2,
         // marginBottom: Platform.OS == "ios" ? -30 : -10,
         marginBottom:isIPhoneWithNotch?-33:-13,
         display: AuthModalUp ? "none" : "flex",

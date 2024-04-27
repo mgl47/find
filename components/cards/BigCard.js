@@ -7,7 +7,7 @@ import {
   Dimensions,
   ImageBackground,
 } from "react-native";
-import colors from "../colors";
+import colors, { darkColors } from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { TouchableHighlight } from "react-native";

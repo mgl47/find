@@ -59,10 +59,10 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
         // dense
 
         style={{ backgroundColor: colors.primary2 }}
-        // disableIndicator
+        disableIndicator
         titleStyle={(active) => ({
-          color: active ? colors.lightGrey : colors.darkGrey,
-          fontSize: active ? 17 : 15,
+          color: active ? colors.white : colors.softGrey,
+          fontSize: active ? 16 : 15,
           fontWeight: "600",
         })}
       >

@@ -70,14 +70,14 @@ export default AddTicketsSheet = ({
   const [price, setPrice] = useState("");
   const [available, setAvailable] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState({ label: "0", value: "0" });
+  const [category, setCategory] = useState({ label: "Promo", value: "Promo" });
   const [ticketDates, setTicketDates] = useState([]);
 
   // console.log(selectedTicket);
 
   const clear = () => {
     setDescription("");
-    setCategory("");
+    setCategory({ label: "Promo", value: "Promo" });
     setAvailable("");
     setPrice("");
     setTicketDates([]);
@@ -86,7 +86,6 @@ export default AddTicketsSheet = ({
   const addDate = (date) => {
     let dates = [...ticketDates];
 
-    // console.log(dates);
     if (dates?.includes(date)) {
       setTicketDates(dates?.filter((item) => item != date));
       return null;
@@ -95,35 +94,31 @@ export default AddTicketsSheet = ({
     dates.push(date);
 
     setTicketDates(dates);
-    // return date?.displayDate;
-    // console.log(ticketDates);
   };
   const addTicket = async () => {
+    if (!price || !available || !description) return;
+
     // let tempTickets = [...tickets];
     let tempTickets = [...tickets];
 
     tempTickets.push({
       price: Number(price),
       available: Number(available),
-      quantity: Number(available),
+      // quantity: Number(available),
       amount: 0,
 
       description,
-      category: category?.label,
+      category: category?.value,
       id: uuid.v4(),
       dates: ticketDates,
     });
 
-    // await new Promise((resolve) =>
-    //   setTimeout(() => resolve(ticketsSheetRef.current.close()), 100)
-    // );
     setTickets(tempTickets);
-
+    tempTickets = null;
     ticketsSheetRef.current.close();
 
     clear();
   };
-
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -194,7 +189,7 @@ export default AddTicketsSheet = ({
               {
                 color: colors.primary,
                 marginVertical: 10,
-                marginRight:10,
+                marginRight: 10,
                 alignSelf: "flex-end",
                 fontWeight: "500",
               },
@@ -269,6 +264,9 @@ export default AddTicketsSheet = ({
               { label: "VIP 1", value: "VIP 1" },
               { label: "VIP 2", value: "VIP 2" },
               { label: "VIP 3", value: "VIP 3" },
+              { label: "1° Dia", value: "1° Dia" },
+              { label: "2° Dia", value: "2° Dia" },
+              { label: "3° Dia", value: "3° Dia" },
               { label: "1 Dia - 1", value: "1 Dia - 1" },
               { label: "1 Dia - 2", value: "1 Dia - 2" },
               { label: "1 Dia - 3", value: "1 Dia - 3" },
@@ -513,7 +511,8 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: 10,
     marginVertical: 5,
-  }, switchContainer: {
+  },
+  switchContainer: {
     flexDirection: "row",
     marginVertical: 15,
     // height: 40,

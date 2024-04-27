@@ -51,7 +51,7 @@ import Animated, {
 import { ActivityIndicator, Chip } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { islands } from "../../../components/Data/islands";
-import { recommendedEvents } from "../../../components/Data/stockEvents";
+// import { recommendedEvents } from "../../../components/Data/stockrecommendedEvents";
 import { markers } from "../../../components/Data/markers";
 import SmallCard from "../../../components/cards/SmallCard";
 import colors from "../../../components/colors";
@@ -66,29 +66,25 @@ const { height, width } = Dimensions.get("window");
 
 const VenuesExplorer = () => {
   const navigation = useNavigation();
-  const { events, apiUrl } = useData();
+  const { apiUrl } = useData();
 
   const { followVenue2, user, userLocation, getLocation } = useAuth();
 
   const mapViewRef = useRef(null);
-  const [tabIndex, setTabIndex] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [venueDetails, setVenueDetails] = useState("");
 
   const [venues, setVenues] = useState([]);
-
-  // const [region, setRegion] = useState({
-  //   ...userLocation,
-  //   latitude: userLocation.latitude - 0.002,
-  //   latitudeDelta: 0.01,
-  //   longitudeDelta: 0.011,
-  // });
-
+  const [events, setEvents] = useState([]);
+  const [showAll, setShowAll] = useState(false);
   const [region, setRegion] = useState({
     latitude: 14.905696 - 0.004,
     longitude: -23.519001,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
+    // latitudeDelta: 0.003,
+    // longitudeDelta: 0.003,
   });
   const prevRegionRef = useRef();
   const regionChangeThreshold = 0.3;
@@ -103,10 +99,10 @@ const VenuesExplorer = () => {
   const getVenues = async () => {
     try {
       const result = await axios.get(
-        `${apiUrl}/venues/near/?long=${region?.longitude}&&lat=${region.latitude}`
+        `${apiUrl}/venues/near/?long=${region?.longitude}&&lat=${region.latitude}&&all=${showAll}`
       );
       console.log("rrefef");
-      setVenues(result?.data);
+      if (result?.data != venues) setVenues(result?.data);
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
@@ -137,18 +133,28 @@ const VenuesExplorer = () => {
   useEffect(() => {
     getVenues();
     prevRegionRef.current = region;
-  }, []);
+  }, [showAll]);
   const getResults = async (item) => {
-    setVenueDetails(null);
+    if (item?.uuid == venueDetails?.uuid) return;
     setLoading(true);
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 700);
-    });
+
+    try {
+      const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid}`);
+      // console.log(result?.data);
+      setEvents(result?.data);
+      console.log(item);
+    } catch (error) {
+      console.log(error);
+    }
+    setVenueDetails(null);
+    // await new Promise((resolve, reject) => {
+    //   setTimeout(resolve, 700);
+    // });
     setVenueDetails(item);
-    console.log(item);
 
     setLoading(false);
   };
+
   const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ["20%", "40%", "60%", "85%"], []);
 
@@ -167,27 +173,8 @@ const VenuesExplorer = () => {
     const scaleFactor = 0.3;
     markerSize = ((3 / a.latitudeDelta) * scaleFactor).toFixed();
 
-
-    // onSetMarkerSize(markerSize);
     onSetMarkerSize(Math.min(60, Math.max(25, markerSize)));
-
-    // console.log("Marker Size:", markerSize);
-    // console.log("Marker Size:", markerSize);
   };
-  console.log("Marker Size:", onMarkerSize / 4);
-
-  // if (
-  //   region?.latitudeDelta * 25000 >= 25 &&
-  //   region?.latitudeDelta * 25000 <= 50
-  // ) {
-  //   markerSize * 25000;
-  // } else if (region?.latitudeDelta * 25000 > 50) {
-  //   markerSize = 25;
-  // } else if (region?.latitudeDelta * 25000 < 25) {
-  //   markerSize = 50;
-  // }
-
-  // console.log(region?.latitudeDelta * 250);
 
   const handleSheetChanges = useCallback((index) => {
     // consol
@@ -245,7 +232,7 @@ const VenuesExplorer = () => {
                   borderWidth: 0.1,
                 }}
                 source={{
-                  uri: item?.photos[3]?.[0]?.uri,
+                  uri: item?.photos[3]?.[item?.photos[3]?.length - 1]?.uri,
                 }}
               />
               <View>
@@ -349,7 +336,9 @@ const VenuesExplorer = () => {
                         borderWidth: 0.1,
                       }}
                       source={{
-                        uri: venueDetails?.photos[3]?.[0]?.uri,
+                        uri: venueDetails?.photos[3]?.[
+                          venueDetails?.photos[3]?.length - 1
+                        ]?.uri,
                       }}
                     />
                     <View>
@@ -438,15 +427,15 @@ const VenuesExplorer = () => {
                     // width: "80%",
                     color: colors.black2,
                     marginLeft: Platform?.OS === "ios" ? 20 : 10,
-                    marginTop: 5,
+                    // marginTop: 5,
 
                     // marginBottom: 5,
                   }}
                 >
-                  {recommendedEvents?.length > 1
-                    ? recommendedEvents?.length + " Eventos"
-                    : recommendedEvents?.length > 0
-                    ? recommendedEvents?.length + " Evento"
+                  {events?.length > 1
+                    ? events?.length + " Eventos"
+                    : events?.length > 0
+                    ? events?.length + " Evento"
                     : ""}
                 </Text>
               </>
@@ -520,7 +509,10 @@ const VenuesExplorer = () => {
               top: 60,
               right: 5,
               zIndex: 2,
-              // padding: 10,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
             }}
             onPress={async () => {
               const newRegion = {
@@ -544,19 +536,35 @@ const VenuesExplorer = () => {
               color={colors.primary}
             />
           </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              // left: 8,
+              alignSelf: "flex-end",
+              position: "absolute",
+              backgroundColor: colors.white,
+              padding: 7,
+              borderRadius: 5,
+              top: 110,
+              right: 5,
+              zIndex: 2,
+              shadowOffset: { width: 0.5, height: 0.5 },
+              shadowOpacity: 0.3,
+              shadowRadius: 1,
+              elevation: 2,
+              // padding: 10,
+            }}
+            onPress={() => setShowAll(!showAll)}
+          >
+            <MaterialIcons name="event" size={24} color={colors.primary} />
+          </TouchableOpacity>
           <MapView
             onPress={() => setVenueDetails(null)}
             ref={mapViewRef}
             region={region}
             mapType="standard"
-            // provider="google"
             style={[styles.map, {}]}
             showsUserLocation={true}
             onRegionChangeComplete={setRegion}
-            // onRegionChange={(a) => {
-            //   console.log((a?.latitudeDelta * 2500).toFixed());
-            //   markerSize = (a?.latitudeDelta * 2500).toFixed();
-            // }}
             onRegionChange={(a) => {
               setMarkerSize(a);
             }}
@@ -565,10 +573,14 @@ const VenuesExplorer = () => {
             // provider={PROVIDER_GOOGLE}
           >
             {venues?.map((item) => {
-              console.log(region.latitude == item?.address?.latitude);
+              console.log(item?.mapSnap);
               return (
                 item?.location?.coordinates && (
-                  <Animated.View key={item._id} entering={FadeIn}>
+                  <Animated.View
+                    key={item._id}
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                  >
                     <Marker
                       style={{
                         shadowOffset: { width: 0.5, height: 0.5 },
@@ -577,8 +589,12 @@ const VenuesExplorer = () => {
                         elevation: 0.5,
                       }}
                       onPress={async () => {
+                        getResults(item);
+
                         const newRegion = {
                           latitude: item?.location?.coordinates?.[1] - 0.0075,
+
+                          // latitude: item?.location?.coordinates?.[1] - 0.006,
 
                           longitude: item?.location?.coordinates?.[0] + 0.00001,
 
@@ -590,7 +606,6 @@ const VenuesExplorer = () => {
                         } else {
                           setRegion(newRegion);
                         }
-                        getResults(item);
                       }}
                       coordinate={{
                         latitude: item?.location?.coordinates?.[1],
@@ -604,10 +619,10 @@ const VenuesExplorer = () => {
                           zIndex: item?.lat == region?.latitude ? 2 : 1,
                         }}
                       >
-                        {onMarkerSize / 4 - 4 > 7 && (
+                        {onMarkerSize / 4 - 4 > 5.73 && (
                           <Animated.View
-                            entering={FadeIn}
-                            exiting={FadeOut}
+                            // entering={FadeIn}
+                            // exiting={FadeOut}
                             style={{
                               position: "absolute",
                               top: -25,
@@ -617,14 +632,18 @@ const VenuesExplorer = () => {
                               height: 20,
                               alignItems: "center",
                               justifyContent: "center",
+
                               borderRadius: 5,
                             }}
                           >
                             <Text
                               style={{
                                 fontSize: 11,
+                                // fontSize: onMarkerSize / 4 - 3,
+
                                 fontWeight: "500",
                                 padding: 3,
+
                                 // marginHorizontal: 10,
 
                                 width: "100%",
@@ -642,11 +661,11 @@ const VenuesExplorer = () => {
                           style={{
                             height:
                               item?.uuid == venueDetails?.uuid
-                                ? onMarkerSize+10
+                                ? onMarkerSize + 10
                                 : onMarkerSize,
                             width:
                               item?.uuid == venueDetails?.uuid
-                                ? onMarkerSize+10
+                                ? onMarkerSize + 10
                                 : onMarkerSize,
                             // borderRadius: 10,
                             borderRadius: 100,

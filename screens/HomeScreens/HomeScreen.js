@@ -43,7 +43,7 @@ import AuthBottomSheet from "../../components/screensComponents/AuthComponents/A
 import OneBigTicket from "../../components/tickets/OneBigTicket";
 import CountDown from "react-native-countdown-component";
 import { TouchableWithoutFeedback } from "react-native";
-import {  useIsFocused } from '@react-navigation/native';
+import { useIsFocused } from "@react-navigation/native";
 
 import {
   Placeholder,
@@ -61,7 +61,7 @@ export default function HomeScreen({ navigation }) {
   const [scrolling, setScrolling] = useState(false);
   const homeTabRef = useRef(null);
   const isFocused = useIsFocused();
-
+  const [ipmaData, setIpmaData] = useState(null);
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     // setScrollingPos(event.nativeEvent.contentOffset.y / 20);
@@ -79,6 +79,51 @@ export default function HomeScreen({ navigation }) {
   // Convert milliseconds to seconds
   const differenceInSeconds = differenceInMilliseconds / 1000;
 
+  const getIpma = async () => {
+    try {
+      const resp = await axios.get(
+        "https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json"
+      );
+
+      const ipmaData = resp.data;
+
+      const keys = Object.keys(ipmaData);
+
+      // Sort keys by date (most recent first)
+      keys.sort((a, b) => new Date(b) - new Date(a));
+
+      // Iterate through sorted keys
+      for (const key of keys) {
+        const nestedObjects = ipmaData[key];
+
+        // Access nested objects based on specific keys
+        if (
+          nestedObjects.hasOwnProperty(1200576) ||
+          nestedObjects.hasOwnProperty(1200575)
+        ) {
+          const element = nestedObjects[1200576] || nestedObjects[1200575];
+          console.log(element);
+          break; // Exit loop after finding the desired nested object
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  let filteredIpma = [];
+
+  // Object.keys(ipmaData).forEach((key) => {
+  //   const value = ipmaData[key];
+  //   filteredIpma.push(value);
+  //   // console.log(`Key: ${key}, Value: ${value}`);
+  // });
+
+  console.log(filteredIpma[0]);
+
+  useEffect(() => {
+    getIpma();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("tabPress", (e) => {
@@ -88,7 +133,7 @@ export default function HomeScreen({ navigation }) {
     });
 
     return unsubscribe;
-  }, [navigation,isFocused]);
+  }, [navigation, isFocused]);
   return (
     <Screen style={[styles.container]}>
       <View

@@ -522,6 +522,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         // pushToken: token,
         creatorId: user.uid,
         createdBy: {
+          uuid:user?.uuid,
           avatar: user?.photos?.avatar?.[0]?.uri,
           displayName: user?.displayName,
         },

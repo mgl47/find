@@ -47,11 +47,12 @@ import { useAuth } from "../../components/hooks/useAuth";
 import SmallCard from "../../components/cards/SmallCard";
 
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
+  const item = route.params;
+
   const { width, height, isIPhoneWithNotch } = useDesign();
   const { user, headerToken, getUpdatedUser } = useAuth();
 
   const { apiUrl } = useData();
-  const item = route.params;
   const [venue, setVenue] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mediaIndex, setMediaIndex] = useState(0);
@@ -61,7 +62,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [followBlock, setFollowBlock] = useState(false);
   const [events, setEvents] = useState([]);
 
-  //  console.log(uuid.v4());
   const getVenues = async () => {
     try {
       const result = await axios.get(`${apiUrl}/venues/?&filter=${item?.uuid}`);
@@ -77,22 +77,19 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
   };
   const getEvents = async () => {
-    const result = await axios.get(`${apiUrl}/events/?venue=${venue?.uuid}`);
+    const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid}`);
     // console.log(result?.data);
     setEvents(result?.data);
   };
 
   useEffect(() => {
     getVenues();
+    getEvents();
   }, []);
   useEffect(() => {
     if (user?.followedVenues?.includes(venue?._id)) setFollowing(true);
-
-    if (venue) {
-      getEvents();
-    }
   }, [venue]);
-
+  console.log(item?.mapSnap);
 
   const followVenue = async () => {
     setFollowBlock(true);
@@ -208,13 +205,15 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={28}
-            color={scrolling ? colors.black : colors.white}
-            style={{
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-            }}
+            color={colors.white}
+            style={
+              !scrolling && {
+                shadowOffset: { width: 0.5, height: 0.5 },
+                shadowOpacity: 0.3,
+                shadowRadius: 1,
+                elevation: 2,
+              }
+            }
           />
         </TouchableOpacity>
       ),
@@ -265,19 +264,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             </Text>
           </View>
         ),
-      headerTitle: () =>
-        scrolling ? (
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 18,
-              fontWeight: "500",
-              color: colors.black,
-            }}
-          >
-            {venue?.displayName}
-          </Text>
-        ) : null,
+      headerTitle: () => null,
     });
   }, [scrolling, mediaIndex, venue]);
 
@@ -398,10 +385,29 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: 90,
             width: "100%",
-            backgroundColor: colors.white,
+            backgroundColor: colors.primary2,
             zIndex: 2,
           }}
-        />
+        >
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 18,
+              fontWeight: "500",
+              color: colors.white,
+              fontWeight: "500",
+              position: "absolute",
+              bottom: 10,
+              // marginLeft:70,
+              marginLeft: 50,
+
+              textAlign: "center",
+              width: "75%",
+            }}
+          >
+            {venue?.displayName}
+          </Text>
+        </Animated.View>
       )}
 
       <Animated.FlatList
@@ -568,18 +574,36 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              <View style={styles.separator} />
-              <ViewMoreText
-                numberOfLines={6}
-                renderViewMore={renderViewMore}
-                renderViewLess={renderViewLess}
-                textStyle={{ textAlign: "left" }}
-              >
-                <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
-              </ViewMoreText>
+              {venue?.description && (
+                <>
+                  <View style={styles.separator} />
+                  <ViewMoreText
+                    numberOfLines={6}
+                    renderViewMore={renderViewMore}
+                    renderViewLess={renderViewLess}
+                    textStyle={{ textAlign: "left" }}
+                  >
+                    <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
+                  </ViewMoreText>
+                </>
+              )}
             </View>
 
             <View style={styles.container}>
+              {/* <Image
+                resizeMode="contain"
+                source={{ uri: venue?.mapSnap }}
+                height={200}
+                width={"100%"}
+
+                // style={{
+                //   width: "100%",
+                //   height: 150,
+                //   borderRadius: 10,
+                // }}
+                // style={styles.map}
+              /> */}
+
               <View
                 style={{
                   // height: 200,
@@ -589,7 +613,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
                   shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
+                  shadowOpacity: 0.1,
                   shadowRadius: 1,
                   elevation: 2,
                   // shadowColor: colors.light2,
@@ -602,7 +626,8 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     latitudeDelta: 0.01,
                     longitudeDelta: 0.011,
                   }}
-                  // provider="google"
+                  scrollEnabled={false}
+                  zoomEnabled={false}
                   mapType="standard"
                   style={styles.map}
                 >
@@ -657,6 +682,15 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     />
                   </View>
                 </TouchableOpacity>
+                <View
+                  style={{
+                    width: "95%",
+                    height: 1,
+                    backgroundColor: colors.grey,
+
+                    alignSelf: "center",
+                  }}
+                />
                 <TouchableOpacity
                   style={{
                     padding: 10,
@@ -806,8 +840,12 @@ const styles = StyleSheet.create({
   },
   map: {
     width: "100%",
-    // borderRadius: 5,
-    height: 150,
+    borderRadius: 5,
+    borderBottomRightRadius: 0,
+    overflow: "hidden",
+    borderBottomLeftRadius: 0,
+    height: 200,
+
     backgroundColor: colors.grey,
   },
 });

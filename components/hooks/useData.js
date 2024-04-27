@@ -24,12 +24,14 @@ import Screen from "../Screen2";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useAuth } from "./useAuth";
-
+import { doc, getDoc } from "firebase/firestore";
+import {db} from "../../firebase"
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [venues, setVenues] = useState([]);
+  const [calDays, setCalDays] = useState([]);
   //   const [headerToken, setHeaderToken] = useState("");
   const { headerToken } = useAuth();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
@@ -65,8 +67,22 @@ export const DataProvider = ({ children }) => {
       console.log(error?.response?.data?.msg);
     }
   };
+  const getCalendarDates = async () => {
+    const docRef = doc(db, "Data", "activeDays");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      // console.log("Document data:", docSnap.data()?.calendar);
+      setCalDays(docSnap.data()?.calendar);
+    } else {
+      // docSnap.data() will be undefined in this case
+      console.log("No such document!");
+    }
+  };
 
   useEffect(() => {
+    getCalendarDates();
+
     getEvents();
     getVenues();
   }, []);
@@ -100,8 +116,9 @@ export const DataProvider = ({ children }) => {
       venues,
       formatNumber,
       getOneEvent,
+      calDays
     }),
-    [events, venues]
+    [events, venues,calDays]
   );
 
   return (

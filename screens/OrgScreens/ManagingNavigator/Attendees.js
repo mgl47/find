@@ -40,7 +40,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   }
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 ,backgroundColor:colors.background }}>
       <FlatList
         data={event?.attendees}
         keyExtractor={(item) => item?.uuid}
