@@ -16,7 +16,12 @@ import {
 import { ActivityIndicator, TextInput } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 
-import Animated, { FadeIn, SlideOutUp } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  SlideInDown,
+  SlideOutDown,
+  SlideOutUp,
+} from "react-native-reanimated";
 import React, { useEffect, useState } from "react";
 import colors from "../../components/colors";
 import {
@@ -54,6 +59,7 @@ import {
 } from "firebase/storage";
 import uuid from "react-native-uuid";
 import ImageView from "react-native-image-viewing";
+import QRCode from "react-native-qrcode-svg";
 
 const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height } = Dimensions.get("window");
@@ -136,6 +142,13 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
+      headerStyle: {
+        backgroundColor: colors.primary2,
+        // shadowColor: colors.transparent,
+        shadowColor: colors.primary2,
+
+        elevation: 0,
+      },
       headerLeft: () => (
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -146,13 +159,15 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
           <MaterialCommunityIcons
             name="arrow-left"
             size={28}
-            color={scrolling ? colors.black : colors.white}
-            style={{
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-            }}
+            color={colors.white}
+            style={
+              {
+                // shadowOffset: { width: 0.5, height: 0.5 },
+                // shadowOpacity: 0.3,
+                // shadowRadius: 1,
+                // elevation: 2,
+              }
+            }
           />
         </TouchableOpacity>
       ),
@@ -160,17 +175,19 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
       headerTitle: () =>
         scrolling ? (
-          <Text
+          <Animated.Text
+            entering={SlideInDown}
+            // exiting={SlideOutDown}
             numberOfLines={1}
             style={{
               fontSize: 18,
               fontWeight: "500",
-              top: 40,
-              color: colors.black,
+              // top: 40,
+              color: colors.white,
             }}
           >
             {artist?.displayName}
-          </Text>
+          </Animated.Text>
         ) : null,
     });
   }, [scrolling]);
@@ -309,6 +326,150 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
   let displayAvatar = [];
   const avatarIndex = user?.photos?.avatar[2];
   displayAvatar?.push(avatarIndex);
+
+  return (
+    <ScrollView
+      scrollEventThrottle={16}
+      onScroll={handleScroll}
+      contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}
+      style={{ backgroundColor: colors.primary2 }}
+      bounces={false}
+    >
+      {/* <View
+        style={{
+          backgroundColor: colors.primary2,
+          height: 80,
+          width: "100%",
+          position: "absolute",
+        }}
+      /> */}
+      <ImageView
+        images={displayAvatar}
+        imageIndex={0}
+        onRequestClose={() => setAvatarVisible(false)}
+        visible={avatarVisible}
+      />
+      <View
+        style={{
+          alignSelf: "center",
+          // marginTop: 20,
+          alignItems: "center",
+        }}
+      >
+        <TouchableHighlight
+          underlayColor={colors.light2}
+          onPress={() => setAvatarVisible(true)}
+          style={{
+            backgroundColor: colors.darkGrey,
+            borderRadius: 100,
+            width: 120,
+            height: 120,
+            // bottom: 50,
+            // marginLeft: 10,
+          }}
+          // activeOpacity={0.7}
+        >
+          <Image
+            style={{
+              height: "100%",
+              width: "100%",
+              borderRadius: 100,
+              backgroundColor: colors.darkSeparator,
+              //   marginTop: 100,
+            }}
+            source={{ uri: user?.photos?.avatar[0]?.uri }}
+          />
+        </TouchableHighlight>
+
+        <Text
+          style={{
+            fontSize: 21,
+            fontWeight: "600",
+            marginVertical: 5,
+            color: colors.primary2,
+          }}
+        >
+          {user?.displayName}
+        </Text>
+        <Text style={{ fontSize: 16, color: colors.description }}>
+          @{user?.username}
+        </Text>
+      </View>
+      <QRCode
+        // key={ite}
+        // value={item.uuid}
+
+        value={user?.username}
+        size={260}
+        // enableLinearGradient={item?.category !== "VIP"}
+        color={colors.darkGold}
+        //   quietZone={10}
+        backgroundColor={colors.white}
+      />
+      <View
+        style={{
+          backgroundColor: colors.white,
+          shadowOffset: { width: 0.5, height: 0.5 },
+          shadowOpacity: 0.2,
+          shadowRadius: 2,
+          elevation: 0.5,
+          // paddingHorizontal: 10,
+          padding: 10,
+          marginTop: 20,
+          borderRadius: 10,
+          margin: 10,
+        }}
+        // onPress={() => navigation.navigate("addEvent", item)}
+      >
+        <Text
+          style={[
+            {
+              textAlign: "center",
+              fontWeight: "500",
+              color: colors.darkSeparator,
+              color: colors.black2,
+              fontSize: 17,
+              fontWeight: "500",
+              marginTop: 3,
+              marginBottom: 15,
+            },
+          ]}
+        >
+          Ações Rápidas
+        </Text>
+        {/* <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <TouchableOpacity
+            style={{
+              backgroundColor: colors.primary2,
+              padding: 10,
+              borderRadius: 5,
+              width: "48%",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: colors.white }}>Check-in</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              backgroundColor: colors.primary2,
+              padding: 10,
+              borderRadius: 5,
+              width: "48%",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: colors.white }}>Editar</Text>
+          </TouchableOpacity>
+        </View> */}
+      </View>
+    </ScrollView>
+  );
   return (
     <>
       {scrolling && (
@@ -625,7 +786,7 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
           {/* {(userInitialInfo != userInfo || avatarUri || coverUri) && ( */}
           {loading ? (
             <ActivityIndicator
-              style={{ padding: 10, alignSelf: "flex-end" ,width:80}}
+              style={{ padding: 10, alignSelf: "flex-end", width: 80 }}
               color={colors.primary}
             />
           ) : (

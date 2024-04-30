@@ -57,6 +57,7 @@ import toast from "../../toast";
 import { useDesign } from "../../hooks/useDesign";
 import { useNavigation } from "@react-navigation/native";
 import formattedDates from "../../formattedDates";
+import DoorTicketSheet from "./DoorTicketSheet";
 export default TicketPurchaseSheet = ({
   Event,
   bottomSheetModalRef,
@@ -64,6 +65,7 @@ export default TicketPurchaseSheet = ({
   purchaseModalUp,
   gift,
   setGift,
+  doorTicket,
 }) => {
   const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
@@ -75,6 +77,7 @@ export default TicketPurchaseSheet = ({
   const [search, setSearch] = useState("");
   const [searchedUser, setSearchedUSer] = useState(null);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const doorTicketModalRef = useRef(null);
   const TL = event?.tickets?.length;
   const customSnap = `${
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
@@ -85,7 +88,7 @@ export default TicketPurchaseSheet = ({
   const [onPayment, setOnPayment] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   const [userLoading, setUserLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [purchaseDone, setPurchaseDone] = useState(false);
   const purchaseId = uuid.v4();
   const initialState = {
@@ -320,12 +323,13 @@ export default TicketPurchaseSheet = ({
     setSearch("");
     setSearchedUSer(null);
     setSearched(false);
-    setGift(false);
-    setPurchaseModalUp(false);
+    gift && setGift(false);
+    purchaseModalUp && setPurchaseModalUp(false);
     setFirstRender(true);
     setAvailable([]);
     setLimitReached(false);
     setPurchaseDone(false);
+    clear(event?.tickets);
   };
 
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
@@ -520,7 +524,9 @@ export default TicketPurchaseSheet = ({
               state.total == 0 || (gift && !searchedUser) || purchaseDone
             }
             onPress={() =>
-              onPayment
+              doorTicket
+                ? doorTicketModalRef.current.present()
+                : onPayment
                 ? buyTickets()
                 : (setOnPayment(true), setFirstRender(false))
             }
@@ -569,11 +575,13 @@ export default TicketPurchaseSheet = ({
     ),
     [
       state?.amount,
-      !firstRender ? loading : null,
+      // !firstRender ? loading : null,
+      loading,
       onPayment,
       firstRender,
       searchedUser,
       gift,
+
       // purchaseModalUp,
     ]
   );
@@ -681,9 +689,10 @@ export default TicketPurchaseSheet = ({
                           style={[
                             styles.price,
                             {
-                              color: !unavailable
-                                ? colors.primary
-                                : colors.darkGrey,
+                              color:
+                                !unavailable || event?.haltedSales
+                                  ? colors.primary
+                                  : colors.darkGrey,
                             },
                           ]}
                         >
@@ -695,7 +704,9 @@ export default TicketPurchaseSheet = ({
                       </View>
 
                       <Text style={styles.description}>
-                        {!unavailable ? item?.description : "Indisponível"}
+                        {unavailable || event?.haltedSales
+                          ? "Indisponível"
+                          : item?.description}
                       </Text>
                     </View>
                     <View style={styles.counterView}>
@@ -704,7 +715,7 @@ export default TicketPurchaseSheet = ({
                           state?.cart?.filter((cartItem) => {
                             if (cartItem?.id == item?.id)
                               return cartItem?.amount;
-                          }) == 0
+                          }) == 0 || event?.haltedSales
                         }
                         onPress={() => decrease(item)}
                       >
@@ -736,7 +747,8 @@ export default TicketPurchaseSheet = ({
                         disabled={
                           limitReached ||
                           available?.includes(item?.id) ||
-                          unavailable
+                          unavailable ||
+                          event?.haltedSales
                         }
                         onPress={() => increase(item)}
                       >
@@ -746,7 +758,8 @@ export default TicketPurchaseSheet = ({
                           color={
                             limitReached ||
                             available?.includes(item?.id) ||
-                            unavailable
+                            unavailable ||
+                            event?.haltedSales
                               ? colors.grey
                               : colors.primary
                           }
@@ -1332,6 +1345,18 @@ export default TicketPurchaseSheet = ({
           }
         />
       </BottomSheetModal>
+
+      <DoorTicketSheet
+          doorTicketModalRef={doorTicketModalRef}
+          // setPurchaseModalUp={setPurchaseModalUp}
+          // purchaseModalUp={purchaseModalUp}
+          event={event}
+          bottomSheetModalRef={bottomSheetModalRef}
+          total={state.total}
+          separatedTickets={separatedTickets}
+          // setGift={setGift}
+          // gift={gift}
+        />
     </BottomSheetModalProvider>
   );
 };
@@ -1443,88 +1468,4 @@ const styles = StyleSheet.create({
   },
 });
 
-{
-  /*
 
-: gift ? (
-                    <Animated.View
-                      entering={firstRender ? null : SlideInLeft}
-                      exiting={SlideOutLeft}
-                      style={{
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 1,
-                        elevation: 1,
-                        backgroundColor: colors.white,
-                        padding: 10,
-                        borderRadius: 10,
-                      }}
-                    >
-                      {userLoading && (
-                        <Animated.View
-                          style={{
-                            // position: "absolute",
-                            alignSelf: "center",
-                            // top: 10,
-                            // zIndex: 4,
-                            left: 18,
-                            top: 13,
-                            // bottom: 5,
-                            zIndex: 3,
-                            padding: 10,
-                            position: "absolute",
-                          }}
-                          // entering={SlideInUp.duration(300)}
-                          // exiting={SlideOutUp.duration(300)}
-                        >
-                          <ActivityIndicator
-                            animating={true}
-                            color={colors.primary}
-                          />
-                        </Animated.View>
-                      )}
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          // marginBottom: 5,
-                          left: 2,
-                        }}
-                      >
-                        <View
-                          style={{
-                            height: 50,
-                            width: 50,
-                            backgroundColor: colors.grey,
-                            borderRadius: 50,
-                            left: 4,
-                          }}
-                        />
-                        <View style={{ marginLeft: 10 }}>
-                          <View
-                            style={{
-                              height: 18,
-                              width: 100,
-                              backgroundColor: colors.grey,
-                              borderRadius: 20,
-                              marginBottom: 5,
-                              // left: 4,
-                              // top: 4,
-                            }}
-                          />
-                          <View
-                            style={{
-                              height: 15,
-                              width: 80,
-                              backgroundColor: colors.grey,
-                              borderRadius: 20,
-                              // left: 4,
-                              // top: 4,
-                            }}
-                          />
-                        </View>
-                      </View>
-                    </Animated.View>
-                  )
-*/
-}

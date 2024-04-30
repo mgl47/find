@@ -31,7 +31,9 @@ import Animated, {
   FadeIn,
   FadeOut,
   SlideInDown,
+  SlideInLeft,
   SlideInRight,
+  SlideInUp,
   SlideOutRight,
 } from "react-native-reanimated";
 import { Tab as Tab2, Text as Text2, TabView } from "@rneui/themed";
@@ -49,6 +51,7 @@ import { Button } from "react-native";
 import { useDesign } from "../../../components/hooks/useDesign";
 import { ActivityIndicator } from "react-native-paper";
 import LottieView from "lottie-react-native";
+import { set } from "firebase/database";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -61,7 +64,7 @@ const EventManagingScreen = ({
   const [hasPermission, setHasPermission] = useState(false);
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const animation = useRef(null);
 
   const [index, setIndex] = useState(1);
@@ -70,9 +73,10 @@ const EventManagingScreen = ({
   const [scanned, setScanned] = useState(false);
   const [statusCode, setStatusCode] = useState(0);
   const [scannedTicket, setScannedTicket] = useState("");
+  const [event, setEvent] = useState(null);
 
   const { getUpdatedUser, myEvents, headerToken, user } = useAuth();
-  const { apiUrl } = useData();
+  const { apiUrl, getOneEvent } = useData();
   const { isIPhoneWithNotch } = useDesign();
 
   // useEffect(() => {
@@ -82,10 +86,23 @@ const EventManagingScreen = ({
   //   })();
   // }, []);
 
-  const selectedEvent = myEvents?.filter(
-    (myEvent) => myEvent?._id == item?._id
-  )[0];
-  const attendeesId = selectedEvent?.attendees?.map((item) => item?.uuid);
+  // const selectedEvent = myEvents?.filter(
+  //   (myEvent) => myEvent?._id == item?._id
+  // )[0];
+
+  const getSelectedEvent = async () => {
+    setLoading(true);
+    try {
+      const selectedEvent = await getOneEvent(item?._id);
+      setEvent(selectedEvent);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getSelectedEvent();
+  }, []);
 
   const clean = () => {
     setFlashMode(FlashMode.off);
@@ -106,7 +123,7 @@ const EventManagingScreen = ({
     // console.log(ticketUser);
     try {
       const result = await axios.patch(
-        `${apiUrl}/purchase/checkin/${selectedEvent?._id}`,
+        `${apiUrl}/purchase/checkin/${event?._id}`,
         { uuid: item?.data },
         {
           headers: {
@@ -163,17 +180,21 @@ const EventManagingScreen = ({
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
+          {event?.store?.length > 0 && (
+            <TouchableOpacity
+              disabled={!event}
+              style={{ right: 40 }}
+              // onPress={() => setShowScanModal(true)}
+              onPress={() => navigation.navigate("eventStore", event)}
+            >
+              <FontAwesome6 name="shop" size={23} color={colors.white} />
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
-            style={{ right: 40 }}
-            // onPress={() => setShowScanModal(true)}
-            onPress={() => navigation.navigate("eventStore", selectedEvent)}
-          >
-            <FontAwesome6 name="shop" size={23} color={colors.white} />
-          </TouchableOpacity>
-          <TouchableOpacity
+          disabled={!event}
             style={{ right: 20 }}
             // onPress={() => setShowScanModal(true)}
-            onPress={() => navigation.navigate("qrValidator", selectedEvent)}
+            onPress={() => navigation.navigate("qrValidator", event)}
           >
             <MaterialCommunityIcons
               name="qrcode-scan"
@@ -184,7 +205,7 @@ const EventManagingScreen = ({
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation,event]);
 
   useEffect(() => {
     getUpdatedUser();
@@ -194,6 +215,7 @@ const EventManagingScreen = ({
       flashMode == FlashMode.torch ? FlashMode.off : FlashMode.torch
     );
   };
+
   // if (!permission) {
   //   return (
   //     <View style={styles.container}>
@@ -204,65 +226,168 @@ const EventManagingScreen = ({
   //     </View>
   //   );
   // }
+
+  // if (!event) {
+  //   return (
+  //     <View
+  //       style={{
+  //         flex: 1,
+  //         alignItems: "center",
+  //         justifyContent: "center",
+  //         backgroundColor: colors.background,
+
+  //       }}
+  //     >
+  //       <ActivityIndicator animating={true} color={colors.primary} />
+  //     </View>
+  //   );
+  // }
+  const DefaultScreen = () => {
+    return <View />;
+  };
+
   return (
     <>
-      {/* <View style={{ flex: 1 }}> */}
-      <Tab.Navigator
-        screenOptions={{
-          tabBarActiveTintColor: colors.primary,
+      {event ? (
+        <Animated.View
+          style={{ flex: 1 }}
+          // entering={FadeIn}
+        >
+          <Tab.Navigator
+            screenOptions={{
+              tabBarActiveTintColor: colors.primary,
 
-          tabBarInactiveTintColor: colors.darkGrey,
-          tabBarIndicatorContainerStyle: {
-            backgroundColor: colors.primary2,
-          },
-          tabBarIndicatorStyle: {
-            backgroundColor: colors.white_shade,
-            // bottom: 2,
-            height: 4,
-          },
-          tabBarLabelStyle: (active) => ({
-            color: active ? colors.white : colors.lightGrey,
-          }),
-        }}
-      >
-        <Tab.Screen
-          initialParams={item}
-          options={{
-            tabBarLabelStyle: {
-              fontWeight: "600",
-              fontSize: 13,
-              color: colors.white,
-            },
-          }}
-          name="Overview"
-          component={Overview}
-        />
+              tabBarInactiveTintColor: colors.darkGrey,
+              tabBarIndicatorContainerStyle: {
+                backgroundColor: colors.primary2,
+              },
+              tabBarIndicatorStyle: {
+                backgroundColor: colors.white_shade,
+                // bottom: 2,
+                height: 4,
+              },
+              tabBarLabelStyle: (active) => ({
+                color: active ? colors.white : colors.lightGrey,
+              }),
+            }}
+          >
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Overview"
+              component={Overview}
+            />
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Attendees"
+              component={Attendees}
+            />
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Staff"
+              component={Staff}
+            />
+          </Tab.Navigator>
+        </Animated.View>
+      ) : (
+        <View style={{ height: 50, backgroundColor: colors.primary2 }} />
+      )}
 
-        <Tab.Screen
-          initialParams={item}
-          options={{
-            tabBarLabelStyle: {
-              fontWeight: "600",
-              fontSize: 13,
-              color: colors.white,
-            },
+      {/* {event && (
+        <Animated.View
+        style={{flex:1}}
+        entering={FadeIn}
+        >
+          <Tab.Navigator
+            screenOptions={{
+              tabBarActiveTintColor: colors.primary,
+
+              tabBarInactiveTintColor: colors.darkGrey,
+              tabBarIndicatorContainerStyle: {
+                backgroundColor: colors.primary2,
+              },
+              tabBarIndicatorStyle: {
+                backgroundColor: colors.white_shade,
+                // bottom: 2,
+                height: 4,
+              },
+              tabBarLabelStyle: (active) => ({
+                color: active ? colors.white : colors.lightGrey,
+              }),
+            }}
+          >
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Overview"
+              component={Overview}
+            />
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Attendees"
+              component={Attendees}
+            />
+            <Tab.Screen
+              initialParams={event}
+              options={{
+                tabBarLabelStyle: {
+                  fontWeight: "600",
+                  fontSize: 13,
+                  color: colors.white,
+                },
+              }}
+              name="Staff"
+              component={Staff}
+            />
+          </Tab.Navigator>
+        </Animated.View>
+      )} */}
+
+      {loading && (
+        <View
+          style={{
+            zIndex: 2,
+            position: "absolute",
+            alignSelf: "center",
+            top: 60,
           }}
-          name="Attendees"
-          component={Attendees}
-        />
-        <Tab.Screen
-          initialParams={item}
-          options={{
-            tabBarLabelStyle: {
-              fontWeight: "600",
-              fontSize: 13,
-              color: colors.white,
-            },
-          }}
-          name="Staff"
-          component={Staff}
-        />
-      </Tab.Navigator>
+        >
+          <ActivityIndicator animating={true} color={colors.primary} />
+        </View>
+      )}
       {/* </View> */}
       <Modal
         // presentationStyle="formSheet"

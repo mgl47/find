@@ -26,12 +26,12 @@ import {
 import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
-  const routeEvent = route.params;
+  const event = route.params;
 
   const { user, myEvents } = useAuth();
   // const { getOneEvent } = useData();
-  const [loading, setLoading] = useState(true);
-  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(false);
+  // const [event, setEvent] = useState(routeEvent);
   const [search, setSearch] = useState("");
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [pend, setPend] = useState(false);
@@ -45,42 +45,25 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   }, []);
 
   const snapPoints = useMemo(() => ["55%", "75%"], []);
-  const getSelectedEvent = async () => {
-    setEvent(myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]);
 
-    setLoading(false);
-  };
+  // if (loading || event == null) {
+  //   return <View style={{ backgroundColor: colors.background, flex: 1 }} />;
+  // }
 
-  useEffect(() => {
-    getSelectedEvent();
-  }, []);
-
-  if (loading || event === null) {
-    return (
-      <View style={{ top: 20 }}>
-        <ActivityIndicator animating={true} color={colors.primary} />
-      </View>
-    );
-  }
-
-  const filteredUsers = event?.attendees.filter(
+  const filteredUsers = event?.attendees?.filter(
     (user) =>
       user.username.toLowerCase().includes(search.toLowerCase()) ||
       user.displayName.toLowerCase().includes(search.toLowerCase())
   );
 
-  // const userTickets= event?.attendees.filter(
-  //   (user) =>
-  // )
-  const ticketsCategories = event?.attendees.map((ticket) => ticket?.category);
-  const categories = [...new Set(ticketsCategories)];
   let totalTickets = [];
-  event?.attendees.forEach((ticket) => {
+  event?.attendees?.forEach((ticket) => {
     if (ticket?.username == selectedAttendee?.username) {
       totalTickets.push(ticket);
       return ticket;
     }
   });
+  const categories = event?.tickets?.map((ticket) => ticket?.category);
   const addToSelectedCat = (cat) => {
     if (selectedCat.includes(cat)) {
       setSelectedCat(selectedCat.filter((c) => c !== cat));
@@ -89,7 +72,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     }
   };
 
-  let sortedUsers = filteredUsers.filter(
+  let sortedUsers = filteredUsers?.filter(
     (ticket) =>
       (!checkedIn || ticket?.checkedIn) &&
       (!selectedCat.length || selectedCat.includes(ticket?.category))

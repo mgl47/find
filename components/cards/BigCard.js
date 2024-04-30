@@ -37,7 +37,7 @@ function BigCard(item) {
           width: "100%",
         }}
         source={{
-          uri: item?.photos[0]?.[0]?.uri,
+          uri: item?.photos[1]?.[0]?.uri,
         }}
       >
         <LinearGradient
@@ -115,7 +115,7 @@ function BigCard(item) {
                   },
                 ]}
               >
-                {item?.venue?.displayName}, {item?.venue?.city}
+                {item?.venue?.displayName}, {item?.venue?.address?.city}
               </Text>
             </View>
           </View>

@@ -33,31 +33,17 @@ import { useData } from "../../../components/hooks/useData";
 import UserSelectorSheet from "../../../components/screensComponents/EventAddingComponents/UserSelectorSheet";
 
 const Staff = ({ navigation, navigation: { goBack }, route }) => {
-  const routeEvent = route.params;
+  const event = route.params;
 
   const { user, headerToken, myEvents, getUpdatedUser } = useAuth();
   const { apiUrl } = useData();
-  const [loading, setLoading] = useState(true);
-  const [event, setEvent] = useState(null);
-  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  // const [event, setEvent] = useState(routeEvent);
+  const [members, setMembers] = useState(event);
   const currentMember = members?.staff?.filter(
     (member) => member?._id == user?._id
   )[0];
   const isOrganizer = event?.organizers?.find((org) => org?._id == user?._id);
-
-  const getSelectedEvent = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setEvent(myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]);
-    setMembers(
-      myEvents?.filter((myEvent) => myEvent?._id == routeEvent?._id)[0]
-    );
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    getSelectedEvent();
-  }, [myEvents]);
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [position, setPosition] = useState(selectedMember?.role);
@@ -126,13 +112,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
       console.log(error?.response?.data?.msg);
     }
   };
-  if (loading || event === null) {
-    return (
-      <View style={{ top: 20 }}>
-        <ActivityIndicator animating={true} color={colors.primary} />
-      </View>
-    );
-  }
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
@@ -177,7 +157,6 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                 item?._id == user?._id ||
                 (currentMember?.role == "Administração" &&
                   item?.role == "Administração")
-                  
               }
               onPress={() => handleManageMembers(item)}
               activeOpacity={0.5}
@@ -198,7 +177,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Image
                   source={{
-                    uri: item?.photos?.avatar?.[0]?.uri,
+                    uri: item?.photos?.avatar?.[2]?.uri,
                   }}
                   style={{
                     width: 70,

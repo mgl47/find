@@ -430,7 +430,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             Event?.videos?.length > 0 || Event?.photos?.[0]?.length > 1
           }
           horizontal
-          data={Event?.photos?.[0]}
+          data={Event?.photos?.[1]}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
@@ -488,6 +488,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             null
           }
           renderItem={({ item, index }) => {
+            console.log(item);
             {
               return !inFullscreen ? (
                 <>

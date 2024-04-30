@@ -330,7 +330,7 @@ function StackNavigator() {
 
       <Stack.Screen
         options={{
-          headerTransparent: true,
+          // headerTransparent: true,
           headerBackgroundContainerStyle: { backgroundColor: "transparent" },
         }}
         name="profile"

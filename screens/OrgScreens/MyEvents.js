@@ -77,19 +77,15 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
-            activeOpacity={0.8}
-
+              activeOpacity={0.8}
               onPress={() => navigation.navigate("manageEvent", item)}
             >
               <BigCard2 {...item} />
             </TouchableOpacity>
           );
         }}
-        ListFooterComponent={<View         style={{marginBottom:50}}
-        />}
-      
+        ListFooterComponent={<View style={{ marginBottom: 50 }} />}
       />
-    
     </View>
   );
 };

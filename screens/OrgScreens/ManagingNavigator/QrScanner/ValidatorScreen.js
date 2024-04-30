@@ -100,6 +100,7 @@ export default function ValidatorScreen({
         {
           uuid: item?.data,
           exiting: index == 1,
+          currentDate: selectedDate?.date,
           exitingTime: selectedDate?.displayDate + " às " + selectedDate?.hour,
           checkedAt: selectedDate?.displayDate + " às " + selectedDate?.hour,
         },
@@ -110,9 +111,9 @@ export default function ValidatorScreen({
           },
         }
       );
-      console.log(result?.status);
+      console.log(result?.data?.msg);
 
-      if (result.status == 200 || 201 || 202) {
+      if (result.status == 200 || 201 || 202 || 204) {
         setLoading(false);
         setStatusCode(result?.status);
         setScannedTicket(result?.data);
@@ -331,6 +332,21 @@ export default function ValidatorScreen({
               source={require("../../../../components/animations/attention.json")}
             />
           )}
+          {statusCode == 204 && (
+            <LottieView
+              autoPlay
+              ref={animation}
+              style={{
+                width: 200,
+                height: 200,
+                position: "absolute",
+                alignSelf: "center",
+                bottom: -85, // backgroundColor: "#eee",
+              }}
+              // Find more Lottie files at https://lottiefiles.com/featured
+              source={require("../../../../components/animations/valid.json")}
+            />
+          )}
           {statusCode == 202 && (
             <LottieView
               autoPlay
@@ -481,6 +497,8 @@ export default function ValidatorScreen({
                           ? "Saída: "
                           : statusCode == 203
                           ? "Checked In: "
+                          : statusCode == 204
+                          ? "Validado: "
                           : ""}
                       </Text>
                       {scannedTicket?.checkedAt && (
