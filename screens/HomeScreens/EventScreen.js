@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -60,6 +61,7 @@ import { useDesign } from "../../components/hooks/useDesign";
 import TicketPurchaseSheet from "../../components/screensComponents/eventComponents/TicketPurchaseSheet";
 import { LinearGradient } from "expo-linear-gradient";
 import { captureRef } from "react-native-view-shot";
+import { ImageBackground } from "react-native";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
@@ -150,7 +152,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.t5}
         />
         {/* <Entypo name="chevron-down" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
@@ -163,7 +165,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.t5}
         />
         {/* <Entypo name="chevron-up" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
@@ -375,7 +377,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: isIPhoneWithNotch ? 90 : 65,
             width: "100%",
-            backgroundColor: colors.primary2,
+            // backgroundColor: colors.background2,
+            backgroundColor: "rgba(32, 40, 47,0.95)",
+
             zIndex: 2,
             shadowOffset: { width: 0.5, height: 0.5 },
             elevation: 2,
@@ -396,7 +400,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
               textAlign: "center",
               // width:"100%",
-              color: colors.white,
+              color: colors.t1,
               width: "75%",
             }}
           >
@@ -425,6 +429,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
         <FlatList
           showsHorizontalScrollIndicator={false}
+          style={{ backgroundColor: colors.background }}
           pagingEnabled
           onScroll={(e) => handleMediaScroll(e)}
           scrollEnabled={
@@ -435,59 +440,77 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
-              <VideoPlayer
-                // defaultControlsVisible={false}
+              <View>
+                {/* <LinearGradient
+                  colors={[
+                    "transparent",
+                    "transparent",
+                    "transparent",
+                    "transparent",
+                    colors.background,
+                  ]}
+                  //                         colors={["#00000000", "#0000000000", "#000000000"]}
 
-                // playbackCallback={()=>console.log("fdasfsdgafdsF")}
-                fullscreen={{
-                  inFullscreen: inFullscreen,
-                  enterFullscreen: async () => {
-                    setInFullsreen(true);
+                  style={{
+                    height: height * 0.37,
+                    width: "100%",
+                    position: "absolute",zIndex:3
+                  }}
+                /> */}
+                <VideoPlayer
+                  // defaultControlsVisible={false}
 
-                    // setStatusBarHidden(true, "fade");
-                    await ScreenOrientation.lockAsync(
-                      ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
-                    );
+                  // playbackCallback={()=>console.log("fdasfsdgafdsF")}
+                  fullscreen={{
+                    inFullscreen: inFullscreen,
+                    enterFullscreen: async () => {
+                      setInFullsreen(true);
 
-                    videoRef.current.setStatusAsync({
-                      shouldPlay: true,
-                    });
-                  },
-                  exitFullscreen: async () => {
-                    // setStatusBarHidden(false, "fade");
-                    setInFullsreen(false);
+                      // setStatusBarHidden(true, "fade");
+                      await ScreenOrientation.lockAsync(
+                        ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
+                      );
 
-                    await ScreenOrientation.lockAsync(
-                      ScreenOrientation.OrientationLock.PORTRAIT_UP
-                    );
-                  },
-                }}
-                mute={{
-                  visible: true,
-                  enterMute: () => setIsMute(true),
-                  exitMute: () => setIsMute(false),
-                  isMute: isMute,
-                }}
-                style={{
-                  videoBackgroundColor: "black",
-                  height: inFullscreen ? width : height * 0.37,
-                  width: inFullscreen ? height : initialWidth,
-                }}
-                videoProps={{
-                  ref: videoRef,
+                      videoRef.current.setStatusAsync({
+                        shouldPlay: true,
+                      });
+                    },
+                    exitFullscreen: async () => {
+                      // setStatusBarHidden(false, "fade");
+                      setInFullsreen(false);
 
-                  source: {
-                    uri: Event?.videos[0]?.uri,
-                  },
+                      await ScreenOrientation.lockAsync(
+                        ScreenOrientation.OrientationLock.PORTRAIT_UP
+                      );
+                    },
+                  }}
+                  mute={{
+                    visible: true,
+                    enterMute: () => setIsMute(true),
+                    exitMute: () => setIsMute(false),
+                    isMute: isMute,
+                  }}
+                  style={{
+                    videoBackgroundColor: "black",
+                    height: inFullscreen ? width : height * 0.37,
+                    width: inFullscreen ? height : initialWidth,
+                  }}
+                  videoProps={{
+                    ref: videoRef,
 
-                  // source: require("../assets/rolling.mp4"),
-                  resizeMode: inFullscreen ? "contain" : "cover",
-                  // useNativeControls:true,
-                  isMuted: isMute,
-                  shouldPlay: true,
-                  isLooping: true,
-                }}
-              />
+                    source: {
+                      uri: Event?.videos[0]?.uri,
+                    },
+
+                    // source: require("../assets/rolling.mp4"),
+                    resizeMode: inFullscreen ? "contain" : "cover",
+                    // useNativeControls:true,
+                    isMuted: isMute,
+                    shouldPlay: true,
+                    isLooping: true,
+                  }}
+                />
+              </View>
             ) : // </TouchableOpacity>
             null
           }
@@ -502,16 +525,36 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     onRequestClose={() => setImageVisible(false)}
                     visible={imageVisible}
                   />
-                  <TouchableOpacity
-                    activeOpacity={0.7}
+                  <TouchableHighlight
+                    underlayColor={colors.black}
+                    // activeOpacity={0.7}
                     onPress={() => onShowGallery(index)}
                   >
-                    <Image
-                      style={{ width: initialWidth, height: height * 0.37 }}
-                      source={{ uri: item?.uri }}
-                      // blurRadius={scrollingPos}
-                    />
-                  </TouchableOpacity>
+                    <>
+                      <ImageBackground
+                        source={{ uri: item?.uri }}
+                        style={{ width: initialWidth, height: height * 0.37 }}
+                      >
+                        {/* <Image
+                        style={{ width: initialWidth, height: height * 0.37 }}
+                        source={{ uri: item?.uri }}
+                        // blurRadius={scrollingPos}
+                      /> */}
+                        {/* <LinearGradient
+                          colors={[
+                            "transparent",
+                            "transparent",
+                            "transparent",
+                            "transparent",
+                            colors.background,
+                          ]}
+                          //                         colors={["#00000000", "#0000000000", "#000000000"]}
+
+                          style={{ height: "100%", width: "100%" }}
+                        /> */}
+                      </ImageBackground>
+                    </>
+                  </TouchableHighlight>
                 </>
               ) : (
                 []
@@ -526,7 +569,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: 20,
                 fontWeight: "500",
                 marginBottom: 5,
-                color: colors.black,
+                color: colors.t1,
               }}
             >
               {Event?.title}
@@ -556,13 +599,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     width: "100%",
                   }}
                 >
-                  <Entypo name="location" size={17} color={colors.primary2} />
+                  <Entypo name="location" size={17} color={colors.light} />
                   <Text
                     style={{
                       fontSize: 16.5,
                       fontWeight: "500",
                       width: "70%",
-                      color: colors.darkSeparator,
+                      color: colors.t3,
                       marginLeft: 5,
                     }}
                   >
@@ -581,14 +624,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <MaterialCommunityIcons
                 name="calendar-month"
                 size={19}
-                color={colors.primary2}
+                color={colors.light}
               />
               <Text
                 style={{
                   fontSize: 15.5,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.darkSeparator,
+                  color: colors.t3,
                   marginLeft: 5,
                 }}
               >
@@ -609,14 +652,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <MaterialCommunityIcons
                   name="lightning-bolt-outline"
                   size={23}
-                  color={colors.gray2}
+                  color={colors.light}
                 />
                 <Text
                   style={{
                     fontSize: 14,
                     fontWeight: "500",
                     // width: "70%",
-                    color: colors.gray2,
+                    color: colors.t5,
                   }}
                 >
                   {Event?.goingUsers?.length}
@@ -634,15 +677,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 icon={() => (
                   <MaterialCommunityIcons
                     name="calendar-heart"
-                    color={interested ? colors.white : colors.black}
+                    color={colors.t3}
                     size={20}
                   />
                 )}
                 textStyle={{
-                  color: interested ? colors.white : colors.black,
+                  // color: interested ? colors.white : colors.black,
+                  color: interested ? colors.t2 : colors.t3,
                 }}
                 style={{
-                  backgroundColor: interested ? colors.primary : colors.white,
+                  // backgroundColor: interested ? colors.primary : colors.background2,
+                  backgroundColor: interested
+                    ? colors.primary
+                    : colors.background2,
+
                   // paddingHorizontal: 2,
                   marginRight: 10,
                   borderRadius: 12,
@@ -658,18 +706,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <Chip
                 elevation={1}
                 icon={() => (
-                  <Ionicons
-                    name="ticket-outline"
-                    size={20}
-                    color={going ? colors.white : colors.black}
-                  />
+                  <Ionicons name="ticket-outline" size={20} color={colors.t3} />
                 )}
                 textStyle={{
-                  color: going ? colors.white : colors.black,
+                  // color: going ? colors.white : colors.black,
+                  color: going ? colors.t2 : colors.t3,
                 }}
                 style={{
-                  backgroundColor: going ? colors.primary : colors.white,
-                  // paddingHorizontal: 2,
+                  backgroundColor: going ? colors.primary : colors.background2, // paddingHorizontal: 2,
                   borderRadius: 12,
                 }}
                 onPress={goingtoEvent}
@@ -679,20 +723,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <Chip
                 elevation={1}
                 icon={() => (
-                  <MaterialIcons
-                    name="ios-share"
-                    size={20}
-                    color={colors.black2}
-                  />
+                  <MaterialIcons name="ios-share" size={20} color={colors.t3} />
                 )}
-                textStyle={
-                  {
-                    // color: colors.white,
-                  }
-                }
+                textStyle={{
+                  color: colors.t3,
+                }}
                 style={{
-                  backgroundColor: colors.white,
-                  // paddingHorizontal: 2,
+                  backgroundColor: colors.background2, // paddingHorizontal: 2,
                   marginHorizontal: 10,
                   borderRadius: 12,
                 }}
@@ -709,7 +746,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 renderViewLess={renderViewLess}
                 textStyle={{ textAlign: "left" }}
               >
-                <Text style={{ fontSize: 15, color: colors.black2 }}>
+                <Text style={{ fontSize: 15, color: colors.t3 }}>
                   {Event?.description}
                 </Text>
               </ViewMoreText>
@@ -730,7 +767,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontWeight: "500",
                   left: 10,
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.t2,
                   // marginLeft: 5,
                   marginTop: 10,
                 }}
@@ -787,6 +824,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     style={{
                       width: item?.displayName?.length > 15 ? 100 : null,
                       textAlign: "center",
+                      color: colors.t3,
                     }}
                   >
                     {item?.displayName}
@@ -802,7 +840,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontWeight: "500",
                 left: 10,
 
-                color: colors.primary,
+                color: colors.t2,
 
                 marginBottom: 5,
               }}
@@ -816,7 +854,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "space-between",
-                backgroundColor: colors.white,
+                backgroundColor: colors.background2,
                 marginTop: 5,
                 borderTopRightRadius: 10,
                 borderTopLeftRadius: 10,
@@ -851,18 +889,18 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   style={{
                     fontSize: 15,
                     fontWeight: "500",
-                    // color: colors.white,
+                    color: colors.t3,
                   }}
                 >
                   {Event?.venue?.displayName}
                 </Text>
               </View>
-              <Entypo name="chevron-right" size={24} color={colors.primary} />
+              <Entypo name="chevron-right" size={24} color={colors.t3} />
             </TouchableOpacity>
             <View
               style={{
                 // height: 200,
-                backgroundColor: colors.white,
+                backgroundColor: colors.background2,
                 //   padding: 10,
                 alignItems: "center",
                 borderBottomRightRadius: 10,
@@ -898,55 +936,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     latitude: Event?.venue?.location?.coordinates?.[1],
                     longitude: Event?.venue?.location?.coordinates?.[0],
                   }}
-                  //listing?.latitude listing?.longitude
                 />
-                {/* <Marker
-                coordinate={{
-                  latitude: Event?.venue?.lat,
-                  longitude: Event?.venue?.long,
-                }}
-              >
-                <View
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 2,
-                  }}
-                >
-                  <View
-                    style={{
-                      backgroundColor: colors.white,
-                      borderWidth: 0.2,
-                      borderColor: colors.darkGrey,
-                      padding: 3,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: 5,
-                      bottom: 2,
-                    }}
-                  >
-                    <Text style={{ fontSize: 11, fontWeight: "500" }}>
-                      {Event?.venue?.displayName}
-                    </Text>
-                  </View>
-                  <Image
-                    // resizeMode="contain"
-                    style={{
-                      height: 50,
-                      width: 50,
-                      // borderRadius: 10,
-                      borderRadius: 50,
-
-                      borderWidth: 0.2,
-                      borderColor: colors.darkGrey,
-                      backgroundColor: colors.grey,
-                    }}
-                    // source={{ uri: Event?.venue?.photos?.[0]?.uri }}
-
-                    source={{ uri: Event?.venue?.uri }}
-                  />
-                </View>
-              </Marker> */}
               </MapView>
 
               <TouchableOpacity
@@ -962,28 +952,26 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <View>
                   <Text
-                    style={{ fontSize: 15, fontWeight: "500", marginBottom: 3 }}
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "500",
+                      marginBottom: 3,
+                      color: colors.t2,
+                    }}
                   >
                     Direções
                   </Text>
-                  <Text>
+                  <Text style={{ color: colors.t3 }}>
                     {Event?.venue?.address?.zone}, {Event?.venue?.address?.city}
                   </Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <FontAwesome5
-                    name="walking"
-                    size={20}
-                    color={colors.primary}
-                  />
-                  <Text style={{ fontSize: 22, color: colors.black2 }}>
-                    {" "}
-                    |{" "}
-                  </Text>
+                  <FontAwesome5 name="walking" size={20} color={colors.t3} />
+                  <Text style={{ fontSize: 22, color: colors.t5 }}> | </Text>
                   <MaterialCommunityIcons
                     name="car"
                     size={25}
-                    color={colors.primary}
+                    color={colors.t3}
                   />
                 </View>
               </TouchableOpacity>
@@ -1021,65 +1009,149 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               fontSize: 18,
               fontWeight: "500",
               left: 20,
-              color: colors.primary,
+              color: colors.t2,
 
               marginVertical: 10,
             }}
           >
-            {Event?.organizers?.length > 1 ? "Organizadores" : "Organizador"}
+            {Event?.organizers?.length > 1 ? "Organizações" : "Organizaçåo"}
           </Text>
 
           <FlatList
-            contentContainerStyle={{ backgroundColor: colors.background }}
+            style={{ padding: 10 }}
+            contentContainerStyle={{}}
             data={Event?.organizers}
-            horizontal={Event?.organizers?.length > 1}
+            // horizontal={Event?.organizers?.length > 1}
             keyExtractor={(item) => item?.uuid}
+            // renderItem={({ item }) => {
+            //   return Event?.organizers?.length > 1 ? (
+            //     <TouchableOpacity
+            //       style={{
+            //         padding: 5,
+            //         alignItems: "center",
+            //         // justifyContent: "center",
+            //       }}
+            //       onPress={() => navigation.navigate("artist", item)}
+            //     >
+            //       <Image
+            //         style={{
+            //           height: 65,
+            //           width: 65,
+            //           borderRadius: 20,
+            //           marginBottom: 2,
+            //           borderWidth: 0.009,
+            //           backgroundColor: colors.darkGrey,
+            //         }}
+            //         source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+            //       />
+            //       <Text
+            //         style={{
+            //           width: item?.displayName?.length > 15 ? 100 : null,
+            //           textAlign: "center",
+            //           fontSize: 14,
+            //           fontWeight: "500",
+            //         }}
+            //       >
+            //         {item?.displayName}
+            //       </Text>
+            //     </TouchableOpacity>
+            //   ) : (
+            //     <View
+            //       style={{
+            //         backgroundColor: colors.background2,
+            //         borderRadius: 10,
+            //         // shadowOffset: { width: 0.5, height: 0.5 },
+            //         // shadowOpacity: 0.3,
+            //         // shadowRadius: 1,
+            //         // elevation: 2,
+            //         shadowOffset: { width: 0.5, height: 0.5 },
+            //         shadowOpacity: 0.1,
+            //         shadowRadius: 1,
+            //         elevation: 0.5,
+            //       }}
+            //     >
+            //       <TouchableOpacity
+            //         onPress={() => navigation.navigate("artist", item)}
+            //         style={{
+            //           flexDirection: "row",
+            //           alignItems: "center",
+            //           justifyContent: "space-between",
+            //           padding: 10,
+            //           alignItems: "center",
+
+            //           // height: 50,
+            //           // padding: 5,
+            //         }}
+            //       >
+            //         <View
+            //           style={{ flexDirection: "row", alignItems: "center" }}
+            //         >
+            //           <Image
+            //             style={{
+            //               width: 40,
+            //               height: 40,
+            //               borderRadius: 50,
+            //               marginRight: 10,
+            //               borderWidth: 0.1,
+            //             }}
+            //             source={{ uri: item?.photos?.avatar?.[0]?.uri }}
+            //           />
+            //           <Text
+            //             style={{
+            //               fontSize: 15,
+            //               fontWeight: "500",
+            //               color: colors.t5,
+            //               // color: colors.white,
+            //             }}
+            //           >
+            //             {item.displayName}
+            //           </Text>
+            //         </View>
+            //         <Entypo
+            //           name="chevron-right"
+            //           size={24}
+            //           color={colors.t3}
+            //         />
+            //       </TouchableOpacity>
+            //       <View style={[styles.separator, { width: "90%" }]} />
+
+            //       <TouchableOpacity
+            //         style={{
+            //           padding: 10,
+            //           flexDirection: "row",
+            //           alignItems: "center",
+            //           justifyContent: "space-between",
+            //           width: "100%",
+            //           // marginVertical: 5,
+            //         }}
+            //       >
+            //         <View>
+            //           <Text style={{ fontSize: 15, fontWeight: "500" }}>
+            //             Telefonar
+            //           </Text>
+            //           <Text>{item.phone1}</Text>
+            //         </View>
+            //         <MaterialCommunityIcons
+            //           name="phone"
+            //           size={25}
+            //           color={colors.primary}
+            //         />
+            //       </TouchableOpacity>
+            //     </View>
+            //   );
+            // }}
             renderItem={({ item }) => {
-              return Event?.organizers?.length > 1 ? (
-                <TouchableOpacity
-                  style={{
-                    padding: 5,
-                    alignItems: "center",
-                    // justifyContent: "center",
-                  }}
-                  onPress={() => navigation.navigate("artist", item)}
-                >
-                  <Image
-                    style={{
-                      height: 65,
-                      width: 65,
-                      borderRadius: 20,
-                      marginBottom: 2,
-                      borderWidth: 0.009,
-                      backgroundColor: colors.darkGrey,
-                    }}
-                    source={{ uri: item?.photos?.avatar?.[0]?.uri }}
-                  />
-                  <Text
-                    style={{
-                      width: item?.displayName?.length > 15 ? 100 : null,
-                      textAlign: "center",
-                      fontSize: 14,
-                      fontWeight: "500",
-                    }}
-                  >
-                    {item?.displayName}
-                  </Text>
-                </TouchableOpacity>
-              ) : (
+              return (
                 <View
                   style={{
-                    backgroundColor: colors.white,
-
+                    backgroundColor: colors.background2,
                     borderRadius: 10,
-                    // shadowOffset: { width: 0.5, height: 0.5 },
-                    // shadowOpacity: 0.3,
-                    // shadowRadius: 1,
-                    // elevation: 2,
+
                     shadowOffset: { width: 0.5, height: 0.5 },
                     shadowOpacity: 0.1,
                     shadowRadius: 1,
                     elevation: 0.5,
+                    marginBottom: 10,
                   }}
                 >
                   <TouchableOpacity
@@ -1090,9 +1162,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                       justifyContent: "space-between",
                       padding: 10,
                       alignItems: "center",
-
-                      // height: 50,
-                      // padding: 5,
                     }}
                   >
                     <View
@@ -1112,17 +1181,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                         style={{
                           fontSize: 15,
                           fontWeight: "500",
+                          color: colors.t2,
                           // color: colors.white,
                         }}
                       >
                         {item.displayName}
                       </Text>
                     </View>
-                    <Entypo
-                      name="chevron-right"
-                      size={24}
-                      color={colors.primary}
-                    />
+                    <Entypo name="chevron-right" size={24} color={colors.t3} />
                   </TouchableOpacity>
                   <View style={[styles.separator, { width: "90%" }]} />
 
@@ -1137,7 +1203,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     }}
                   >
                     <View>
-                      <Text style={{ fontSize: 15, fontWeight: "500" }}>
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                          color: colors.t2,
+                        }}
+                      >
                         Telefonar
                       </Text>
                       <Text>{item.phone1}</Text>
@@ -1145,7 +1217,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <MaterialCommunityIcons
                       name="phone"
                       size={25}
-                      color={colors.primary}
+                      color={colors.t3}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1177,7 +1249,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             justifyContent: "space-around",
             width: "100%",
             height: isIPhoneWithNotch ? 70 : 55,
-            backgroundColor: colors.white,
+            backgroundColor: colors.background,
             position: "absolute",
             zIndex: 2,
             bottom: 0,
@@ -1186,6 +1258,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             shadowOpacity: 1,
             shadowRadius: 1,
             elevation: 3,
+            borderTopWidth: 1,
+            borderRightWidth: 1,
+            borderLeftWidth: 1,
+            borderColor: colors.background2,
             borderTopRightRadius: 15,
             borderTopLeftRadius: 15,
             opacity: inFullscreen ? 0 : 1,
@@ -1201,7 +1277,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: Event?.tickets?.length > 1 ? 14 : 15,
                 fontWeight: "500",
                 // width: "80%",
-                color: colors.primary2,
+                color: colors.t3,
                 // marginLeft: 5,
                 // textAlign: "center",
               }}
@@ -1214,7 +1290,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 17,
                   fontWeight: "600",
                   // width: "80%",
-                  color: colors.primary2,
+                  color: colors.t3,
                   textAlign: "center",
                   marginRight: 3,
                   top: 1,
@@ -1228,7 +1304,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 20,
                   fontWeight: "700",
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.t1,
                   textAlign: "center",
                   // marginLeft: 5,
                 }}
@@ -1248,12 +1324,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 width: 38,
                 // padding:5,
                 height: 38,
-                backgroundColor: colors.white, // position: "absolute",
+                // backgroundColor: colors.t2, // position: "absolute",
                 zIndex: 1,
                 marginRight: 10,
                 // left: 10,
                 borderRadius: 10,
-                borderWidth: 1.3,
+                // borderWidth: 1.3,
                 borderColor: colors.primary,
                 alignItems: "center",
                 justifyContent: "center",
@@ -1266,7 +1342,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               }}
               activeOpacity={0.5}
             >
-              <Feather name="gift" size={24} color={colors.primary} />
+              <Feather name="gift" size={24} color={colors.t2} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -1274,7 +1350,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 width: 140,
                 height: 40,
-                backgroundColor: colors.primary, // position: "absolute",
+                backgroundColor: colors.primary2, // position: "absolute",
                 zIndex: 1,
                 // left: 10,
                 borderRadius: 10,
@@ -1292,14 +1368,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               <Text
                 style={{
                   fontSize: 15,
-                  color: colors.white,
+                  color: colors.t2,
                   fontWeight: "500",
                   marginRight: 10,
                 }}
               >
                 Comprar
               </Text>
-              <Ionicons name="ticket-outline" size={24} color={colors.white} />
+              <Ionicons name="ticket-outline" size={24} color={colors.t2} />
             </TouchableOpacity>
           </View>
         </Animated.View>
@@ -1346,7 +1422,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },

@@ -49,7 +49,7 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
         // titleStyle={{ color: colors.primary }}
 
         indicatorStyle={{
-          backgroundColor: colors.primary,
+          backgroundColor: colors.primary2,
           //   height: 2,
           //   width: "33%",
         }}
@@ -57,12 +57,12 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
         onChange={setIndex}
         // dense
 
-        style={{ backgroundColor: colors.primary2 }}
-        // disableIndicator
+        style={{ backgroundColor: colors.background }}
+        disableIndicator
         titleStyle={(active) => ({
-          color: active ? colors.white : colors.softGrey,
+          color: active ? colors.t1 : colors.t5,
           fontSize: active ? 16 : 15,
-          fontWeight: "600",
+          fontWeight: "500",
         })}
       >
         <Tab.Item>Passados</Tab.Item>

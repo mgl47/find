@@ -217,15 +217,16 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   let displayAvatar = [];
   const avatarIndex = artist?.photos?.avatar[3] || [];
   displayAvatar?.push(avatarIndex);
-  if (loading||!fetched) {
+  if (loading || !fetched) {
     return (
       <Animated.View
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: colors.skeleton }}
         entering={FadeIn}
         // exiting={FadeOut}
       >
         <Placeholder
-          Animation={Fade}
+      
+          // Animation={Fade}
 
           // Left={PlaceholderMedia}
           // Right={PlaceholderMedia}
@@ -238,9 +239,16 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               paddingTop: isIPhoneWithNotch ? 60 : 10,
             }}
             animating={true}
-            color={colors.light2}
+            color={colors.primary}
           />
-          <PlaceholderLine style={{ borderRadius: 0, height: 150, width }} />
+          <PlaceholderLine
+            style={{
+              borderRadius: 0,
+              height: 150,
+              width,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
           <PlaceholderLine
             style={{
               height: 100,
@@ -250,6 +258,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               zIndex: 2,
               bottom: 50,
               marginLeft: 10,
+              backgroundColor: colors.skeleton2,
             }}
           />
 
@@ -270,11 +279,18 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   height: 30,
                   width: "27%",
                   marginRight: 20,
+                  backgroundColor: colors.skeleton2,
+
                   // marginHorizontal: 10,
                 }}
               />
               <PlaceholderLine
-                style={{ borderRadius: 20, height: 30, width: "27%" }}
+                style={{
+                  borderRadius: 20,
+                  height: 30,
+                  width: "27%",
+                  backgroundColor: colors.skeleton2,
+                }}
               />
             </View>
             <PlaceholderLine
@@ -284,6 +300,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 width: "35%",
                 marginRight: 20,
                 bottom: 60,
+                backgroundColor: colors.skeleton2,
+
                 // marginHorizontal: 10,
               }}
             />
@@ -294,13 +312,26 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 width: "90%",
                 marginTop: 10,
                 bottom: 60,
+                backgroundColor: colors.skeleton2,
               }}
             />
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 15, width: "90%", bottom: 60 }}
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "90%",
+                bottom: 60,
+                backgroundColor: colors.skeleton2,
+              }}
             />
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 15, width: "70%", bottom: 60 }}
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "70%",
+                bottom: 60,
+                backgroundColor: colors.skeleton2,
+              }}
             />
             <View
               style={{
@@ -321,6 +352,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   bottom: 70,
                   marginTop: 10,
                   marginRight: 15,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
               <PlaceholderLine
@@ -333,6 +365,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   bottom: 70,
                   marginTop: 10,
                   marginRight: 15,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
               <PlaceholderLine
@@ -344,14 +377,27 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   // right: 70,
                   bottom: 70,
                   marginTop: 10,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
             </View>
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 20, width: "35%", bottom: 60 }}
+              style={{
+                borderRadius: 20,
+                height: 20,
+                width: "35%",
+                bottom: 60,
+                backgroundColor: colors.skeleton2,
+              }}
             />
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 15, width: "30%", bottom: 60 }}
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "30%",
+                bottom: 60,
+                backgroundColor: colors.skeleton2,
+              }}
             />
           </View>
         </Placeholder>
@@ -369,7 +415,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: 90,
             width: "100%",
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             zIndex: 2,
           }}
         />
@@ -395,7 +441,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               disabled={!artist?.photos?.cover?.[0]?.uri}
               onPress={() => setCoverVisible(true)}
               activeOpacity={0.9}
-              style={{ backgroundColor: colors.grey }}
+              style={{ backgroundColor: colors.dark }}
             >
               <Image
                 style={{ height: 150, width: "100%" }}
@@ -436,6 +482,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   marginVertical: 10,
                   marginLeft: 20,
                   height: 30,
+                  top: 5,
                 }}
               >
                 <Chip
@@ -444,16 +491,17 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   icon={() => (
                     <MaterialCommunityIcons
                       name={following ? "heart" : "heart-outline"}
-                      color={following ? colors.white : colors.black2}
+                      color={following ? colors.t2 : colors.t3}
                       size={20}
                     />
                   )}
                   textStyle={{
-                    color: following ? colors.white : colors.black,
+                    color: following ? colors.t2 : colors.t3,
                   }}
                   style={{
-                    backgroundColor: following ? colors.primary : colors.white,
-                    // paddingHorizontal: 2,
+                    backgroundColor: following
+                      ? colors.primary
+                      : colors.background2, // paddingHorizontal: 2,
                     marginRight: 10,
                     borderRadius: 12,
                     width: 110,
@@ -472,16 +520,14 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <MaterialIcons
                       name="ios-share"
                       size={20}
-                      color={colors.black2}
+                      color={colors.t2}
                     />
                   )}
-                  textStyle={
-                    {
-                      // color: colors.white,
-                    }
-                  }
+                  textStyle={{
+                    color: colors.t2,
+                  }}
                   style={{
-                    backgroundColor: colors.white,
+                    backgroundColor: colors.background2,
                     // paddingHorizontal: 2,
                     marginHorizontal: 10,
                     borderRadius: 12,
@@ -500,7 +546,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontWeight: "600",
                   marginBottom: 5,
                   marginLeft: artist?.displayName?.length < 10 ? 20 : 0,
-                  color: colors.primary2,
+                  color: colors.t2,
                 }}
               >
                 {artist?.displayName}
@@ -519,10 +565,10 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               <View style={styles.separator} />
               <Text
                 style={{
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.black2,
+                  color: colors.t3,
                   marginLeft: 5,
                   marginTop: 5,
                   // marginBottom: 5,
@@ -532,13 +578,11 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               </Text>
               <Text
                 style={{
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: "400",
-                  // width: "80%",
-                  color: colors.description,
+
+                  color: colors.t5,
                   marginLeft: 5,
-                  // marginTop: 5,
-                  // marginBottom: 5,
                 }}
               >
                 {events?.length > 1
@@ -583,7 +627,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
             >
               <Text
                 style={{
-                  color: colors.darkSeparator,
+                  color: colors.t5,
                   fontSize: 15,
                   fontWeight: "500",
                   marginBottom: 10,
@@ -604,34 +648,34 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <AntDesign
                     name="facebook-square"
                     size={24}
-                    color={colors.primary}
+                    color={colors.primary2}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <AntDesign
                     name="instagram"
                     size={24}
-                    color={colors.primary}
+                    color={colors.primary2}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <AntDesign name="twitter" size={25} color={colors.primary} />
+                  <AntDesign name="twitter" size={25} color={colors.primary2} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <Entypo name="spotify" size={25} color={colors.primary} />
+                  <Entypo name="spotify" size={25} color={colors.primary2} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <Fontisto
                     name="applemusic"
                     size={23}
-                    color={colors.primary}
+                    color={colors.primary2}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <Fontisto
                     name="youtube-play"
                     size={23}
-                    color={colors.primary}
+                    color={colors.primary2}
                   />
                 </TouchableOpacity>
               </View>
@@ -678,7 +722,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.lightGrey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },

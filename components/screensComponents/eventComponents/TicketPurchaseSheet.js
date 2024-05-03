@@ -476,7 +476,7 @@ export default TicketPurchaseSheet = ({
             justifyContent: "space-between",
             width: "100%",
             height: isIPhoneWithNotch ? 80 : 55,
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             // position: "absolute",
             zIndex: 4,
             bottom: 0,
@@ -499,7 +499,7 @@ export default TicketPurchaseSheet = ({
             <Text
               style={{
                 fontSize: 19,
-                color: colors.black2,
+                color: colors.t5,
                 fontWeight: "600",
                 marginRight: 5,
               }}
@@ -509,7 +509,7 @@ export default TicketPurchaseSheet = ({
             <Text
               style={{
                 fontSize: 19,
-                color: colors.primary,
+                color: colors.t1,
                 fontWeight: "600",
               }}
             >
@@ -683,8 +683,8 @@ export default TicketPurchaseSheet = ({
                             {
                               color:
                                 !unavailable || event?.haltedSales
-                                  ? colors.primary
-                                  : colors.darkGrey,
+                                  ? colors.t1
+                                  : colors.t1,
                             },
                           ]}
                         >
@@ -729,8 +729,8 @@ export default TicketPurchaseSheet = ({
                           fontSize: 22,
                           fontWeight: "600",
                           color: !unavailable
-                            ? colors.primary
-                            : colors.darkGrey,
+                            ? colors.t3
+                            : colors.dark,
                         }}
                       >
                         {item?.amount}
@@ -808,7 +808,7 @@ export default TicketPurchaseSheet = ({
                       fontWeight: "600",
                       // left: "8%",
                       // width: "80%",
-                      color: colors.primary,
+                      color: colors.t2,
                       marginLeft: 30,
                     }}
                   >
@@ -831,7 +831,7 @@ export default TicketPurchaseSheet = ({
                     style={{
                       fontSize: 17,
                       fontWeight: "500",
-                      color: colors.primary2,
+                      color: colors.t5,
 
                       // left: 10,
                     }}
@@ -843,7 +843,7 @@ export default TicketPurchaseSheet = ({
                     style={{
                       fontSize: 17,
                       fontWeight: "500",
-                      color: colors.primary,
+                      color: colors.t2,
                       // top: 2,
                       // position: "absolute",
                       // left: 20,
@@ -871,7 +871,7 @@ export default TicketPurchaseSheet = ({
                       opacity: giftedUser ? 1 : 0,
                     }}
                   >
-                    <Feather name="gift" size={20} color={colors.primary2} />
+                    <Feather name="gift" size={20} color={colors.t5} />
 
                     <Text
                       style={{
@@ -880,7 +880,7 @@ export default TicketPurchaseSheet = ({
                         marginRight: 5,
                         marginLeft: 2,
                         top: 2,
-                        color: colors.primary2,
+                        color: colors.t5,
                       }}
                     >
                       Presente para
@@ -894,7 +894,7 @@ export default TicketPurchaseSheet = ({
 
                         top: 2,
 
-                        color: colors.primary,
+                        color: colors.t3,
                       }}
                     >
                       @{giftedUser?.username}
@@ -906,7 +906,7 @@ export default TicketPurchaseSheet = ({
                       opacity: event?.ticketsLimit > 0 ? 1 : 0,
 
                       right: 10,
-                      color: colors.darkGrey,
+                      color: colors.light,
                       alignSelf: "flex-end",
 
                       bottom: 3,
@@ -979,7 +979,7 @@ export default TicketPurchaseSheet = ({
                                 style={{
                                   fontSize: 17,
                                   fontWeight: "500",
-                                  color: colors.primary,
+                                  color: colors.t1,
                                   // left: 10,
                                 }}
                               >
@@ -1016,7 +1016,6 @@ export default TicketPurchaseSheet = ({
                           );
                         }}
                       />
-                      <View></View>
                     </View>
                   </Animated.View>
                 </>
@@ -1106,7 +1105,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -1122,7 +1121,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 21,
     fontWeight: "600",
-    color: colors.primary,
+    color: colors.t1,
     lineHeight: 30,
     // width: "65%",
     // marginBottom: 5,
@@ -1139,7 +1138,7 @@ const styles = StyleSheet.create({
   ticketCategory: {
     alignSelf: "flex-start",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "500",
     color: colors.description2,
     lineHeight: 30,
     // width: "65%",
@@ -1154,8 +1153,8 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     alignSelf: "flex-start",
-    color: colors.darkGrey,
-    fontWeight: "500",
+    color: colors.t5,
+    fontWeight: "400",
   },
   counterView: {
     flexDirection: "row",

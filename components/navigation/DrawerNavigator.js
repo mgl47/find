@@ -45,7 +45,7 @@ export function DrawerContent(props) {
   const navigation = useNavigation();
 
   return (
-    <Screen style={{ backgroundColor: colors.primary2 }}>
+    <Screen style={{ backgroundColor: colors.background }}>
       <View
         style={{
           flexDirection: "row",
@@ -88,7 +88,7 @@ export function DrawerContent(props) {
           fontSize: 14,
           fontWeight: "400",
           marginLeft: 20, // marginTop: 10,
-          color: colors.lightGrey,
+          color: colors.t4,
 
           // paddingBottom: 5,
         }}
@@ -103,7 +103,7 @@ export function DrawerContent(props) {
         contentContainerStyle={{
           paddingTop: 5,
           width: "100%",
-          backgroundColor: colors.primary2,
+          backgroundColor: colors.background,
         }}
       >
         <DrawerItem
@@ -111,7 +111,7 @@ export function DrawerContent(props) {
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="account-outline"
-              color={colors.white}
+              color={colors.t2}
               size={30}
             />
           )}
@@ -120,7 +120,7 @@ export function DrawerContent(props) {
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.navigate("profile")}
         />
@@ -129,7 +129,7 @@ export function DrawerContent(props) {
           icon={({ color, size }) => (
             // <MaterialCommunityIcons
             //   name="account-outline"
-            //   color={colors.white}
+            //   color={colors.t2}
             //   size={30}
             // />
             <Image
@@ -142,7 +142,7 @@ export function DrawerContent(props) {
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.navigate("profile")}
         />
@@ -150,28 +150,28 @@ export function DrawerContent(props) {
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
-            <MaterialIcons name="event-note" size={28} color={colors.white} />
+            <MaterialIcons name="event-note" size={28} color={colors.t2} />
           )}
           label="Meus Eventos"
           labelStyle={{
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.navigate("myEvents")}
         />
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
-            <Ionicons name="ticket-outline" size={28} color={colors.white} />
+            <Ionicons name="ticket-outline" size={28} color={colors.t2} />
           )}
           label="Meus Bilhetes"
           labelStyle={{
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.navigate("myTickets")}
         />
@@ -181,7 +181,7 @@ export function DrawerContent(props) {
           icon={({ color, size }) => (
             <MaterialCommunityIcons
               name="calendar-heart"
-              color={colors.white}
+              color={colors.t2}
               size={28}
             />
           )}
@@ -190,7 +190,7 @@ export function DrawerContent(props) {
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
         />
@@ -199,14 +199,14 @@ export function DrawerContent(props) {
         <DrawerItem
           style={{ left: 2 }}
           icon={({ color, size }) => (
-            <Octicons name="gear" size={26} color={colors.white} />
+            <Octicons name="gear" size={26} color={colors.t2} />
           )}
           label="Definições"
           labelStyle={{
             fontSize: 16,
             fontWeight: "500",
             right: 20,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
         />
@@ -217,7 +217,7 @@ export function DrawerContent(props) {
             <MaterialCommunityIcons
               name="logout"
               size={30}
-              color={colors.white}
+              color={colors.t2}
             />
           )}
           label="Sair"
@@ -225,7 +225,7 @@ export function DrawerContent(props) {
             fontSize: 16,
             fontWeight: "500",
             right: 25,
-            color: colors.lightGrey,
+            color: colors.t4,
           }}
           onPress={() => {
             Alert.alert(

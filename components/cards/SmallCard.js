@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
-import colors from "../colors";
+import colors, { darkColors } from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useData } from "../hooks/useData";
@@ -32,8 +32,8 @@ function SmallCard(item, { selectedDay }) {
                 style={[
                   styles.date,
                   {
-                    fontWeight: "600",
-                    color: greyy,
+                    fontWeight: "500",
+                    color: colors.t5,
                     fontSize: 15,
                     // marginBottom: title?.length > 27 ? 3 : 0,
                     // bottom: 1,
@@ -49,7 +49,7 @@ function SmallCard(item, { selectedDay }) {
                     styles.date,
                     {
                       // color: colors.primary2,
-                      color: greyy,
+                      color: colors.t5,
                       fontSize: 15,
                       // marginBottom: title?.length > 27 ? 3 : 0,
                       bottom: 1,
@@ -59,13 +59,13 @@ function SmallCard(item, { selectedDay }) {
                   {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
                     ", "}
                 </Text>
-                <Text style={[styles.date, { color: greyy }]}>
+                <Text style={[styles.date, { color: colors.t5 }]}>
                   {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] +
                     " - "}
                 </Text>
               </>
             )}
-            <Text style={[styles.date, { color: greyy }]}>
+            <Text style={[styles.date, { color: colors.t5 }]}>
               {dates?.[0]?.hour}
             </Text>
           </View>
@@ -89,7 +89,7 @@ function SmallCard(item, { selectedDay }) {
               style={[
                 styles.venue,
                 // { marginBottom: title?.length > 27 ? 7 : 3, color: "#585858" },
-                { color: greyy },
+                { color: colors.t5 },
               ]}
             >
               {venue?.displayName}, {venue?.address?.city}
@@ -99,7 +99,7 @@ function SmallCard(item, { selectedDay }) {
             <Text
               style={[
                 styles.venue,
-                { color: greyy },
+                { color: colors.t5 },
 
                 // { marginBottom: title?.length > 27 ? 7 : 3, color: "#585858" },
               ]}
@@ -110,7 +110,7 @@ function SmallCard(item, { selectedDay }) {
               style={[
                 styles.venue,
                 {
-                  color: colors.black,
+                  color: colors.t3,
                   fontWeight: "700",
                   fontSize: 15,
                   // color: greyy,
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 17,
     fontWeight: "500",
-    color: colors.black,
+    color: colors.t2,
     lineHeight: 18,
     width: "70%",
     // marginVertical: 5,

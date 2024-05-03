@@ -175,7 +175,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               <View
                 style={{
                   padding: 10,
-                  backgroundColor: colors.primary2,
+                  backgroundColor: colors.background,
                   zIndex: 2,
                 }}
               >
@@ -297,7 +297,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
               <View
                 style={{
                   height: 220,
-                  backgroundColor: colors.primary2,
+                  backgroundColor: colors.background,
                   width,
                   zIndex: 0,
                   position: "absolute",

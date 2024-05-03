@@ -29,7 +29,7 @@ function BigCard(item) {
         backgroundColor: colors.dark2,
       }}
       onPress={() => navigation.navigate("event", item)}
-      underlayColor={colors.darkSeparator}
+      underlayColor={colors.background}
     >
       <ImageBackground
         style={{
@@ -42,7 +42,7 @@ function BigCard(item) {
       >
         <LinearGradient
           // colors={["#00000000", "#000000"]}
-          colors={["transparent", "black", colors.primary]}
+          colors={["transparent", "black", colors.background]}
           style={{
             height: 200,
             width: "100%",
@@ -64,7 +64,7 @@ function BigCard(item) {
                 style={[
                   styles.date,
                   {
-                    fontWeight: "600",
+                    fontWeight: "500",
                     color: colors.white,
                     fontSize: 16,
                     marginBottom: 3,
@@ -93,7 +93,7 @@ function BigCard(item) {
                 {
                   fontSize: 19,
                   lineHeight: 19,
-                  fontWeight: "700",
+                  fontWeight: "600",
 
                   // fontSize: title?.length > 39 ? 16 : 18,
                   // lineHeight: title?.length > 39 ? 15 : 30,
@@ -129,13 +129,13 @@ const styles = StyleSheet.create({
   venue: {
     fontSize: 14.5,
     alignSelf: "flex-start",
-    fontWeight: "600",
+    fontWeight: "400",
     color: colors.white,
   },
   title: {
     alignSelf: "flex-start",
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "500",
     color: colors.white,
     lineHeight: 30,
     width: "95%",
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 15,
     alignSelf: "flex-start",
-    fontWeight: "600",
+    fontWeight: "400",
     color: colors.white,
 
     marginTop: 3,

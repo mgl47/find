@@ -159,7 +159,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.t3}
         />
         {/* <Entypo name="chevron-down" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
@@ -172,7 +172,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
           size={26}
-          color={colors.primary}
+          color={colors.t3}
         />
         {/* <Entypo name="chevron-up" size={24} color={colors.primary} /> */}
       </TouchableOpacity>
@@ -271,15 +271,15 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   if (loading) {
     return (
       <Animated.View
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: colors.skeleton }}
         entering={FadeIn}
         // exiting={FadeOut}
       >
         <Placeholder
-          Animation={Fade}
+        // Animation={Fade}
 
-          // Left={PlaceholderMedia}
-          // Right={PlaceholderMedia}
+        // Left={PlaceholderMedia}
+        // Right={PlaceholderMedia}
         >
           <ActivityIndicator
             style={{
@@ -289,9 +289,16 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               paddingTop: isIPhoneWithNotch ? 60 : 10,
             }}
             animating={true}
-            color={colors.light2}
+            color={colors.primary}
           />
-          <PlaceholderLine style={{ borderRadius: 0, height: 270, width }} />
+          <PlaceholderLine
+            style={{
+              borderRadius: 0,
+              height: 270,
+              width,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
           <View style={{ padding: 10 }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <PlaceholderLine
@@ -301,22 +308,17 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   width: "27%",
                   marginRight: 10,
                   // marginHorizontal: 10,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
-              <Animated.View
-                style={{
-                  // position: "absolute",
-                  alignSelf: "center",
-                  // top: 10,
-                  // zIndex: 2,
-                  marginVertical: 20,
-                }}
-                // entering={SlideInUp.duration(300)}
-                // exiting={SlideOutUp.duration(300)}
-              ></Animated.View>
 
               <PlaceholderLine
-                style={{ borderRadius: 20, height: 30, width: "27%" }}
+                style={{
+                  borderRadius: 20,
+                  height: 30,
+                  width: "27%",
+                  backgroundColor: colors.skeleton2,
+                }}
               />
               <PlaceholderLine
                 style={{
@@ -326,6 +328,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   position: "absolute",
                   right: 10,
                   bottom: 3,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
               <PlaceholderLine
@@ -336,6 +339,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   position: "absolute",
                   right: 70,
                   bottom: 3,
+                  backgroundColor: colors.skeleton2,
                 }}
               />
             </View>
@@ -345,13 +349,26 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 height: 15,
                 width: "90%",
                 marginTop: 10,
+                backgroundColor: colors.skeleton2,
               }}
             />
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 15, width: "90%", bottom: 2 }}
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "90%",
+                bottom: 2,
+                backgroundColor: colors.skeleton2,
+              }}
             />
             <PlaceholderLine
-              style={{ borderRadius: 20, height: 15, width: "70%", bottom: 2 }}
+              style={{
+                borderRadius: 20,
+                height: 15,
+                width: "70%",
+                bottom: 2,
+                backgroundColor: colors.skeleton2,
+              }}
             />
             <PlaceholderLine
               style={{
@@ -359,6 +376,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 marginTop: 10,
                 // borderRadius: 5,
                 height: 250,
+                backgroundColor: colors.skeleton2,
               }}
             />
             <PlaceholderLine
@@ -367,6 +385,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 height: 20,
                 width: "30%",
                 marginTop: 10,
+                backgroundColor: colors.skeleton2,
               }}
             />
           </View>
@@ -385,7 +404,8 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             position: "absolute",
             height: 90,
             width: "100%",
-            backgroundColor: colors.primary2,
+            // backgroundColor: colors.background2,
+            backgroundColor: "rgba(32, 40, 47,0.95)",
             zIndex: 2,
           }}
         >
@@ -394,7 +414,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             style={{
               fontSize: 18,
               fontWeight: "500",
-              color: colors.white,
+              color: colors.t2,
               fontWeight: "500",
               position: "absolute",
               bottom: 10,
@@ -427,7 +447,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: 20,
                 fontWeight: "500",
                 marginBottom: 5,
-                color: colors.white,
+                color: colors.t1,
                 position: "absolute",
                 top: 230,
                 zIndex: 2,
@@ -438,7 +458,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             </Text>
             <FlatList
               scrollEnabled={venue?.photos?.[0]?.length > 1}
-              style={{ backgroundColor: colors.grey }}
+              style={{ backgroundColor: colors.dark }}
               showsHorizontalScrollIndicator={false}
               pagingEnabled
               horizontal
@@ -461,9 +481,9 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                           colors={[
                             "transparent",
                             "transparent",
-                            "transparent",
-                            "transparent",
-                            colors.dark2,
+                            // "transparent",
+                            // "transparent",
+                            colors.background,
                           ]}
                           //                         colors={["#00000000", "#0000000000", "#000000000"]}
 
@@ -497,16 +517,17 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   icon={() => (
                     <MaterialCommunityIcons
                       name={following ? "heart" : "heart-outline"}
-                      color={following ? colors.white : colors.black2}
+                      color={following ? colors.t2 : colors.t3}
                       size={20}
                     />
                   )}
                   textStyle={{
-                    color: following ? colors.white : colors.black,
+                    color: following ? colors.t2 : colors.t3,
                   }}
                   style={{
-                    backgroundColor: following ? colors.primary : colors.white,
-                    // paddingHorizontal: 2,
+                    backgroundColor: following
+                      ? colors.primary
+                      : colors.background2, // paddingHorizontal: 2,
                     marginRight: 0,
                     borderRadius: 12,
                     width: 110,
@@ -525,16 +546,14 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <MaterialIcons
                       name="ios-share"
                       size={20}
-                      color={colors.black2}
+                      color={colors.t2}
                     />
                   )}
-                  textStyle={
-                    {
-                      // color: colors.white,
-                    }
-                  }
+                  textStyle={{
+                    color: colors.t2,
+                  }}
                   style={{
-                    backgroundColor: colors.white,
+                    backgroundColor: colors.background2,
                     // paddingHorizontal: 2,
                     marginHorizontal: 10,
                     borderRadius: 12,
@@ -583,7 +602,9 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     renderViewLess={renderViewLess}
                     textStyle={{ textAlign: "left" }}
                   >
-                    <Text style={{ fontSize: 15 }}>{venue?.description}</Text>
+                    <Text style={{ fontSize: 15, color: colors.t3 }}>
+                      {venue?.description}
+                    </Text>
                   </ViewMoreText>
                 </>
               )}
@@ -607,8 +628,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               <View
                 style={{
                   // height: 200,
-                  backgroundColor: colors.white,
-                  //   padding: 10,
+                  backgroundColor: colors.background2, //   padding: 10,
                   alignItems: "center",
                   borderBottomRightRadius: 10,
                   borderBottomLeftRadius: 10,
@@ -657,28 +677,22 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                         fontSize: 15,
                         fontWeight: "600",
                         marginBottom: 3,
+                        color: colors.t2,
                       }}
                     >
                       Direções
                     </Text>
-                    <Text style={{ color: colors.black2 }}>
+                    <Text style={{ color: colors.t2 }}>
                       {venue?.address?.zone}, {venue?.address?.city}
                     </Text>
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <FontAwesome5
-                      name="walking"
-                      size={20}
-                      color={colors.primary}
-                    />
-                    <Text style={{ fontSize: 22, color: colors.black2 }}>
-                      {" "}
-                      |{" "}
-                    </Text>
+                    <FontAwesome5 name="walking" size={20} color={colors.t3} />
+                    <Text style={{ fontSize: 22, color: colors.t5 }}> | </Text>
                     <MaterialCommunityIcons
                       name="car"
                       size={25}
-                      color={colors.primary}
+                      color={colors.t3}
                     />
                   </View>
                 </TouchableOpacity>
@@ -686,7 +700,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   style={{
                     width: "95%",
                     height: 1,
-                    backgroundColor: colors.grey,
+                    backgroundColor: colors.separator,
 
                     alignSelf: "center",
                   }}
@@ -698,6 +712,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     width: "100%",
+
                     // marginVertical: 5,
                   }}
                 >
@@ -707,40 +722,38 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                         fontSize: 15,
                         fontWeight: "600",
                         marginBottom: 3,
+                        color: colors.t3,
                       }}
                     >
                       Telefonar
                     </Text>
-                    <Text style={{ color: colors.black2 }}>
-                      {venue?.phone1}
-                    </Text>
+                    <Text style={{ color: colors.t2 }}>{venue?.phone1}</Text>
                   </View>
                   <MaterialCommunityIcons
                     name="phone"
                     size={25}
-                    color={colors.primary}
+                    color={colors.t3}
                   />
                 </TouchableOpacity>
               </View>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: 17,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.t3,
                   marginLeft: 5,
                   marginTop: 15,
-                  //   marginBottom: 5,
                 }}
               >
                 Próximos Eventos
               </Text>
               <Text
                 style={{
-                  fontSize: 19,
-                  fontWeight: "500",
-                  // width: "80%",
-                  color: colors.primary2,
+                  fontSize: 15,
+                  fontWeight: "400",
+
+                  color: colors.t5,
                   marginLeft: 5,
                   marginTop: 5,
                 }}
@@ -777,7 +790,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               //   }}
               //   onPress={() => navigation.navigate("event", item)}
               // >
+
+              <View style={{ bottom: 10 }}>
                 <SmallCard {...item} />
+              </View>
               // </TouchableOpacity>
             )
           );
@@ -822,7 +838,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },

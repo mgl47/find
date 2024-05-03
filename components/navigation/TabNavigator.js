@@ -8,20 +8,14 @@ import ChatsScreen from "../../screens/ChatsScreen";
 import colors, { darkColors } from "../colors";
 import { Dimensions, Platform } from "react-native";
 import { useAuth } from "../hooks/useAuth";
+import { useDesign } from "../hooks/useDesign";
 // import StackNavigator from "./StackNavigator";
 
 const Tab = createMaterialBottomTabNavigator();
-const isIPhoneWithNotch =
-  Platform.OS === "ios" &&
-  (Dimensions.get("window").height === 852 ||
-    Dimensions.get("window").height === 844 ||
-    Dimensions.get("window").height === 812 ||
-    Dimensions.get("window").height === 896 ||
-    Dimensions.get("window").height === 926 ||
-    Dimensions.get("window").height === 932);
 
 const TabNavigator = () => {
   const { AuthModalUp } = useAuth();
+  const  {isIPhoneWithNotch}=useDesign()
   return (
     <Tab.Navigator
       keyboardHidesNavigationBar={true}
@@ -30,9 +24,9 @@ const TabNavigator = () => {
       initialRouteName="início"
       // inactiveColor="#3e2465"
       barStyle={{
-        backgroundColor: colors.white,
-        // borderTopWidth: 0.2,
-        // borderColor: darkColors.primary2,
+        backgroundColor: colors.background,
+        borderTopWidth: 0.17,
+        borderColor: colors.black2,
         // marginBottom: Platform.OS == "ios" ? -30 : -10,
         marginBottom: isIPhoneWithNotch ? -33 : -13,
         // display: AuthModalUp ? "none" : "flex",
@@ -42,7 +36,8 @@ const TabNavigator = () => {
       backBehavior="initialRoute"
       shifting={true}
       sceneAnimationEnabled={false}
-      activeColor={colors.primary}
+      activeColor={colors.primary2}
+      inactiveColor={colors.t5}
       activeIndicatorStyle={{ backgroundColor: "transparent" }}
       screenOptions={{}}
     >

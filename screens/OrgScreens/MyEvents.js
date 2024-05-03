@@ -58,7 +58,7 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
         onChange={setIndex}
         // dense
 
-        style={{ backgroundColor: colors.primary2 }}
+        style={{ backgroundColor: colors.background }}
         disableIndicator
         titleStyle={(active) => ({
           color: active ? colors.white : colors.softGrey,

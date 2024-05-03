@@ -53,6 +53,8 @@ import {
 } from "rn-placeholder";
 import { useDesign } from "../../components/hooks/useDesign";
 import BigTicket from "../../components/tickets/BigTicket";
+import Constants from "expo-constants";
+
 export default function HomeScreen({ navigation }) {
   const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
@@ -140,14 +142,21 @@ export default function HomeScreen({ navigation }) {
     return unsubscribe;
   }, [navigation, isFocused]);
   return (
-    <Screen style={[styles.container]}>
+    <>
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
           marginBottom: 5,
-          // backgroundColor: colors.primary2,
+          backgroundColor: "rgba(5, 19, 29,0.96)",
+          position: "absolute",
+          paddingTop: isIPhoneWithNotch ? 44 : Constants.statusBarHeight,
+
+          top: 0,
+          zIndex: 3,
+          width: "100%",
+          // backgroundColor:"transparent"
         }}
       >
         <TouchableOpacity
@@ -200,244 +209,258 @@ export default function HomeScreen({ navigation }) {
           <MaterialIcons name="manage-search" size={35} color={colors.white} />
         </TouchableOpacity>
       </View>
-      <FlatList
-        contentContainerStyle={{ backgroundColor: colors.background }}
-        onRefresh={getEvents}
-        bounces={false}
-        ref={homeTabRef}
-        scrollEventThrottle={16}
-        onScroll={handleScroll}
-        refreshing={refreshing}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={
-          <>
-            <View
-              style={{
-                backgroundColor: colors.primary2,
-                position: "absolute",
-                width: "100%",
-                height: 250,
-              }}
-            />
-            {events?.length > 0 ? (
-              <Carousel
-                inactiveSlideOpacity={1}
-                ref={carouselRef}
-                data={events}
-                renderItem={_renderItem}
-                // sliderWidth={300}
-                sliderWidth={width}
-                itemWidth={width * 0.8}
+      <View
+        style={{
+          paddingTop: isIPhoneWithNotch ? 44 : Constants.statusBarHeight,
+          backgroundColor: "rgba(5, 19, 29,0.98)",
+        }}
+      >
+        {/* <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 5,
+            // backgroundColor: "rgba(5, 19, 29,0)",
+            // backgroundColor:"transparent"
+          }}
+        >
+          <TouchableOpacity
+            onPress={() =>
+              user
+                ? navigation.openDrawer()
+                : (authSheetRef?.current?.present(), setAuthModalUp(true))
+            }
+            style={{ left: 20, bottom: 1 }}
+          >
+            {user ? (
+              <Image
+                source={{
+                  uri: user?.photos?.avatar[0]?.uri,
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 50,
+                  // left:20
+                }}
               />
             ) : (
-              // <Animated.View
-              //   style={{ flex: 1 }}
-              //   entering={FadeIn}
-              //   // exiting={FadeOut}
-              // >
-              //   <Placeholder
-              //     Animation={Fade}
-
-              //     // Left={PlaceholderMedia}
-              //     // Right={PlaceholderMedia}
-              //   >
-              //     <ActivityIndicator
-              //       style={{
-              //         position: "absolute",
-              //         zIndex: 2,
-              //         alignSelf: "center",
-              //         paddingTop: isIPhoneWithNotch ? 60 : 10,
-              //       }}
-              //       animating={true}
-              //       color={colors.light2}
-              //     />
-
-              //     <PlaceholderLine
-              //       style={{
-              //         borderRadius: 0,
-              //         height: 270,
-              //         width,
-              //         backgroundColor: colors.black2,
-              //       }}
-              //     >
-              //       <View style={{ zIndex: 4 }}>
-              //         <PlaceholderLine
-              //           style={{
-              //             borderRadius: 20,
-              //             height: 15,
-              //             width: "90%",
-              //             marginTop: 10,
-              //           }}
-              //         />
-              //         <PlaceholderLine
-              //           style={{
-              //             borderRadius: 20,
-              //             height: 15,
-              //             width: "90%",
-              //             bottom: 2,
-              //           }}
-              //         />
-              //         <PlaceholderLine
-              //           style={{
-              //             borderRadius: 20,
-              //             height: 15,
-              //             width: "70%",
-              //             bottom: 2,
-              //           }}
-              //         />
-              //       </View>
-              //     </PlaceholderLine>
-              //   </Placeholder>
-              // </Animated.View>
-              <Animated.View
-                style={{
-                  // position: "absolute",
-                  alignSelf: "center",
-                  // top: 10,
-                  // zIndex: 2,
-                  // marginVertical: 10,
-                  height: height * 0.442,
-                }}
-                // entering={SlideInUp.duration(300)}
-                // exiting={SlideOutUp.duration(300)}
-              >
-                <ActivityIndicator
-                  style={{ top: "30%" }}
-                  animating={true}
-                  color={colors.white}
-                />
-              </Animated.View>
+              <MaterialCommunityIcons
+                name="account-outline"
+                size={35}
+                color={colors.white}
+              />
             )}
-            {/* {user && myTickets?.length > 0 && differenceInSeconds > 0 && (
-              <Animated.View
-                // style={{ marginBottom: 20 }}
-                entering={FadeIn}
-                exiting={FadeOut}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-around",
-                    marginBottom: 5,
-                  }}
-                >
-                  <Text style={styles.headerText}>Bu próximo evento</Text>
-
-                  <CountDown
-                    size={15}
-                    until={differenceInSeconds}
-                    style={{
-                      alignItems: "center",
-                      // backgroundColor:colors.background,
-                      // left: 10,
-                      top: 10,
-
-                      // position: "absolute",
-                    }}
-                    // onFinish={() => alert('Finished')}
-                    digitStyle={{
-                      // backgroundColor: colors.white,
-                      // shadowOffset: { width: 0.5, height: 0.5 },
-                      // shadowOpacity: 0.2,
-                      // shadowRadius: 1,
-                      // elevation: 0.5,
-                    }}
-                    digitTxtStyle={{ color: colors.primary }}
-                    timeLabelStyle={{
-                      color: colors.primary,
-                      fontWeight: "bold",
-                    }}
-                    separatorStyle={{ color: colors.white }}
-                    timeToShow={[
-                      differenceInSeconds > 86000 ? "D" : "",
-                      "H",
-                      "M",
-                      "S",
-                    ]}
-                    timeLabels={{
-                      d: "d",
-                      h: "h",
-                      m: "m",
-                      s: "s",
-                    }}
-                  />
-                </View>
-                <TouchableOpacity
-                  activeOpacity={0.95}
-                  style={{ padding: 10 }}
-                  // onPress={() =>
-                  //   navigation.navigate("ticketDetails", myTickets?.[0])
-                  // }
-                  onPress={() => navigation.navigate("addArtist")}
-                >
-                  <BigTicket {...myTickets?.[0]} />
-                </TouchableOpacity>
-              </Animated.View>
-            )} */}
-            <Animated.View
-              // style={{ marginBottom: 20 }}
-              entering={FadeIn}
-              exiting={FadeOut}
-            >
-              <Text style={styles.headerText}>Bu próximo evento</Text>
-              <TouchableOpacity
-                activeOpacity={0.95}
-                style={{ padding: 10 }}
-                // onPress={() =>
-                //   navigation.navigate("ticketDetails", myTickets?.[0])
-                // }
-                onPress={() => navigation.navigate("addArtist")}
-              >
-                <BigTicket {...myTickets?.[0]} />
-              </TouchableOpacity>
-            </Animated.View>
-            <FlatList
-              style={{ backgroundColor: colors.background }}
-              // data={recommendedEvents}
-              data={reco}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item) => item.uuid}
-              renderItem={({ item }) => {
-                return (
-                  // <TouchableOpacity
-                  //   activeOpacity={0.8}
-                  //   style={{
-                  //     // shadowOffset: { width: 0.5, height: 0.5 },
-                  //     // shadowOpacity: 0.3,
-                  //     // shadowRadius: 1,
-                  //     // elevation: 2,
-                  //     shadowOffset: { width: 0.5, height: 0.5 },
-                  //     shadowOpacity: 0.1,
-                  //     shadowRadius: 1,
-                  //     elevation: 0.5,
-                  //     paddingHorizontal: 10,
-                  //     marginTop: 10,
-                  //   }}
-                  //   // onPress={() => navigation.navigate("addEvent", item)}
-                  //   onPress={() => navigation.navigate("addVenue")}
-                  // >
-                  <SmallCard {...item} />
-                  //</TouchableOpacity>
-                );
-              }}
-              ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+          </TouchableOpacity>
+          <Image
+            // source={
+            //   scrolling
+            //     ? require("../../assets/logos/logo1.png")
+            //     : require("../../assets/logos/logo_white.png")
+            // }
+            source={require("../../assets/logos/logo_white.png")}
+            style={{ width: 35, height: 35, left: !user ? 5 : 3 }}
+            resizeMode="contain"
+          />
+          <TouchableOpacity
+            style={{
+              borderRadius: 50,
+              padding: 5,
+              right: 10,
+              // backgroundColor: colors.grey,
+            }}
+            onPress={() => navigation.navigate("search")}
+          >
+            <MaterialIcons
+              name="manage-search"
+              size={35}
+              color={colors.white}
             />
-          </>
-        }
-      />
-      <AuthBottomSheet
-        authSheetRef={authSheetRef}
-        setAuthModalUp={setAuthModalUp}
-      />
-    </Screen>
+          </TouchableOpacity>
+        </View> */}
+        <FlatList
+          contentContainerStyle={{ backgroundColor: colors.background, top: 50 }}
+          onRefresh={getEvents}
+          bounces={false}
+          ref={homeTabRef}
+          scrollEventThrottle={16}
+          onScroll={handleScroll}
+          refreshing={refreshing}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={
+            <>
+              <Text style={styles.headerText}>Destaques</Text>
+
+              <View
+                style={{
+                  backgroundColor: colors.background,
+                  position: "absolute",
+                  width: "100%",
+                  height: 250,
+                }}
+              />
+              {events?.length > 0 ? (
+                <Carousel
+                  inactiveSlideOpacity={1}
+                  ref={carouselRef}
+                  data={events}
+                  renderItem={_renderItem}
+                  // sliderWidth={300}
+                  sliderWidth={width}
+                  itemWidth={width * 0.8}
+                />
+              ) : (
+                // <Animated.View
+                //   style={{ flex: 1 }}
+                //   entering={FadeIn}
+                //   // exiting={FadeOut}
+                // >
+                //   <Placeholder
+                //     Animation={Fade}
+
+                //     // Left={PlaceholderMedia}
+                //     // Right={PlaceholderMedia}
+                //   >
+                //     <ActivityIndicator
+                //       style={{
+                //         position: "absolute",
+                //         zIndex: 2,
+                //         alignSelf: "center",
+                //         paddingTop: isIPhoneWithNotch ? 60 : 10,
+                //       }}
+                //       animating={true}
+                //       color={colors.light2}
+                //     />
+
+                //     <PlaceholderLine
+                //       style={{
+                //         borderRadius: 0,
+                //         height: 270,
+                //         width,
+                //         backgroundColor: colors.black2,
+                //       }}
+                //     >
+                //       <View style={{ zIndex: 4 }}>
+                //         <PlaceholderLine
+                //           style={{
+                //             borderRadius: 20,
+                //             height: 15,
+                //             width: "90%",
+                //             marginTop: 10,
+                //           }}
+                //         />
+                //         <PlaceholderLine
+                //           style={{
+                //             borderRadius: 20,
+                //             height: 15,
+                //             width: "90%",
+                //             bottom: 2,
+                //           }}
+                //         />
+                //         <PlaceholderLine
+                //           style={{
+                //             borderRadius: 20,
+                //             height: 15,
+                //             width: "70%",
+                //             bottom: 2,
+                //           }}
+                //         />
+                //       </View>
+                //     </PlaceholderLine>
+                //   </Placeholder>
+                // </Animated.View>
+                <Animated.View
+                  style={{
+                    // position: "absolute",
+                    alignSelf: "center",
+                    // top: 10,
+                    // zIndex: 2,
+                    // marginVertical: 10,
+                    height: height * 0.442,
+                  }}
+                  // entering={SlideInUp.duration(300)}
+                  // exiting={SlideOutUp.duration(300)}
+                >
+                  <ActivityIndicator
+                    style={{ top: "30%" }}
+                    animating={true}
+                    color={colors.white}
+                  />
+                </Animated.View>
+              )}
+              {user &&
+                myTickets?.length > 0 &&
+                differenceInSeconds > 0 &&
+                false && (
+                  <Animated.View
+                    // style={{ marginBottom: 20 }}
+                    entering={FadeIn}
+                    exiting={FadeOut}
+                  >
+                    <Text style={styles.headerText}>Bu próximo evento</Text>
+                    <TouchableOpacity
+                      activeOpacity={0.95}
+                      style={{ padding: 10 }}
+                      // onPress={() =>
+                      //   navigation.navigate("ticketDetails", myTickets?.[0])
+                      // }
+                      onPress={() => navigation.navigate("addArtist")}
+                    >
+                      <BigTicket {...myTickets?.[0]} />
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
+              <Text style={styles.headerText}>Recomendados</Text>
+
+              <FlatList
+                style={{ backgroundColor: colors.background }}
+                // data={recommendedEvents}
+                data={reco}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.uuid}
+                renderItem={({ item }) => {
+                  return (
+                    // <TouchableOpacity
+                    //   activeOpacity={0.8}
+                    //   style={{
+                    //     // shadowOffset: { width: 0.5, height: 0.5 },
+                    //     // shadowOpacity: 0.3,
+                    //     // shadowRadius: 1,
+                    //     // elevation: 2,
+                    //     shadowOffset: { width: 0.5, height: 0.5 },
+                    //     shadowOpacity: 0.1,
+                    //     shadowRadius: 1,
+                    //     elevation: 0.5,
+                    //     paddingHorizontal: 10,
+                    //     marginTop: 10,
+                    //   }}
+                    //   // onPress={() => navigation.navigate("addEvent", item)}
+                    //   onPress={() => navigation.navigate("addVenue")}
+                    // >
+                    <SmallCard {...item} />
+                    //</TouchableOpacity>
+                  );
+                }}
+                ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+              />
+            </>
+          }
+        />
+        <AuthBottomSheet
+          authSheetRef={authSheetRef}
+          setAuthModalUp={setAuthModalUp}
+        />
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    backgroundColor: colors.primary2,
+    // backgroundColor: colors.background,
+    backgroundColor: "rgba(5, 19, 29,0.9)",
   },
   headerContainer: {
     // backgroundColor: colors.white,
@@ -449,11 +472,12 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 19,
-    fontWeight: "600",
+    fontWeight: "500",
     // padding: 5,
     left: 20,
-    color: colors.black,
+    color: colors.t3,
     marginTop: 10,
+    zIndex: 3,
   },
   search: {
     height: 40,

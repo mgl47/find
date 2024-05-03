@@ -36,6 +36,7 @@ export default function BigTicket({ uri, tickets, event }) {
   return (
     <ImageBackground
       blurRadius={8}
+
       // tintColor={"black"}
       style={{
         height: 200,

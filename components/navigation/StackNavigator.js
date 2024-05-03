@@ -77,13 +77,13 @@ function StackNavigator() {
         headerStyle: { backgroundColor: "transparent" },
         headerBackgroundContainerStyle: !invisibleHeaders?.includes(route.name)
           ? {
-              backgroundColor: colors.primary2,
+              backgroundColor: colors.background,
 
-              shadowOffset: { width: 0.5, height: 0.5 },
-              elevation: 2,
-              shadowColor: colors.primary2,
-              shadowOpacity: 0.1,
-              shadowRadius: 1,
+              // shadowOffset: { width: 0.5, height: 0.5 },
+              // elevation: 2,
+              // shadowColor: colors.primary2,
+              // shadowOpacity: 0.1,
+              // shadowRadius: 1,
             }
           : {},
       })}
