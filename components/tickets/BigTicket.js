@@ -68,7 +68,7 @@ export default function BigTicket({ uri, tickets, event }) {
         </Text>
         <Text
           style={{
-            color: colors.lightGrey,
+            color: colors.light2,
             fontSize: 15,
             fontWeight: "500",
             marginRight: 10,
@@ -77,7 +77,20 @@ export default function BigTicket({ uri, tickets, event }) {
             // left: 20,
           }}
         >
-          {event?.venue?.displayName + ", " + event?.venue?.city}
+          {event?.venue?.displayName}
+        </Text>
+        <Text
+          style={{
+            color: colors.grey,
+            fontSize: 13,
+            fontWeight: "500",
+            marginRight: 10,
+            // textAlign: "center",
+            top: 15,
+            // left: 20,
+          }}
+        >
+          {event?.venue?.address?.zone + ", " + event?.venue?.address?.city}
         </Text>
         {/* <Text
           style={{
@@ -186,20 +199,20 @@ export default function BigTicket({ uri, tickets, event }) {
       >
         <Text
           style={{
-            color: colors.grey,
-            fontSize: 15,
-            fontWeight: "600",
-            marginRight: 5,
+            color: colors.description2,
+            fontSize: 13,
+            fontWeight: "500",
+            // marginRight: 5,
             // left: 20,
           }}
         >
           {tickets?.length + (tickets?.length > 1 ? " Bilhetes" : " Bilhete")}
         </Text>
-        <MaterialCommunityIcons
+        {/* <MaterialCommunityIcons
           name="arrow-right"
           size={20}
           color={colors.grey}
-        />
+        /> */}
       </View>
       <View
         style={{

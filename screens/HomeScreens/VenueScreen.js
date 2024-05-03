@@ -761,24 +761,24 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           // console.log(index);
           return (
             events?.length > 0 && (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={{
-                  // shadowOffset: { width: 0.5, height: 0.5 },
-                  // shadowOpacity: 0.3,
-                  // shadowRadius: 1,
-                  // elevation: 2,
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 1,
-                  elevation: 0.5,
-                  paddingHorizontal: 10,
-                  marginTop: 10,
-                }}
-                onPress={() => navigation.navigate("event", item)}
-              >
+              // <TouchableOpacity
+              //   activeOpacity={0.8}
+              //   style={{
+              //     // shadowOffset: { width: 0.5, height: 0.5 },
+              //     // shadowOpacity: 0.3,
+              //     // shadowRadius: 1,
+              //     // elevation: 2,
+              //     shadowOffset: { width: 0.5, height: 0.5 },
+              //     shadowOpacity: 0.1,
+              //     shadowRadius: 1,
+              //     elevation: 0.5,
+              //     paddingHorizontal: 10,
+              //     marginTop: 10,
+              //   }}
+              //   onPress={() => navigation.navigate("event", item)}
+              // >
                 <SmallCard {...item} />
-              </TouchableOpacity>
+              // </TouchableOpacity>
             )
           );
         }}

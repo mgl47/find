@@ -82,6 +82,7 @@ export default TicketPurchaseSheet = ({
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const doorTicketModalRef = useRef(null);
   const topUpModalRef = useRef(null);
+  console.log(giftedUser);
   const TL = event?.tickets?.length;
   const customSnap = `${
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
@@ -127,7 +128,6 @@ export default TicketPurchaseSheet = ({
       console.log(error);
     }
   };
-
   useEffect(() => {
     if (purchaseModalUp) {
       getSelectedEvent();
@@ -573,7 +573,7 @@ export default TicketPurchaseSheet = ({
       onPayment,
       firstRender,
       giftedUser,
-      user,
+
       // purchaseModalUp,
     ]
   );
@@ -765,157 +765,6 @@ export default TicketPurchaseSheet = ({
           }}
           ListHeaderComponent={
             <BottomSheetView style={styles.contentContainer}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  width: "100%",
-                  // marginHorizontal: 0,
-                  // marginVertical: giftedUser ? 5 : 10,
-                }}
-              >
-                {onPayment ? (
-                  <TouchableOpacity
-                    onPress={() => setOnPayment(false)}
-                    style={{
-                      padding: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginLeft: 5,
-                    }}
-                  >
-                    <MaterialCommunityIcons
-                      name="arrow-left"
-                      size={25}
-                      color={colors.primary}
-                    />
-                    <Text
-                      style={{
-                        color: colors.black2,
-                        fontSize: 16,
-                        fontWeight: "500",
-                        marginLeft: 10,
-                      }}
-                    >
-                      Confirmar compra
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <Text
-                    style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      // left: "8%",
-                      // width: "80%",
-                      color: colors.primary,
-                      marginLeft: 30,
-                    }}
-                  >
-                    Bilhetes
-                  </Text>
-                )}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    // alignItems: "center",
-                    // alignSelf: "flex-end",
-                    // marginRight: 20,
-                    // marginRight: 0,
-                    // marginLeft: 5,
-                    zIndex: 3,
-                    padding: 10,
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 17,
-                      fontWeight: "500",
-                      color: colors.primary2,
-
-                      // left: 10,
-                    }}
-                  >
-                    Balanço:
-                  </Text>
-
-                  <Text
-                    style={{
-                      fontSize: 17,
-                      fontWeight: "500",
-                      color: colors.primary,
-                      // top: 2,
-                      // position: "absolute",
-                      // left: 20,
-                    }}
-                  >
-                    {" cve " + formatNumber(user?.balance?.amount) || 0}
-                  </Text>
-                </View>
-              </View>
-              {(giftedUser || event?.ticketsLimit > 0) && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                  }}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginLeft: onPayment ? 20 : 28,
-                      marginBottom: 10,
-                      opacity: giftedUser ? 1 : 0,
-                    }}
-                  >
-                    <Feather name="gift" size={20} color={colors.primary2} />
-
-                    <Text
-                      style={{
-                        fontWeight: "500",
-                        fontSize: 15,
-                        marginRight: 5,
-                        marginLeft: 2,
-                        top: 2,
-                        color: colors.primary2,
-                      }}
-                    >
-                      Presente para
-                    </Text>
-
-                    <Text
-                      style={{
-                        fontWeight: "500",
-                        fontSize: 15,
-                        marginRight: 20,
-
-                        top: 2,
-
-                        color: colors.primary,
-                      }}
-                    >
-                      @{giftedUser?.username}
-                    </Text>
-                  </View>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      opacity: event?.ticketsLimit > 0 ? 1 : 0,
-
-                      right: 10,
-                      color: colors.darkGrey,
-                      alignSelf: "flex-end",
-
-                      bottom: 3,
-                    }}
-                  >
-                    limite por usuário:{` ${event?.ticketsLimit}`}
-                  </Text>
-                </View>
-              )}
               {onPayment ? (
                 <>
                   <Animated.View
@@ -923,6 +772,137 @@ export default TicketPurchaseSheet = ({
                     entering={SlideInRight}
                     exiting={SlideOutRight}
                   >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <TouchableOpacity
+                          onPress={() => setOnPayment(false)}
+                          style={{
+                            padding: 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                          }}
+                        >
+                          <MaterialCommunityIcons
+                            name="arrow-left"
+                            size={20}
+                            color={colors.primary}
+                          />
+                          <Text
+                            style={{
+                              color: colors.primary,
+                              fontSize: 16,
+                              fontWeight: "500",
+                            }}
+                          >
+                            Voltar
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text
+                      style={{
+                        fontWeight: "500",
+                        fontSize: 19,
+                        marginRight: 20,
+                        marginLeft: 5,
+                        color: colors.primary,
+                      }}
+                    >
+                      Confirmar compra
+                    </Text>
+                  </View> */}
+
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          alignSelf: "flex-end",
+                          // marginRight: 20,
+                          marginRight: 0,
+                          marginLeft: 5,
+                          zIndex: 3,
+                          padding: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 17,
+                            fontWeight: "500",
+                            color: colors.primary2,
+
+                            // left: 10,
+                          }}
+                        >
+                          Balanço:
+                        </Text>
+
+                        <Text
+                          style={{
+                            fontSize: 17,
+                            fontWeight: "500",
+                            color: colors.primary,
+                            // top: 2,
+                            // position: "absolute",
+                            // left: 20,
+                          }}
+                        >
+                          {" cve " + formatNumber(user?.balance?.amount) || 0}
+                        </Text>
+                      </View>
+                    </View>
+                    {giftedUser && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          marginLeft: 30,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <Feather
+                          name="gift"
+                          size={20}
+                          color={colors.primary2}
+                        />
+
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            fontSize: 15,
+                            marginRight: 5,
+                            marginLeft: 2,
+                            top: 2,
+                            color: colors.primary2,
+                          }}
+                        >
+                          Presente para:
+                        </Text>
+
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            fontSize: 15,
+                            marginRight: 20,
+                            // marginLeft: 2,
+                            top: 2,
+
+                            color: colors.primary,
+                          }}
+                        >
+                          @{giftedUser?.username}
+                        </Text>
+                      </View>
+                    )}
+
                     <View
                       style={{
                         flex: 1,
@@ -939,11 +919,11 @@ export default TicketPurchaseSheet = ({
                             style={{
                               fontSize: 17,
                               fontWeight: "500",
-                              color: colors.black,
-                              marginLeft: 10,
+                              color: colors.primary,
+                              // marginLeft: 10,
                               // marginTop: 10,
                               marginBottom: 10,
-                              // marginTop: giftedUser ? 5 : 0,
+                              marginTop: giftedUser ? 5 : 0,
 
                               // left: 10,
                             }}
@@ -990,10 +970,10 @@ export default TicketPurchaseSheet = ({
                                 style={{
                                   fontSize: 15,
                                   fontWeight: "500",
-                                  color: colors.darkGrey,
+                                  color: colors.primary2,
                                   top: 2,
-                                  // position: "absolute",
-                                  // left: 20,
+                                  position: "absolute",
+                                  left: 20,
                                   // fontSize: 17,
                                   // fontWeight: "500",
                                   // color: colors.primary,
@@ -1021,7 +1001,42 @@ export default TicketPurchaseSheet = ({
                   </Animated.View>
                 </>
               ) : (
-                <View style={{}}></View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginHorizontal: 30,
+                    marginVertical: giftedUser ? 5 : 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 18,
+                      fontWeight: "600",
+                      left: "8%",
+                      // width: "80%",
+                      color: colors.primary,
+                      // marginLeft: 5,
+                    }}
+                  >
+                    Bilhetes
+                  </Text>
+                  {event?.ticketsLimit > 0 && (
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        // fontWeight: "600",
+                        left: "8%",
+                        // width: "80%",
+                        color: colors.darkGrey,
+                        marginLeft: 5,
+                      }}
+                    >
+                      limite por usuário:{" " + event?.ticketsLimit}
+                    </Text>
+                  )}
+                </View>
               )}
               {/* {giftedUser && (
                 <View

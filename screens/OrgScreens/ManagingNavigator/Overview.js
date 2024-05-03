@@ -785,7 +785,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         <View style={{ marginBottom: 50 }} />
       </Animated.ScrollView>
       <TicketPurchaseSheet
-        bottomSheetModalRef={bottomSheetModalRef}
+        purchaseSheetRef={bottomSheetModalRef}
         // setPurchaseModalUp={setPurchaseModalUp}
         // purchaseModalUp={purchaseModalUp}
         doorTicket={true}

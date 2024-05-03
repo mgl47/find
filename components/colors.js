@@ -5,7 +5,8 @@ export default {
   primary: "#004680",
   // primary: "#800060",
   // primary: "#800060",  //pink
- 
+  gray2: "#696969",
+
   // secondary: "#E78200",
   background: "#faf8f8",
   // background:"#f2f2f2",
@@ -47,18 +48,17 @@ export default {
   darkRed: "#990000",
   darkGrey: "#686868",
 };
-export const  darkColors= {
+export const darkColors = {
   // primary: "#191970",
-  primary: "#004680",
-  primary2: "#000017",
+  primary: "#3bc0f8",
+  primary2: "#05131d",
 
   primary: "#004680",
   // primary: "#800060",
   // primary: "#800060",  //pink
- 
-  // secondary: "#E78200",
-  background: "#161622",
 
+  // secondary: "#E78200",
+  background: "#072f49",
 
   // background:"#000080",
   // background:"#FFFAFA",

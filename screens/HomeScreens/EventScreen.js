@@ -63,6 +63,8 @@ import { captureRef } from "react-native-view-shot";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
+
+  const defautlsizes = { width, height };
   const [print, setPrint] = useState(null);
   const mapPrintRef = useRef(null);
   const takePrint = async () => {
@@ -92,6 +94,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
+  const [giftedUser, setGiftedUser] = useState(null);
+
+  const [giftModalUp, setGiftModalUp] = useState(false);
   const [gift, setGift] = useState(false);
   const [muted, setMuted] = useState(true);
   const [initialWidth, setInitalWidth] = useState(width);
@@ -125,21 +130,17 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [interested, setInterested] = useState(false);
   const [going, setGoing] = useState(false);
 
-  const bottomSheetModalRef = useRef(null);
-  const bottomSheetModalRef2 = useRef(null);
+  const purchaseSheetRef = useRef(null);
+  const giftModalRef = useRef(null);
 
   const handlePurchaseSheet = useCallback((gift) => {
     if (gift) {
-      setGift(true);
+      setGiftModalUp(true);
+      giftModalRef.current?.present();
+    } else {
+      purchaseSheetRef.current?.present();
+      setPurchaseModalUp(true);
     }
-    setPurchaseModalUp(true);
-
-    bottomSheetModalRef.current?.present();
-  }, []);
-  const handleGiftSheet = useCallback(() => {
-    setGift(true);
-
-    bottomSheetModalRef2.current?.present();
   }, []);
 
   const renderViewMore = (onPress) => {
@@ -435,6 +436,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           ListHeaderComponent={
             Event?.videos?.length > 0 ? (
               <VideoPlayer
+                // defaultControlsVisible={false}
+
                 // playbackCallback={()=>console.log("fdasfsdgafdsF")}
                 fullscreen={{
                   inFullscreen: inFullscreen,
@@ -443,7 +446,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
                     // setStatusBarHidden(true, "fade");
                     await ScreenOrientation.lockAsync(
-                      ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+                      ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT
                     );
 
                     videoRef.current.setStatusAsync({
@@ -452,11 +455,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   },
                   exitFullscreen: async () => {
                     // setStatusBarHidden(false, "fade");
+                    setInFullsreen(false);
 
                     await ScreenOrientation.lockAsync(
                       ScreenOrientation.OrientationLock.PORTRAIT_UP
                     );
-                    setInFullsreen(false);
                   },
                 }}
                 mute={{
@@ -472,13 +475,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 }}
                 videoProps={{
                   ref: videoRef,
+
                   source: {
                     uri: Event?.videos[0]?.uri,
                   },
 
                   // source: require("../assets/rolling.mp4"),
                   resizeMode: inFullscreen ? "contain" : "cover",
-                  // useNativeControls
+                  // useNativeControls:true,
                   isMuted: isMute,
                   shouldPlay: true,
                   isLooping: true,
@@ -488,7 +492,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             null
           }
           renderItem={({ item, index }) => {
-            console.log(item);
             {
               return !inFullscreen ? (
                 <>
@@ -523,7 +526,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 fontSize: 20,
                 fontWeight: "500",
                 marginBottom: 5,
-                color: colors.primary2,
+                color: colors.black,
               }}
             >
               {Event?.title}
@@ -556,7 +559,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <Entypo name="location" size={17} color={colors.primary2} />
                   <Text
                     style={{
-                      fontSize: 16,
+                      fontSize: 16.5,
                       fontWeight: "500",
                       width: "70%",
                       color: colors.darkSeparator,
@@ -582,10 +585,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               />
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: 15.5,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.darkSeparator,
                   marginLeft: 5,
                 }}
               >
@@ -606,14 +609,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <MaterialCommunityIcons
                   name="lightning-bolt-outline"
                   size={23}
-                  color={colors.primary2}
+                  color={colors.gray2}
                 />
                 <Text
                   style={{
                     fontSize: 14,
                     fontWeight: "500",
                     // width: "70%",
-                    color: colors.darkGrey,
+                    color: colors.gray2,
                   }}
                 >
                   {Event?.goingUsers?.length}
@@ -1152,18 +1155,23 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           <View style={{ marginBottom: 100 }} />
         </View>
       </ScrollView>
+
       <TicketPurchaseSheet
-        bottomSheetModalRef={bottomSheetModalRef}
+        purchaseSheetRef={purchaseSheetRef}
+        giftModalRef={giftModalRef}
         setPurchaseModalUp={setPurchaseModalUp}
         purchaseModalUp={purchaseModalUp}
+        setGiftModalUp={setGiftModalUp}
+        setGiftedUser={setGiftedUser}
+        giftedUser={giftedUser}
         Event={Event}
         setGift={setGift}
         gift={gift}
       />
-
-      {!inFullscreen && !purchaseModalUp && !gift && (
+      {/* {!inFullscreen && ( */}
+      {!inFullscreen && !purchaseModalUp && !giftModalUp && (
         <Animated.View
-          entering={!firstMount && SlideInDown}
+          entering={!firstMount && SlideInDown.duration(180)}
           exiting={SlideOutDown}
           style={{
             justifyContent: "space-around",
@@ -1171,7 +1179,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             height: isIPhoneWithNotch ? 70 : 55,
             backgroundColor: colors.white,
             position: "absolute",
-            zIndex: 3,
+            zIndex: 2,
             bottom: 0,
             flexDirection: "row",
             shadowOffset: { width: 1, height: 1 },
@@ -1180,6 +1188,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             elevation: 3,
             borderTopRightRadius: 15,
             borderTopLeftRadius: 15,
+            opacity: inFullscreen ? 0 : 1,
             // paddingHorizontal: 10,
             // padding: 10,
           }}
@@ -1233,6 +1242,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           >
             <TouchableOpacity
               // onPress={handleGiftSheet}
+              disabled={inFullscreen}
               onPress={() => handlePurchaseSheet(true)}
               style={{
                 width: 38,
@@ -1303,8 +1313,8 @@ export default EventScreen;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    bottom: 10,
-    borderRadius: 10,
+    // bottom: 10,
+    // borderRadius: 10,
 
     overflow: "hidden",
     flex: 1,

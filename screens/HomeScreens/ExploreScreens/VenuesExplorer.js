@@ -451,28 +451,28 @@ const VenuesExplorer = () => {
 
         data={venueDetails ? events : venues}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item.uuid}
         renderItem={({ item }) => {
           // console.log("rrefef");
 
           return !venueDetails ? (
             <VenuesList {...item} />
           ) : (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.1,
-                shadowRadius: 1,
-                elevation: 1,
-                // padding: 10,
-                marginTop: 10,
-                paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
-              }}
-              onPress={() => navigation.navigate("event", item)}
-            >
+            // <TouchableOpacity
+            //   activeOpacity={0.8}
+            //   style={{
+            //     shadowOffset: { width: 0.5, height: 0.5 },
+            //     shadowOpacity: 0.1,
+            //     shadowRadius: 1,
+            //     elevation: 1,
+            //     // padding: 10,
+            //     marginTop: 10,
+            //     paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
+            //   }}
+            //   onPress={() => navigation.navigate("event", item)}
+            // >
               <SmallCard {...item} />
-            </TouchableOpacity>
+            // </TouchableOpacity> */}
           );
         }}
         ListFooterComponent={<View style={{ marginBottom: 10 }} />}
@@ -489,74 +489,63 @@ const VenuesExplorer = () => {
       >
         <View
           style={{
-            // shadowOffset: { width: 0.5, height: 0.5 },
-            // shadowOpacity: 0.3,
-            // shadowRadius: 1,
-            // elevation: 2,
-
             width: "100%",
             height: "80%",
           }}
         >
-          <TouchableOpacity
+          <View
             style={{
-              // left: 8,
               alignSelf: "flex-end",
               position: "absolute",
-              backgroundColor: colors.white,
-              padding: 7,
-              borderRadius: 5,
-              top: 60,
+              backgroundColor: "rgba(245,245,245,0.8)",
+              padding: 5,
+              borderRadius: 15,
+              top: 10,
               right: 5,
               zIndex: 2,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
             }}
-            onPress={async () => {
-              const newRegion = {
-                ...userLocation,
-                latitude: userLocation.latitude - 0.002,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.011,
-              };
+          >
+            <TouchableOpacity
+              style={{
+                padding: 7,
+              }}
+              onPress={async () => {
+                const newRegion = {
+                  ...userLocation,
+                  latitude: userLocation.latitude - 0.002,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.011,
+                };
 
-              if (Platform.OS === "ios") {
-                mapViewRef.current.animateToRegion(newRegion, 200);
-                // setRegion(newRegion);
-              } else {
-                setRegion(newRegion);
-              }
-            }}
-          >
-            <MaterialIcons
-              name="my-location"
-              size={24}
-              color={colors.primary}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              // left: 8,
-              alignSelf: "flex-end",
-              position: "absolute",
-              backgroundColor: colors.white,
-              padding: 7,
-              borderRadius: 5,
-              top: 110,
-              right: 5,
-              zIndex: 2,
-              shadowOffset: { width: 0.5, height: 0.5 },
-              shadowOpacity: 0.3,
-              shadowRadius: 1,
-              elevation: 2,
-              // padding: 10,
-            }}
-            onPress={() => setShowAll(!showAll)}
-          >
-            <MaterialIcons name="event" size={24} color={colors.primary} />
-          </TouchableOpacity>
+                if (Platform.OS === "ios") {
+                  mapViewRef.current.animateToRegion(newRegion, 200);
+
+                } else {
+                  setRegion(newRegion);
+                }
+              }}
+            >
+              <MaterialIcons
+                name="my-location"
+                size={25}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                // left: 8,
+
+                // backgroundColor: "rgba(150,150,150,0.7)",
+                padding: 7,
+                // borderRadius: 5,
+
+                // padding: 10,
+              }}
+              onPress={() => setShowAll(!showAll)}
+            >
+              <MaterialIcons name="event" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
           <MapView
             onPress={() => setVenueDetails(null)}
             ref={mapViewRef}

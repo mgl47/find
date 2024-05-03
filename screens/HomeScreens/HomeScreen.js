@@ -52,6 +52,7 @@ import {
   Fade,
 } from "rn-placeholder";
 import { useDesign } from "../../components/hooks/useDesign";
+import BigTicket from "../../components/tickets/BigTicket";
 export default function HomeScreen({ navigation }) {
   const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
@@ -125,6 +126,9 @@ export default function HomeScreen({ navigation }) {
     getIpma();
   }, []);
 
+  const reco = [...events];
+
+  reco.reverse();
   useEffect(() => {
     const unsubscribe = navigation.addListener("tabPress", (e) => {
       authSheetRef?.current?.close();
@@ -304,7 +308,7 @@ export default function HomeScreen({ navigation }) {
                 />
               </Animated.View>
             )}
-            {user && myTickets?.length > 0 && differenceInSeconds > 0 && (
+            {/* {user && myTickets?.length > 0 && differenceInSeconds > 0 && (
               <Animated.View
                 // style={{ marginBottom: 20 }}
                 entering={FadeIn}
@@ -333,11 +337,11 @@ export default function HomeScreen({ navigation }) {
                     }}
                     // onFinish={() => alert('Finished')}
                     digitStyle={{
-                      backgroundColor: colors.white,
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.2,
-                      shadowRadius: 1,
-                      elevation: 0.5,
+                      // backgroundColor: colors.white,
+                      // shadowOffset: { width: 0.5, height: 0.5 },
+                      // shadowOpacity: 0.2,
+                      // shadowRadius: 1,
+                      // elevation: 0.5,
                     }}
                     digitTxtStyle={{ color: colors.primary }}
                     timeLabelStyle={{
@@ -352,10 +356,10 @@ export default function HomeScreen({ navigation }) {
                       "S",
                     ]}
                     timeLabels={{
-                      d: "dias",
-                      h: "horas",
-                      m: "minutos",
-                      s: "segundos",
+                      d: "d",
+                      h: "h",
+                      m: "m",
+                      s: "s",
                     }}
                   />
                 </View>
@@ -367,36 +371,54 @@ export default function HomeScreen({ navigation }) {
                   // }
                   onPress={() => navigation.navigate("addArtist")}
                 >
-                  <OneBigTicket {...myTickets?.[0]} />
+                  <BigTicket {...myTickets?.[0]} />
                 </TouchableOpacity>
               </Animated.View>
-            )}
+            )} */}
+            <Animated.View
+              // style={{ marginBottom: 20 }}
+              entering={FadeIn}
+              exiting={FadeOut}
+            >
+              <Text style={styles.headerText}>Bu próximo evento</Text>
+              <TouchableOpacity
+                activeOpacity={0.95}
+                style={{ padding: 10 }}
+                // onPress={() =>
+                //   navigation.navigate("ticketDetails", myTickets?.[0])
+                // }
+                onPress={() => navigation.navigate("addArtist")}
+              >
+                <BigTicket {...myTickets?.[0]} />
+              </TouchableOpacity>
+            </Animated.View>
             <FlatList
               style={{ backgroundColor: colors.background }}
-              data={recommendedEvents}
+              // data={recommendedEvents}
+              data={reco}
               showsVerticalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.uuid}
               renderItem={({ item }) => {
                 return (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={{
-                      // shadowOffset: { width: 0.5, height: 0.5 },
-                      // shadowOpacity: 0.3,
-                      // shadowRadius: 1,
-                      // elevation: 2,
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 1,
-                      elevation: 0.5,
-                      paddingHorizontal: 10,
-                      marginTop: 10,
-                    }}
-                    // onPress={() => navigation.navigate("addEvent", item)}
-                    onPress={() => navigation.navigate("addVenue")}
-                  >
-                    <SmallCard {...item} />
-                  </TouchableOpacity>
+                  // <TouchableOpacity
+                  //   activeOpacity={0.8}
+                  //   style={{
+                  //     // shadowOffset: { width: 0.5, height: 0.5 },
+                  //     // shadowOpacity: 0.3,
+                  //     // shadowRadius: 1,
+                  //     // elevation: 2,
+                  //     shadowOffset: { width: 0.5, height: 0.5 },
+                  //     shadowOpacity: 0.1,
+                  //     shadowRadius: 1,
+                  //     elevation: 0.5,
+                  //     paddingHorizontal: 10,
+                  //     marginTop: 10,
+                  //   }}
+                  //   // onPress={() => navigation.navigate("addEvent", item)}
+                  //   onPress={() => navigation.navigate("addVenue")}
+                  // >
+                  <SmallCard {...item} />
+                  //</TouchableOpacity>
                 );
               }}
               ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -430,7 +452,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     // padding: 5,
     left: 20,
-    color: colors.primary,
+    color: colors.black,
     marginTop: 10,
   },
   search: {

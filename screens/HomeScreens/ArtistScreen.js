@@ -67,6 +67,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [isMute, setIsMute] = useState(true);
   const [followBlock, setFollowBlock] = useState(false);
   const [events, setEvents] = useState([]);
+  const [fetched, setFetched] = useState(false);
   const { user, headerToken, getUpdatedUser } = useAuth();
   const findUser = async () => {
     setLoading(true);
@@ -91,9 +92,12 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   }, []);
   console.log(item?.uuid);
   const getEvents = async () => {
-    const result = await axios.get(`${apiUrl}/events/?artist=${item?.uuid}`);
-    // console.log(result?.data);
-    setEvents(result?.data);
+    try {
+      const result = await axios.get(`${apiUrl}/events/?artist=${item?.uuid}`);
+      // console.log(result?.data);
+      setEvents(result?.data);
+      setFetched(true);
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -213,7 +217,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   let displayAvatar = [];
   const avatarIndex = artist?.photos?.avatar[3] || [];
   displayAvatar?.push(avatarIndex);
-  if (loading) {
+  if (loading||!fetched) {
     return (
       <Animated.View
         style={{ flex: 1 }}
@@ -398,7 +402,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                 source={{ uri: artist?.photos?.cover?.[2]?.uri }}
               />
             </TouchableOpacity>
-            <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row", zIndex: 2 }}>
               <ImageView
                 images={displayAvatar}
                 imageIndex={0}
@@ -511,58 +515,14 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <Text style={{ fontSize: 15 }}>{artist?.description}</Text>
                 </ViewMoreText>
               )}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginVertical: 10,
-                  marginLeft:10,
-                  flexWrap:1
-                }}
-              >
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <AntDesign
-                    name="facebook-square"
-                    size={26}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <AntDesign
-                    name="instagram"
-                    size={26}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <AntDesign name="twitter" size={27} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <Entypo name="spotify" size={27} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <Fontisto
-                    name="applemusic"
-                    size={25}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginRight: 15 }}>
-                  <Fontisto
-                    name="youtube-play"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-              
-              </View>
+
               <View style={styles.separator} />
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: "500",
                   // width: "80%",
-                  color: colors.primary,
+                  color: colors.black2,
                   marginLeft: 5,
                   marginTop: 5,
                   // marginBottom: 5,
@@ -572,10 +532,10 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               </Text>
               <Text
                 style={{
-                  fontSize: 17,
-                  fontWeight: "500",
+                  fontSize: 16,
+                  fontWeight: "400",
                   // width: "80%",
-                  color: colors.black2,
+                  color: colors.description,
                   marginLeft: 5,
                   // marginTop: 5,
                   // marginBottom: 5,
@@ -592,78 +552,92 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         }
         renderItem={({ item }) => {
           return (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                // shadowOffset: { width: 0.5, height: 0.5 },
-                // shadowOpacity: 0.3,
-                // shadowRadius: 1,
-                // elevation: 2,
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.1,
-                shadowRadius: 1,
-                elevation: 0.5,
-                paddingHorizontal: 10,
-                marginBottom: 10,
-                bottom: 50,
-              }}
-              onPress={() => navigation.navigate("event", item)}
-            >
+            // <TouchableOpacity
+            //   activeOpacity={0.8}
+            //   style={{
+            //     // shadowOffset: { width: 0.5, height: 0.5 },
+            //     // shadowOpacity: 0.3,
+            //     // shadowRadius: 1,
+            //     // elevation: 2,
+            //     shadowOffset: { width: 0.5, height: 0.5 },
+            //     shadowOpacity: 0.1,
+            //     shadowRadius: 1,
+            //     elevation: 0.5,
+            //     paddingHorizontal: 10,
+            //     marginBottom: 10,
+            //     bottom: 50,
+            //   }}
+            //   onPress={() => navigation.navigate("event", item)}
+            // >
+            <View style={{ bottom: 70 }}>
               <SmallCard {...item} />
-            </TouchableOpacity>
+            </View>
+            //   </TouchableOpacity>
           );
         }}
-        // renderItem={({ item }) => {
-        //   return (
-        //     <TouchableOpacity
-        //       style={{
-        //         borderRadius: 10,
-        //         padding: 10,
-        //         marginBottom: 12,
-        //         backgroundColor: colors.white,
-        //         shadowOffset: { width: 1, height: 1 },
-        //         shadowOpacity: 0.3,
-        //         shadowRadius: 1,
-        //         elevation: 1,
-        //         bottom: 50,
-        //         width: "95%",
-        //         alignSelf: "center",
-        //       }}
-        //     >
-        //       <Text
-        //         style={{
-        //           color: colors.black,
-        //           marginBottom: 3,
-        //           fontWeight: "500",
-        //           fontSize: 15,
-        //         }}
-        //       >
-        //         {item?.date}
-        //       </Text>
-        //       <Text
-        //         style={{
-        //           color: colors.primary,
-        //           marginBottom: 3,
-        //           fontWeight: "500",
-        //           fontSize: 16,
-        //         }}
-        //       >
-        //         {item?.title}
-        //       </Text>
+        ListFooterComponent={
+          fetched && (
+            <Animated.View
+              entering={FadeIn}
+              style={{ bottom: 50, marginLeft: 10 }}
+            >
+              <Text
+                style={{
+                  color: colors.darkSeparator,
+                  fontSize: 15,
+                  fontWeight: "500",
+                  marginBottom: 10,
+                }}
+              >
+                Outras Plataformas
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  // alignSelf: "flex-end",
 
-        //       <Text
-        //         style={{
-        //           color: colors.black2,
-        //           marginBottom: 3,
-        //           fontWeight: "500",
-        //           fontSize: 15,
-        //         }}
-        //       >
-        //         {item?.promoter}
-        //       </Text>
-        //     </TouchableOpacity>
-        //   );
-        // }}
+                  alignItems: "center",
+                  flexWrap: 1,
+                }}
+              >
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <AntDesign
+                    name="facebook-square"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <AntDesign
+                    name="instagram"
+                    size={24}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <AntDesign name="twitter" size={25} color={colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <Entypo name="spotify" size={25} color={colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <Fontisto
+                    name="applemusic"
+                    size={23}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity style={{ marginRight: 10 }}>
+                  <Fontisto
+                    name="youtube-play"
+                    size={23}
+                    color={colors.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          )
+        }
       />
     </>
   );
@@ -675,7 +649,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     flex: 1,
-    bottom: 50,
+    bottom: 55,
     backgroundColor: colors.background,
   },
   headerContainer: {
@@ -704,7 +678,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.lightGrey,
     marginVertical: 5,
     alignSelf: "center",
   },
