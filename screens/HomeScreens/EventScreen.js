@@ -1212,7 +1212,17 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                       >
                         Telefonar
                       </Text>
-                      <Text>{item.phone1}</Text>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "500",
+                          color: colors.t4,
+                          left:1
+                          ,top:1
+                        }}
+                      >
+                        9123456
+                      </Text>
                     </View>
                     <MaterialCommunityIcons
                       name="phone"

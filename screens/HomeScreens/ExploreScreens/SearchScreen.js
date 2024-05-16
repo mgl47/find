@@ -61,7 +61,12 @@ const SearchScreen = ({
   const [loading, setLoading] = useState(false);
   const [recent, setRecent] = useState(recommendedEvents.slice().reverse());
 
+
+
+
+  
   useEffect(() => {
+
     setFirstMount(false);
   }, []);
 
@@ -162,6 +167,7 @@ const SearchScreen = ({
                 // placeholder="encontre artistas, eventos ou lugares"
                 placeholder=" artistas, eventos ou lugares"
                 placeholderTextColor={colors.description}
+                cursorColor={colors.t3}
                 returnKeyType="search"
                 autoFocus
                 style={[styles.search, { width: "100%" }]}
@@ -219,14 +225,12 @@ const SearchScreen = ({
                     <Chip
                       elevation={1}
                       elevated={false}
-                      textStyle={
-                        {
-                          // color: colors.white,
-                        }
-                      }
+                      textStyle={{
+                        color: colors.t3,
+                      }}
                       style={{
                         margin: 2,
-                        backgroundColor: colors.white,
+                        backgroundColor: colors.background2, // paddingHorizontal: 2,
                         // paddingHorizontal: 2,
                         //  marginVertical: 5,
                         marginHorizontal: 3,
@@ -304,9 +308,9 @@ const SearchScreen = ({
                       >
                         <Text
                           style={{
-                            color: colors.primary,
+                            color: colors.t2,
                             fontSize: 16,
-                            fontWeight: "500",
+                            fontWeight: "600",
                           }}
                         >
                           limpar
@@ -327,25 +331,25 @@ const SearchScreen = ({
                 // ListHeaderComponent={<View style={{ marginTop: 10 }} />}
                 renderItem={({ item }) => {
                   return (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      style={{
-                        // shadowOffset: { width: 0.5, height: 0.5 },
-                        // shadowOpacity: 0.3,
-                        // shadowRadius: 1,
-                        // elevation: 2,
-                        shadowOffset: { width: 0.5, height: 0.5 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 1,
-                        elevation: 0.5,
-                        // padding: 10,
-                        paddingHorizontal: 10,
-                        marginTop: 10,
-                      }}
-                      // onPress={() => navigation.navigate("event", item)}
-                    >
-                      <SmallCard {...item} />
-                    </TouchableOpacity>
+                    // <TouchableOpacity
+                    //   activeOpacity={0.8}
+                    //   style={{
+                    //     // shadowOffset: { width: 0.5, height: 0.5 },
+                    //     // shadowOpacity: 0.3,
+                    //     // shadowRadius: 1,
+                    //     // elevation: 2,
+                    //     shadowOffset: { width: 0.5, height: 0.5 },
+                    //     shadowOpacity: 0.1,
+                    //     shadowRadius: 1,
+                    //     elevation: 0.5,
+                    //     // padding: 10,
+                    //     paddingHorizontal: 10,
+                    //     // marginTop: 10,
+                    //   }}
+                    //   // onPress={() => navigation.navigate("event", item)}
+                    // >
+                    <SmallCard {...item} />
+                    // {/* </TouchableOpacity> */}
                   );
                 }}
                 ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -372,6 +376,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 19,
     fontWeight: "500",
+    color: colors.t3,
     // padding: 5,
     zIndex: 2,
     left: 20,

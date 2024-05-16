@@ -37,7 +37,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Tab as Tab2, Text as Text2, TabView } from "@rneui/themed";
 
-import { Camera, FlashMode } from "expo-camera";
+import { Camera } from 'expo-camera/legacy';
 import axios from "axios";
 import { useData } from "../../../../components/hooks/useData";
 import { Button } from "react-native";
@@ -47,6 +47,7 @@ import { useAuth } from "../../../../components/hooks/useAuth";
 
 import { useDesign } from "../../../../components/hooks/useDesign";
 import formattedDates from "../../../../components/formattedDates";
+import { FlashMode } from "expo-camera/build/legacy/Camera.types";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -57,7 +58,7 @@ export default function ValidatorScreen({
 }) {
   const selectedEvent = route.params;
   const [hasPermission, setHasPermission] = useState(false);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  // const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const [loading, setLoading] = useState(false);
   const animation = useRef(null);
@@ -169,7 +170,7 @@ export default function ValidatorScreen({
         // paddingTop: isIPhoneWithNotch ? 44 : 0,
       }}
     >
-      <View style={{ backgroundColor: colors.primary2, height: 200 }}>
+      <View style={{ height: 200 }}>
         <View
           style={{
             flexDirection: "row",
@@ -183,7 +184,8 @@ export default function ValidatorScreen({
           <TouchableOpacity
             onPress={() => setIndex(0)}
             style={{
-              backgroundColor: index == 0 ? colors.primary : colors.grey,
+              backgroundColor:
+                index == 0 ? colors.primary2 : colors.background2,
               borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
@@ -194,7 +196,7 @@ export default function ValidatorScreen({
           >
             <Text
               style={{
-                color: index == 0 ? colors.white : colors.black2,
+                color: index == 0 ? colors.t2 : colors.t4,
                 fontSize: 15,
                 fontWeight: "500",
               }}
@@ -205,7 +207,8 @@ export default function ValidatorScreen({
           <TouchableOpacity
             onPress={() => setIndex(1)}
             style={{
-              backgroundColor: index == 1 ? colors.primary : colors.grey,
+              backgroundColor:
+                index == 1 ? colors.primary2 : colors.background2,
               borderRadius: 10,
               alignItems: "center",
               justifyContent: "center",
@@ -216,7 +219,7 @@ export default function ValidatorScreen({
           >
             <Text
               style={{
-                color: index == 1 ? colors.white : colors.black2,
+                color: index == 1 ? colors.t2 : colors.t4,
                 fontSize: 15,
                 fontWeight: "500",
               }}
@@ -227,7 +230,7 @@ export default function ValidatorScreen({
         </View>
 
         <View style={{ padding: 10, borderRadius: 15, zIndex: 5 }}>
-          <View
+          {/* <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -239,7 +242,7 @@ export default function ValidatorScreen({
 
               //   marginBottom: 10,
             }}
-          />
+          /> */}
           <TouchableOpacity
             onPress={toggleFlashMode}
             style={{
@@ -428,7 +431,7 @@ export default function ValidatorScreen({
                     style={{
                       fontSize: 18,
                       fontWeight: "600",
-                      color: colors.primary,
+                      color: colors.t2,
                       left: 4,
                     }}
                   >
@@ -440,7 +443,7 @@ export default function ValidatorScreen({
                       fontWeight: "600",
                       marginLeft: 5,
                       top: 1,
-                      color: colors.darkGrey,
+                      color: colors.t4,
                       left: 4,
                     }}
                   >
@@ -576,7 +579,7 @@ export default function ValidatorScreen({
                     style={{
                       height: 20,
                       width: 150,
-                      backgroundColor: colors.grey,
+                      backgroundColor: colors.background,
                       borderRadius: 20,
                       left: 4,
                     }}
@@ -604,7 +607,7 @@ export default function ValidatorScreen({
                     style={{
                       height: 30,
                       width: 30,
-                      backgroundColor: colors.grey,
+                      backgroundColor: colors.background,
                       borderRadius: 20,
                       left: 4,
                     }}
@@ -613,7 +616,7 @@ export default function ValidatorScreen({
                     style={{
                       height: 20,
                       width: 100,
-                      backgroundColor: colors.grey,
+                      backgroundColor: colors.background,
                       borderRadius: 20,
                       left: 10,
                     }}
@@ -637,7 +640,7 @@ export default function ValidatorScreen({
                   style={{
                     height: 18,
                     width: 100,
-                    backgroundColor: colors.grey,
+                    backgroundColor: colors.background,
                     borderRadius: 20,
                     left: 4,
                     top: 4,
@@ -668,13 +671,13 @@ export default function ValidatorScreen({
             marginRight: 10,
             marginTop: 10,
             zIndex: 2,
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             borderRadius: 10,
           }}
           // onPress={() => navigation.navigate("addEvent", item)}
           // onPress={() => navigation.navigate("manageEvent", item)}
         >
-          <FontAwesome name="refresh" size={24} color={colors.primary} />
+          <FontAwesome name="refresh" size={24} color={colors.t4} />
         </TouchableOpacity>
       </View>
     </View>
@@ -695,7 +698,7 @@ const styles = StyleSheet.create({
   card: {
     height: 95,
     borderRadius: 10,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "100%",
     alignSelf: "center",

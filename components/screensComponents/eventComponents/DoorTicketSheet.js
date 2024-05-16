@@ -47,12 +47,13 @@ import axios from "axios";
 import { useData } from "../../hooks/useData";
 import { useAuth } from "../../hooks/useAuth";
 import colors from "../../colors";
-import { Camera, FlashMode } from "expo-camera";
+import { Camera } from "expo-camera/legacy";
 import toast from "../../toast";
 import formattedDates from "../../formattedDates";
 
 const { height, width } = Dimensions.get("window");
 import uuid from "react-native-uuid";
+import { FlashMode } from "expo-camera/build/legacy/Camera.types";
 
 export default DoorTicketSheet = ({
   doorTicketModalRef,
@@ -63,7 +64,7 @@ export default DoorTicketSheet = ({
   eventId,
   bottomSheetModalRef,
   total,
-  separatedTickets
+  separatedTickets,
 }) => {
   // const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ["55%", "95%"], []);
@@ -84,7 +85,7 @@ export default DoorTicketSheet = ({
     setStatusCode(0);
     setLoading(false);
     bottomSheetModalRef.current.close();
-};
+  };
 
   const toggleFlashMode = () => {
     setFlashMode(
@@ -115,17 +116,16 @@ export default DoorTicketSheet = ({
   const handleSheetChanges = useCallback((index) => {}, []);
   const [loading, setLoading] = useState(false);
   const purchaseId = uuid.v4();
-const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
+  const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
     return {
-        ...ticket,
+      ...ticket,
 
-        doorTicket: true,
-        soldBy: user?.username,
+      doorTicket: true,
+      soldBy: user?.username,
     };
-});
+  });
 
   const buyTickets = async () => {
-
     if (!searchedUser) {
       toast({
         msg: "Usuário não encontrado",
@@ -168,14 +168,14 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
           },
           details: {
             purchaseId,
-            doorTicket:true,
+            doorTicket: true,
             user: {
               endUser: {
-                userId:  searchedUser?._id,
-                username:  searchedUser?.username,
-                email:  searchedUser?.email,
+                userId: searchedUser?._id,
+                username: searchedUser?.username,
+                email: searchedUser?.email,
                 displayName: searchedUser?.displayName,
-                uri:searchedUser?.photos?.avatar?.[0]?.uri,
+                uri: searchedUser?.photos?.avatar?.[0]?.uri,
               },
               buyer: {
                 userId: searchedUser?._id,
@@ -215,7 +215,6 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
 
         await new Promise((resolve, reject) => setTimeout(resolve, 500));
 
-   
         // getUpdatedUser();
         clean();
 
@@ -249,6 +248,11 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
       snapPoints={snapPoints}
       onChange={handleSheetChanges}
       onDismiss={clean}
+      enableOverDrag={false}
+      handleStyle={{
+        backgroundColor: colors.background,
+      }}
+      handleIndicatorStyle={{ backgroundColor: colors.t5 }}
     >
       <BottomSheetView style={styles.contentContainer}>
         {/* <View
@@ -258,7 +262,7 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
         // paddingTop: isIPhoneWithNotch ? 44 : 0,
       }}
     > */}
-        <View style={{ backgroundColor: colors.primary2, height: 200 }}>
+        <View style={{ backgroundColor: colors.background, height: 200 }}>
           <View
             style={{
               flexDirection: "row",
@@ -689,7 +693,7 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
                         style={{
                           height: 20,
                           width: 150,
-                          backgroundColor: colors.grey,
+                          backgroundColor: colors.background,
                           borderRadius: 20,
                           left: 4,
                         }}
@@ -707,7 +711,7 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
                         style={{
                           height: 30,
                           width: 30,
-                          backgroundColor: colors.grey,
+                          backgroundColor: colors.background,
                           borderRadius: 20,
                           left: 4,
                         }}
@@ -716,7 +720,7 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
                         style={{
                           height: 20,
                           width: 100,
-                          backgroundColor: colors.grey,
+                          backgroundColor: colors.background,
                           borderRadius: 20,
                           left: 10,
                         }}
@@ -740,7 +744,7 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
                       style={{
                         height: 18,
                         width: 100,
-                        backgroundColor: colors.grey,
+                        backgroundColor: colors.background,
                         borderRadius: 20,
                         left: 4,
                         top: 4,
@@ -752,8 +756,9 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
             </Animated.View>
           )}
           <TouchableOpacity
+          disabled={!searchedUser}
             onPress={() => {
-                buyTickets()
+              buyTickets();
             }}
             activeOpacity={0.5}
             style={{
@@ -770,7 +775,10 @@ const doorTicketSeparatedTickets = separatedTickets?.map((ticket) => {
               marginRight: 10,
               marginTop: 10,
               zIndex: 2,
-              backgroundColor: colors.primary,
+              backgroundColor: searchedUser
+                ? colors.primary
+                : colors.background2,
+
               borderRadius: 10,
             }}
             // onPress={() => navigation.navigate("addEvent", item)}
@@ -830,7 +838,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -869,7 +877,7 @@ const styles = StyleSheet.create({
   card: {
     height: 95,
     borderRadius: 10,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "100%",
     alignSelf: "center",

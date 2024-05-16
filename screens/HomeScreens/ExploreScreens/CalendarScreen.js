@@ -193,14 +193,24 @@ const CalendarScreen = () => {
             //   setSelectedDay(day.dateString);
             // }}
             onDayPress={getCalendarEvents}
+            // style={{ backgroundColor: colors.background2 }}
             theme={{
-              textSectionTitleColor: "#b6c1cd",
+              textSectionTitleColor: colors.t2,
               selectedDayBackgroundColor: colors.primary,
               selectedDayTextColor: "#ffffff",
               textMonthFontWeight: "500",
               textDayFontWeight: "500",
-              todayTextColor: colors.primary,
-              arrowColor: colors.primary,
+              todayTextColor: colors.t1,
+              todayBackgroundColor: colors.background,
+              arrowColor: colors.t3,
+              textDayHeaderFontWeight: "500",
+              monthTextColor: colors.t2,
+              dayTextColor: colors.t4,
+              
+
+              // backgroundColor: colors.background,
+              calendarBackground: colors.background2,
+              // contentStyle: { backgroundColor: colors.background },
               //  textDayHeaderFontWeight:"500",
               // textDayHeaderFontSize:14,
 
@@ -272,9 +282,9 @@ const CalendarScreen = () => {
           //   }}
           //   // onPress={() => navigation.navigate("event", item)}
           // >
-            <SmallCard {...item} selectedDay={selectedDay} />
-          // </TouchableOpacity>
-        ) : null;
+          <SmallCard {...item} selectedDay={selectedDay} />
+        ) : // </TouchableOpacity>
+        null;
       }}
       ListFooterComponent={<View style={{ marginBottom: 200 }} />}
     />

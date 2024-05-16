@@ -82,67 +82,23 @@ export default function HomeScreen({ navigation }) {
   // Convert milliseconds to seconds
   const differenceInSeconds = differenceInMilliseconds / 1000;
 
-  const getIpma = async () => {
-    try {
-      const resp = await axios.get(
-        "https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json"
-      );
-
-      const ipmaData = resp.data;
-
-      const keys = Object.keys(ipmaData);
-
-      // Sort keys by date (most recent first)
-      keys.sort((a, b) => new Date(b) - new Date(a));
-
-      // Iterate through sorted keys
-      for (const key of keys) {
-        const nestedObjects = ipmaData[key];
-
-        // Access nested objects based on specific keys
-        if (
-          nestedObjects.hasOwnProperty(1200576) ||
-          nestedObjects.hasOwnProperty(1200575)
-        ) {
-          const element = nestedObjects[1200576] || nestedObjects[1200575];
-          console.log(element);
-          break; // Exit loop after finding the desired nested object
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  let filteredIpma = [];
-
-  // Object.keys(ipmaData).forEach((key) => {
-  //   const value = ipmaData[key];
-  //   filteredIpma.push(value);
-  //   // console.log(`Key: ${key}, Value: ${value}`);
-  // });
-
-  console.log(filteredIpma[0]);
-
-  useEffect(() => {
-    getIpma();
-  }, []);
-
   const reco = [...events];
 
-  reco.reverse();
+  reco?.reverse();
   useEffect(() => {
-    const unsubscribe = navigation.addListener("tabPress", (e) => {
+    const unsubscribe = navigation?.addListener("tabPress", (e) => {
       authSheetRef?.current?.close();
       if (isFocused) {
-        homeTabRef.current?.scrollToOffset({ offset: 0, animated: true });
+        homeTabRef?.current?.scrollToOffset({ offset: 0, animated: true });
       }
     });
 
     return unsubscribe;
   }, [navigation, isFocused]);
   return (
-    <>
+    //     <View style={{backgroundColor:colors.background}}>
+
+    <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <View
         style={{
           flexDirection: "row",
@@ -280,7 +236,10 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View> */}
         <FlatList
-          contentContainerStyle={{ backgroundColor: colors.background, top: 50 }}
+          contentContainerStyle={{
+            backgroundColor: colors.background,
+            top: 50,
+          }}
           onRefresh={getEvents}
           bounces={false}
           ref={homeTabRef}
@@ -300,17 +259,20 @@ export default function HomeScreen({ navigation }) {
                   height: 250,
                 }}
               />
-              {events?.length > 0 ? (
+              {events?.length > 0 ? ( //
                 <Carousel
+                  layout="stack"
                   inactiveSlideOpacity={1}
                   ref={carouselRef}
                   data={events}
                   renderItem={_renderItem}
                   // sliderWidth={300}
                   sliderWidth={width}
-                  itemWidth={width * 0.8}
+                  itemWidth={width * 0.85}
+                  loop={true}
                 />
               ) : (
+                // null
                 // <Animated.View
                 //   style={{ flex: 1 }}
                 //   entering={FadeIn}
@@ -442,7 +404,14 @@ export default function HomeScreen({ navigation }) {
                     //</TouchableOpacity>
                   );
                 }}
-                ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+                ListFooterComponent={
+                  <View
+                    style={{
+                      marginBottom: 50,
+                      backgroundColor: colors.background,
+                    }}
+                  />
+                }
               />
             </>
           }
@@ -452,15 +421,15 @@ export default function HomeScreen({ navigation }) {
           setAuthModalUp={setAuthModalUp}
         />
       </View>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     // backgroundColor: "red",
-    // backgroundColor: colors.background,
-    backgroundColor: "rgba(5, 19, 29,0.9)",
+    backgroundColor: colors.background,
+    // backgroundColor: "rgba(5, 19, 29,0.9)",
   },
   headerContainer: {
     // backgroundColor: colors.white,

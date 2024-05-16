@@ -395,7 +395,7 @@ export default EventStoreSheet = ({
             justifyContent: "space-between",
             width: "100%",
             height: isIPhoneWithNotch ? 80 : 55,
-            backgroundColor: colors.white,
+            backgroundColor: colors.background,
             // position: "absolute",
             zIndex: 4,
             bottom: 0,
@@ -417,9 +417,9 @@ export default EventStoreSheet = ({
           >
             <Text
               style={{
-                fontSize: 19,
-                color: colors.black2,
-                fontWeight: "600",
+                fontSize: 18,
+                color: colors.t5,
+                fontWeight: "400",
                 marginRight: 5,
               }}
             >
@@ -428,10 +428,11 @@ export default EventStoreSheet = ({
             <Text
               style={{
                 fontSize: 19,
-                color: colors.primary,
-                fontWeight: "600",
+                color: colors.t2,
+                fontWeight: "500",
                 position: "absolute",
                 left: 50,
+                bottom: 2,
               }}
             >
               cve {formatNumber(state?.total)}
@@ -446,7 +447,7 @@ export default EventStoreSheet = ({
               width: 150,
               height: 40,
               backgroundColor:
-                state?.total != 0 ? colors.primary : colors.softGrey,
+                state?.total == 0 ? colors.background2 : colors.primary2, // position: "absolute",
               zIndex: 1,
               //   top: 10,
               // left: 10,
@@ -468,7 +469,7 @@ export default EventStoreSheet = ({
               <Text
                 style={{
                   fontSize: 15,
-                  color: colors.white,
+                  color: state?.total == 0 ? colors.t5 : colors.t2,
                   fontWeight: "500",
                   marginRight: 10,
                 }}
@@ -483,13 +484,7 @@ export default EventStoreSheet = ({
     [state?.amount, loading, onPayment, topUp]
   );
   const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={1}
-        appearsOnIndex={2}
-      />
-    ),
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
     []
   );
   // if (loading) {
@@ -526,61 +521,43 @@ export default EventStoreSheet = ({
   //   );
   // }
 
-  if(event?.store?.length>0)return (
-    <BottomSheetModalProvider>
-      <BottomSheetModal
-        // style={{backgroundColor:}}
-        ref={sheetRef}
-        // index={keyboardVisible ? 1 : 0}
-        index={keyboardVisible ? 2 : onPayment ? 0 : 1}
-        snapPoints={snapPoints}
-        // onChange={() => setStoreSheetUp(true)}
-        onDismiss={clean}
-        footerComponent={renderFooter}
-        backdropComponent={renderBackdrop}
-      >
-        <BottomSheetFlatList
-          data={state?.cart}
-          style={{ backgroundColor: colors.background }}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.contentContainer]}
-          numColumns={2}
-          keyExtractor={(item) => item?.id}
-          ListHeaderComponent={
-            <>
-              {!onPayment && !topUp && (
-                <Text
+  if (event?.store?.length > 0)
+    return (
+      <BottomSheetModalProvider>
+        <BottomSheetModal
+          // style={{backgroundColor:}}
+          ref={sheetRef}
+          // index={keyboardVisible ? 1 : 0}
+          index={keyboardVisible ? 2 : onPayment ? 0 : 1}
+          snapPoints={snapPoints}
+          // onChange={() => setStoreSheetUp(true)}
+          onDismiss={clean}
+          footerComponent={renderFooter}
+          backdropComponent={renderBackdrop}
+          handleStyle={{
+            backgroundColor: colors.background,
+          }}
+          handleIndicatorStyle={{ backgroundColor: colors.t5 }}
+        >
+          <BottomSheetFlatList
+            data={state?.cart}
+            style={{ backgroundColor: colors.background }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.contentContainer]}
+            numColumns={2}
+            keyExtractor={(item) => item?.id}
+            ListHeaderComponent={
+              <>
+                {/* {!onPayment && !topUp && ( */}
+                <View
                   style={{
-                    fontSize: 18,
-                    fontWeight: "500",
-                    color: colors.primary,
-                    padding: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                     marginBottom: 40,
-                    alignSelf: "center",
                   }}
                 >
-                  Loja
-                </Text>
-              )}
-              {onPayment && (
-                <Animated.View
-                  style={{ zIndex: 3 }}
-                  entering={SlideInRight}
-                  exiting={SlideOutRight}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      // flex:1,
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: 10,
-                      borderBottomWidth: 1,
-                      borderColor: colors.grey,
-                      marginBottom: 10,
-                      zIndex: 3,
-                    }}
-                  >
+                  {onPayment ? (
                     <TouchableOpacity
                       onPress={() => {
                         setOnPayment(false), setTopUp(false);
@@ -588,483 +565,517 @@ export default EventStoreSheet = ({
                       style={{
                         flexDirection: "row",
                         alignItems: "center",
+                        marginLeft: 20,
                       }}
                     >
                       <MaterialCommunityIcons
                         name="arrow-left"
-                        size={20}
-                        color={colors.primary}
+                        size={23}
+                        color={colors.t2}
                       />
                       <Text
                         style={{
-                          color: colors.primary,
+                          color: colors.t4,
                           fontSize: 16,
                           fontWeight: "500",
+                          marginLeft: 5,
                         }}
                       >
                         Voltar
                       </Text>
                     </TouchableOpacity>
+                  ) : (
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "500",
+                        color: colors.t2,
+                        padding: 10,
+                        marginLeft: 30,
+                        // alignSelf: "center",
+                      }}
+                    >
+                      Loja
+                    </Text>
+                  )}
+                  <View
+                    style={{
+                      flexDirection: "row",
 
+                      marginRight: 20,
+                      marginLeft: 5,
+                      zIndex: 3,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "500",
+                        color: colors.t4,
+
+                        // left: 10,
+                      }}
+                    >
+                      Balanço:
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: 17,
+                        fontWeight: "500",
+                        color: colors.t2,
+                        // top: 2,
+                        // position: "absolute",
+                        // left: 20,
+                      }}
+                    >
+                      {" cve " + formatNumber(user?.balance?.amount) || 0}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* )} */}
+                {onPayment && (
+                  <Animated.View
+                    style={{ zIndex: 3 }}
+                    entering={SlideInRight}
+                    exiting={SlideOutRight}
+                  >
+                    <Animated.FlatList
+                      entering={FadeIn}
+                      exiting={FadeOut}
+                      data={state?.cart?.filter((item) => item?.amount != 0)}
+                      keyExtractor={(item) => item?.id}
+                      ListHeaderComponent={
+                        <>
+                          {topUp && (
+                            <Animated.View
+                              entering={SlideInUp.duration(200)}
+                              exiting={SlideOutUp.duration(80)}
+                              style={{
+                                padding: 10,
+                                zIndex: 1,
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  fontSize: 15,
+                                  fontWeight: "400",
+                                  marginBottom: 5,
+                                  color: colors.darkRed,
+                                  textAlign: "center",
+                                }}
+                              >
+                                Não tens saldo suficiente.{"\n"}Por favor
+                                carregue a sua conta!
+                              </Text>
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  marginBottom: 5,
+                                  // marginVertical: 10,
+                                  // marginBottom: 20,
+                                }}
+                              >
+                                <TextInput
+                                  error={
+                                    (emptyCardInfo &&
+                                      paymentInfo?.cardInfo?.amount < 0) ||
+                                    !paymentInfo?.cardInfo?.amount
+                                  }
+                                  style={{
+                                    backgroundColor: "transparent",
+                                    width: "25%",
+                                  }}
+                                  // autoFocus
+                                  mode="outlined"
+                                  activeOutlineColor={colors.primary}
+                                  underlineStyle={{
+                                    backgroundColor: colors.primary,
+                                  }}
+                                  outlineColor={colors.primary}
+                                  // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                  label="Valor"
+                                  defaultValue={paymentInfo?.cardInfo?.amount}
+                                  activeUnderlineColor={colors.primary}
+                                  value={paymentInfo?.cardInfo?.amount}
+                                  onChangeText={(text) =>
+                                    setPaymentInfo({
+                                      ...paymentInfo,
+                                      cardInfo: {
+                                        ...paymentInfo?.cardInfo,
+                                        amount: text,
+                                      },
+                                    })
+                                  }
+                                />
+                                <TextInput
+                                  error={
+                                    emptyCardInfo &&
+                                    !paymentInfo?.cardInfo?.number
+                                  }
+                                  style={{
+                                    width: "72%",
+                                    backgroundColor: "transparent",
+                                  }}
+                                  // autoFocus
+                                  mode="outlined"
+                                  activeOutlineColor={colors.primary}
+                                  underlineStyle={{
+                                    backgroundColor: colors.primary,
+                                  }}
+                                  outlineColor={colors.primary}
+                                  // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                  label="Número de cartão"
+                                  defaultValue={paymentInfo?.cardInfo?.number}
+                                  activeUnderlineColor={colors.primary}
+                                  value={paymentInfo?.cardInfo?.number}
+                                  onChangeText={(text) =>
+                                    setPaymentInfo({
+                                      ...paymentInfo,
+                                      cardInfo: {
+                                        ...paymentInfo?.cardInfo,
+                                        number: text,
+                                      },
+                                    })
+                                  }
+                                />
+                              </View>
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  // marginVertical: 10,
+                                  // marginBottom: 20,
+                                }}
+                              >
+                                <TextInput
+                                  error={
+                                    emptyCardInfo &&
+                                    !paymentInfo?.cardInfo?.date
+                                  }
+                                  style={{
+                                    marginBottom: 5,
+                                    backgroundColor: "transparent",
+                                    width: "48%",
+                                  }}
+                                  // autoFocus
+                                  mode="outlined"
+                                  activeOutlineColor={colors.primary}
+                                  underlineStyle={{
+                                    backgroundColor: colors.primary,
+                                  }}
+                                  outlineColor={colors.primary}
+                                  // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                  label="Data de validade"
+                                  defaultValue={paymentInfo?.cardInfo?.date}
+                                  activeUnderlineColor={colors.primary}
+                                  keyboardType="number-pad"
+                                  onKeyPress={({ nativeEvent }) => {
+                                    nativeEvent.key === "Backspace" &&
+                                    paymentInfo?.cardInfo?.date?.length == 5
+                                      ? paymentInfo?.cardInfo?.date?.slice(2)
+                                      : null;
+                                  }}
+                                  value={paymentInfo?.cardInfo?.date}
+                                  onChangeText={(text) => {
+                                    return setPaymentInfo({
+                                      ...paymentInfo,
+                                      cardInfo: {
+                                        ...paymentInfo?.cardInfo,
+                                        date:
+                                          paymentInfo?.cardInfo?.date?.length ==
+                                            1 &&
+                                          text.length === 2 &&
+                                          text.charAt(1) === "/"
+                                            ? text + " / "
+                                            : text,
+                                      },
+                                    });
+                                  }}
+                                  // onChange={({
+                                  //   nativeEvent: { eventCount, target, text },
+                                  // }) =>
+                                  //   setPaymentInfo({
+                                  //     ...paymentInfo,
+                                  //     cardInfo: {
+                                  //       ...paymentInfo?.cardInfo,
+                                  //       date:
+                                  //         paymentInfo?.cardInfo?.date?.length ==
+                                  //           1 && nativeEvent.key != "Backspace"
+                                  //           ? text + " / "
+                                  //           : text,
+                                  //     },
+                                  //   })
+                                  // }
+                                />
+                                <TextInput
+                                  error={
+                                    emptyCardInfo && !paymentInfo?.cardInfo?.ccv
+                                  }
+                                  style={{
+                                    marginBottom: 5,
+                                    backgroundColor: "transparent",
+                                    width: "48%",
+                                  }}
+                                  // autoFocus
+                                  mode="outlined"
+                                  activeOutlineColor={colors.primary}
+                                  underlineStyle={{
+                                    backgroundColor: colors.primary,
+                                  }}
+                                  outlineColor={colors.primary}
+                                  // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                                  label="cvv"
+                                  defaultValue={paymentInfo?.cardInfo?.ccv}
+                                  activeUnderlineColor={colors.primary}
+                                  value={paymentInfo?.cardInfo?.ccv}
+                                  onChangeText={(text) =>
+                                    setPaymentInfo({
+                                      ...paymentInfo,
+                                      cardInfo: {
+                                        ...paymentInfo?.cardInfo,
+                                        ccv: text,
+                                      },
+                                    })
+                                  }
+                                />
+                              </View>
+                            </Animated.View>
+                          )}
+                          <Text
+                            style={{
+                              fontSize: 17,
+                              fontWeight: "400",
+                              color: colors.t3,
+                              marginLeft: 10,
+                              // marginTop: 10,
+                              marginBottom: 10,
+
+                              // left: 10,
+                            }}
+                          >
+                            Produtos selecionados
+                          </Text>
+                        </>
+                      }
+                      ItemSeparatorComponent={
+                        <View
+                          style={{
+                            alignSelf: "center",
+                            width: "95%",
+                            backgroundColor: colors.separator,
+                            height: 1,
+                            marginVertical: 10,
+                          }}
+                        />
+                      }
+                      renderItem={({ item }) => {
+                        return (
+                          <Animated.View
+                            entering={FadeIn}
+                            exiting={FadeOut}
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginLeft: 10,
+                            }}
+                          >
+                            <Text
+                              style={{
+                                fontSize: 17,
+                                fontWeight: "500",
+                                color: colors.t2,
+                                // left: 10,
+                              }}
+                            >
+                              {item?.amount}x
+                            </Text>
+
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                fontWeight: "500",
+                                color: colors.t5,
+                                top: 2,
+                                position: "absolute",
+                                left: 30,
+                              }}
+                            >
+                              {item?.displayName +
+                                (item?.amount > 1
+                                  ? " selecionados!"
+                                  : " selecionado!")}
+                            </Text>
+                          </Animated.View>
+                        );
+                      }}
+                    />
+                  </Animated.View>
+                )}
+              </>
+            }
+            renderItem={({ item }) => {
+              return !onPayment ? (
+                <Animated.View
+                  entering={FadeIn}
+                  exiting={FadeOut.duration(10)}
+                  style={{
+                    margin: 10,
+                    marginBottom: 50,
+
+                    alignItems: "center",
+                    backgroundColor: colors.background2,
+                    //   width: width * 0.45,
+                    //   height: height * 0.2,
+                    width: width * 0.45,
+                    height: 150,
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 1,
+                    elevation: 0.5,
+                    paddingHorizontal: 10,
+                    padding: 10,
+                    //   marginTop: 50,
+                    borderRadius: 10,
+                  }}
+                  // onPress={() => navigation.navigate("addEvent", item)}
+                >
+                  <View
+                    style={{
+                      // height: height * 0.15,
+                      // width: width * 0.3,
+                      height: 120,
+                      width: 130,
+                      borderRadius: 10,
+                      // bottom: 40,
+                      zIndex: 1,
+                      // overflow: "hidden",
+
+                      // marginLeft: 20,
+                      bottom: 70,
+                      position: "absolute",
+                      shadowOffset: { width: 1, height: 1 },
+                      shadowOpacity: 1,
+                      shadowRadius: 3,
+                      elevation: 2,
+                      // shadowColor: colors.grey,
+                      // backgroundColor: colors.background,
+                    }}
+                  >
                     <View
                       style={{
-                        flexDirection: "row",
+                        height: 20,
+                        // width: 50,
                         alignItems: "center",
-                        alignSelf: "flex-end",
-                        // marginRight: 20,
-                        marginRight: 20,
-                        marginLeft: 5,
+                        justifyContent: "center",
+                        backgroundColor: colors.background,
+                        position: "absolute",
+                        // right: width * 0.12,
+                        right: 0,
+
+                        // top: 100,
+                        // transform: [{ rotate: "45deg" }],
+                        // borderRadius: 10,
+
+                        borderTopLeftRadius: 10,
+                        borderBottomRightRadius: 10,
+                        bottom: 0,
+                        // borderWidth: 1,
+                        // borderColor: colors.grey,
+                        // borderStyle: "dashed",
                         zIndex: 3,
                       }}
                     >
                       <Text
                         style={{
-                          fontSize: 17,
+                          color: colors.white,
                           fontWeight: "500",
-                          color: colors.primary2,
-
-                          // left: 10,
+                          padding: 2,
+                          paddingHorizontal: 5,
                         }}
                       >
-                        Balanço:
-                      </Text>
-
-                      <Text
-                        style={{
-                          fontSize: 17,
-                          fontWeight: "500",
-                          color: colors.primary,
-                          // top: 2,
-                          // position: "absolute",
-                          // left: 20,
-                        }}
-                      >
-                        {" cve " + formatNumber(user?.balance?.amount) || 0}
+                        cve {formatNumber(item?.price)}
                       </Text>
                     </View>
+                    <Image
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        borderRadius: 10,
+
+                        //   borderRadius: 5,
+                      }}
+                      source={{ uri: item?.photo }}
+                    />
                   </View>
-
-                  <Animated.FlatList
-                    entering={FadeIn}
-                    exiting={FadeOut}
-                    data={state?.cart?.filter((item) => item?.amount != 0)}
-                    keyExtractor={(item) => item?.id}
-                    ListHeaderComponent={
-                      <>
-                        {topUp && (
-                          <Animated.View
-                            entering={SlideInUp.duration(200)}
-                            exiting={SlideOutUp.duration(80)}
-                            style={{
-                              padding: 10,
-                              zIndex: 1,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontSize: 15,
-                                fontWeight: "400",
-                                marginBottom: 5,
-                                color: colors.darkRed,
-                                textAlign: "center",
-                              }}
-                            >
-                              Não tens saldo suficiente.{"\n"}Por favor carregue
-                              a sua conta!
-                            </Text>
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                marginBottom: 5,
-                                // marginVertical: 10,
-                                // marginBottom: 20,
-                              }}
-                            >
-                              <TextInput
-                                error={
-                                  (emptyCardInfo &&
-                                    paymentInfo?.cardInfo?.amount < 0) ||
-                                  !paymentInfo?.cardInfo?.amount
-                                }
-                                style={{
-                                  backgroundColor: "transparent",
-                                  width: "25%",
-                                }}
-                                // autoFocus
-                                mode="outlined"
-                                activeOutlineColor={colors.primary}
-                                underlineStyle={{
-                                  backgroundColor: colors.primary,
-                                }}
-                                outlineColor={colors.primary}
-                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                                label="Valor"
-                                defaultValue={paymentInfo?.cardInfo?.amount}
-                                activeUnderlineColor={colors.primary}
-                                value={paymentInfo?.cardInfo?.amount}
-                                onChangeText={(text) =>
-                                  setPaymentInfo({
-                                    ...paymentInfo,
-                                    cardInfo: {
-                                      ...paymentInfo?.cardInfo,
-                                      amount: text,
-                                    },
-                                  })
-                                }
-                              />
-                              <TextInput
-                                error={
-                                  emptyCardInfo &&
-                                  !paymentInfo?.cardInfo?.number
-                                }
-                                style={{
-                                  width: "72%",
-                                  backgroundColor: "transparent",
-                                }}
-                                // autoFocus
-                                mode="outlined"
-                                activeOutlineColor={colors.primary}
-                                underlineStyle={{
-                                  backgroundColor: colors.primary,
-                                }}
-                                outlineColor={colors.primary}
-                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                                label="Número de cartão"
-                                defaultValue={paymentInfo?.cardInfo?.number}
-                                activeUnderlineColor={colors.primary}
-                                value={paymentInfo?.cardInfo?.number}
-                                onChangeText={(text) =>
-                                  setPaymentInfo({
-                                    ...paymentInfo,
-                                    cardInfo: {
-                                      ...paymentInfo?.cardInfo,
-                                      number: text,
-                                    },
-                                  })
-                                }
-                              />
-                            </View>
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                // marginVertical: 10,
-                                // marginBottom: 20,
-                              }}
-                            >
-                              <TextInput
-                                error={
-                                  emptyCardInfo && !paymentInfo?.cardInfo?.date
-                                }
-                                style={{
-                                  marginBottom: 5,
-                                  backgroundColor: "transparent",
-                                  width: "48%",
-                                }}
-                                // autoFocus
-                                mode="outlined"
-                                activeOutlineColor={colors.primary}
-                                underlineStyle={{
-                                  backgroundColor: colors.primary,
-                                }}
-                                outlineColor={colors.primary}
-                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                                label="Data de validade"
-                                defaultValue={paymentInfo?.cardInfo?.date}
-                                activeUnderlineColor={colors.primary}
-                                keyboardType="number-pad"
-                                onKeyPress={({ nativeEvent }) => {
-                                  nativeEvent.key === "Backspace" &&
-                                  paymentInfo?.cardInfo?.date?.length == 5
-                                    ? paymentInfo?.cardInfo?.date?.slice(2)
-                                    : null;
-                                }}
-                                value={paymentInfo?.cardInfo?.date}
-                                onChangeText={(text) => {
-                                  return setPaymentInfo({
-                                    ...paymentInfo,
-                                    cardInfo: {
-                                      ...paymentInfo?.cardInfo,
-                                      date:
-                                        paymentInfo?.cardInfo?.date?.length ==
-                                          1 &&
-                                        text.length === 2 &&
-                                        text.charAt(1) === "/"
-                                          ? text + " / "
-                                          : text,
-                                    },
-                                  });
-                                }}
-                                // onChange={({
-                                //   nativeEvent: { eventCount, target, text },
-                                // }) =>
-                                //   setPaymentInfo({
-                                //     ...paymentInfo,
-                                //     cardInfo: {
-                                //       ...paymentInfo?.cardInfo,
-                                //       date:
-                                //         paymentInfo?.cardInfo?.date?.length ==
-                                //           1 && nativeEvent.key != "Backspace"
-                                //           ? text + " / "
-                                //           : text,
-                                //     },
-                                //   })
-                                // }
-                              />
-                              <TextInput
-                                error={
-                                  emptyCardInfo && !paymentInfo?.cardInfo?.ccv
-                                }
-                                style={{
-                                  marginBottom: 5,
-                                  backgroundColor: "transparent",
-                                  width: "48%",
-                                }}
-                                // autoFocus
-                                mode="outlined"
-                                activeOutlineColor={colors.primary}
-                                underlineStyle={{
-                                  backgroundColor: colors.primary,
-                                }}
-                                outlineColor={colors.primary}
-                                // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-                                label="cvv"
-                                defaultValue={paymentInfo?.cardInfo?.ccv}
-                                activeUnderlineColor={colors.primary}
-                                value={paymentInfo?.cardInfo?.ccv}
-                                onChangeText={(text) =>
-                                  setPaymentInfo({
-                                    ...paymentInfo,
-                                    cardInfo: {
-                                      ...paymentInfo?.cardInfo,
-                                      ccv: text,
-                                    },
-                                  })
-                                }
-                              />
-                            </View>
-                          </Animated.View>
-                        )}
-                        <Text
-                          style={{
-                            fontSize: 17,
-                            fontWeight: "500",
-                            color: colors.primary,
-                            marginLeft: 10,
-                            // marginTop: 10,
-                            marginBottom: 10,
-
-                            // left: 10,
-                          }}
-                        >
-                          Produtos selecionados
-                        </Text>
-                      </>
-                    }
-                    ItemSeparatorComponent={
-                      <View
-                        style={{
-                          alignSelf: "center",
-                          width: "95%",
-                          backgroundColor: colors.grey,
-                          height: 1,
-                          marginVertical: 10,
-                        }}
-                      />
-                    }
-                    renderItem={({ item }) => {
-                      return (
-                        <Animated.View
-                          entering={FadeIn}
-                          exiting={FadeOut}
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginLeft: 10,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontSize: 17,
-                              fontWeight: "500",
-                              color: colors.primary,
-                              // left: 10,
-                            }}
-                          >
-                            {item?.amount}x
-                          </Text>
-
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              fontWeight: "500",
-                              color: colors.dark,
-                              top: 2,
-                              position: "absolute",
-                              left: 30,
-                            }}
-                          >
-                            {item?.displayName +
-                              (item?.amount > 1
-                                ? " selecionados!"
-                                : " selecionado!")}
-                          </Text>
-                        </Animated.View>
-                      );
-                    }}
-                  />
-                </Animated.View>
-              )}
-            </>
-          }
-          renderItem={({ item }) => {
-            return !topUp && !onPayment ? (
-              <Animated.View
-                entering={FadeIn}
-                exiting={FadeOut.duration(10)}
-                style={{
-                  margin: 10,
-                  marginBottom: 50,
-
-                  alignItems: "center",
-                  backgroundColor: colors.white,
-                  //   width: width * 0.45,
-                  //   height: height * 0.2,
-                  width: width * 0.45,
-                  height: 150,
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 1,
-                  elevation: 0.5,
-                  paddingHorizontal: 10,
-                  padding: 10,
-                  //   marginTop: 50,
-                  borderRadius: 10,
-                }}
-                // onPress={() => navigation.navigate("addEvent", item)}
-              >
-                <View
-                  style={{
-                    // height: height * 0.15,
-                    // width: width * 0.3,
-                    height: 120,
-                    width: 130,
-                    borderRadius: 10,
-                    // bottom: 40,
-                    zIndex: 1,
-                    // overflow: "hidden",
-
-                    // marginLeft: 20,
-                    bottom: 70,
-                    position: "absolute",
-                    shadowOffset: { width: 1, height: 1 },
-                    shadowOpacity: 1,
-                    shadowRadius: 3,
-                    elevation: 2,
-                    shadowColor: colors.grey,
-                    backgroundColor: colors.background,
-                  }}
-                >
                   <View
                     style={{
-                      height: 20,
-                      // width: 50,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: colors.primary,
                       position: "absolute",
-                      // right: width * 0.12,
-                      right: 0,
-
-                      // top: 100,
-                      // transform: [{ rotate: "45deg" }],
-                      // borderRadius: 10,
-
-                      borderTopLeftRadius: 10,
-                      borderBottomRightRadius: 10,
-                      bottom: 0,
-                      // borderWidth: 1,
-                      // borderColor: colors.grey,
-                      // borderStyle: "dashed",
-                      zIndex: 3,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.white,
-                        fontWeight: "500",
-                        padding: 2,
-                        paddingHorizontal: 5,
-                      }}
-                    >
-                      cve {formatNumber(item?.price)}
-                    </Text>
-                  </View>
-                  <Image
-                    style={{
-                      height: "100%",
-                      width: "100%",
-                      borderRadius: 10,
-
-                      //   borderRadius: 5,
-                    }}
-                    source={{ uri: item?.photo }}
-                  />
-                </View>
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 10,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      zIndex: 3,
                       bottom: 10,
-                      fontSize: 14,
-                      fontWeight: "500",
-                      color: colors.primary2,
+                      alignItems: "center",
                     }}
                   >
-                    {item?.displayName}
-                  </Text>
-                  <View style={styles.counterView}>
-                    <TouchableOpacity onPress={() => decrease(item)}>
-                      <AntDesign
-                        name="minuscircle"
-                        size={24}
-                        color={colors.darkGrey}
-                      />
-                    </TouchableOpacity>
                     <Text
                       style={{
-                        fontSize: 22,
-                        fontWeight: "600",
-                        color: colors.darkGrey,
+                        zIndex: 3,
+                        bottom: 10,
+                        fontSize: 14,
+                        fontWeight: "500",
+                        color: colors.t2,
                       }}
                     >
-                      {item?.amount}
+                      {item?.displayName}
                     </Text>
-                    <TouchableOpacity onPress={() => increase(item)}>
-                      <AntDesign
-                        name="pluscircle"
-                        size={24}
-                        color={colors.primary}
-                      />
-                    </TouchableOpacity>
+                    <View style={styles.counterView}>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => decrease(item)}
+                      >
+                        <AntDesign
+                          name="minuscircle"
+                          size={24}
+                          color={
+                            state?.cart?.filter((cartItem) => {
+                              if (cartItem?.id == item?.id)
+                                return cartItem?.amount;
+                            })== 0
+                              ? colors.description
+                              : colors.t4
+                          }
+                        />
+                      </TouchableOpacity>
+                      <Text
+                        style={{
+                          fontSize: 22,
+                          fontWeight: "600",
+                          color: colors.t4,
+                        }}
+                      >
+                        {item?.amount}
+                      </Text>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        onPress={() => increase(item)}
+                      >
+                        <AntDesign
+                          name="pluscircle"
+                          size={24}
+                          color={colors.t1}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              </Animated.View>
-            ) : null;
-          }}
-        />
-      </BottomSheetModal>
-    </BottomSheetModalProvider>
-  );
+                </Animated.View>
+              ) : null;
+            }}
+          />
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    );
 };
 
 const styles = StyleSheet.create({

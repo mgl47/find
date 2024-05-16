@@ -104,8 +104,8 @@ import {
       (props) => (
         <BottomSheetBackdrop
           {...props}
-          disappearsOnIndex={1}
-          appearsOnIndex={2}
+          disappearsOnIndex={-1}
+
         />
       ),
       []

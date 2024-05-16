@@ -35,7 +35,7 @@ import {
   } from "react-native-reanimated";
   import { Tab as Tab2, Text as Text2, TabView } from "@rneui/themed";
   
-  import { Camera, FlashMode } from "expo-camera";
+  import { Camera, FlashMode } from  'expo-camera/legacy';
   import axios from "axios";
   import { useData } from "../../../../components/hooks/useData";
   import { Button } from "react-native";

@@ -399,7 +399,7 @@ function StackNavigator() {
           // headerTransparent: true,
           // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
           headerTitle: "Gerenciar Evento",
-          headerTitleStyle: { color: colors.white },
+          headerTitleStyle: { color: colors.t3 },
         }}
         name="manageEvent"
         component={EventManagingScreen}
@@ -407,7 +407,7 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           headerTitle: "Validar",
-          headerTitleStyle: { color: colors.white },
+          headerTitleStyle: { color: colors.t2 },
         }}
         name="qrValidator"
         component={ValidatorScreen}
@@ -415,7 +415,7 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           headerTitle: "Loja",
-          headerTitleStyle: { color: colors.white },
+          headerTitleStyle: { color: colors.t3 },
         }}
         name="eventStore"
         component={StoreScreen}
@@ -424,7 +424,7 @@ function StackNavigator() {
         options={{
           headerShown: true,
           title: "Criar Evento",
-          headerTitleStyle: { color: colors.white },
+          headerTitleStyle: { color: colors.t2 },
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}

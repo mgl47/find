@@ -139,7 +139,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         /> */}
           <Text
             style={{
-              color: colors.primary,
+              color: colors.t4,
               fontSize: 16,
               fontWeight: "600",
             }}
@@ -151,7 +151,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
           // entering={FadeIn}
           // exiting={FadeOut}
           style={{
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             shadowOffset: { width: 0.5, height: 0.5 },
             shadowOpacity: 0.2,
             shadowRadius: 2,
@@ -213,9 +213,9 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               <Text style={styles.section}>Local:</Text>
               <Text
                 style={{
-                  color: colors.black2,
-                  fontSize: 16,
-                  fontWeight: "500",
+                  color: colors.t4,
+                  fontSize: 15,
+                  fontWeight: "400",
                   marginTop: 3,
                   // marginBottom: 15,
                 }}
@@ -259,7 +259,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         </View>
         <View
           style={{
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             shadowOffset: { width: 0.5, height: 0.5 },
             shadowOpacity: 0.2,
             shadowRadius: 2,
@@ -276,8 +276,8 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               {
                 textAlign: "center",
                 fontWeight: "500",
-                color: colors.darkSeparator,
-                color: colors.black2,
+                // color: colors.darkSeparator,
+                color: colors.t3,
                 fontSize: 17,
                 fontWeight: "500",
                 marginTop: 3,
@@ -317,7 +317,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       />
                       <Text
                         style={{
-                          color: colors.black2,
+                          color: colors.t4,
                           marginLeft: 10,
                           fontSize: 15,
                           fontWeight: "500",
@@ -333,23 +333,12 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                         justifyContent: "space-between",
                       }}
                     >
-                      {/* <Text
-                      style={{
-                        color: colors.black2,
-                        // marginLeft: 10,
-                        fontSize: 15,
-                        fontWeight: "600",
-                        textAlign: "left",
-                      }}
-                    >
-                      Preço:
-                    </Text> */}
                       <Text
                         style={{
-                          color: colors.black2,
+                          color: colors.t3,
                           marginLeft: 10,
                           fontSize: 15,
-                          fontWeight: "600",
+                          fontWeight: "500",
                         }}
                       >
                         cve{" " + formatNumber(item?.price)}
@@ -377,10 +366,10 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     >
                       <Text
                         style={{
-                          color: colors.description,
+                          color: colors.t4,
                           // marginLeft: 10,
                           fontSize: 15,
-                          fontWeight: "600",
+                          fontWeight: "500",
                           textAlign: "left",
                           // marginLeft: 10,
                         }}
@@ -389,10 +378,10 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       </Text>
                       <Text
                         style={{
-                          color: colors.primary2,
+                          color: colors.t3,
                           marginLeft: 5,
                           fontSize: 15,
-                          fontWeight: "600",
+                          fontWeight: "500",
                         }}
                       >
                         {item?.quantity}
@@ -412,7 +401,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     >
                       <Text
                         style={{
-                          color: colors.description,
+                          color: colors.t4,
                           marginLeft: 10,
                           fontSize: 15,
                           fontWeight: "600",
@@ -423,7 +412,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       </Text>
                       <Text
                         style={{
-                          color: colors.primary2,
+                          color: colors.t3,
                           marginLeft: 5,
                           fontSize: 15,
                           fontWeight: "600",
@@ -441,7 +430,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       </Text>
                       <Text
                         style={{
-                          color: colors.description,
+                          color: colors.t4,
                           marginLeft: 10,
                           fontSize: 15,
                           fontWeight: "600",
@@ -452,7 +441,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       </Text>
                       <Text
                         style={{
-                          color: colors.primary2,
+                          color: colors.t3,
                           marginLeft: 5,
                           fontSize: 15,
                           fontWeight: "600",
@@ -553,7 +542,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     <Text
                       style={[
                         styles.description,
-                        { color: colors.black2, alignSelf: "flex-start" },
+                        { color: colors.t5, alignSelf: "flex-start" },
                       ]}
                     >
                       cve
@@ -561,7 +550,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     <Text
                       style={[
                         styles.description,
-                        { color: colors.primary, alignSelf: "flex-start" },
+                        { color: colors.t5, alignSelf: "flex-start" },
                       ]}
                     >
                       cve
@@ -570,7 +559,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       <Text
                         style={[
                           styles.description,
-                          { color: colors.primary, alignSelf: "flex-start" },
+                          { color: colors.t5, alignSelf: "flex-start" },
                         ]}
                       >
                         cve
@@ -580,7 +569,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       style={[
                         styles.description,
                         {
-                          color: colors.black2,
+                          color: colors.t5,
                           alignSelf: "flex-start",
                           marginTop: 5,
                         },
@@ -598,8 +587,8 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       style={[
                         styles.amount,
                         {
-                          color: colors.primary,
-                          fontWeight: "700",
+                          color: colors.t5,
+                          fontWeight: "500",
                           alignSelf: "flex-end",
                         },
                       ]}
@@ -611,9 +600,9 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                         style={[
                           styles.amount,
                           {
-                            color: colors.primary,
+                            color: colors.t4,
                             alignSelf: "flex-end",
-                            fontWeight: "700",
+                            fontWeight: "500",
                           },
                         ]}
                       >
@@ -624,7 +613,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                       style={[
                         styles.amount,
                         {
-                          color: colors.primary2,
+                          color: colors.t4,
                           alignSelf: "flex-end",
                           marginTop: 5,
                         },
@@ -649,7 +638,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
 
         <View
           style={{
-            backgroundColor: colors.white,
+            backgroundColor: colors.background2,
             shadowOffset: { width: 0.5, height: 0.5 },
             shadowOpacity: 0.2,
             shadowRadius: 2,
@@ -666,8 +655,8 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               {
                 textAlign: "center",
                 fontWeight: "500",
-                color: colors.darkSeparator,
-                color: colors.black2,
+                color: colors.t3,
+
                 fontSize: 17,
                 fontWeight: "500",
                 marginTop: 3,
@@ -721,7 +710,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 fontSize: 15,
                 fontWeight: "500",
-                color: colors.primary2,
+                color: colors.t4,
               }}
             >
               Vender Bilhete
@@ -734,7 +723,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               <FontAwesome
                 name={"plus-circle"}
                 size={30}
-                color={colors.primary}
+                color={colors.t4}
               />
             </TouchableOpacity>
           </View>
@@ -752,7 +741,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               style={{
                 fontSize: 15,
                 fontWeight: "500",
-                color: colors.primary2,
+                color: colors.t4,
               }}
             >
               Suspender venda de bilhetes
@@ -799,27 +788,27 @@ export default Overview;
 
 const styles = StyleSheet.create({
   section: {
-    color: colors.darkGrey,
-    fontSize: 17,
+    color: colors.t2,
+    fontSize: 16,
     fontWeight: "400",
   },
   sectionText: {
     maxWidth: "99.75%",
-    color: colors.black2,
+    color: colors.t4,
     fontSize: 17,
-    fontWeight: "500",
+    fontWeight: "400",
     marginTop: 3,
     marginBottom: 15,
   },
 
   section2: {
-    color: colors.darkGrey,
-    fontSize: 17,
+    color: colors.t2,
+    fontSize: 16,
     fontWeight: "400",
   },
   sectionText2: {
-    color: colors.black2,
-    fontSize: 17,
+    color: colors.t4,
+    fontSize: 15,
     fontWeight: "500",
     top: 5,
   },
@@ -830,7 +819,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   eventTitle: {
-    color: colors.primary,
+    color: colors.t2,
     fontSize: 21,
     fontWeight: "600",
     textAlign: "center",
@@ -840,23 +829,23 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     width: "95%",
     marginVertical: 3,
     alignSelf: "center",
   },
   description: {
-    color: colors.description,
+    color: colors.t4,
     fontSize: 15.5,
     fontWeight: "600",
     textAlign: "right",
     marginBottom: 5,
   },
   amount: {
-    color: colors.black2,
+    color: colors.t3,
     marginLeft: 5,
     fontSize: 15.5,
-    fontWeight: "600",
+    fontWeight: "500",
     textAlign: "left",
     marginBottom: 5,
     alignSelf: "flex-start",

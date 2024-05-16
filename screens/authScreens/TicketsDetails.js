@@ -328,7 +328,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                           shadowOpacity: 0.2,
                           shadowRadius: 1,
                           elevation: 0.7,
-                          backgroundColor: "white",
+                          backgroundColor: colors.t1,
                           padding: 10,
                           paddingHorizontal: 20,
                           borderRadius: 10,
@@ -363,6 +363,12 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
                           color={colors.darkGold}
                           //   quietZone={10}
                           backgroundColor={colors.white}
+                          linearGradient={[
+                            colors.primary,
+                            colors.background,
+                            colors.primary,
+                            colors.primary,
+                          ]}
                         />
                       </View>
                       {item?.checkedIn && (
@@ -504,15 +510,15 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
         }}
         ListFooterComponent={<View style={{ marginBottom: 20 }} />}
       />
-      
-        <EventStoreSheet
-          // users={members}
 
-          ticket={ticket}
-          sheetRef={eventStoreSheetRef}
-          storeSheetUp={storeSheetUp}
-          setStoreSheetUp={setStoreSheetUp}
-        />
+      <EventStoreSheet
+        // users={members}
+
+        ticket={ticket}
+        sheetRef={eventStoreSheetRef}
+        storeSheetUp={storeSheetUp}
+        setStoreSheetUp={setStoreSheetUp}
+      />
 
       <OrderSheet
         order={selectedOrder}

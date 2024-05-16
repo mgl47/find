@@ -22,6 +22,7 @@ import {
   BottomSheetFlatList,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
@@ -80,16 +81,19 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
 
   const ticketColor = (category) => {
     if (category?.startsWith("Promo")) {
-      return colors.darkGrey;
+      return colors.t4;
     } else if (category?.startsWith("Normal")) {
-      return colors.primary;
+      return colors.primary2;
     } else if (category?.startsWith("V")) {
       return colors.darkGold;
     } else {
       return colors.primary2;
     }
   };
-
+  const renderBackdrop = useCallback(
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    []
+  );
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
@@ -104,13 +108,13 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 backgroundColor: colors.background,
               }}
               // autoFocus
-              underlineStyle={{ backgroundColor: colors.primary }}
+              // underlineStyle={{ backgroundColor: colors.background2 }}
               contentStyle={{}}
-              outlineColor={colors.primary}
+              outlineColor={colors.background2}
               mode="outlined"
-              activeOutlineColor={colors.primary}
+              activeOutlineColor={colors.primary2}
               label="Pesquise por um usuário"
-              activeUnderlineColor={colors.primary}
+              // activeUnderlineColor={colors.primary2}
               value={search}
               cursorColor={colors.primary}
               onChangeText={setSearch}
@@ -197,7 +201,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     style={{
                       fontSize: 18,
                       fontWeight: "600",
-                      color: colors.primary,
+                      color: colors.t2,
                       left: 4,
                     }}
                   >
@@ -209,7 +213,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "600",
                       marginLeft: 5,
                       top: 1,
-                      color: colors.darkGrey,
+                      color: colors.t4,
                       left: 4,
                     }}
                   >
@@ -228,13 +232,13 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     name={
                       item?.checkedIn ? "check-circle" : "check-circle-outline"
                     }
-                    size={24}
+                    size={22}
                     color={item?.checkedIn ? "green" : colors.description}
                   />
                   <Text
                     style={{
-                      fontSize: 15,
-                      fontWeight: "600",
+                      fontSize: 14,
+                      fontWeight: "500",
                       marginLeft: 5,
                       color: item?.checkedIn ? "green" : colors.description,
                     }}
@@ -245,9 +249,9 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     <Text
                       style={{
                         fontSize: 15,
-                        fontWeight: "600",
+                        fontWeight: "500",
                         marginLeft: 8,
-                        color: colors.primary2,
+                        color: colors.t4,
                       }}
                     >
                       {item?.checkedAt}
@@ -257,7 +261,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontWeight: "600",
+                    fontWeight: "500",
                     marginLeft: 5,
                     color: ticketColor(item?.category),
                   }}
@@ -286,6 +290,11 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
           ref={attendeeSheetRef}
           index={1}
           snapPoints={snapPoints}
+          backdropComponent={renderBackdrop}
+          handleStyle={{
+            backgroundColor: colors.background,
+          }}
+          handleIndicatorStyle={{ backgroundColor: colors.t5 }}
         >
           <BottomSheetFlatList
             style={styles.contentContainer}
@@ -311,7 +320,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "600",
                       // alignSelf: "center",
                       // left: 10,
-                      color: colors.primary2,
+                      color: colors.t4,
                     }}
                   >
                     Attendee Details
@@ -334,7 +343,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       alignSelf: "flex-start",
                       fontSize: 17,
                       fontWeight: "400",
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                     }}
                   >
@@ -358,7 +367,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       alignSelf: "flex-start",
                       fontSize: 17,
                       fontWeight: "400",
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                     }}
                   >
@@ -381,7 +390,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     style={{
                       alignSelf: "flex-start",
                       fontSize: 17,
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                     }}
                   >
@@ -406,7 +415,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       alignSelf: "flex-start",
                       fontSize: 17,
                       fontWeight: "400",
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                     }}
                   >
@@ -434,7 +443,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       alignSelf: "flex-start",
                       fontSize: 17,
                       fontWeight: "400",
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                     }}
                   >
@@ -462,7 +471,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       alignSelf: "flex-start",
                       fontSize: 16,
                       fontWeight: "400",
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginVertical: 3,
                       width: "70%",
                     }}
@@ -477,7 +486,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "500",
                       // alignSelf: "center",
                       // left: 10,
-                      color: colors.primary2,
+                      color: colors.t4,
                       marginTop: 15,
                     }}
                   >
@@ -500,7 +509,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       marginVertical: 2,
                       backgroundColor:
                         selectedAttendee?.uuid == item?.uuid
-                          ? colors.lightGrey
+                          ? colors.background2
                           : colors.background,
                     }}
                   >
@@ -519,7 +528,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                           alignSelf: "flex-start",
                           fontSize: 17,
                           // fontWeight: "500",
-                          color: colors.primary2,
+                          color: colors.t4,
                           marginVertical: 3,
                         }}
                       >
@@ -552,7 +561,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                           // alignSelf: "flex-start",
                           fontSize: 17,
                           // fontWeight: "500",
-                          color: colors.primary2,
+                          color: colors.t4,
                           marginVertical: 3,
                           position: "absolute",
                           right: -30,
@@ -601,7 +610,7 @@ const styles = StyleSheet.create({
     // alignItems:"center",
     height: 95,
     borderRadius: 10,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "100%",
     alignSelf: "center",
@@ -656,15 +665,15 @@ const styles = StyleSheet.create({
     width: "95%",
     height: 1,
     right: 10,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },
   label: {
     marginRight: 5,
-    fontSize: 17,
-    fontWeight: "500",
-    color: colors.description,
+    fontSize: 16,
+    fontWeight: "400",
+    color: colors.t5,
   },
   section: {
     flexDirection: "row",
@@ -672,8 +681,10 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     fontSize: 15,
+    color: colors.t5,
   },
   checkbox: {
     margin: 8,
+    borderColor: colors.t4,
   },
 });

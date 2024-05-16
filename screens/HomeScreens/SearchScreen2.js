@@ -40,45 +40,92 @@ import Animated, {
   SlideOutRight,
   SlideOutUp,
   SlideInDown,
+  FadeOut,
 } from "react-native-reanimated";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
 import { categories } from "../../components/Data/categories";
-import {
-  newEvents,
-  recommendedEvents,
-} from "../../components/Data/stockEvents";
+import { recommendedEvents } from "../../components/Data/stockEvents";
 import { artist } from "../../components/Data/artist";
 
 import SmallCard from "../../components/cards/SmallCard";
 import MediumCard from "../../components/cards/MediumCard";
 import { markers } from "../../components/Data/markers";
+import { useData } from "../../components/hooks/useData";
+import axios from "axios";
+import VenuesList from "../../components/cards/Venues/VenueList";
 const SearchScreen2 = ({
   navigation,
   navigation: { goBack, canGoBack },
   route,
 }) => {
   const { text, category } = route.params;
+  const { apiUrl } = useData();
   const [searchText, setSearchText] = useState(text);
+  const [events, setEvents] = useState([]);
+  const [venues, setVenues] = useState([]);
+  const [users, setUsers] = useState([]);
+
   const [firstMount, setFirstMount] = useState(true);
   const [inSearch, setInSearch] = useState(false);
   const [loading, setLoading] = useState(false);
   const [index, setIndex] = useState(1);
 
+  const fetchData = async (endpoint, setter) => {
+    try {
+      setLoading(true);
+      const result = await axios.get(
+        `${apiUrl}/${endpoint}/search/?search=${searchText.trim()}`
+      );
+      setter(result?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getEvents = async () => {
+    await fetchData("events", setEvents);
+  };
+
+  const getUsers = async () => {
+    await fetchData("users", setUsers);
+  };
+
+  const getVenues = async () => {
+    await fetchData("venues", setVenues);
+  };
+
   useEffect(() => {
+    getEvents();
+    getVenues();
+    getUsers();
     setFirstMount(false);
     getResults();
   }, []);
 
   const getResults = async () => {
     setLoading(true);
-    await new Promise((resolve, reject) => {
-      setTimeout(resolve, 1500);
-    });
-
-    setInSearch(true);
+    getEvents();
+    getVenues();
+    getUsers();
     setLoading(false);
   };
+
+  useEffect(() => {
+    let maxLength = Math.max(users.length, events.length, venues.length);
+
+    if (maxLength === events.length) {
+      setIndex(1);
+    } else if (maxLength === venues.length) {
+      setIndex(2);
+    } else if (maxLength === users.length) {
+      setIndex(0);
+    }
+
+    // Use index as needed...
+  }, [users, events, venues]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -178,11 +225,10 @@ const SearchScreen2 = ({
                 <TextInput
                   value={searchText}
                   onChangeText={setSearchText}
-                  // onSubmitEditing={() => navigation.navigate("search", searchText)}
                   onSubmitEditing={getResults}
                   // placeholder="encontre artistas, eventos ou lugares"
                   placeholder=" artistas, eventos ou lugares"
-                  placeholderTextColor={colors.description}
+                  placeholderTextColor={colors.t5}
                   returnKeyType="search"
                   //   autoFocus
                   style={[styles.search, { width: "100%" }]}
@@ -202,7 +248,7 @@ const SearchScreen2 = ({
                       }}
                       name="circle-with-cross"
                       size={20}
-                      color={colors.grey}
+                      color={colors.darkGrey}
                     />
                   </TouchableOpacity>
                 )}
@@ -273,7 +319,7 @@ const SearchScreen2 = ({
                     fontWeight: "500",
                   }}
                 >
-                  {artist?.length}
+                  {users?.length}
                 </Text>
               </View>
             )}
@@ -335,7 +381,7 @@ const SearchScreen2 = ({
                     fontWeight: "500",
                   }}
                 >
-                  {newEvents?.length}
+                  {events?.length}
                 </Text>
               </View>
             )}
@@ -364,7 +410,7 @@ const SearchScreen2 = ({
                     fontWeight: "500",
                   }}
                 >
-                  {markers?.length}
+                  {venues?.length}
                 </Text>
               </View>
             )}
@@ -379,28 +425,31 @@ const SearchScreen2 = ({
           // exiting={index == 0? SlideOutRight : SlideOutLeft}
           contentContainerStyle={{ alignItems: "center" }}
           entering={FadeIn.duration(250)}
-          data={newEvents?.slice().reverse()}
+          // data={newEvents?.slice().reverse()}
+          data={events}
           showsVerticalScrollIndicator={false}
-          numColumns={2}
-          keyExtractor={(item) => item.id}
+          // numColumns={2}
+          keyExtractor={(item) => item._id}
           ListHeaderComponent={<View style={{ marginTop: 5 }} />}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={{
-                  shadowOffset: { width: 1, height: 1 },
-                  shadowOpacity: 1,
-                  shadowRadius: 1,
-                  elevation: 3,
-                  // marginVertical: 5,
+              <SmallCard {...item} />
 
-                  // alignSelf: "center",
-                }}
-                onPress={() => navigation.navigate("event", item)}
-              >
-                <MediumCard {...item} />
-              </TouchableOpacity>
+              // <TouchableOpacity
+              //   activeOpacity={0.8}
+              //   style={{
+              //     shadowOffset: { width: 1, height: 1 },
+              //     shadowOpacity: 1,
+              //     shadowRadius: 1,
+              //     elevation: 3,
+              //     // marginVertical: 5,
+
+              //     // alignSelf: "center",
+              //   }}
+              //   onPress={() => navigation.navigate("event", item)}
+              // >
+              //* <MediumCard {...item} /> *
+              // </TouchableOpacity>
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -415,40 +464,37 @@ const SearchScreen2 = ({
           }}
           // entering={index == 0 ?SlideInRight:SlideInLeft}
           // exiting={SlideOutLeft}
-          data={artist}
+          data={users}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           ListHeaderComponent={<View style={{ marginTop: 5 }} />}
           renderItem={({ item }) => {
             return (
-              <View
+              <TouchableOpacity
+                onPress={() => navigation.navigate("artist", item)}
+                activeOpacity={0.5}
                 style={{
                   shadowOffset: { width: 0.5, height: 0.5 },
                   shadowOpacity: 0.3,
                   shadowRadius: 1,
                   elevation: 2,
+                  width: "100%",
+                  marginTop: 10,
                 }}
+                // onPress={() => navigation.navigate("event", item)}
               >
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => navigation.navigate("artist")}
-                  style={[
-                    styles.card,
-                    {
-                      shadowOffset: { width: 1, height: 1 },
-                      shadowOpacity: 1,
-                      shadowRadius: 1,
-                      elevation: 3,
-                    },
-                  ]}
+                <Animated.View
+                  style={styles.userCard}
+                  entering={FadeIn}
+                  exiting={FadeOut}
                 >
                   <Image
                     source={{
-                      uri: item?.avatar,
+                      uri: item?.photos?.avatar?.[0]?.uri,
                     }}
                     style={{
-                      width: 60,
-                      height: 60,
+                      width: 70,
+                      height: 70,
                       borderRadius: 50,
 
                       // marginLeft: 20,
@@ -457,9 +503,7 @@ const SearchScreen2 = ({
 
                     // resizeMode="contain"
                   />
-                  <View
-                    style={{ alignItems: "center", marginLeft: 10, bottom: 5 }}
-                  >
+                  <View style={{ alignItems: "center", marginLeft: 10 }}>
                     <Text numberOfLines={2} style={[styles.displayName]}>
                       {item?.displayName}
                     </Text>
@@ -467,36 +511,8 @@ const SearchScreen2 = ({
                       @{item?.username}
                     </Text>
                   </View>
-                  <TouchableOpacity
-                    onPress={() => {
-                      // navigation.goBack();
-                    }}
-                    style={{
-                      padding: 2,
-                      left: 10,
-                      borderColor: colors.primary,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: colors.primary,
-                        fontSize: 14,
-                        fontWeight: "600",
-                        bottom: 11,
-                      }}
-                    >
-                      Seguir
-                    </Text>
-                  </TouchableOpacity>
-
-                  <Entypo
-                    style={{ position: "absolute", right: 10 }}
-                    name="chevron-right"
-                    size={25}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-              </View>
+                </Animated.View>
+              </TouchableOpacity>
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -512,30 +528,35 @@ const SearchScreen2 = ({
             }}
             //  entering={index == 0 ? SlideInRight : SlideInLeft}
             // exiting={index == 0? SlideOutRight : SlideOutLeft}
-            contentContainerStyle={{ alignItems: "center" }}
+            // contentContainerStyle={{ alignItems: "center" }}
             entering={FadeIn.duration(250)}
-            data={newEvents}
+            // data={newEvents}
+            data={events}
             showsVerticalScrollIndicator={false}
-            numColumns={2}
-            keyExtractor={(item) => item.id}
+            // numColumns={2}
+            keyExtractor={(item) => item._id}
             ListHeaderComponent={<View style={{ marginTop: 5 }} />}
             renderItem={({ item }) => {
               return (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  style={{
-                    shadowOffset: { width: 1, height: 1 },
-                    shadowOpacity: 1,
-                    shadowRadius: 1,
-                    elevation: 3,
-                    // marginVertical: 5,
+                // <TouchableOpacity
+                //   activeOpacity={0.8}
+                //   style={{
+                //     shadowOffset: { width: 1, height: 1 },
+                //     shadowOpacity: 1,
+                //     shadowRadius: 1,
+                //     elevation: 3,
+                //     // marginVertical: 5,
 
-                    // alignSelf: "center",
-                  }}
-                  onPress={() => navigation.navigate("event", item)}
-                >
-                  <MediumCard {...item} />
-                </TouchableOpacity>
+                //     // alignSelf: "center",
+                //   }}
+                //   onPress={() => navigation.navigate("event", item)}
+                // >
+                //                   {/* <MediumCard {...item} />
+
+                //  */}
+
+                <SmallCard {...item} />
+                // {/* </TouchableOpacity> */}
               );
             }}
             ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -552,118 +573,12 @@ const SearchScreen2 = ({
           // entering={SlideInRight}
           // exiting={SlideOutRight}
           //   style={{ zIndex: 0 }}
-          data={markers}
+          data={venues}
           showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           ListHeaderComponent={<View style={{ marginTop: 5 }} />}
           renderItem={({ item }) => {
-            return (
-              <View
-                style={{
-                  padding: 10,
-                  borderBottomRightRadius: 10,
-                  borderBottomLeftRadius: 10,
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 1,
-                  elevation: 2,
-                }}
-              >
-                <View
-                  style={{
-                    backgroundColor: colors.white,
-                    borderRadius: 10,
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("venue");
-                    }}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: 10,
-                      alignItems: "center",
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 50,
-                          marginRight: 10,
-                          borderWidth: 0.1,
-                        }}
-                        source={{
-                          uri: item?.uri,
-                        }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          fontWeight: "500",
-                        }}
-                      >
-                        {item?.displayName}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => {
-                          // navigation.goBack();
-                        }}
-                        style={{
-                          padding: 2,
-                          paddingHorizontal: 5,
-                          left: 10,
-                          borderRadius: 5,
-                          borderWidth: 1,
-                          borderColor: colors.primary,
-                          // alignSelf: "flex-end",
-                          // position: "absolute",
-                          // marginBottom: 10,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            color: colors.primary,
-                            fontSize: 14,
-                            fontWeight: "600",
-                          }}
-                        >
-                          Seguir
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    <Entypo
-                      name="chevron-right"
-                      size={24}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                  {item?.description && <View style={styles.separator} />}
-                  {item?.description && (
-                    <View style={{ padding: 10 }}>
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          fontWeight: "500",
-                          color: colors.darkGrey,
-                        }}
-                      >
-                        {item?.description}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </View>
-            );
+            return <VenuesList {...item} />;
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
         />
@@ -678,7 +593,8 @@ const styles = StyleSheet.create({
   search: {
     height: 37,
     width: "90%",
-    backgroundColor: colors.light2,
+    backgroundColor: colors.background2,
+    color: colors.t4,
     borderRadius: 30,
     paddingLeft: 35,
     paddingRight: 30,
@@ -709,19 +625,36 @@ const styles = StyleSheet.create({
     // shadowRadius: 1,
     // elevation: 3,
   },
-  displayName: {
-    alignSelf: "flex-start",
-    fontSize: 17,
-    fontWeight: "600",
-    color: colors.black2,
+  userCard: {
+    flexDirection: "row",
+    marginBottom: 10,
+    padding: 10,
 
-    // marginVertical: 5,
+    // height: 95,
+    backgroundColor: colors.background2,
+    overflow: "hidden",
+    width: "95%",
+    alignSelf: "center",
+
+    borderRadius: 10,
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 1,
+    // shadowRadius: 1,
+    // elevation: 3,
   },
   userName: {
-    fontSize: 13,
+    fontSize: 14,
     alignSelf: "flex-start",
-    color: colors.darkGrey,
+    color: colors.t4,
     fontWeight: "600",
-    top: 2,
+  },
+
+  displayName: {
+    alignSelf: "flex-start",
+    fontSize: 19,
+    fontWeight: "600",
+    color: colors.t2,
+    marginTop: 10,
+    marginBottom: 3,
   },
 });

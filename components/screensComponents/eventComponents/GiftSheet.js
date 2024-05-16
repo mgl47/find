@@ -62,7 +62,7 @@ export default GiftSheet = ({
   setGiftModalUp,
   setGiftedUser,
   giftedUser,
-  setPurchaseModalUp
+  setPurchaseModalUp,
 }) => {
   const { apiUrl } = useData();
   const [searched, setSearched] = useState(false);
@@ -96,7 +96,7 @@ export default GiftSheet = ({
   };
 
   const clean = () => {
-     setGiftModalUp(false);
+    setGiftModalUp(false);
 
     setSearch("");
     // setGiftedUser(null);
@@ -121,13 +121,7 @@ export default GiftSheet = ({
   }, []);
 
   const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={1}
-        appearsOnIndex={2}
-      />
-    ),
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
     []
   );
 
@@ -156,6 +150,10 @@ export default GiftSheet = ({
       onDismiss={() => {
         clean();
       }}
+      handleStyle={{
+        backgroundColor: colors.background,
+      }}
+      handleIndicatorStyle={{ backgroundColor: colors.t5 }}
     >
       <BottomSheetView style={styles.contentContainer}>
         <View
@@ -168,7 +166,7 @@ export default GiftSheet = ({
               fontSize: 19,
               fontWeight: "500",
               // alignSelf: "center",
-              color: colors.primary2,
+              color: colors.t2,
               left: 10,
               marginRight: 15,
             }}
@@ -186,7 +184,7 @@ export default GiftSheet = ({
             <View style={{ padding: 10, width: "70%" }}>
               <Text
                 style={{
-                  color: colors.black2,
+                  color: colors.t2,
                   fontSize: 18,
                   fontWeight: "600",
                   //   alignSelf: "center",
@@ -202,7 +200,7 @@ export default GiftSheet = ({
 
               <Text
                 style={{
-                  color: colors.darkGrey,
+                  color: colors.t5,
                   fontSize: 17,
                   textAlign: "center",
 
@@ -236,7 +234,7 @@ export default GiftSheet = ({
               //   fontWeight: "500",
               // }}
 
-              outlineColor={colors.primary}
+              outlineColor={colors.background2}
               mode="outlined"
               // placeholder="Pesquise por um usuário"
               activeOutlineColor={colors.primary}
@@ -272,7 +270,7 @@ export default GiftSheet = ({
                 >
                   <View
                     style={{
-                      backgroundColor: colors.primary,
+                      backgroundColor: colors.primary2,
                       width: 100,
                       height: 40,
                       position: "absolute",
@@ -296,7 +294,7 @@ export default GiftSheet = ({
                         transform: [{ rotate: "-45deg" }],
                       }}
                       size={20}
-                      color={colors.white}
+                      color={colors.t3}
                     />
                   </View>
                   <Image
@@ -421,9 +419,9 @@ const styles = StyleSheet.create({
   },
   displayName: {
     alignSelf: "flex-start",
-    fontSize: 19,
-    fontWeight: "600",
-    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "500",
+    color: colors.t2,
     marginTop: 10,
     marginVertical: 5,
   },
@@ -432,7 +430,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 16,
     fontWeight: "600",
-    color: colors.description2,
+    color: colors.t4,
     lineHeight: 30,
     // width: "65%",
     marginLeft: 10,
@@ -441,7 +439,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     alignSelf: "flex-start",
     color: colors.description,
-    fontWeight: "600",
+    fontWeight: "500",
   },
   description: {
     fontSize: 13,
@@ -473,7 +471,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",

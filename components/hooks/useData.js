@@ -106,7 +106,7 @@ export const DataProvider = ({ children }) => {
   }
 
   // const venues2 = memo(() => {
-
+console.log(apiUrl);
   // }, [is_wishlist]);
   const memoedValue = useMemo(
     () => ({

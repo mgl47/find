@@ -61,6 +61,7 @@ import { useData } from "../../../components/hooks/useData";
 import { useAuth } from "../../../components/hooks/useAuth";
 import axios from "axios";
 import * as Location from "expo-location";
+import VenuesList from "../../../components/cards/Venues/VenueList";
 
 const { height, width } = Dimensions.get("window");
 
@@ -179,106 +180,6 @@ const VenuesExplorer = () => {
   const handleSheetChanges = useCallback((index) => {
     // consol
   });
-  function VenuesList(item) {
-    return (
-      <View
-        style={{
-          paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
-          marginTop: 10,
-          borderRadius: 10,
-          paddingVertical: Platform?.OS === "ios" ? 1 : 0,
-          // shadowOffset: { width: 0.5, height: 0.5 },
-          // shadowOpacity: 0.3,
-          // shadowRadius: 1,
-          // elevation: 2,
-          shadowOffset: { width: 0.5, height: 0.5 },
-          shadowOpacity: 0.1,
-          shadowRadius: 1,
-          elevation: 0.5,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: colors.white,
-            borderRadius: 10,
-          }}
-        >
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => {
-              navigation.navigate("venue", item);
-            }}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: 10,
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <Image
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 50,
-                  marginRight: 10,
-                  borderWidth: 0.1,
-                }}
-                source={{
-                  uri: item?.photos[3]?.[item?.photos[3]?.length - 1]?.uri,
-                }}
-              />
-              <View>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "500",
-                  }}
-                >
-                  {item?.displayName}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 11,
-                    fontWeight: "500",
-                    color: colors.darkGrey,
-                    left: 1,
-                  }}
-                >
-                  {item?.address?.zone + ", " + item?.address?.city}
-                </Text>
-              </View>
-            </View>
-
-            <Entypo name="chevron-right" size={24} color={colors.primary} />
-          </TouchableOpacity>
-
-          {item?.description && <View style={styles.separator} />}
-          {item?.description && (
-            <View style={{ padding: 10 }}>
-              <Text
-                numberOfLines={2}
-                style={{
-                  fontSize: 13,
-                  fontWeight: "500",
-                  color: colors.darkGrey,
-                }}
-              >
-                {item?.description}
-              </Text>
-            </View>
-          )}
-        </View>
-      </View>
-    );
-  }
 
   const memoizedFlatlist = useMemo(() => {
     return (
@@ -288,7 +189,7 @@ const VenuesExplorer = () => {
             {venueDetails && (
               <View
                 style={{
-                  backgroundColor: colors.white,
+                  backgroundColor: colors.background2,
                   // borderBottomLeftRadius: 10,
                   // borderBottomRightRadius: 10,
                   marginTop: 3,
@@ -346,7 +247,7 @@ const VenuesExplorer = () => {
                         style={{
                           fontSize: 15,
                           fontWeight: "500",
-                          // color: colors.white,
+                          color: colors.t3,
                         }}
                       >
                         {venueDetails?.displayName}
@@ -355,7 +256,7 @@ const VenuesExplorer = () => {
                         style={{
                           fontSize: 11,
                           fontWeight: "500",
-                          color: colors.darkGrey,
+                          color: colors.t3,
                           left: 1,
                         }}
                       >
@@ -370,7 +271,7 @@ const VenuesExplorer = () => {
                     style={{ right: 10 }}
                     name="chevron-right"
                     size={24}
-                    color={colors.primary}
+                    color={colors.t4}
                   />
                 </TouchableOpacity>
 
@@ -380,7 +281,7 @@ const VenuesExplorer = () => {
                       style={{
                         height: 1,
                         width: width * 0.9,
-                        backgroundColor: colors.light2,
+                        backgroundColor: colors.separator,
                         marginBottom: 2,
                         alignSelf: "center",
                         zIndex: 2,
@@ -392,7 +293,7 @@ const VenuesExplorer = () => {
                         style={{
                           fontSize: 13,
                           fontWeight: "500",
-                          color: colors.darkGrey,
+                          color: colors.t4,
                           zIndex: 2,
                           padding: 5,
                         }}
@@ -409,10 +310,10 @@ const VenuesExplorer = () => {
               <>
                 <Text
                   style={{
-                    fontSize: 18,
-                    fontWeight: "500",
+                    fontSize: 17,
+                    fontWeight: "400",
                     // width: "80%",
-                    color: colors.primary,
+                    color: colors.t3,
                     marginLeft: Platform?.OS === "ios" ? 20 : 10,
                     marginTop: Platform?.OS === "ios" ? 10 : 0,
                     // marginBottom: 5,
@@ -422,10 +323,10 @@ const VenuesExplorer = () => {
                 </Text>
                 <Text
                   style={{
-                    fontSize: 16,
-                    fontWeight: "500",
+                    fontSize: 15,
+                    fontWeight: "400",
                     // width: "80%",
-                    color: colors.black2,
+                    color: colors.t5,
                     marginLeft: Platform?.OS === "ios" ? 20 : 10,
                     // marginTop: 5,
 
@@ -471,7 +372,7 @@ const VenuesExplorer = () => {
             //   }}
             //   onPress={() => navigation.navigate("event", item)}
             // >
-              <SmallCard {...item} />
+            <SmallCard {...item} />
             // </TouchableOpacity> */}
           );
         }}
@@ -497,7 +398,7 @@ const VenuesExplorer = () => {
             style={{
               alignSelf: "flex-end",
               position: "absolute",
-              backgroundColor: "rgba(245,245,245,0.8)",
+              backgroundColor: "rgba(5, 19, 29,0.85)",
               padding: 5,
               borderRadius: 15,
               top: 10,
@@ -519,17 +420,12 @@ const VenuesExplorer = () => {
 
                 if (Platform.OS === "ios") {
                   mapViewRef.current.animateToRegion(newRegion, 200);
-
                 } else {
                   setRegion(newRegion);
                 }
               }}
             >
-              <MaterialIcons
-                name="my-location"
-                size={25}
-                color={colors.primary}
-              />
+              <MaterialIcons name="my-location" size={25} color={colors.t4} />
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -543,7 +439,7 @@ const VenuesExplorer = () => {
               }}
               onPress={() => setShowAll(!showAll)}
             >
-              <MaterialIcons name="event" size={24} color={colors.primary} />
+              <MaterialIcons name="event" size={24} color={colors.t4} />
             </TouchableOpacity>
           </View>
           <MapView
@@ -557,6 +453,8 @@ const VenuesExplorer = () => {
             onRegionChange={(a) => {
               setMarkerSize(a);
             }}
+            tintColor=""
+            colo
             maxDelta={0.5}
             // customMapStyle={mapCustomStyle}
             // provider={PROVIDER_GOOGLE}
@@ -615,7 +513,7 @@ const VenuesExplorer = () => {
                             style={{
                               position: "absolute",
                               top: -25,
-                              backgroundColor: colors.white,
+                              backgroundColor: colors.background2,
                               borderWidth: 0.2,
                               borderColor: colors.darkGrey,
                               height: 20,
@@ -637,7 +535,7 @@ const VenuesExplorer = () => {
 
                                 width: "100%",
 
-                                color: colors.primary2,
+                                color: colors.t3,
                               }}
                             >
                               {item?.displayName}
@@ -661,7 +559,7 @@ const VenuesExplorer = () => {
 
                             borderWidth: 0.2,
                             borderColor: colors.darkGrey,
-                            backgroundColor: colors.grey,
+                            backgroundColor: colors.background2,
                           }}
                           source={{
                             uri: item?.photos?.[2]?.[
@@ -680,6 +578,9 @@ const VenuesExplorer = () => {
         <BottomSheetModalProvider>
           <View style={styles.sheetContainer}>
             <BottomSheetModal
+            style={{backgroundColor: colors.background }}
+              handleStyle={{ backgroundColor: colors.background }}
+              handleIndicatorStyle={{ backgroundColor: colors.t5 }}
               // enableDismissOnClose={false}
               enablePanDownToClose={false}
               ref={bottomSheetModalRef}
@@ -694,7 +595,7 @@ const VenuesExplorer = () => {
                     alignSelf: "center",
                     // top: 10,
                     // zIndex: 2,
-                    marginVertical: 20,
+                    // top: 20,
                     backgroundColor: colors.background,
                     flex: 1,
                     width,
@@ -748,7 +649,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "95%",
     height: 1,
-    backgroundColor: colors.light2,
+    backgroundColor: colors.separator,
     marginBottom: 2,
     alignSelf: "center",
   },

@@ -26,6 +26,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 
 import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
@@ -168,6 +169,10 @@ export default UserSelectorSheet = ({
     setUsers(usersList);
     userSheetModalRef.current.close();
   };
+  const renderBackdrop = useCallback(
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    []
+  );
 
   return (
     <BottomSheetModalProvider>
@@ -180,238 +185,254 @@ export default UserSelectorSheet = ({
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={clear}
+        backdropComponent={renderBackdrop}
+        handleStyle={{
+          backgroundColor: colors.background,
+        }}
+        handleIndicatorStyle={{ backgroundColor: colors.t5 }}
+        enableOverDrag={false}
+
       >
-        <BottomSheetView style={styles.contentContainer}>
-          <View style={{ padding: 10 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <Text
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <BottomSheetView style={styles.contentContainer}>
+            <View style={{ padding: 10 }}>
+              <View
                 style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  // alignSelf: "center",
-                  left: 10,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 10,
                 }}
               >
-                {type == "artist"
-                  ? "Adicionar Artista"
-                  : type == "members"
-                  ? "Adiconar Membro"
-                  : "Adicionar Organizador"}
-              </Text>
-              {type != "members" && (
-                <TouchableOpacity onPress={save}>
-                  <Text
-                    style={{
-                      color: colors.primary,
-                      fontSize: 16,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Guardar
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View>
-              <TextInput
-                // error={!searchText}
-                style={{ marginBottom: 10, backgroundColor: colors.background }}
-                // autoFocus
-                underlineStyle={{ backgroundColor: colors.primary }}
-                // contentStyle={{
-                //   backgroundColor: colors.background,
-                //   fontWeight: "500",
-                // }}
-
-                outlineColor={colors.primary}
-                mode="outlined"
-                placeholder="Pesquise por um usuário"
-                activeOutlineColor={colors.primary}
-                label="Nome"
-                activeUnderlineColor={colors.primary}
-                returnKeyType="search"
-                value={search}
-                cursorColor={colors.primary}
-                // onChangeText={(text) => setPerson({ ...person, email: text })}
-                onChangeText={setSearch}
-                onSubmitEditing={findUser}
-              />
-              {searched && !searchedUser && !loading && (
                 <Text
                   style={{
-                    color: colors.darkGrey,
-                    alignSelf: "center",
-                    bottom: -10,
-                    position: "absolute",
+                    fontSize: 17,
+                    fontWeight: "500",
+                    color: colors.t3,
+                    // alignSelf: "center",
+                    left: 10,
                   }}
                 >
-                  {" Este usuário não existe!"}
+                  {type == "artist"
+                    ? "Adicionar Artista"
+                    : type == "members"
+                    ? "Adiconar Membro"
+                    : "Adicionar Organizador"}
                 </Text>
-              )}
-
-              {loading&& type!="members" && (
-                <Animated.View
-                  style={{
-                    // position: "absolute",
-                    alignSelf: "center",
-                    // top: 10,
-                    // zIndex: 4,
-                    bottom: -35,
-                    position: "absolute",
-                  }}
-                  // entering={SlideInUp.duration(300)}
-                  // exiting={SlideOutUp.duration(300)}
-                >
-                  <ActivityIndicator animating={true} color={colors.primary} />
-                </Animated.View>
-              )}
-            </View>
-            {!loading && searchedUser && (
-              <View
-                onPress={addUser}
-                activeOpacity={0.5}
-                style={{
-                  shadowOffset: { width: 0.5, height: 0.5 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 1,
-                  elevation: 2,
-                  width: "100%",
-                  marginTop: 10,
-                }}
-                // onPress={() => navigation.navigate("event", item)}
-              >
-                <Animated.View entering={FadeIn} exiting={FadeOut}>
-                  <View style={styles.userCard}>
-                    <Image
-                      source={{
-                        uri: searchedUser?.photos?.avatar?.[0]?.uri,
-                      }}
+                {type != "members" && (
+                  <TouchableOpacity onPress={save}>
+                    <Text
                       style={{
-                        width: 70,
-                        height: 70,
-                        borderRadius: 50,
-
-                        // marginLeft: 20,
-                        // position: "absolute",
+                        color: colors.primary,
+                        fontSize: 16,
+                        fontWeight: "600",
                       }}
+                    >
+                      Guardar
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View>
+                <TextInput
+                  // error={!searchText}
+                  style={{
+                    marginBottom: 10,
+                    backgroundColor: colors.background,
+                  }}
+                  // autoFocus
+                  underlineStyle={{ backgroundColor: colors.primary2 }}
+                  // contentStyle={{
+                  //   backgroundColor: colors.background,
+                  //   fontWeight: "500",
+                  // }}
 
-                      // resizeMode="contain"
-                    />
-                    <View style={{ alignItems: "center", marginLeft: 10 }}>
-                      <Text numberOfLines={2} style={[styles.displayName]}>
-                        {searchedUser?.displayName}
-                      </Text>
-                      <Text numberOfLines={2} style={[styles.userName]}>
-                        @{searchedUser?.username}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <TouchableOpacity
-                    onPress={type == "members" ? addMember : addUser}
-                    activeOpacity={0.7}
+                  outlineColor={colors.background2}
+                  mode="outlined"
+                  placeholder="Pesquise por um usuário"
+                  activeOutlineColor={colors.primary2}
+                  label="Nome"
+                  returnKeyType="search"
+                  placeholderTextColor={colors.t5}
+                  value={search}
+                  cursorColor={colors.primary}
+                  // onChangeText={(text) => setPerson({ ...person, email: text })}
+                  onChangeText={setSearch}
+                  onSubmitEditing={findUser}
+                />
+                {searched && !searchedUser && !loading && (
+                  <Text
                     style={{
+                      color: colors.darkGrey,
                       alignSelf: "center",
-                      flexDirection: "row",
-                      height: 50,
-                      width: "90%",
-                      backgroundColor: colors.primary,
-                      borderRadius: 10,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 1,
-                      elevation: 2,
-                      marginTop: 5,
-                      marginBottom: 15,
+                      bottom: -10,
+                      position: "absolute",
                     }}
                   >
-                    {loading ? (
-                      <View
-                        style={{
-                          flex: 1,
-                          position: "absolute",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          alignSelf: "center",
-                          backgroundColor: "transparent",
-                          zIndex: 1,
-                        }}
-                      >
-                        <ActivityIndicator color={colors.white} />
-                      </View>
-                    ) : (
-                      <Text
-                        style={{
-                          color: colors.white,
-                          marginLeft: 5,
-                          fontSize: 17,
-                          fontWeight: "500",
-                        }}
-                      >
-                        Adicionar
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                </Animated.View>
+                    {" Este usuário não existe!"}
+                  </Text>
+                )}
+
+                {loading && type != "members" && (
+                  <Animated.View
+                    style={{
+                      // position: "absolute",
+                      alignSelf: "center",
+                      // top: 10,
+                      // zIndex: 4,
+                      bottom: -35,
+                      position: "absolute",
+                    }}
+                    // entering={SlideInUp.duration(300)}
+                    // exiting={SlideOutUp.duration(300)}
+                  >
+                    <ActivityIndicator
+                      animating={true}
+                      color={colors.primary}
+                    />
+                  </Animated.View>
+                )}
               </View>
-            )}
-
-            <View>
-              {type != "members" && (
-                <FlatList
-                  style={{ top: loading && 110 }}
-                  // numColumns={5}
-
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  data={usersList}
-                  keyExtractor={(item) => item?._id}
-                  renderItem={({ item }) => {
-                    return (
-                      <TouchableOpacity
-                        style={{
-                          padding: 5,
-                          alignItems: "center",
-                          // justifyContent: "center",
+              {!loading && searchedUser && (
+                <View
+                  onPress={addUser}
+                  activeOpacity={0.5}
+                  style={{
+                    shadowOffset: { width: 0.5, height: 0.5 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 1,
+                    elevation: 2,
+                    width: "100%",
+                    marginTop: 10,
+                  }}
+                  // onPress={() => navigation.navigate("event", item)}
+                >
+                  <Animated.View entering={FadeIn} exiting={FadeOut}>
+                    <View style={styles.userCard}>
+                      <Image
+                        source={{
+                          uri: searchedUser?.photos?.avatar?.[0]?.uri,
                         }}
-                        onPress={() => removeUser(item)}
-                      >
-                        <Image
+                        style={{
+                          width: 70,
+                          height: 70,
+                          borderRadius: 50,
+
+                          // marginLeft: 20,
+                          // position: "absolute",
+                        }}
+
+                        // resizeMode="contain"
+                      />
+                      <View style={{ alignItems: "center", marginLeft: 10 }}>
+                        <Text numberOfLines={2} style={[styles.displayName]}>
+                          {searchedUser?.displayName}
+                        </Text>
+                        <Text numberOfLines={2} style={[styles.userName]}>
+                          @{searchedUser?.username}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <TouchableOpacity
+                      onPress={type == "members" ? addMember : addUser}
+                      activeOpacity={0.7}
+                      style={{
+                        alignSelf: "center",
+                        flexDirection: "row",
+                        height: 50,
+                        width: "90%",
+                        backgroundColor: colors.primary,
+                        borderRadius: 10,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        shadowOffset: { width: 0.5, height: 0.5 },
+                        shadowOpacity: 0.3,
+                        shadowRadius: 1,
+                        elevation: 2,
+                        marginTop: 5,
+                        marginBottom: 15,
+                      }}
+                    >
+                      {loading ? (
+                        <View
                           style={{
-                            height: 60,
-                            width: 60,
-                            borderRadius: 50,
-                            marginBottom: 2,
-                            borderWidth: 0.009,
-                          }}
-                          source={{
-                            uri: item?.photos?.avatar?.[0]?.uri,
-                          }}
-                        />
-                        <Text
-                          style={{
-                            width: item?.displayName?.length > 15 ? 100 : null,
-                            textAlign: "center",
+                            flex: 1,
+                            position: "absolute",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            alignSelf: "center",
+                            backgroundColor: "transparent",
+                            zIndex: 1,
                           }}
                         >
-                          {item?.displayName}
+                          <ActivityIndicator color={colors.white} />
+                        </View>
+                      ) : (
+                        <Text
+                          style={{
+                            color: colors.white,
+                            marginLeft: 5,
+                            fontSize: 17,
+                            fontWeight: "500",
+                          }}
+                        >
+                          Adicionar
                         </Text>
-                      </TouchableOpacity>
-                    );
-                  }}
-                />
+                      )}
+                    </TouchableOpacity>
+                  </Animated.View>
+                </View>
               )}
-            </View>
-            {/* <Text
+
+              <View>
+                {type != "members" && (
+                  <FlatList
+                    style={{ top: loading && 110 }}
+                    // numColumns={5}
+
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    data={usersList}
+                    keyExtractor={(item) => item?._id}
+                    renderItem={({ item }) => {
+                      return (
+                        <TouchableOpacity
+                          style={{
+                            padding: 5,
+                            alignItems: "center",
+                            // justifyContent: "center",
+                          }}
+                          onPress={() => removeUser(item)}
+                        >
+                          <Image
+                            style={{
+                              height: 60,
+                              width: 60,
+                              borderRadius: 50,
+                              marginBottom: 2,
+                              borderWidth: 0.009,
+                            }}
+                            source={{
+                              uri: item?.photos?.avatar?.[0]?.uri,
+                            }}
+                          />
+                          <Text
+                            style={{
+                              width:
+                                item?.displayName?.length > 15 ? 100 : null,
+                              textAlign: "center",
+                            }}
+                          >
+                            {item?.displayName}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
+                  />
+                )}
+              </View>
+              {/* <Text
                 style={[
                   styles.switchText,
                   {
@@ -426,8 +447,9 @@ export default UserSelectorSheet = ({
                   users?.length > 1 ? "adicionados" : "adicionado"
                 }`}
               </Text> */}
-          </View>
-        </BottomSheetView>
+            </View>
+          </BottomSheetView>
+        </TouchableWithoutFeedback>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );

@@ -315,7 +315,7 @@ export default TicketPurchaseSheet = ({
     dispatch({ type: "CLEAR", payload: item });
   };
   const clean = () => {
-    setGiftedUser(null);
+    giftedUser && setGiftedUser(null);
     purchaseModalUp && setPurchaseModalUp(false);
     setFirstRender(true);
     setAvailable([]);
@@ -476,7 +476,7 @@ export default TicketPurchaseSheet = ({
             justifyContent: "space-between",
             width: "100%",
             height: isIPhoneWithNotch ? 80 : 55,
-            backgroundColor: colors.background2,
+            backgroundColor: colors.background,
             // position: "absolute",
             zIndex: 4,
             bottom: 0,
@@ -498,9 +498,9 @@ export default TicketPurchaseSheet = ({
           >
             <Text
               style={{
-                fontSize: 19,
+                fontSize: 17,
                 color: colors.t5,
-                fontWeight: "600",
+                fontWeight: "500",
                 marginRight: 5,
               }}
             >
@@ -508,9 +508,10 @@ export default TicketPurchaseSheet = ({
             </Text>
             <Text
               style={{
-                fontSize: 19,
+                fontSize: 18,
                 color: colors.t1,
                 fontWeight: "600",
+                bottom:1
               }}
             >
               cve {formatNumber(state?.total)}
@@ -529,7 +530,7 @@ export default TicketPurchaseSheet = ({
               width: 150,
               height: 40,
               backgroundColor:
-                state?.total == 0 ? colors.description2 : colors.primary, // position: "absolute",
+                state?.total == 0 ? colors.background2 : colors.primary2, // position: "absolute",
               zIndex: 1,
               // top: 10,
               // left: 10,
@@ -554,7 +555,7 @@ export default TicketPurchaseSheet = ({
               <Text
                 style={{
                   fontSize: 15,
-                  color: colors.white,
+                  color: state?.total == 0 ?colors.t5 : colors.t2,
                   fontWeight: "500",
                   marginRight: 10,
                 }}
@@ -578,13 +579,7 @@ export default TicketPurchaseSheet = ({
     ]
   );
   const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={1}
-        appearsOnIndex={2}
-      />
-    ),
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
     []
   );
   // if (loading) {
@@ -638,6 +633,10 @@ export default TicketPurchaseSheet = ({
           setOnPayment(false);
         }}
         footerComponent={renderFooter}
+        handleStyle={{
+          backgroundColor: colors.background,
+        }}
+        handleIndicatorStyle={{ backgroundColor: colors.t5 }}
       >
         <BottomSheetFlatList
           style={{ backgroundColor: colors.background }}
@@ -718,9 +717,9 @@ export default TicketPurchaseSheet = ({
                             state?.cart?.filter((cartItem) => {
                               if (cartItem?.id == item?.id)
                                 return cartItem?.amount;
-                            }) == 0
-                              ? colors.grey
-                              : colors.darkGrey
+                            }) == 0 || event?.haltedSales
+                              ? colors.gray2
+                              : colors.t4
                           }
                         />
                       </TouchableOpacity>
@@ -728,9 +727,10 @@ export default TicketPurchaseSheet = ({
                         style={{
                           fontSize: 22,
                           fontWeight: "600",
-                          color: !unavailable
-                            ? colors.t3
-                            : colors.dark,
+                          color:
+                            unavailable || event?.haltedSales
+                              ? colors.gray2
+                              : colors.t3,
                         }}
                       >
                         {item?.amount}
@@ -752,8 +752,8 @@ export default TicketPurchaseSheet = ({
                             available?.includes(item?.id) ||
                             unavailable ||
                             event?.haltedSales
-                              ? colors.grey
-                              : colors.primary
+                              ? colors.gray2
+                              : colors.t2
                           }
                         />
                       </TouchableOpacity>
@@ -788,11 +788,11 @@ export default TicketPurchaseSheet = ({
                     <MaterialCommunityIcons
                       name="arrow-left"
                       size={25}
-                      color={colors.primary}
+                      color={colors.t4}
                     />
                     <Text
                       style={{
-                        color: colors.black2,
+                        color: colors.t3,
                         fontSize: 16,
                         fontWeight: "500",
                         marginLeft: 10,
@@ -906,7 +906,7 @@ export default TicketPurchaseSheet = ({
                       opacity: event?.ticketsLimit > 0 ? 1 : 0,
 
                       right: 10,
-                      color: colors.light,
+                      color: colors.t5,
                       alignSelf: "flex-end",
 
                       bottom: 3,
@@ -939,7 +939,7 @@ export default TicketPurchaseSheet = ({
                             style={{
                               fontSize: 17,
                               fontWeight: "500",
-                              color: colors.black,
+                              color: colors.t4,
                               marginLeft: 10,
                               // marginTop: 10,
                               marginBottom: 10,
@@ -959,7 +959,7 @@ export default TicketPurchaseSheet = ({
                             style={{
                               alignSelf: "center",
                               width: "95%",
-                              backgroundColor: colors.grey,
+                              backgroundColor: colors.separator,
                               height: 1,
                               marginVertical: 10,
                             }}
@@ -977,9 +977,9 @@ export default TicketPurchaseSheet = ({
                             >
                               <Text
                                 style={{
-                                  fontSize: 17,
+                                  fontSize: 16,
                                   fontWeight: "500",
-                                  color: colors.t1,
+                                  color: colors.t2,
                                   // left: 10,
                                 }}
                               >
@@ -990,8 +990,8 @@ export default TicketPurchaseSheet = ({
                                 style={{
                                   fontSize: 15,
                                   fontWeight: "500",
-                                  color: colors.darkGrey,
-                                  top: 2,
+                                  color: colors.t5,
+                                  top: 1,
                                   // position: "absolute",
                                   // left: 20,
                                   // fontSize: 17,

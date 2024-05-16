@@ -100,27 +100,27 @@ export default function StoreScreen({
   sheetOrder = orders?.filter(
     (order) => order?.orderId == selectedOrder?.orderId
   )?.[0];
-  useEffect(() => {
-    if (event?._id) {
-      const q = query(
-        collection(db, "transactions"),
+  // useEffect(() => {
+  //   if (event?._id) {
+  //     const q = query(
+  //       collection(db, "transactions"),
 
-        where("eventId", "==", event?._id),
-        orderBy("time", "asc")
-      );
+  //       where("eventId", "==", event?._id),
+  //       orderBy("time", "asc")
+  //     );
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const newOrders = [];
-        querySnapshot.forEach((doc) => {
-          newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
-        });
+  //     const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //       const newOrders = [];
+  //       querySnapshot.forEach((doc) => {
+  //         newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
+  //       });
 
-        setOrders(newOrders);
-      });
-    }
+  //       setOrders(newOrders);
+  //     });
+  //   }
 
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
 
   const total = sheetOrder?.products?.reduce(
     (acc, val) => acc + val?.price * val?.amount,
@@ -223,16 +223,16 @@ export default function StoreScreen({
         bounces={false}
         ListHeaderComponent={
           <>
-            <View
+            {/* <View
               style={{
                 position: "absolute",
                 width: "100%",
 
                 height: 130,
-                backgroundColor: colors.primary2,
+                // backgroundColor: colors.primary2,
                 zIndex: 0,
               }}
-            />
+            /> */}
             <View
               style={{
                 alignItems: "center",
@@ -306,7 +306,7 @@ export default function StoreScreen({
                       // marginBottom: 50,
 
                       alignItems: "center",
-                      backgroundColor: colors.white,
+                      backgroundColor: colors.background2,
                       //   width: width * 0.45,
                       //   height: height * 0.2,
                       width: width * 0.42,
@@ -340,7 +340,7 @@ export default function StoreScreen({
                         shadowOpacity: 1,
                         shadowRadius: 3,
                         elevation: 2,
-                        shadowColor: colors.primary,
+                        shadowColor: colors.background,
                         backgroundColor: colors.background,
                       }}
                     >
@@ -350,7 +350,7 @@ export default function StoreScreen({
                           // width: 50,
                           alignItems: "center",
                           justifyContent: "center",
-                          backgroundColor: colors.primary,
+                          backgroundColor: colors.background,
                           position: "absolute",
                           // right: width * 0.12,
                           right: 0,
@@ -404,7 +404,7 @@ export default function StoreScreen({
                           bottom: 10,
                           fontSize: 14,
                           fontWeight: "500",
-                          color: colors.primary2,
+                          color: colors.t2,
                         }}
                       >
                         {item?.displayName}
@@ -418,7 +418,7 @@ export default function StoreScreen({
               style={{
                 fontSize: 18,
                 fontWeight: "500",
-                color: colors.primary2,
+                color: colors.t4,
                 top: 5,
                 marginLeft: 30,
                 // marginTop: 10,
@@ -1036,11 +1036,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 10,
     alignItems: "center",
+
     // height: 10,
     // justifyContent:""
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -1092,11 +1093,14 @@ const styles = StyleSheet.create({
   section: {
     flexDirection: "row",
     alignItems: "center",
+    // flexWrap: "wrap",
   },
   paragraph: {
     fontSize: 15,
+    color: colors.t5,
   },
   checkbox: {
     margin: 8,
+    borderColor: colors.t4,
   },
 });

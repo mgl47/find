@@ -11,7 +11,7 @@ import {
 import { Provider as PaperProvider } from "react-native-paper";
 // import { createDrawerNavigator } from "@react-navigation/drawer";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
+import React, { useState } from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import StackNavigator from "./components/navigation/StackNavigator";
 
@@ -27,6 +27,8 @@ LogBox.ignoreLogs([
   "ViewPropTypes will be removed from React Native, along with all other PropTypes. We recommend that you migrate away from PropTypes and switch to a type system like TypeScript. If you need to continue using ViewPropTypes, migrate to the 'deprecated-react-native-prop-types' package.",
   "Sending `onAnimatedValueUpdate` with no listeners registered.",
   "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.",
+  "Warning: VideoPlayer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
+  "react-native-snap-carousel: It is recommended to use at least version 0.44 of React Native with the plugin",
   // "`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.",
   // "No native splash screen registered for given view controller. Call 'SplashScreen.show' for given view controller first.",
   // "TypeError: Cannot read property 'indexOf' of undefined",

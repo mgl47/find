@@ -1,7 +1,7 @@
 import React from "react";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import HomeScreen from "../../screens/HomeScreens/HomeScreen";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Appbar, Avatar } from "react-native-paper";
 import NotificationScreen from "../../screens/NotificationScreen";
 import ChatsScreen from "../../screens/ChatsScreen";
@@ -9,13 +9,14 @@ import colors, { darkColors } from "../colors";
 import { Dimensions, Platform } from "react-native";
 import { useAuth } from "../hooks/useAuth";
 import { useDesign } from "../hooks/useDesign";
+import ExploreScreens from "../../screens/HomeScreens/ExploreScreens/ExploreScreens";
 // import StackNavigator from "./StackNavigator";
 
 const Tab = createMaterialBottomTabNavigator();
 
 const TabNavigator = () => {
   const { AuthModalUp } = useAuth();
-  const  {isIPhoneWithNotch}=useDesign()
+  const { isIPhoneWithNotch } = useDesign();
   return (
     <Tab.Navigator
       keyboardHidesNavigationBar={true}
@@ -70,7 +71,9 @@ const TabNavigator = () => {
       />
       <Tab.Screen
         name="Notificações"
+        // name="Explorar"
         component={NotificationScreen}
+        // component={ExploreScreens}
         options={{
           tabBarIcon: ({ color, focused, size }) => (
             <MaterialCommunityIcons
@@ -78,6 +81,11 @@ const TabNavigator = () => {
               size={24}
               color={color}
             />
+            // <MaterialIcons
+            //   name="manage-search"
+            //   size={30}
+            //   color={focused ? colors.primary : colors.t5}
+            // />
           ),
         }}
       />

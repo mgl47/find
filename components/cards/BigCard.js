@@ -6,6 +6,9 @@ import {
   Text,
   Dimensions,
   ImageBackground,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import colors, { darkColors } from "../colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,16 +23,17 @@ function BigCard(item) {
   // const title = "Sessão anual da literatura caboverdiana sd g das ag dsag das";
 
   return (
-    <TouchableHighlight
+    <Pressable
       style={{
-        right: 30,
+        right: 10,
         overflow: "hidden",
         borderRadius: 10,
         marginTop: 10,
-        backgroundColor: colors.dark2,
+        // backgroundColor: colors.dark2,
       }}
       onPress={() => navigation.navigate("event", item)}
-      underlayColor={colors.background}
+      // activeOpacity={1}
+      // underlayColor={colors.background}
     >
       <ImageBackground
         style={{
@@ -121,7 +125,7 @@ function BigCard(item) {
           </View>
         </LinearGradient>
       </ImageBackground>
-    </TouchableHighlight>
+    </Pressable>
   );
 }
 

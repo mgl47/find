@@ -82,7 +82,7 @@ const ExploreScreens = ({
           >
             <Text
               style={{
-                color: colors.white,
+                color: colors.t3,
                 fontSize: 16,
                 fontWeight: "600",
               }}
@@ -122,7 +122,7 @@ const ExploreScreens = ({
                 style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
                 name="magnifying-glass"
                 size={19}
-                color={colors.description}
+                color={colors.t4}
               />
               <TextInput
                 value={searchText}
@@ -131,11 +131,15 @@ const ExploreScreens = ({
                   Keyboard.dismiss(),
                     navigation.navigate("search2", { text: searchText });
                 }}
+              
                 placeholder=" artistas, eventos ou lugares"
-                placeholderTextColor={colors.description}
+                placeholderTextColor={colors.t5}
                 returnKeyType="search"
                 ref={inputRef}
                 style={[styles.search, { width: "100%" }]}
+                cursorColor={colors.t4}
+                selectionHandleColor={colors.t5}
+                selectionColor={colors.t5}
               />
               {searchText && (
                 <TouchableOpacity
@@ -152,7 +156,7 @@ const ExploreScreens = ({
                     }}
                     name="circle-with-cross"
                     size={20}
-                    color={colors.grey}
+                    color={colors.darkGrey}
                   />
                 </TouchableOpacity>
               )}
@@ -167,60 +171,46 @@ const ExploreScreens = ({
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Animated.View style={{ flex: 1 }} entering={firstMount && SlideInDown}>
         <Tab.Navigator
-          screenOptions={{
-            tabBarActiveTintColor: colors.primary,
+          screenOptions={({ active }) => ({
+            tabBarActiveTintColor: colors.t2,
 
-            tabBarInactiveTintColor: colors.darkGrey,
+            tabBarInactiveTintColor: colors.t5,
             tabBarIndicatorContainerStyle: {
-              backgroundColor: colors.primary2,
+              backgroundColor: colors.background,
             },
             tabBarIndicatorStyle: {
               backgroundColor: colors.white,
-              // bottom: 2,
-              height:4,
             },
-            tabBarLabelStyle: (active) => ({
-              color: active ? colors.white : colors.lightGrey,
-            }),
-
-            // tabBarIndicatorStyle: {
-            //   width: "40%",
-            //   left: "5%",
-            //   backgroundColor: colors.primary,
-            // },
-          }}
+            tabBarLabelStyle: {
+              fontWeight: active ? "500" : "600",
+            },
+          })}
         >
           <Tab.Screen
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
+            // options={(active) => ({
+            //   tabBarLabelStyle: {
+            //     color: active ? colors.t2 : colors.t5,
+            //   },
+            // })}
             name="Explorar"
             component={SearchScreen}
           />
 
           <Tab.Screen
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
+            // options={(active) => ({
+            //   tabBarLabelStyle: {
+            //     color: active ? colors.t2 : colors.t5,
+            //   },
+            // })}
             name="Lugares"
             component={VenuesExplorer}
           />
           <Tab.Screen
-            options={{
-              tabBarLabelStyle: {
-                fontWeight: "600",
-                fontSize: 13,
-                color: colors.white,
-              },
-            }}
+            // options={(active) => ({
+            //   tabBarLabelStyle: {
+            //     color: active ? colors.t2 : colors.t5,
+            //   },
+            // })}
             name="Calendário"
             component={CalendarScreen}
           />
@@ -255,10 +245,12 @@ const styles = StyleSheet.create({
   search: {
     height: 37,
     width: "90%",
-    backgroundColor: colors.background,
+    backgroundColor: colors.background2,
     borderRadius: 30,
     paddingLeft: 35,
     paddingRight: 30,
+    color:colors.t4
+  
   },
   headerText: {
     fontSize: 19,

@@ -43,7 +43,7 @@ import Overview from "./Overview";
 import Attendees from "./Attendees";
 import Staff from "./Staff";
 import Screen from "../../../components/Screen";
-import { Camera, FlashMode } from "expo-camera";
+import { Camera } from 'expo-camera/legacy';
 import { useAuth } from "../../../components/hooks/useAuth";
 import axios from "axios";
 import { useData } from "../../../components/hooks/useData";
@@ -52,6 +52,7 @@ import { useDesign } from "../../../components/hooks/useDesign";
 import { ActivityIndicator } from "react-native-paper";
 import LottieView from "lottie-react-native";
 import { set } from "firebase/database";
+import { FlashMode } from "expo-camera/build/legacy/Camera.types";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -62,7 +63,7 @@ const EventManagingScreen = ({
 }) => {
   const item = route.params;
   const [hasPermission, setHasPermission] = useState(false);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
+  // const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const [loading, setLoading] = useState(true);
   const animation = useRef(null);
@@ -187,11 +188,11 @@ const EventManagingScreen = ({
               // onPress={() => setShowScanModal(true)}
               onPress={() => navigation.navigate("eventStore", event)}
             >
-              <FontAwesome6 name="shop" size={23} color={colors.white} />
+              <FontAwesome6 name="shop" size={23} color={colors.t3} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-          disabled={!event}
+            disabled={!event}
             style={{ right: 20 }}
             // onPress={() => setShowScanModal(true)}
             onPress={() => navigation.navigate("qrValidator", event)}
@@ -199,13 +200,13 @@ const EventManagingScreen = ({
             <MaterialCommunityIcons
               name="qrcode-scan"
               size={24}
-              color={colors.white}
+              color={colors.t3}
             />
           </TouchableOpacity>
         </View>
       ),
     });
-  }, [navigation,event]);
+  }, [navigation, event]);
 
   useEffect(() => {
     getUpdatedUser();
@@ -254,63 +255,56 @@ const EventManagingScreen = ({
           // entering={FadeIn}
         >
           <Tab.Navigator
-            screenOptions={{
-              tabBarActiveTintColor: colors.primary,
+            // screenOptions={{
+            //   tabBarActiveTintColor: colors.primary,
 
-              tabBarInactiveTintColor: colors.darkGrey,
+            //   tabBarInactiveTintColor: colors.darkGrey,
+            //   tabBarIndicatorContainerStyle: {
+            //     backgroundColor: colors.primary2,
+            //   },
+            //   tabBarIndicatorStyle: {
+            //     backgroundColor: colors.white_shade,
+            //     // bottom: 2,
+            //     height: 4,
+            //   },
+            //   tabBarLabelStyle: (active) => ({
+            //     color: active ? colors.white : colors.lightGrey,
+            //   }),
+            // }}
+
+            screenOptions={({ active }) => ({
+              tabBarActiveTintColor: colors.t2,
+
+              // tabBarIndicator: event && null,
+              // tabBarBounces:false
+              // ,
+              tabBarInactiveTintColor: colors.t5,
               tabBarIndicatorContainerStyle: {
-                backgroundColor: colors.primary2,
+                backgroundColor: colors.background,
               },
               tabBarIndicatorStyle: {
-                backgroundColor: colors.white_shade,
-                // bottom: 2,
-                height: 4,
+                backgroundColor: colors.white,
               },
-              tabBarLabelStyle: (active) => ({
-                color: active ? colors.white : colors.lightGrey,
-              }),
-            }}
+              tabBarLabelStyle: {
+                fontWeight: active ? "500" : "600",
+              },
+            })}
           >
             <Tab.Screen
               initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
               name="Overview"
               component={Overview}
             />
             <Tab.Screen
               initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
               name="Attendees"
               component={Attendees}
             />
-            <Tab.Screen
-              initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
-              name="Staff"
-              component={Staff}
-            />
+            <Tab.Screen initialParams={event} name="Staff" component={Staff} />
           </Tab.Navigator>
         </Animated.View>
       ) : (
-        <View style={{ height: 50, backgroundColor: colors.primary2 }} />
+        <View style={{ height: 50, backgroundColor: colors.background }} />
       )}
 
       {/* {event && (

@@ -26,6 +26,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import RNPickerSelect from "react-native-picker-select";
 import axios from "axios";
@@ -44,6 +45,20 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
     (member) => member?._id == user?._id
   )[0];
   const isOrganizer = event?.organizers?.find((org) => org?._id == user?._id);
+
+  const notAllowed = (item) => {
+    return (
+      !item?.role ||
+      item?._id == user?._id ||
+      (item?.role == "Administração" && !isOrganizer) ||
+      currentMember?.role == item?.role
+    );
+  };
+  // !item?.role ||
+  //   item?.role == "Organizador" ||
+  //   (currentMember?.role != "Administração" && !isOrganizer) ||
+  //   item?._id == user?._id ||
+  //   (currentMember?.role == "Administração" && item?.role == "Administração");
 
   const [selectedMember, setSelectedMember] = useState(null);
   const [position, setPosition] = useState(selectedMember?.role);
@@ -112,6 +127,18 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
       console.log(error?.response?.data?.msg);
     }
   };
+  const renderBackdrop = useCallback(
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    []
+  );
+  // disabled={
+  //   !item?.role ||
+  //   item?.role == "Organizador" ||
+  //   (currentMember?.role != "Administração" && !isOrganizer) ||
+  //   item?._id == user?._id ||
+  //   (currentMember?.role == "Administração" &&
+  //     item?.role == "Administração")
+  // }
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -121,9 +148,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         ListHeaderComponent={
           <>
             <View style={[styles.switchContainer]}>
-              <Text
-                style={[styles.switchText, { color: colors.darkSeparator }]}
-              >
+              <Text style={[styles.switchText, { color: colors.t4 }]}>
                 Membros{" "}
               </Text>
               {(currentMember?.role == "Administração" || isOrganizer) && (
@@ -133,7 +158,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                 >
                   <Text
                     style={{
-                      color: colors.primary,
+                      color: colors.t2,
                       fontSize: 14,
                       left: 20,
                       padding: 3,
@@ -148,16 +173,19 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
           </>
         }
         renderItem={({ item }) => {
+          const disabled = notAllowed(item);
+
           return (
             <TouchableOpacity
-              disabled={
-                !item?.role ||
-                item?.role == "Organizador" ||
-                (currentMember?.role != "Administração" && !isOrganizer) ||
-                item?._id == user?._id ||
-                (currentMember?.role == "Administração" &&
-                  item?.role == "Administração")
-              }
+              // disabled={
+              //   !item?.role ||
+              //   item?.role == "Organizador" ||
+              //   (currentMember?.role != "Administração" && !isOrganizer) ||
+              //   item?._id == user?._id ||
+              //   (currentMember?.role == "Administração" &&
+              //     item?.role == "Administração")
+              // }
+              disabled={disabled}
               onPress={() => handleManageMembers(item)}
               activeOpacity={0.5}
               style={{
@@ -201,8 +229,8 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     numberOfLines={2}
                     style={{
                       alignItems: "center",
-                      fontSize: 16.5,
-                      color: colors.darkSeparator,
+                      fontSize: 16,
+                      color: colors.t4,
                       fontWeight: "500",
                     }}
                   >
@@ -219,6 +247,12 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
           ref={manageMembersSheetRef}
           index={1}
           snapPoints={snapPoints}
+          backdropComponent={renderBackdrop}
+          handleStyle={{
+            backgroundColor: colors.background,
+          }}
+          handleIndicatorStyle={{ backgroundColor: colors.t5 }}
+          enableOverDrag={false}
         >
           <BottomSheetView style={styles.contentContainer}>
             <View style={{ padding: 10 }}>
@@ -236,6 +270,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     fontWeight: "500",
                     // alignSelf: "center",
                     left: 10,
+                    color: colors.t4,
                   }}
                 >
                   Gerenciar Membro
@@ -243,7 +278,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                 <TouchableOpacity onPress={updateMember}>
                   <Text
                     style={{
-                      color: colors.primary,
+                      color: colors.t2,
                       fontSize: 16,
                       fontWeight: "600",
                     }}
@@ -262,7 +297,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Text
                   numberOfLines={2}
-                  style={{ marginRight: 5, fontSize: 17 }}
+                  style={{ marginRight: 5, fontSize: 16, color: colors.t4 }}
                 >
                   Nome:
                 </Text>
@@ -272,7 +307,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     alignSelf: "flex-start",
                     fontSize: 17,
                     fontWeight: "400",
-                    color: colors.primary2,
+                    color: colors.t3,
                     marginVertical: 3,
                   }}
                 >
@@ -289,7 +324,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Text
                   numberOfLines={2}
-                  style={{ marginRight: 5, fontSize: 17 }}
+                  style={{ marginRight: 5, fontSize: 16, color: colors.t4 }}
                 >
                   username:
                 </Text>
@@ -299,7 +334,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     alignSelf: "flex-start",
                     fontSize: 17,
                     fontWeight: "400",
-                    color: colors.primary2,
+                    color: colors.t3,
                     marginVertical: 3,
                   }}
                 >
@@ -316,7 +351,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Text
                   numberOfLines={2}
-                  style={{ marginRight: 5, fontSize: 17 }}
+                  style={{ marginRight: 5, fontSize: 16, color: colors.t4 }}
                 >
                   Adicionado por:
                 </Text>
@@ -326,7 +361,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     alignSelf: "flex-start",
                     fontSize: 17,
                     fontWeight: "400",
-                    color: colors.primary2,
+                    color: colors.t3,
                     marginVertical: 3,
                   }}
                 >
@@ -357,7 +392,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
               >
                 <Text
                   numberOfLines={2}
-                  style={{ marginRight: 5, fontSize: 17 }}
+                  style={{ marginRight: 5, fontSize: 16, color: colors.t4 }}
                 >
                   Posição:
                 </Text>
@@ -367,7 +402,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                     alignSelf: "flex-start",
                     fontSize: 17,
                     fontWeight: "400",
-                    color: colors.primary2,
+                    color: colors.t3,
                     marginVertical: 3,
                   }}
                 >
@@ -377,7 +412,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                   style={{ alignSelf: "flex-end" }}
                   name="unfold-more-horizontal"
                   size={26}
-                  color={colors.primary}
+                  color={colors.primary2}
                 />
               </View>
             </RNPickerSelect>
@@ -466,7 +501,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -480,7 +515,7 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 14,
     alignSelf: "flex-start",
-    color: colors.description,
+    color: colors.t5,
     fontWeight: "600",
     marginBottom: 5,
   },
@@ -497,9 +532,9 @@ const styles = StyleSheet.create({
   },
   displayName: {
     alignSelf: "flex-start",
-    fontSize: 19,
-    fontWeight: "600",
-    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "500",
+    color: colors.t2,
     // marginTop: 10,
     marginVertical: 3,
   },
@@ -507,7 +542,7 @@ const styles = StyleSheet.create({
     width: "95%",
     height: 1,
     right: 10,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },

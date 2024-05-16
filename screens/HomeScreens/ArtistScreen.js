@@ -96,8 +96,10 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
       const result = await axios.get(`${apiUrl}/events/?artist=${item?.uuid}`);
       // console.log(result?.data);
       setEvents(result?.data);
+    } catch (error) {
+    } finally {
       setFetched(true);
-    } catch (error) {}
+    }
   };
 
   useEffect(() => {
@@ -225,11 +227,11 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         // exiting={FadeOut}
       >
         <Placeholder
-      
-          // Animation={Fade}
 
-          // Left={PlaceholderMedia}
-          // Right={PlaceholderMedia}
+        // Animation={Fade}
+
+        // Left={PlaceholderMedia}
+        // Right={PlaceholderMedia}
         >
           <ActivityIndicator
             style={{
@@ -422,6 +424,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
       )}
 
       <Animated.FlatList
+      showsVerticalScrollIndicator={false}
         entering={FadeIn.duration(300)}
         scrollEventThrottle={16}
         onScroll={handleScroll}
@@ -648,34 +651,34 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <AntDesign
                     name="facebook-square"
                     size={24}
-                    color={colors.primary2}
+                    color={colors.t3}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <AntDesign
                     name="instagram"
                     size={24}
-                    color={colors.primary2}
+                    color={colors.t3}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <AntDesign name="twitter" size={25} color={colors.primary2} />
+                  <AntDesign name="twitter" size={25} color={colors.t3} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <Entypo name="spotify" size={25} color={colors.primary2} />
+                  <Entypo name="spotify" size={25} color={colors.t3} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <Fontisto
                     name="applemusic"
                     size={23}
-                    color={colors.primary2}
+                    color={colors.t3}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <Fontisto
                     name="youtube-play"
                     size={23}
-                    color={colors.primary2}
+                    color={colors.t3}
                   />
                 </TouchableOpacity>
               </View>

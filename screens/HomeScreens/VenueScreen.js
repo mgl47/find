@@ -61,6 +61,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [following, setFollowing] = useState(false);
   const [followBlock, setFollowBlock] = useState(false);
   const [events, setEvents] = useState([]);
+  const [fetched, setFetched] = useState(false);
 
   const getVenues = async () => {
     try {
@@ -68,7 +69,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
 
       if (result?.data?.length > 0) {
         setVenue(result?.data?.[0]);
-
         setLoading(false);
       }
     } catch (error) {
@@ -77,9 +77,14 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
   };
   const getEvents = async () => {
-    const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid}`);
+    try {
+      const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid}`);
+      setEvents(result?.data);
+    } catch (error) {
+    } finally {
+      setFetched(true);
+    }
     // console.log(result?.data);
-    setEvents(result?.data);
   };
 
   useEffect(() => {
@@ -89,7 +94,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   useEffect(() => {
     if (user?.followedVenues?.includes(venue?._id)) setFollowing(true);
   }, [venue]);
-  console.log(item?.mapSnap);
 
   const followVenue = async () => {
     setFollowBlock(true);
@@ -268,10 +272,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     });
   }, [scrolling, mediaIndex, venue]);
 
-  if (loading) {
+  if (loading || !fetched) {
     return (
       <Animated.View
-        style={{ flex: 1, backgroundColor: colors.skeleton }}
+        style={{ flex: 1, backgroundColor: colors.background }}
         entering={FadeIn}
         // exiting={FadeOut}
       >
@@ -394,7 +398,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     );
   }
   return (
-    <>
+    <View style={{ backgroundColor: colors.background }}>
       {scrolling && (
         <Animated.View
           entering={FadeIn.duration(200)}
@@ -431,6 +435,8 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
       )}
 
       <Animated.FlatList
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={{ backgroundColor: colors.background }}
         showsVerticalScrollIndicator={false}
         entering={FadeIn.duration(400)}
         data={events}
@@ -574,21 +580,21 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     <AntDesign
                       name="facebook-square"
                       size={26}
-                      color={colors.primary}
+                      color={colors.t4}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity style={{ marginRight: 10 }}>
                     <AntDesign
                       name="instagram"
                       size={26}
-                      color={colors.primary}
+                      color={colors.t4}
                     />
                   </TouchableOpacity>
                   <TouchableOpacity style={{ marginRight: 10 }}>
                     <AntDesign
                       name="twitter"
                       size={27}
-                      color={colors.primary}
+                      color={colors.t4}
                     />
                   </TouchableOpacity>
                 </View>
@@ -769,7 +775,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             </View>
           </>
         }
-        style={{ backgroundColor: colors.background }}
         renderItem={({ item, index }) => {
           // console.log(index);
           return (
@@ -798,9 +803,13 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
             )
           );
         }}
-        ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+        ListFooterComponent={
+          <View
+            style={{ marginBottom: 50, backgroundColor: colors.background }}
+          />
+        }
       />
-    </>
+    </View>
   );
 };
 
