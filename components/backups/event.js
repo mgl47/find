@@ -731,7 +731,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     alignItems: "center",
                     // justifyContent: "center",
                   }}
-                  onPress={() => navigation.navigate("artist", item)}
+                  onPress={() => navigation.navigate("artist", {item})}
                 >
                   <Image
                     style={{
@@ -996,7 +996,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                       alignItems: "center",
                       // justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("artist", item)}
+                    onPress={() => navigation.navigate("artist", {artistId:"sda",item})}
                   >
                     <Image
                       style={{

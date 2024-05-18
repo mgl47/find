@@ -34,7 +34,7 @@ export default function VenuesList(item) {
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => {
-            navigation.navigate("venue", item);
+            navigation.navigate("venue", {item});
           }}
           style={{
             flexDirection: "row",

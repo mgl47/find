@@ -127,7 +127,7 @@ import {
           >
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("venue", item);
+                navigation.navigate("venue", {item});
               }}
               style={{
                 flexDirection: "row",
@@ -351,7 +351,7 @@ import {
                       >
                         <TouchableOpacity
                           onPress={() => {
-                            navigation.navigate("venue", venueDetails);
+                            navigation.navigate("venue",{item});
                           }}
                           style={{
                             flexDirection: "row",

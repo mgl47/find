@@ -1406,7 +1406,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       alignItems: "center",
                       // justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("artist", item)}
+                    onPress={() => navigation.navigate("artist", {item})}
                   >
                     <Image
                       style={{
@@ -1534,7 +1534,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       alignItems: "center",
                       // justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("artist", item)}
+                    onPress={() => navigation.navigate("artist", {item})}
                   >
                     <Image
                       style={{

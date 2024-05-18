@@ -11,8 +11,9 @@ const colors = {
   // primary: "#800060",  //pink
   gray2: "#696969",
   background: darkMode ? "#05131d" : "#faf8f8",
-  // background2: darkMode ? "#04141c" : "#faf8f8",
-  // background2: darkMode ? "#072f49" : "#white",
+
+  // background: darkMode ? "#030d13" : "#faf8f8",
+
 
   background2: darkMode ? "#20282f" : "#white",
 
@@ -23,7 +24,7 @@ const colors = {
 
   t5: darkMode ? "#9F9F9F" : "#686868",
   light: darkMode ? "#D9D9D9" : "#F2F2F2",
-  separator: darkMode ? "#333333" : "#D9D9D9",
+  separator: darkMode ? "#10161c" : "#D9D9D9",
 
   skeleton:darkMode?'#05131d':"faf8f8",
   skeleton2:darkMode?'#20282f':"F2F2F2",

@@ -47,13 +47,13 @@ import { useAuth } from "../../components/hooks/useAuth";
 import SmallCard from "../../components/cards/SmallCard";
 
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
-  const item = route.params;
+  const { item, venueId } = route.params;
 
   const { width, height, isIPhoneWithNotch } = useDesign();
   const { user, headerToken, getUpdatedUser } = useAuth();
 
   const { apiUrl } = useData();
-  const [venue, setVenue] = useState(null);
+  const [venue, setVenue] = useState(item);
   const [loading, setLoading] = useState(true);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [imageVisible, setImageVisible] = useState(false);
@@ -65,7 +65,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   const getVenues = async () => {
     try {
-      const result = await axios.get(`${apiUrl}/venues/?&filter=${item?.uuid}`);
+      const result = await axios.get(`${apiUrl}/venues/?&filter=${venueId}`);
 
       if (result?.data?.length > 0) {
         setVenue(result?.data?.[0]);
@@ -78,17 +78,19 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   };
   const getEvents = async () => {
     try {
-      const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid}`);
+      const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid||venueId}`);
       setEvents(result?.data);
     } catch (error) {
     } finally {
       setFetched(true);
+      setLoading(false);
     }
     // console.log(result?.data);
   };
 
   useEffect(() => {
-    getVenues();
+    if (venueId) getVenues();
+
     getEvents();
   }, []);
   useEffect(() => {
@@ -128,7 +130,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       // console.log(response?.data);
-      await  getUpdatedUser({field:"favVenues"})
+      await getUpdatedUser({ field: "favVenues" });
     } catch (error) {
       console.log(error?.response?.data?.msg);
     } finally {
@@ -272,7 +274,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     });
   }, [scrolling, mediaIndex, venue]);
 
-  if (loading || !fetched) {
+  if (venueId && (loading || !fetched)) {
     return (
       <Animated.View
         style={{ flex: 1, backgroundColor: colors.background }}
@@ -401,7 +403,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     <View style={{ backgroundColor: colors.background }}>
       {scrolling && (
         <Animated.View
-          entering={FadeIn.duration(200)}
+          entering={venueId && FadeIn.duration(200)}
           // exiting={FadeOutUp.duration(200)}
           exiting={SlideOutUp.duration(500)}
           style={{
@@ -584,18 +586,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     />
                   </TouchableOpacity>
                   <TouchableOpacity style={{ marginRight: 10 }}>
-                    <AntDesign
-                      name="instagram"
-                      size={26}
-                      color={colors.t4}
-                    />
+                    <AntDesign name="instagram" size={26} color={colors.t4} />
                   </TouchableOpacity>
                   <TouchableOpacity style={{ marginRight: 10 }}>
-                    <AntDesign
-                      name="twitter"
-                      size={27}
-                      color={colors.t4}
-                    />
+                    <AntDesign name="twitter" size={27} color={colors.t4} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -630,7 +624,6 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 // }}
                 // style={styles.map}
               /> */}
-
               <View
                 style={{
                   // height: 200,
@@ -742,36 +735,38 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   />
                 </TouchableOpacity>
               </View>
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  // width: "80%",
-                  color: colors.t3,
-                  marginLeft: 5,
-                  marginTop: 15,
-                }}
-              >
-                Próximos Eventos
-              </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "400",
+              {events?.length > 0 && (
+                <Animated.View entering={FadeIn.duration(200)}>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: "500",
+                      // width: "80%",
+                      color: colors.t3,
+                      marginLeft: 5,
+                      marginTop: 5,
+                      // marginBottom: 5,
+                    }}
+                  >
+                    Próximos Eventos
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "400",
 
-                  color: colors.t5,
-                  marginLeft: 5,
-                  marginTop: 5,
-                }}
-              >
-                {events?.length > 1
-                  ? events?.length + " Eventos"
-                  : events?.length > 0
-                  ? events?.length + " Evento"
-                  : ""}
-              </Text>
-
-              {/* <View style={{ marginBottom: 100 }} /> */}
+                      color: colors.t5,
+                      marginLeft: 5,
+                    }}
+                  >
+                    {events?.length > 1
+                      ? events?.length + " Eventos"
+                      : events?.length > 0
+                      ? events?.length + " Evento"
+                      : ""}
+                  </Text>
+                </Animated.View>
+              )}
             </View>
           </>
         }
@@ -796,9 +791,12 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               //   onPress={() => navigation.navigate("event", item)}
               // >
 
-              <View style={{ bottom: 10 }}>
+              <Animated.View
+                entering={FadeIn.duration(300)}
+                style={{ bottom: 10 }}
+              >
                 <SmallCard {...item} />
-              </View>
+              </Animated.View>
               // </TouchableOpacity>
             )
           );

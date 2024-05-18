@@ -210,7 +210,7 @@ const VenuesExplorer = () => {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => {
-                    navigation.navigate("venue", venueDetails);
+                    navigation.navigate("venue",{item:venueDetails});
                   }}
                   style={{
                     flexDirection: "row",

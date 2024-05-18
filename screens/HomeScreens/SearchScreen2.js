@@ -378,7 +378,7 @@ const SearchScreen2 = ({
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                onPress={() => navigation.navigate("artist", item)}
+                onPress={() => navigation.navigate("artist", {item})}
                 activeOpacity={0.5}
                 style={{
                   shadowOffset: { width: 0.5, height: 0.5 },

@@ -313,17 +313,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
 
-      await  getUpdatedUser({field:"favEvents"})  
-    
-    } 
-      
-      
-      catch (error) {
+      await getUpdatedUser({ field: "favEvents" });
+    } catch (error) {
       console.log(error?.response?.data?.msg);
     }
   };
   const goingtoEvent = async () => {
-
     let updateInterested = [];
     let updatedGoing = [];
 
@@ -349,10 +344,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       }
     }
 
-
     try {
-
-
       const response = await axios.patch(
         `${apiUrl}/user/current/${user?._id}`,
         {
@@ -369,15 +361,14 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
 
-
-
-      await  getUpdatedUser({field:"favEvents"})  
+      await getUpdatedUser({ field: "favEvents" });
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
   };
+
   return (
-    <>
+    <Animated.View entering={FadeIn.duration(300)}>
       {scrolling && (
         <Animated.View
           entering={SlideInUp.duration(300)}
@@ -426,8 +417,6 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         onScroll={handleScroll}
         bounces={false}
       >
-      
-
         <FlatList
           showsHorizontalScrollIndicator={false}
           style={{ backgroundColor: colors.background }}
@@ -697,11 +686,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   borderRadius: 12,
                 }}
                 onPress={() => {
-
                   likeEvent();
-
-
-
                 }}
               >
                 Interressado
@@ -744,7 +729,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <View style={[styles.separator, { marginVertical: 10 }]} />
             <View>
               <ViewMoreText
-                numberOfLines={6}
+                numberOfLines={10}
                 renderViewMore={renderViewMore}
                 renderViewLess={renderViewLess}
                 textStyle={{ textAlign: "left" }}
@@ -810,7 +795,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     alignItems: "center",
                     // justifyContent: "center",
                   }}
-                  onPress={() => navigation.navigate("artist", item)}
+                  onPress={() => navigation.navigate("artist", { item })}
+                  // onPress={() =>
+                  //   navigation.navigate("artist", { artistId: "neyna" })
+                  // }
                 >
                   <Image
                     style={{
@@ -852,7 +840,12 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             </Text>
             <TouchableOpacity
               activeOpacity={0.6}
-              onPress={() => navigation.navigate("venue", Event?.venue)}
+              onPress={
+                () => navigation.navigate("venue", { item: Event?.venue })
+                // navigation.navigate("venue", {
+                //   venueId: "762c47cd-68a6-4d83-9655-31857d0aa9eb",
+                // })
+              }
               style={{
                 flexDirection: "row",
                 alignItems: "center",
@@ -1024,125 +1017,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             style={{ padding: 10 }}
             contentContainerStyle={{}}
             data={Event?.organizers}
-            // horizontal={Event?.organizers?.length > 1}
+
             keyExtractor={(item) => item?.uuid}
-            // renderItem={({ item }) => {
-            //   return Event?.organizers?.length > 1 ? (
-            //     <TouchableOpacity
-            //       style={{
-            //         padding: 5,
-            //         alignItems: "center",
-            //         // justifyContent: "center",
-            //       }}
-            //       onPress={() => navigation.navigate("artist", item)}
-            //     >
-            //       <Image
-            //         style={{
-            //           height: 65,
-            //           width: 65,
-            //           borderRadius: 20,
-            //           marginBottom: 2,
-            //           borderWidth: 0.009,
-            //           backgroundColor: colors.darkGrey,
-            //         }}
-            //         source={{ uri: item?.photos?.avatar?.[0]?.uri }}
-            //       />
-            //       <Text
-            //         style={{
-            //           width: item?.displayName?.length > 15 ? 100 : null,
-            //           textAlign: "center",
-            //           fontSize: 14,
-            //           fontWeight: "500",
-            //         }}
-            //       >
-            //         {item?.displayName}
-            //       </Text>
-            //     </TouchableOpacity>
-            //   ) : (
-            //     <View
-            //       style={{
-            //         backgroundColor: colors.background2,
-            //         borderRadius: 10,
-            //         // shadowOffset: { width: 0.5, height: 0.5 },
-            //         // shadowOpacity: 0.3,
-            //         // shadowRadius: 1,
-            //         // elevation: 2,
-            //         shadowOffset: { width: 0.5, height: 0.5 },
-            //         shadowOpacity: 0.1,
-            //         shadowRadius: 1,
-            //         elevation: 0.5,
-            //       }}
-            //     >
-            //       <TouchableOpacity
-            //         onPress={() => navigation.navigate("artist", item)}
-            //         style={{
-            //           flexDirection: "row",
-            //           alignItems: "center",
-            //           justifyContent: "space-between",
-            //           padding: 10,
-            //           alignItems: "center",
-
-            //           // height: 50,
-            //           // padding: 5,
-            //         }}
-            //       >
-            //         <View
-            //           style={{ flexDirection: "row", alignItems: "center" }}
-            //         >
-            //           <Image
-            //             style={{
-            //               width: 40,
-            //               height: 40,
-            //               borderRadius: 50,
-            //               marginRight: 10,
-            //               borderWidth: 0.1,
-            //             }}
-            //             source={{ uri: item?.photos?.avatar?.[0]?.uri }}
-            //           />
-            //           <Text
-            //             style={{
-            //               fontSize: 15,
-            //               fontWeight: "500",
-            //               color: colors.t5,
-            //               // color: colors.white,
-            //             }}
-            //           >
-            //             {item.displayName}
-            //           </Text>
-            //         </View>
-            //         <Entypo
-            //           name="chevron-right"
-            //           size={24}
-            //           color={colors.t3}
-            //         />
-            //       </TouchableOpacity>
-            //       <View style={[styles.separator, { width: "90%" }]} />
-
-            //       <TouchableOpacity
-            //         style={{
-            //           padding: 10,
-            //           flexDirection: "row",
-            //           alignItems: "center",
-            //           justifyContent: "space-between",
-            //           width: "100%",
-            //           // marginVertical: 5,
-            //         }}
-            //       >
-            //         <View>
-            //           <Text style={{ fontSize: 15, fontWeight: "500" }}>
-            //             Telefonar
-            //           </Text>
-            //           <Text>{item.phone1}</Text>
-            //         </View>
-            //         <MaterialCommunityIcons
-            //           name="phone"
-            //           size={25}
-            //           color={colors.primary}
-            //         />
-            //       </TouchableOpacity>
-            //     </View>
-            //   );
-            // }}
+           
             renderItem={({ item }) => {
               return (
                 <View
@@ -1158,12 +1035,15 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("artist", item)}
+                    onPress={() => navigation.navigate("artist", { item })}
+                    // onPress={() =>
+                    //   navigation.navigate("artist", { artistId: "neyna" })
+                    // }
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      padding: 10,
+                      padding: 5,
                       alignItems: "center",
                     }}
                   >
@@ -1197,12 +1077,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
                   <TouchableOpacity
                     style={{
-                      padding: 10,
+                      padding: 5,
+                      paddingHorizontal: 10,
                       flexDirection: "row",
                       alignItems: "center",
                       justifyContent: "space-between",
                       width: "100%",
-                      // marginVertical: 5,
+                      marginBottom: 5,
                     }}
                   >
                     <View>
@@ -1220,8 +1101,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                           fontSize: 14,
                           fontWeight: "500",
                           color: colors.t4,
-                          left:1
-                          ,top:1
+                          left: 1,
+                          top: 1,
                         }}
                       >
                         9123456
@@ -1393,7 +1274,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           </View>
         </Animated.View>
       )}
-    </>
+    </Animated.View>
   );
 };
 

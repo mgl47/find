@@ -49,8 +49,8 @@ import { useAuth } from "../../components/hooks/useAuth";
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
   const { apiUrl } = useData();
-  const item = route.params;
-  const [artist, setArtist] = useState(null);
+  const { artistId, item } = route.params;
+  const [artist, setArtist] = useState(item);
   const [avatarVisible, setAvatarVisible] = useState(false);
   const [coverVisible, setCoverVisible] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
 
     try {
       const response = await axios.get(
-        `${apiUrl}/users/?username=${item?.username?.toLowerCase()}`
+        // `${apiUrl}/users/?username=${item?.username?.toLowerCase()}`
+        `${apiUrl}/users/?username=${artistId}`
       );
       if (response.status === 200) {
         // console.log(response?.data);
@@ -86,19 +87,27 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
     // setSearched(true);
   };
+  console.log(item?.username);
   useEffect(() => {
-    findUser();
+    if (artistId) {
+      findUser();
+    }
     getEvents();
   }, []);
-  console.log(item?.uuid);
+
   const getEvents = async () => {
     try {
-      const result = await axios.get(`${apiUrl}/events/?artist=${item?.uuid}`);
+      const result = await axios.get(
+        `${apiUrl}/events/?username=${
+          item?.username != undefined ? item?.username : artistId
+        }`
+      );
       // console.log(result?.data);
       setEvents(result?.data);
     } catch (error) {
     } finally {
       setFetched(true);
+      setLoading(false);
     }
   };
 
@@ -139,7 +148,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       // console.log(response?.data);
-      await       getUpdatedUser({field:"favArtists"})  
+      await getUpdatedUser({ field: "favArtists" });
     } catch (error) {
       console.log(error?.response?.data?.msg);
     } finally {
@@ -219,7 +228,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   let displayAvatar = [];
   const avatarIndex = artist?.photos?.avatar[3] || [];
   displayAvatar?.push(avatarIndex);
-  if (loading || !fetched) {
+  if (artistId && (loading || !fetched)) {
     return (
       <Animated.View
         style={{ flex: 1, backgroundColor: colors.skeleton }}
@@ -424,8 +433,8 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
       )}
 
       <Animated.FlatList
-      showsVerticalScrollIndicator={false}
-        entering={FadeIn.duration(300)}
+        showsVerticalScrollIndicator={false}
+        entering={artistId && FadeIn.duration(300)}
         scrollEventThrottle={16}
         onScroll={handleScroll}
         bounces={false}
@@ -434,113 +443,118 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         style={{ backgroundColor: colors.background }}
         ListHeaderComponent={
           <>
-            <ImageView
-              images={displayCover}
-              imageIndex={0}
-              onRequestClose={() => setCoverVisible(false)}
-              visible={coverVisible}
-            />
-            <TouchableOpacity
-              disabled={!artist?.photos?.cover?.[0]?.uri}
-              onPress={() => setCoverVisible(true)}
-              activeOpacity={0.9}
-              style={{ backgroundColor: colors.dark }}
-            >
-              <Image
-                style={{ height: 150, width: "100%" }}
-                source={{ uri: artist?.photos?.cover?.[2]?.uri }}
-              />
-            </TouchableOpacity>
-            <View style={{ flexDirection: "row", zIndex: 2 }}>
+            <Animated.View entering={FadeIn}>
               <ImageView
-                images={displayAvatar}
+                images={displayCover}
                 imageIndex={0}
-                onRequestClose={() => setAvatarVisible(false)}
-                visible={avatarVisible}
+                onRequestClose={() => setCoverVisible(false)}
+                visible={coverVisible}
               />
-              <TouchableHighlight
-                underlayColor={colors.light2}
-                onPress={() => setAvatarVisible(true)}
-                style={{
-                  backgroundColor: colors.black,
-                  borderRadius: 100,
-                  bottom: 50,
-                  marginLeft: 10,
-                }}
-                // activeOpacity={0.7}
+              <TouchableOpacity
+                disabled={!artist?.photos?.cover?.[0]?.uri}
+                onPress={() => setCoverVisible(true)}
+                activeOpacity={0.9}
+                style={{ backgroundColor: colors.dark }}
               >
                 <Image
-                  style={{
-                    height: 100,
-                    width: 100,
-                    borderRadius: 100,
-                    //   marginTop: 100,
-                  }}
-                  source={{ uri: artist?.photos?.avatar?.[1]?.uri }}
+                  style={{ height: 150, width: "100%" }}
+                  source={{ uri: artist?.photos?.cover?.[2]?.uri }}
                 />
-              </TouchableHighlight>
+              </TouchableOpacity>
               <View
-                style={{
-                  flexDirection: "row",
-                  marginVertical: 10,
-                  marginLeft: 20,
-                  height: 30,
-                  top: 5,
-                }}
+                style={{ flexDirection: "row", zIndex: 2, marginBottom: 10 }}
               >
-                <Chip
-                  // elevated
-                  elevation={1}
-                  icon={() => (
-                    <MaterialCommunityIcons
-                      name={following ? "heart" : "heart-outline"}
-                      color={following ? colors.t2 : colors.t3}
-                      size={20}
-                    />
-                  )}
-                  textStyle={{
-                    color: following ? colors.t2 : colors.t3,
-                  }}
+                <ImageView
+                  images={displayAvatar}
+                  imageIndex={0}
+                  onRequestClose={() => setAvatarVisible(false)}
+                  visible={avatarVisible}
+                />
+                <TouchableHighlight
+                  underlayColor={colors.light2}
+                  onPress={() => setAvatarVisible(true)}
                   style={{
-                    backgroundColor: following
-                      ? colors.primary
-                      : colors.background2, // paddingHorizontal: 2,
-                    marginRight: 10,
-                    borderRadius: 12,
-                    width: 110,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    backgroundColor: colors.black,
+                    borderRadius: 100,
+                    bottom: 50,
+                    marginLeft: 10,
                   }}
-                  disabled={followBlock}
-                  onPress={followUser}
+                  // activeOpacity={0.7}
                 >
-                  {following ? "Seguindo" : "Seguir"}
-                </Chip>
+                  <Image
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderRadius: 100,
+                      //   marginTop: 100,
+                    }}
+                    source={{ uri: artist?.photos?.avatar?.[1]?.uri }}
+                  />
+                </TouchableHighlight>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    marginVertical: 10,
+                    marginLeft: 20,
+                    height: 30,
+                    top: 5,
+                  }}
+                >
+                  <Chip
+                    // elevated
+                    elevation={1}
+                    icon={() => (
+                      <MaterialCommunityIcons
+                        name={following ? "heart" : "heart-outline"}
+                        color={following ? colors.t2 : colors.t3}
+                        size={20}
+                      />
+                    )}
+                    textStyle={{
+                      color: following ? colors.t2 : colors.t3,
+                    }}
+                    style={{
+                      backgroundColor: following
+                        ? colors.primary
+                        : colors.background2, // paddingHorizontal: 2,
+                      marginRight: 10,
+                      borderRadius: 12,
+                      width: 110,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    disabled={followBlock}
+                    onPress={followUser}
+                  >
+                    {following ? "Seguindo" : "Seguir"}
+                  </Chip>
 
-                <Chip
-                  elevation={1}
-                  icon={() => (
-                    <MaterialIcons
-                      name="ios-share"
-                      size={20}
-                      color={colors.t2}
-                    />
-                  )}
-                  textStyle={{
-                    color: colors.t2,
-                  }}
-                  style={{
-                    backgroundColor: colors.background2,
-                    // paddingHorizontal: 2,
-                    marginHorizontal: 10,
-                    borderRadius: 12,
-                  }}
-                  onPress={() => console.log("Pressed")}
-                >
-                  Partilhar
-                </Chip>
+                  <Chip
+                    elevation={1}
+                    icon={() => (
+                      <MaterialIcons
+                        name="ios-share"
+                        size={20}
+                        color={colors.t2}
+                      />
+                    )}
+                    textStyle={{
+                      color: colors.t2,
+                    }}
+                    style={{
+                      backgroundColor: colors.background2,
+                      // paddingHorizontal: 2,
+                      marginHorizontal: 10,
+                      borderRadius: 12,
+                    }}
+                    onPress={() => console.log("Pressed")}
+                  >
+                    Partilhar
+                  </Chip>
+                </View>
               </View>
-            </View>
+            </Animated.View>
+
             {/* </View> */}
             <View style={styles.container}>
               <Text
@@ -548,6 +562,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   fontSize: 21,
                   fontWeight: "600",
                   marginBottom: 5,
+
                   marginLeft: artist?.displayName?.length < 10 ? 20 : 0,
                   color: colors.t2,
                 }}
@@ -566,60 +581,160 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
               )}
 
               <View style={styles.separator} />
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  // width: "80%",
-                  color: colors.t3,
-                  marginLeft: 5,
-                  marginTop: 5,
-                  // marginBottom: 5,
-                }}
-              >
-                Próximos Eventos
-              </Text>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "400",
+              {events?.length > 0 && (
+                <Animated.View entering={FadeIn.duration(200)}>
+                  <Text
+                    style={{
+                      fontSize: 17,
+                      fontWeight: "500",
+                      // width: "80%",
+                      color: colors.t3,
+                      marginLeft: 5,
+                      marginTop: 5,
+                      // marginBottom: 5,
+                    }}
+                  >
+                    Próximos Eventos
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      fontWeight: "400",
 
-                  color: colors.t5,
-                  marginLeft: 5,
-                }}
-              >
-                {events?.length > 1
-                  ? events?.length + " Eventos"
-                  : events?.length > 0
-                  ? events?.length + " Evento"
-                  : ""}
-              </Text>
+                      color: colors.t5,
+                      marginLeft: 5,
+                    }}
+                  >
+                    {events?.length > 1
+                      ? events?.length + " Eventos"
+                      : events?.length > 0
+                      ? events?.length + " Evento"
+                      : ""}
+                  </Text>
+                </Animated.View>
+              )}
             </View>
+
+            {(loading || !fetched) && !artistId && (
+              <View style={{ padding: 10 }}>
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 25,
+                    width: "35%",
+                    marginRight: 20,
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+
+                    // marginHorizontal: 10,
+                  }}
+                />
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 15,
+                    width: "90%",
+                    marginTop: 10,
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+                  }}
+                />
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 15,
+                    width: "90%",
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+                  }}
+                />
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 15,
+                    width: "70%",
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+                  }}
+                />
+                <View
+                  style={{
+                    flexDirection: "row",
+
+                    width,
+                    // marginLeft: 10,
+                    marginTop: 10,
+                  }}
+                >
+                  <PlaceholderLine
+                    style={{
+                      borderRadius: 5,
+                      height: 40,
+                      width: 45,
+                      // position: "absolute",
+                      // right: 70,
+                      bottom: 70,
+                      marginTop: 10,
+                      marginRight: 15,
+                      backgroundColor: colors.skeleton2,
+                    }}
+                  />
+                  <PlaceholderLine
+                    style={{
+                      borderRadius: 5,
+                      height: 40,
+                      width: 45,
+                      // position: "absolute",
+                      // right: 70,
+                      bottom: 70,
+                      marginTop: 10,
+                      marginRight: 15,
+                      backgroundColor: colors.skeleton2,
+                    }}
+                  />
+                  <PlaceholderLine
+                    style={{
+                      borderRadius: 5,
+                      height: 40,
+                      width: 45,
+                      // position: "absolute",
+                      // right: 70,
+                      bottom: 70,
+                      marginTop: 10,
+                      backgroundColor: colors.skeleton2,
+                    }}
+                  />
+                </View>
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 20,
+                    width: "35%",
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+                  }}
+                />
+                <PlaceholderLine
+                  style={{
+                    borderRadius: 20,
+                    height: 15,
+                    width: "30%",
+                    bottom: 60,
+                    backgroundColor: colors.skeleton2,
+                  }}
+                />
+              </View>
+            )}
           </>
         }
         renderItem={({ item }) => {
-          return (
-            // <TouchableOpacity
-            //   activeOpacity={0.8}
-            //   style={{
-            //     // shadowOffset: { width: 0.5, height: 0.5 },
-            //     // shadowOpacity: 0.3,
-            //     // shadowRadius: 1,
-            //     // elevation: 2,
-            //     shadowOffset: { width: 0.5, height: 0.5 },
-            //     shadowOpacity: 0.1,
-            //     shadowRadius: 1,
-            //     elevation: 0.5,
-            //     paddingHorizontal: 10,
-            //     marginBottom: 10,
-            //     bottom: 50,
-            //   }}
-            //   onPress={() => navigation.navigate("event", item)}
-            // >
-            <View style={{ bottom: 70 }}>
+          return loading || !fetched ? null : (
+            <Animated.View
+              style={{ bottom: 70 }}
+              entering={FadeIn.duration(300)}
+            >
               <SmallCard {...item} />
-            </View>
-            //   </TouchableOpacity>
+            </Animated.View>
           );
         }}
         ListFooterComponent={
@@ -655,11 +770,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <AntDesign
-                    name="instagram"
-                    size={24}
-                    color={colors.t3}
-                  />
+                  <AntDesign name="instagram" size={24} color={colors.t3} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
                   <AntDesign name="twitter" size={25} color={colors.t3} />
@@ -668,18 +779,10 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <Entypo name="spotify" size={25} color={colors.t3} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <Fontisto
-                    name="applemusic"
-                    size={23}
-                    color={colors.t3}
-                  />
+                  <Fontisto name="applemusic" size={23} color={colors.t3} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ marginRight: 10 }}>
-                  <Fontisto
-                    name="youtube-play"
-                    size={23}
-                    color={colors.t3}
-                  />
+                  <Fontisto name="youtube-play" size={23} color={colors.t3} />
                 </TouchableOpacity>
               </View>
             </Animated.View>
