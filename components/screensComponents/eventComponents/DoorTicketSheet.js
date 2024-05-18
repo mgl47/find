@@ -215,7 +215,7 @@ export default DoorTicketSheet = ({
 
         await new Promise((resolve, reject) => setTimeout(resolve, 500));
 
-        // getUpdatedUser();
+        getUpdatedUser({field:"myEvents"});
         clean();
 
         // setOnPayment(false);

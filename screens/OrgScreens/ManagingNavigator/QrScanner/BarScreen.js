@@ -66,7 +66,7 @@ import {
     const [statusCode, setStatusCode] = useState(0);
     const [scannedTicket, setScannedTicket] = useState("");
   
-    const { getUpdatedUser, myEvents, headerToken, user } = useAuth();
+    const { getUpdatedUser, headerToken, user } = useAuth();
     const { apiUrl } = useData();
     const { isIPhoneWithNotch } = useDesign();
   
@@ -105,7 +105,7 @@ import {
             },
           }
         );
-        console.log(result);
+        // console.log(result);
   
         if (result.status == 200 || result.status == 201) {
           setLoading(false);
@@ -168,7 +168,7 @@ import {
     //   }, [navigation]);
   
     useEffect(() => {
-      getUpdatedUser();
+      getUpdatedUser({field:"myEvents"});
     }, []);
     const toggleFlashMode = () => {
       setFlashMode(

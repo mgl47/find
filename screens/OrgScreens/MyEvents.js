@@ -39,7 +39,7 @@ import BigCard2 from "../../components/cards/BigCards2";
 
 const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
   const [index, setIndex] = useState(1);
-  const { user, myEvents } = useAuth();
+  const { user, userData } = useAuth();
 
   const { height, width } = useDesign();
 
@@ -72,7 +72,7 @@ const MyEvents = ({ navigation, navigation: { goBack }, route }) => {
       </Tab>
 
       <FlatList
-        data={myEvents}
+        data={userData?.myEvents}
         keyExtractor={(item) => item?.uuid}
         renderItem={({ item }) => {
           return (

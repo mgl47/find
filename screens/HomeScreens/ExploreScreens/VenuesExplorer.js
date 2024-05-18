@@ -401,8 +401,8 @@ const VenuesExplorer = () => {
               backgroundColor: "rgba(5, 19, 29,0.85)",
               padding: 5,
               borderRadius: 15,
-              top: 10,
-              right: 5,
+              top: 50,
+              right: 2,
               zIndex: 2,
             }}
           >

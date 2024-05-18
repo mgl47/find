@@ -312,13 +312,18 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         },
         { headers: { Authorization: headerToken } }
       );
-      // console.log(response?.data);
-      getUpdatedUser();
-    } catch (error) {
+
+      await  getUpdatedUser({field:"favEvents"})  
+    
+    } 
+      
+      
+      catch (error) {
       console.log(error?.response?.data?.msg);
     }
   };
   const goingtoEvent = async () => {
+
     let updateInterested = [];
     let updatedGoing = [];
 
@@ -344,7 +349,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       }
     }
 
+
     try {
+
+
       const response = await axios.patch(
         `${apiUrl}/user/current/${user?._id}`,
         {
@@ -360,8 +368,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         },
         { headers: { Authorization: headerToken } }
       );
-      // console.log(response?.data);
-      getUpdatedUser();
+
+
+
+      await  getUpdatedUser({field:"favEvents"})  
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
@@ -416,16 +426,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         onScroll={handleScroll}
         bounces={false}
       >
-        {/* <Image
-          resizeMode="contain"
-          source={{ uri: print }}
-          style={{
-            width: "100%",
-            // borderRadius: 5,
-            height: 150,
-            marginTop: 90,
-          }}
-        /> */}
+      
 
         <FlatList
           showsHorizontalScrollIndicator={false}
@@ -696,9 +697,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   borderRadius: 12,
                 }}
                 onPress={() => {
-                  // setInterested(!interested),
+
                   likeEvent();
-                  // getUpdatedUser();
+
+
+
                 }}
               >
                 Interressado

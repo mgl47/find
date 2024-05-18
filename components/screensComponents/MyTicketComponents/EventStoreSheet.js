@@ -341,8 +341,8 @@ export default EventStoreSheet = ({
           }`,
           status: "pendente",
         });
-        getUpdatedUser();
-        clean();
+        getUpdatedUser({field:"user"})  
+                clean();
       }
     } catch (error) {
       console.log(error);
@@ -374,7 +374,7 @@ export default EventStoreSheet = ({
       );
 
       if (response.status === 200) {
-        await getUpdatedUser();
+        await       getUpdatedUser({field:"user"})  
 
         setTopUp(false);
         // setOnPayment(false);

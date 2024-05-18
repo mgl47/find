@@ -85,9 +85,10 @@ const SignInScreen = () => {
 
              authSheetRef?.current?.close();
           await   new Promise((resolve, reject) => setTimeout(resolve, 500));
-          getUpdatedUser(
-            response.data.user?._id,
-            "Bearer " + response.data.token
+          getUpdatedUser({
+            // response.data.user?._id,
+field:"all", 
+           token: "Bearer " + response.data.token}
           );
         }
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));

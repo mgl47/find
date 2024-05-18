@@ -71,7 +71,7 @@ export default TicketPurchaseSheet = ({
   setGiftedUser,
   giftedUser,
 }) => {
-  const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
+  const { headerToken, user, userData, getUpdatedUser } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
   const purchaseDates = formattedDates();
   const { isIPhoneWithNotch } = useDesign();
@@ -168,7 +168,7 @@ export default TicketPurchaseSheet = ({
     dispatch({ type: "GET_TOTALS" });
   }, [state.cart]);
   let purchasedAlready = 0;
-  myTickets.forEach((purchase) => {
+  userData?.myTickets.forEach((purchase) => {
     purchase?.tickets?.forEach((ticket) => {
       if (ticket?.eventId == event?._id) {
         purchasedAlready += 1;
@@ -439,7 +439,7 @@ export default TicketPurchaseSheet = ({
         if (!giftedUser) {
           navigation.navigate("ticketDetails", response?.data);
         }
-        getUpdatedUser();
+        getUpdatedUser({field:"user"})  
         clean();
 
         setOnPayment(false);

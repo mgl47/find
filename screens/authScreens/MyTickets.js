@@ -38,7 +38,7 @@ import { useDesign } from "../../components/hooks/useDesign";
 
 const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
   const [index, setIndex] = useState(1);
-  const { myTickets } = useAuth();
+  const { userData } = useAuth();
   const { height, width } = useDesign();
 
   const uuidKey = uuid.v4();
@@ -71,7 +71,7 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
       </Tab>
 
       <FlatList
-        data={myTickets}
+        data={userData?.myTickets}
         keyExtractor={(item) => item?.purchaseId}
         renderItem={({ item }) => {
           return (

@@ -206,7 +206,7 @@ const SearchScreen = ({
     <Animated.FlatList
       style={{ backgroundColor: colors.background }}
       // contentContainerStyle={{ alignItems: "center" }}
-      entering={firstMount && SlideInDown}
+      // entering={firstMount && SlideInDown}
       ListFooterComponent={
         <>
           {!inSearch && !loading && (

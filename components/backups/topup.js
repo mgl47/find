@@ -242,7 +242,8 @@ import {
         );
   
         if (response.status === 200) {
-          await getUpdatedUser();
+          await     getUpdatedUser({field:"user"});
+
   
           setTopUp(false);
           // setOnPayment(false);

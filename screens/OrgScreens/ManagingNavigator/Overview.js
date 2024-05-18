@@ -32,7 +32,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const { height, width } = useDesign();
   const { formatNumber, apiUrl } = useData();
 
-  const { user, myEvents, headerToken } = useAuth();
+  const { user, headerToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [event, setEvent] = useState(routeEvent);
   const [firstRender, setFirstRender] = useState(true);
@@ -109,7 +109,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
       if (result.status === 200) {
         setEvent(result.data);
         // console.log(result.data);
-        console.log(result.data?.haltedSales);
+        // console.log(result.data?.haltedSales);
         // setSuspendTickets(result.data?.haltedSales);
       }
     } catch (error) {

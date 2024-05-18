@@ -259,7 +259,7 @@ export default TopUpSheet = ({ topUpModalRef, state }) => {
       );
 
       if (response.status === 200) {
-        await getUpdatedUser();
+        await   getUpdatedUser({field:"user"})  
 
         // setTopUp(false);
         topUpModalRef.current.dismiss();

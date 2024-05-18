@@ -68,7 +68,7 @@ export default function StoreScreen({
 }) {
   const event = route.params;
   const { apiUrl, formatNumber } = useData();
-  const { user, headerToken, getUpdatedUser } = useAuth();
+  const { user, } = useAuth();
   const { height, width } = useDesign();
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [flashMode, setFlashMode] = useState(FlashMode.off);

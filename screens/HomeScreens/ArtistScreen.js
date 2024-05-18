@@ -139,7 +139,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       // console.log(response?.data);
-      await getUpdatedUser();
+      await       getUpdatedUser({field:"favArtists"})  
     } catch (error) {
       console.log(error?.response?.data?.msg);
     } finally {

@@ -36,7 +36,7 @@ import UserSelectorSheet from "../../../components/screensComponents/EventAdding
 const Staff = ({ navigation, navigation: { goBack }, route }) => {
   const event = route.params;
 
-  const { user, headerToken, myEvents, getUpdatedUser } = useAuth();
+  const { user, headerToken, getUpdatedUser } = useAuth();
   const { apiUrl } = useData();
   const [loading, setLoading] = useState(false);
   // const [event, setEvent] = useState(routeEvent);
@@ -95,7 +95,11 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getUpdatedUser(), manageMembersSheetRef.current?.close();
+        getUpdatedUser({field:"myEvents"}), 
+
+        setMembers(response.data)
+      
+        manageMembersSheetRef.current?.close();
       }
     } catch (error) {
       console.log(error?.response?.data?.msg);
@@ -121,7 +125,10 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getUpdatedUser(), manageMembersSheetRef.current?.close();
+        getUpdatedUser({field:"myEvents"}), 
+
+        setMembers(response.data)        
+        manageMembersSheetRef.current?.close();
       }
     } catch (error) {
       console.log(error?.response?.data?.msg);

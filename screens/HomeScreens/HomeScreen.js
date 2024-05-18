@@ -56,7 +56,7 @@ import BigTicket from "../../components/tickets/BigTicket";
 import Constants from "expo-constants";
 
 export default function HomeScreen({ navigation }) {
-  const { user, myTickets, setAuthModalUp, authSheetRef } = useAuth();
+  const { user, userData, setAuthModalUp, authSheetRef } = useAuth();
   const bottomSheetModalRef = useRef(null);
   const { isIPhoneWithNotch, width, height } = useDesign();
   const { events, getEvents } = useData();
@@ -76,7 +76,7 @@ export default function HomeScreen({ navigation }) {
   };
   const currentDate = new Date();
   // Target date
-  const targetDate = new Date(myTickets?.[0]?.event?.dates?.[0]?.date);
+  const targetDate = new Date(userData?.myTickets?.[0]?.event?.dates?.[0]?.date);
   // Calculate the difference in milliseconds between the two dates
   const differenceInMilliseconds = targetDate.getTime() - currentDate.getTime();
   // Convert milliseconds to seconds
@@ -112,6 +112,7 @@ export default function HomeScreen({ navigation }) {
           top: 0,
           zIndex: 3,
           width: "100%",
+          paddingBottom:5
           // backgroundColor:"transparent"
         }}
       >
@@ -158,7 +159,7 @@ export default function HomeScreen({ navigation }) {
             borderRadius: 50,
             padding: 5,
             right: 10,
-            // backgroundColor: colors.grey,
+            // backgroundColor: colors.background2,
           }}
           onPress={() => navigation.navigate("search")}
         >
@@ -238,10 +239,10 @@ export default function HomeScreen({ navigation }) {
         <FlatList
           contentContainerStyle={{
             backgroundColor: colors.background,
-            top: 50,
+            top: 40,
           }}
           onRefresh={getEvents}
-          bounces={false}
+          // bounces={false}
           ref={homeTabRef}
           scrollEventThrottle={16}
           onScroll={handleScroll}
@@ -271,6 +272,8 @@ export default function HomeScreen({ navigation }) {
                   itemWidth={width * 0.85}
                   loop={true}
                 />
+
+                // null
               ) : (
                 // null
                 // <Animated.View
@@ -352,7 +355,7 @@ export default function HomeScreen({ navigation }) {
                 </Animated.View>
               )}
               {user &&
-                myTickets?.length > 0 &&
+                userData?.myTickets?.length > 0 &&
                 differenceInSeconds > 0 &&
                 false && (
                   <Animated.View
@@ -369,7 +372,7 @@ export default function HomeScreen({ navigation }) {
                       // }
                       onPress={() => navigation.navigate("addArtist")}
                     >
-                      <BigTicket {...myTickets?.[0]} />
+                      <BigTicket {...userData?.myTickets?.[0]} />
                     </TouchableOpacity>
                   </Animated.View>
                 )}
@@ -407,7 +410,7 @@ export default function HomeScreen({ navigation }) {
                 ListFooterComponent={
                   <View
                     style={{
-                      marginBottom: 50,
+                      marginBottom: 70,
                       backgroundColor: colors.background,
                     }}
                   />

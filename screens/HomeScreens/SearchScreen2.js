@@ -54,6 +54,7 @@ import { markers } from "../../components/Data/markers";
 import { useData } from "../../components/hooks/useData";
 import axios from "axios";
 import VenuesList from "../../components/cards/Venues/VenueList";
+import Screen from "../../components/Screen";
 const SearchScreen2 = ({
   navigation,
   navigation: { goBack, canGoBack },
@@ -124,143 +125,10 @@ const SearchScreen2 = ({
       setIndex(0);
     }
 
-    // Use index as needed...
   }, [users, events, venues]);
 
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      headerRight: () => (
-        <Animated.View
-          style={{
-            padding: 10,
-            right: 10,
-            // alignSelf: "flex-end",
-            position: "absolute",
-            // marginBottom: 10,
-            zIndex: 2,
-          }}
-          //   entering={SlideInRight.duration(570)}
-        >
-          <TouchableOpacity
-            style={{ left: 8 }}
-            onPress={() => {
-              //   setcategory(false),
-              //     setSearchText(""),
-              Keyboard.dismiss(), navigation.goBack();
-            }}
-          >
-            <Text
-              style={{
-                color: colors.white,
-                fontSize: 16,
-                fontWeight: "600",
-              }}
-            >
-              Voltar
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      ),
-
-      headerTitle: () =>
-        category ? (
-          <Text
-            style={{ fontSize: 17, fontWeight: "600", color: colors.white }}
-          >
-            {category}
-          </Text>
-        ) : (
-          <View
-            style={{
-              // marginTop: 40,
-              flexDirection: "row",
-              alignItems: "center",
-              // backgroundColor: colors.white,
-              zIndex: 2,
-            }}
-          >
-            {/* {navigation.canGoBack("calendar") && (
-              <TouchableOpacity
-                style={{ position: "absolute", zIndex: 3, left: 4 }}
-                onPress={() =>
-                  navigation.canGoBack("calendar")
-                    ? navigation.goBack()
-                    : navigation.navigate("calendar")
-                }
-              >
-                <Entypo name="chevron-left" size={30} color={colors.primary} />
-              </TouchableOpacity>
-            )} */}
-            <Animated.View
-              // entering={SlideInRight.duration(500)}
-              // exiting={SlideOutRight.duration(250)}
-              style={{
-                width: "100%",
-
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexDirection: "row",
-
-                zIndex: 1,
-                // padding: 5,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  width: "85%",
-                  // left: 10,
-                  // width: "75%",
-                  // left: 40,
-                }}
-              >
-                <Entypo
-                  style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
-                  name="magnifying-glass"
-                  size={19}
-                  color={colors.description}
-                />
-
-                <TextInput
-                  value={searchText}
-                  onChangeText={setSearchText}
-                  onSubmitEditing={getResults}
-                  // placeholder="encontre artistas, eventos ou lugares"
-                  placeholder=" artistas, eventos ou lugares"
-                  placeholderTextColor={colors.t5}
-                  returnKeyType="search"
-                  //   autoFocus
-                  style={[styles.search, { width: "100%" }]}
-                />
-                {searchText && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setSearchText("");
-                    }}
-                  >
-                    <Entypo
-                      style={{
-                        position: "absolute",
-                        zIndex: 1,
-                        right: 10,
-                        top: 8,
-                      }}
-                      name="circle-with-cross"
-                      size={20}
-                      color={colors.darkGrey}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </Animated.View>
-          </View>
-        ),
-    });
-  }, [searchText]);
-
   return (
-    <View style={{ backgroundColor: colors.background, flex: 1 }}>
+    <Screen style={{ flex: 1, backgroundColor: colors.background }}>
       {loading && (
         <Animated.View
           style={{
@@ -275,11 +143,84 @@ const SearchScreen2 = ({
           <ActivityIndicator animating={loading} color={colors.primary} />
         </Animated.View>
       )}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          zIndex: 2,
+          width: "100%",
 
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            width: "80%",
+            left: 15,
+          }}
+        >
+          <Entypo
+            style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
+            name="magnifying-glass"
+            size={19}
+            color={colors.t4}
+          />
+          <TextInput
+            value={searchText}
+            onChangeText={setSearchText}
+            onSubmitEditing={getResults}
+            // placeholder="encontre artistas, eventos ou lugares"
+            placeholder=" artistas, eventos ou lugares"
+            placeholderTextColor={colors.t5}
+            returnKeyType="search"
+            //   autoFocus
+            style={[styles.search, { width: "100%" }]}
+          />
+          {searchText && (
+            <TouchableOpacity
+              onPress={() => {
+                setSearchText("");
+              }}
+            >
+              <Entypo
+                style={{
+                  position: "absolute",
+                  zIndex: 3,
+                  right: 10,
+                  top: 8,
+                  // backgroundColor:"red"
+                }}
+                name="circle-with-cross"
+                size={20}
+                color={colors.darkGrey}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+   
+          <TouchableOpacity
+            style={{   right: 5,
+              position: "absolute", padding: 10 }}
+            onPress={() => {
+              //   setcategory(false),
+              //     setSearchText(""),
+              Keyboard.dismiss(), navigation.goBack();
+            }}
+          >
+            <Text
+              style={{
+                color: colors.t3,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              Voltar
+            </Text>
+          </TouchableOpacity>
+
+      </View>
       {!category && !loading && (
         <Tab
-          // titleStyle={{ color: colors.primary }}
-
           indicatorStyle={{
             backgroundColor: colors.primary,
             height: 2,
@@ -287,8 +228,6 @@ const SearchScreen2 = ({
           }}
           value={index}
           onChange={setIndex}
-          // dense
-
           style={{ marginVertical: 5 }}
           disableIndicator
           titleStyle={(active) => ({
@@ -326,39 +265,7 @@ const SearchScreen2 = ({
             title={"Artistas"}
             iconPosition="right"
           />
-          {/* <Tab.Item>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text
-                style={{
-                  color: colors.darkGrey,
-                  fontSize: 14,
-                  fontWeight: "500",
-                }}
-              >
-                Artistas
-              </Text>
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  left: 5,
-                  backgroundColor: colors.darkGrey,
-                  padding: 3,
-                  borderRadius: 30,
-                }}
-              >
-                <Text
-                  style={{
-                    color: colors.white,
-                    fontSize: 12,
-                    fontWeight: "500",
-                  }}
-                >
-                  {artist?.length}
-                </Text>
-              </View>
-            </View>
-          </Tab.Item> */}
+
           <Tab.Item
             icon={(active) => (
               <View
@@ -583,7 +490,7 @@ const SearchScreen2 = ({
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
         />
       )}
-    </View>
+    </Screen>
   );
 };
 

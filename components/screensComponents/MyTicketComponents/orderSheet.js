@@ -50,7 +50,7 @@ export default orderSheet = ({ sheetRef, order }) => {
   const snapPoints = useMemo(() => ["55%", "75%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const { apiUrl, formatNumber } = useData();
-  const { user, headerToken, getUpdatedUser } = useAuth();
+
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(

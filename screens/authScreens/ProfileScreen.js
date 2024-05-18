@@ -311,8 +311,8 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
       if (response.status === 200) {
         setModalVisible(false);
-        getUpdatedUser();
-        setAvatarUri(null);
+        getUpdatedUser({field:"user"})  
+                setAvatarUri(null);
         setCoverUri(null);
       }
     } catch (error) {

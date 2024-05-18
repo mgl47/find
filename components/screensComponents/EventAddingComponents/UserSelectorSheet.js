@@ -148,7 +148,9 @@ export default UserSelectorSheet = ({
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        getUpdatedUser(), userSheetModalRef.current?.close();
+        getUpdatedUser({ field: "myEvents" }),
+        setUsers(response.data)
+          userSheetModalRef.current?.close();
       }
     } catch (error) {
       console.log(error?.response?.data?.msg);
@@ -191,7 +193,6 @@ export default UserSelectorSheet = ({
         }}
         handleIndicatorStyle={{ backgroundColor: colors.t5 }}
         enableOverDrag={false}
-
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <BottomSheetView style={styles.contentContainer}>

@@ -16,11 +16,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
+
 import { useNavigation, DrawerActions } from "@react-navigation/native";
 
 import colors from "../colors";
@@ -35,6 +31,14 @@ export const AuthProvider = ({ children }) => {
   const navigation = useNavigation();
 
   const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState({
+    myEvents: [],
+    myTickets: [],
+    favEvents: [],
+    favVenues: [],
+    favArtists: [],
+  });
+
   const [authLoading, setAuthLoading] = useState(false);
   const authSheetRef = useRef(null);
   const [userLocation, setUserLocation] = useState({
@@ -44,8 +48,6 @@ export const AuthProvider = ({ children }) => {
     longitudeDelta: 0.0421,
   });
   const [headerToken, setHeaderToken] = useState("");
-  const [myEvents, setMyEvents] = useState([]);
-  const [myTickets, setMyTickets] = useState([]);
 
   const [cacheChecked, setCacheChecked] = useState(false);
   const getUser = async () => {
@@ -75,33 +77,58 @@ export const AuthProvider = ({ children }) => {
       getUser();
     }
     if (cacheChecked && user) {
-      getUpdatedUser();
+      getUpdatedUser({ field: "all" });
     }
   }, [cacheChecked]);
 
-  const getUpdatedUser = async (id, token) => {
+  const getUpdatedUser = async ({ token, field }) => {
     try {
-      // if (headerToken) {
       const response = await axios.get(
-        `${apiUrl}/user/current/${id ?? user?._id}`,
+        `${apiUrl}/user/current/?field=${field}`,
         {
           headers: {
             Authorization: token ?? headerToken,
           },
         }
       );
+      const { myEvents, tickets, favEvents, favVenues, favArtists, user } =
+        response.data;
+      const updatedData = { ...userData };
 
-      setMyEvents(response?.data?.events);
-      setMyTickets(response?.data?.tickets);
-      setUser(response?.data?.user);
+      if (!field || field === "all" || field === "myEvents") {
+        updatedData.myEvents = myEvents;
+      }
+      if (!field || field === "all" || field === "myTickets") {
+        updatedData.myTickets = tickets;
+      }
+      if (!field || field === "all" || field === "favEvents") {
+        updatedData.favEvents = favEvents;
+      }
+      if (!field || field === "all" || field === "favVenues") {
+        updatedData.favVenues = favVenues;
+      }
+      if (!field || field === "all" || field === "favArtists") {
+        updatedData.favArtists = favArtists;
+      }
+      if (
+        !field ||
+        field === "all" ||
+        field === "user" ||
+        field === "favVenues" ||
+        field === "favArtists" 
+    
+      ) {
+        setUser(user);
 
-      const jsonValue = JSON.stringify(response.data?.user);
-      await AsyncStorage.setItem("user", jsonValue);
-      // }
+        const jsonValue = JSON.stringify(user);
+        await AsyncStorage.setItem("user", jsonValue);
+      }
+      setUserData(updatedData);
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
   };
+
   const followVenue2 = async (venue) => {
     let updateFollowedVenue = [];
 
@@ -129,8 +156,7 @@ export const AuthProvider = ({ children }) => {
         },
         { headers: { Authorization: headerToken } }
       );
-      // console.log(response?.data);
-      await getUpdatedUser();
+      await getUpdatedUser({ field: "user" });
     } catch (error) {
       console.log(error?.response?.data?.msg);
     } finally {
@@ -142,10 +168,15 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("headerToken");
     setCacheChecked(false);
-
-    setMyEvents([]);
-    setMyTickets([]);
     setHeaderToken(null);
+
+    setUserData({
+      myEvents: [],
+      myTickets: [],
+      favEvents: [],
+      favVenues: [],
+      favArtists: [],
+    });
     setUser(null);
 
     navigation.dispatch(DrawerActions.closeDrawer());
@@ -183,28 +214,28 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.setItem("lastLocation", jsonValue);
     // }
   };
+
   useLayoutEffect(() => {
     getLocation();
   }, []);
 
   const memoedValue = useMemo(
     () => ({
-      headerToken,
       user,
-      myEvents,
-      myTickets,
-      setUser,
+      userData,
       AuthModalUp,
-      setAuthModalUp,
+      headerToken,
       authSheetRef,
-      setHeaderToken,
-      getUpdatedUser,
-      logOut,
-      followVenue2,
-      getLocation,
       userLocation,
+      logOut,
+      setUser,
+      getLocation,
+      followVenue2,
+      getUpdatedUser,
+      setAuthModalUp,
+      setHeaderToken,
     }),
-    [headerToken, user, AuthModalUp, authSheetRef, userLocation]
+    [headerToken, user, userData, AuthModalUp, authSheetRef, userLocation]
   );
 
   return (

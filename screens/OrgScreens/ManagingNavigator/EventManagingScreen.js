@@ -76,20 +76,10 @@ const EventManagingScreen = ({
   const [scannedTicket, setScannedTicket] = useState("");
   const [event, setEvent] = useState(null);
 
-  const { getUpdatedUser, myEvents, headerToken, user } = useAuth();
+  const { getUpdatedUser, headerToken, user } = useAuth();
   const { apiUrl, getOneEvent } = useData();
   const { isIPhoneWithNotch } = useDesign();
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const { status } = await Camera.requestCameraPermissionsAsync();
-  //     setHasPermission(status === "granted");
-  //   })();
-  // }, []);
-
-  // const selectedEvent = myEvents?.filter(
-  //   (myEvent) => myEvent?._id == item?._id
-  // )[0];
 
   const getSelectedEvent = async () => {
     setLoading(true);
@@ -133,7 +123,7 @@ const EventManagingScreen = ({
           },
         }
       );
-      console.log(result);
+
 
       if (result.status == 200 || result.status == 201) {
         setLoading(false);
@@ -209,7 +199,7 @@ const EventManagingScreen = ({
   }, [navigation, event]);
 
   useEffect(() => {
-    getUpdatedUser();
+    getUpdatedUser({field:"myEvents"})
   }, []);
   const toggleFlashMode = () => {
     setFlashMode(

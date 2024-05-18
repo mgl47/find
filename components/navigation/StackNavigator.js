@@ -39,6 +39,7 @@ import ValidatorScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanne
 import StoreScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/StoreScreen";
 import AddVenueScreen from "../../screens/AdminScreens/AddVenueScreen";
 import AddArtistScreen from "../../screens/AdminScreens/AddArtistScreen";
+import FavoriteScreens from "../../screens/authScreens/FavoriteScreens/FavoriteScreens";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -191,7 +192,7 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           presentation: "transparentModal",
-          headerShown: true,
+          headerShown: false,
         }}
         name="search"
         component={ExploreScreens}
@@ -200,10 +201,20 @@ function StackNavigator() {
       <Stack.Screen
         options={{
           presentation: "transparentModal",
-          headerShown: true,
+          headerShown: false,
         }}
         name="search2"
         component={SearchScreen2}
+      />
+      <Stack.Screen
+        options={
+          {
+            // presentation: "transparentModal",
+            // headerShown: false,
+          }
+        }
+        name="favorite"
+        component={FavoriteScreens}
       />
 
       <Stack.Screen

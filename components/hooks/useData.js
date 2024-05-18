@@ -25,15 +25,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useAuth } from "./useAuth";
 import { doc, getDoc } from "firebase/firestore";
-import {db} from "../../firebase"
+import { db } from "../../firebase";
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [venues, setVenues] = useState([]);
   const [calDays, setCalDays] = useState([]);
-  //   const [headerToken, setHeaderToken] = useState("");
-  const { headerToken } = useAuth();
+  const [favorites, setFavorites] = useState({});
+  const { headerToken, user } = useAuth();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const getEvents = async () => {
@@ -82,7 +82,6 @@ export const DataProvider = ({ children }) => {
 
   useEffect(() => {
     getCalendarDates();
-
     getEvents();
     getVenues();
   }, []);
@@ -106,19 +105,20 @@ export const DataProvider = ({ children }) => {
   }
 
   // const venues2 = memo(() => {
-console.log(apiUrl);
+
   // }, [is_wishlist]);
   const memoedValue = useMemo(
     () => ({
       events,
+      favorites,
       getEvents,
       apiUrl,
       venues,
       formatNumber,
       getOneEvent,
-      calDays
+      calDays,
     }),
-    [events, venues,calDays]
+    [events, venues, calDays, favorites]
   );
 
   return (

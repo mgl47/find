@@ -56,7 +56,7 @@ import {
     const snapPoints = useMemo(() => ["55%", "75%"], []);
     const [keyboardVisible, setKeyboardVisible] = useState(false);
     const { apiUrl } = useData();
-    const { user, headerToken, getUpdatedUser } = useAuth();
+    const { user, headerToken } = useAuth();
   
     useEffect(() => {
       const keyboardDidShowListener = Keyboard.addListener(

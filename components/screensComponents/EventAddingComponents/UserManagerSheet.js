@@ -170,7 +170,7 @@ export default UserManagerSheet = ({
         { headers: { Authorization: headerToken } }
       );
       if (response?.status == 200) {
-        //getUpdatedUser(),
+        getUpdatedUser({field:"myEvents"}),
         userSheetModalRef.current?.close();
       }
     } catch (error) {

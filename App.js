@@ -28,8 +28,11 @@ LogBox.ignoreLogs([
   "Sending `onAnimatedValueUpdate` with no listeners registered.",
   "VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.",
   "Warning: VideoPlayer: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
-  "react-native-snap-carousel: It is recommended to use at least version 0.44 of React Native with the plugin",
-  // "`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.",
+  "Warning: Failed prop type: Carousel: prop type `slideStyle` is invalid; it must be a function, usually from the `prop-types` package, but received `undefined`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.",
+"Warning: Failed prop type: Carousel: prop type `slideStyle` is invalid; it must be a function, usually from the `prop-types` package, but received `undefined`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`.",
+"Warning: Failed prop type: Carousel: prop type `contentContainerCustomStyle` is invalid; it must be a function, usually from the `prop-types` package, but received `undefined`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`."  
+
+// "`flexWrap: `wrap`` is not supported with the `VirtualizedList` components.Consider using `numColumns` with `FlatList` instead.",
   // "No native splash screen registered for given view controller. Call 'SplashScreen.show' for given view controller first.",
   // "TypeError: Cannot read property 'indexOf' of undefined",
 ]);

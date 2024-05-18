@@ -288,7 +288,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       // console.log(response?.data);
-      getUpdatedUser();
+      getUpdatedUser({field:"user"});
     } catch (error) {
       console.log(error?.response?.data?.msg);
     }
@@ -612,9 +612,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   borderRadius: 12,
                 }}
                 onPress={() => {
-                  // setInterested(!interested),
+
                   likeEvent();
-                  // getUpdatedUser();
+
                 }}
               >
                 Interressado

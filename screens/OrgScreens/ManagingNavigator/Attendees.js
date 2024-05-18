@@ -29,7 +29,7 @@ import { ScrollView } from "react-native";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const event = route.params;
 
-  const { user, myEvents } = useAuth();
+  const { user } = useAuth();
   // const { getOneEvent } = useData();
   const [loading, setLoading] = useState(false);
   // const [event, setEvent] = useState(routeEvent);

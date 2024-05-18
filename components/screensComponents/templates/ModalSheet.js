@@ -64,7 +64,7 @@ export default GiftSheet = ({
   setGift,
   setPurchaseModalUp,
 }) => {
-  const { headerToken, user, myTickets, getUpdatedUser } = useAuth();
+  const { headerToken, user,  } = useAuth();
   const { formatNumber, apiUrl, getOneEvent } = useData();
   const purchaseDates = formattedDates();
   const { isIPhoneWithNotch, height, width } = useDesign();

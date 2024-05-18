@@ -23,6 +23,7 @@
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.8",
     "axios": "^1.6.7",
+    "deprecated-react-native-prop-types": "^5.0.0",
     "expo": "~51.0.6",
     "expo-camera": "~15.0.8",
     "expo-checkbox": "~3.0.0",

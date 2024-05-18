@@ -179,20 +179,23 @@ export function DrawerContent(props) {
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
+      
+            
             <MaterialCommunityIcons
-              name="calendar-heart"
+              name={"heart"}
               color={colors.t2}
-              size={28}
+              size={28  }
             />
           )}
-          label="Interessado"
+          label="Favoritos"
           labelStyle={{
             fontSize: 16,
             fontWeight: "500",
             right: 20,
             color: colors.t4,
           }}
-          onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
+          // onPress={() => navigation.dispatch(DrawerActions.closeDrawer())}
+          onPress={() => navigation.navigate("favorite")}
         />
         <View style={styles.separator} />
 
@@ -214,11 +217,7 @@ export function DrawerContent(props) {
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
-            <MaterialCommunityIcons
-              name="logout"
-              size={30}
-              color={colors.t2}
-            />
+            <MaterialCommunityIcons name="logout" size={30} color={colors.t2} />
           )}
           label="Sair"
           labelStyle={{

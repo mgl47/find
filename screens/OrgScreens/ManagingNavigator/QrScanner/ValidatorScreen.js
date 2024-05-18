@@ -70,7 +70,7 @@ export default function ValidatorScreen({
   const [statusCode, setStatusCode] = useState(0);
   const [scannedTicket, setScannedTicket] = useState("");
 
-  const { getUpdatedUser, myEvents, headerToken, user } = useAuth();
+  const { getUpdatedUser, headerToken, user } = useAuth();
   const { apiUrl } = useData();
   const { isIPhoneWithNotch } = useDesign();
 
@@ -112,7 +112,7 @@ export default function ValidatorScreen({
           },
         }
       );
-      console.log(result?.data?.msg);
+      // console.log(result?.data?.msg);
 
       if (result.status == 200 || 201 || 202 || 204) {
         setLoading(false);
@@ -144,7 +144,7 @@ export default function ValidatorScreen({
   //   }, [navigation]);
 
   useEffect(() => {
-    getUpdatedUser();
+    getUpdatedUser({field:"myEvents"});
   }, []);
   const toggleFlashMode = () => {
     setFlashMode(

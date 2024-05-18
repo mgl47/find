@@ -32,6 +32,7 @@ import VenuesExplorer from "./VenuesExplorer";
 import SearchScreen from "./SearchScreen";
 import CalendarScreen from "./CalendarScreen";
 import { recommendedEvents } from "../../../components/Data/stockEvents";
+import Screen from "../../../components/Screen";
 
 // import FavVenues from "../VenuesScreens/FavVenues";
 const Tab = createMaterialTopTabNavigator();
@@ -61,39 +62,118 @@ const ExploreScreens = ({
     open();
   }, [firstMount]);
   // console.log(autoFocus && firstMount);
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      headerRight: () => (
-        <Animated.View
-          style={{
-            padding: 10,
-            right: 10,
-            position: "absolute",
-            zIndex: 2,
-          }}
-          entering={firstMount ? SlideInRight.duration(580) : null}
-        >
-          <TouchableOpacity
-            style={{ left: inSearch ? 5 : 0 }}
-            onPress={() => {
-              navigation.navigate("home"), Keyboard.dismiss();
-            }}
-          >
-            <Text
-              style={{
-                color: colors.t3,
-                fontSize: 16,
-                fontWeight: "600",
-              }}
-            >
-              sair
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      ),
+  // useLayoutEffect(() => {
+  //   navigation.setOptions({
+  //     headerLeft: () => null,
+  //     headerRight: () => (
+  //       <Animated.View
+  //         style={{
+  //           padding: 10,
+  //           right: 10,
+  //           position: "absolute",
+  //           zIndex: 2,
+  //         }}
+  //         // entering={firstMount ? SlideInRight.duration(580) : null}
+  //       >
+  //         <TouchableOpacity
+  //           style={{ left: inSearch ? 10 : 0 ,padding:10}}
+  //           onPress={() => {
+  //             navigation.navigate("home"), Keyboard.dismiss();
+  //           }}
+  //         >
+  //           <Text
+  //             style={{
+  //               color: colors.t3,
+  //               fontSize: 16,
+  //               fontWeight: "600",
+  //             }}
+  //           >
+  //             sair
+  //           </Text>
+  //         </TouchableOpacity>
+  //       </Animated.View>
+  //     ),
 
-      headerTitle: () => (
+  //     headerTitle: () => (
+  //       <View
+  //         style={{
+  //           flexDirection: "row",
+  //           alignItems: "center",
+  //           zIndex: 2,
+  //         }}
+  //       >
+  //         <Animated.View
+  //           // entering={firstMount ? SlideInRight.duration(500) : null}
+  //           // exiting={firstMount ? SlideOutRight.duration(250) : null}
+  //           style={{
+  //             width: "100%",
+  //             alignItems: "center",
+  //             justifyContent: "space-between",
+  //             flexDirection: "row",
+  //             zIndex: 1,
+  //           }}
+  //         >
+  //           <View
+  //             style={{
+  //               flexDirection: "row",
+  //               width: "85%",
+  //             }}
+  //           >
+  //             <Entypo
+  //               style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
+  //               name="magnifying-glass"
+  //               size={19}
+  //               color={colors.t4}
+  //             />
+  //             <TextInput
+  //               value={searchText}
+  //               onChangeText={setSearchText}
+  //               onSubmitEditing={() => {
+  //                 Keyboard.dismiss(),
+  //                   navigation.navigate("search2", { text: searchText });
+  //               }}
+              
+  //               placeholder=" artistas, eventos ou lugares"
+  //               placeholderTextColor={colors.t5}
+  //               returnKeyType="search"
+  //               ref={inputRef}
+  //               style={[styles.search, { width: "100%" }]}
+  //               cursorColor={colors.t4}
+  //               selectionHandleColor={colors.t5}
+  //               selectionColor={colors.t5}
+  //             />
+  //             {searchText && (
+  //               <TouchableOpacity
+  //                 onPress={() => {
+  //                   setSearchText("");
+  //                 }}
+  //               >
+  //                 <Entypo
+  //                   style={{
+  //                     position: "absolute",
+  //                     zIndex: 1,
+  //                     right: 10,
+  //                     top: 8,
+  //                   }}
+  //                   name="circle-with-cross"
+  //                   size={20}
+  //                   color={colors.darkGrey}
+  //                 />
+  //               </TouchableOpacity>
+  //             )}
+  //           </View>
+  //         </Animated.View>
+  //       </View>
+  //     ),
+  //   });
+  // }, [navigation, firstMount, inSearch, searchText, inputRef]); // Add inputRef as dependency if used
+
+  return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      
+      <Screen style={{ flex: 1 ,backgroundColor:colors.background}} 
+      // entering={firstMount && SlideInDown}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -102,12 +182,12 @@ const ExploreScreens = ({
           }}
         >
           <Animated.View
-            entering={firstMount ? SlideInRight.duration(500) : null}
-            exiting={firstMount ? SlideOutRight.duration(250) : null}
+            // entering={firstMount ? SlideInRight.duration(500) : null}
+            // exiting={firstMount ? SlideOutRight.duration(250) : null}
             style={{
               width: "100%",
               alignItems: "center",
-              justifyContent: "space-between",
+              // justifyContent: "space-between",
               flexDirection: "row",
               zIndex: 1,
             }}
@@ -115,7 +195,8 @@ const ExploreScreens = ({
             <View
               style={{
                 flexDirection: "row",
-                width: "85%",
+                width: "80%",
+                left: 15,
               }}
             >
               <Entypo
@@ -129,7 +210,13 @@ const ExploreScreens = ({
                 onChangeText={setSearchText}
                 onSubmitEditing={() => {
                   Keyboard.dismiss(),
-                    navigation.navigate("search2", { text: searchText });
+                    navigation.navigate("search2", { text: searchText },
+                    
+                    setTimeout(()=>{
+                      setSearchText("")
+
+                    },500)
+                    );
                 }}
               
                 placeholder=" artistas, eventos ou lugares"
@@ -162,14 +249,33 @@ const ExploreScreens = ({
               )}
             </View>
           </Animated.View>
+          <Animated.View
+          style={{
+            padding: 10,
+            right: 10,
+            position: "absolute",
+            zIndex: 2,
+          }}
+          // entering={firstMount ? SlideInRight.duration(580) : null}
+        >
+          <TouchableOpacity
+            style={{ left: inSearch ? 20 : 5 ,padding:10}}
+            onPress={() => {
+              navigation.navigate("home"), Keyboard.dismiss();
+            }}
+          >
+            <Text
+              style={{
+                color: colors.t3,
+                fontSize: 16,
+                fontWeight: "600",
+              }}
+            >
+              sair
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
         </View>
-      ),
-    });
-  }, [navigation, firstMount, inSearch, searchText, inputRef]); // Add inputRef as dependency if used
-
-  return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <Animated.View style={{ flex: 1 }} entering={firstMount && SlideInDown}>
         <Tab.Navigator
           screenOptions={({ active }) => ({
             tabBarActiveTintColor: colors.t2,
@@ -215,7 +321,7 @@ const ExploreScreens = ({
             component={CalendarScreen}
           />
         </Tab.Navigator>
-      </Animated.View>
+      </Screen>
     </TouchableWithoutFeedback>
   );
 };

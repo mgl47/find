@@ -4,9 +4,10 @@ import Constants from "expo-constants";
 import { StyleSheet, View, Platform, StatusBar } from "react-native";
 
 import colors from "./colors";
+import { useDesign } from "./hooks/useDesign";
 
 function Screen({ children, style }) {
-
+const{isIPhoneWithNotch}=useDesign()
   return (
     <View
       style={[
@@ -15,14 +16,10 @@ function Screen({ children, style }) {
         style,
       ]}
     >
-      <View
-        style={[
-          styles.screen,
-          // { backgroundColor: colors.background },
-        ]}
-      >
+
+      
         {children}
-      </View>
+
     </View>
   );
 }
@@ -31,7 +28,7 @@ function Screen({ children, style }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight+5,
     // backgroundColor:colors.light
   },
   screen: {

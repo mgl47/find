@@ -128,7 +128,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
         { headers: { Authorization: headerToken } }
       );
       // console.log(response?.data);
-      await getUpdatedUser();
+      await  getUpdatedUser({field:"favVenues"})
     } catch (error) {
       console.log(error?.response?.data?.msg);
     } finally {
