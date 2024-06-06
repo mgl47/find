@@ -423,6 +423,7 @@ export default UserSelectorSheet = ({
                               width:
                                 item?.displayName?.length > 15 ? 100 : null,
                               textAlign: "center",
+                              color: colors.t3,
                             }}
                           >
                             {item?.displayName}
@@ -497,7 +498,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -518,7 +519,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: "90%",
     alignSelf: "center",
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     padding: 10,
     marginTop: 10,
     marginBottom: 20,
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 19,
     fontWeight: "600",
-    color: colors.primary,
+    color: colors.t3,
     marginTop: 10,
     marginVertical: 5,
   },

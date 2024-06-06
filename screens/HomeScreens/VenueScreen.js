@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeIn, FadeOut, SlideOutUp } from "react-native-reanimated";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import colors from "../../components/colors";
 import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 
@@ -45,12 +45,13 @@ import {
 import ImageView from "react-native-image-viewing";
 import { useAuth } from "../../components/hooks/useAuth";
 import SmallCard from "../../components/cards/SmallCard";
+import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 
 const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { item, venueId } = route.params;
 
   const { width, height, isIPhoneWithNotch } = useDesign();
-  const { user, headerToken, getUpdatedUser } = useAuth();
+  const { user, headerToken, getUpdatedUser, closeSheet } = useAuth();
 
   const { apiUrl } = useData();
   const [venue, setVenue] = useState(item);
@@ -62,7 +63,10 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [followBlock, setFollowBlock] = useState(false);
   const [events, setEvents] = useState([]);
   const [fetched, setFetched] = useState(false);
-
+  const authSheetRef2 = useRef(null);
+  useEffect(() => {
+    authSheetRef2.current?.close();
+  }, [closeSheet]);
   const getVenues = async () => {
     try {
       const result = await axios.get(`${apiUrl}/venues/?&filter=${venueId}`);
@@ -78,7 +82,9 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   };
   const getEvents = async () => {
     try {
-      const result = await axios.get(`${apiUrl}/events/?venue=${item?.uuid||venueId}`);
+      const result = await axios.get(
+        `${apiUrl}/events/?venue=${item?.uuid || venueId}`
+      );
       setEvents(result?.data);
     } catch (error) {
     } finally {
@@ -95,9 +101,14 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   }, []);
   useEffect(() => {
     if (user?.followedVenues?.includes(venue?._id)) setFollowing(true);
-  }, [venue]);
+  }, [venue, user]);
 
   const followVenue = async () => {
+    if (!user) {
+      authSheetRef2.current?.present();
+      return;
+    }
+
     setFollowBlock(true);
     let updateFollowedVenue = [];
 
@@ -160,7 +171,11 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   const renderViewMore = (onPress) => {
     return (
-      <TouchableOpacity style={styles.more} onPress={onPress}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={styles.more}
+        onPress={onPress}
+      >
         {/* <Text style={[styles.more]}>Ver mais</Text> */}
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
@@ -173,7 +188,11 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
   };
   const renderViewLess = (onPress) => {
     return (
-      <TouchableOpacity style={styles.more} onPress={onPress}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={styles.more}
+        onPress={onPress}
+      >
         {/* <Text style={[styles.more]}>Ver menos</Text> */}
         <MaterialCommunityIcons
           name="unfold-more-horizontal"
@@ -203,6 +222,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
     navigation.setOptions({
       headerLeft: () => (
         <TouchableOpacity
+          activeOpacity={0.7}
           onPress={() => navigation.goBack()}
           style={{
             left: 20,
@@ -578,17 +598,26 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                     marginLeft: 10,
                   }}
                 >
-                  <TouchableOpacity style={{ marginRight: 10 }}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={{ marginRight: 10 }}
+                  >
                     <AntDesign
                       name="facebook-square"
                       size={26}
                       color={colors.t4}
                     />
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ marginRight: 10 }}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={{ marginRight: 10 }}
+                  >
                     <AntDesign name="instagram" size={26} color={colors.t4} />
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ marginRight: 10 }}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={{ marginRight: 10 }}
+                  >
                     <AntDesign name="twitter" size={27} color={colors.t4} />
                   </TouchableOpacity>
                 </View>
@@ -661,6 +690,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                 </MapView>
 
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
@@ -705,6 +735,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 />
                 <TouchableOpacity
+                  activeOpacity={0.7}
                   style={{
                     padding: 10,
                     flexDirection: "row",
@@ -807,6 +838,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
           />
         }
       />
+      <AuthBottomSheet authSheetRef2={authSheetRef2} />
     </View>
   );
 };

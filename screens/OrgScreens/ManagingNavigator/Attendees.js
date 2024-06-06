@@ -26,6 +26,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const event = route.params;
 
@@ -53,8 +54,8 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
 
   const filteredUsers = event?.attendees?.filter(
     (user) =>
-      user.username.toLowerCase().includes(search.toLowerCase()) ||
-      user.displayName.toLowerCase().includes(search.toLowerCase())
+      user.username?.toLowerCase().includes(search?.toLowerCase()) ||
+      user.displayName?.toLowerCase().includes(search?.toLowerCase())
   );
 
   let totalTickets = [];
@@ -95,7 +96,9 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     []
   );
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <Animated.View style={{ flex: 1, backgroundColor: colors.background }}
+    entering={FadeIn.duration(200)}
+    >
       <FlatList
         data={sortedUsers}
         keyExtractor={(item) => item?.uuid}
@@ -587,7 +590,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
-    </View>
+    </Animated.View>
   );
 };
 

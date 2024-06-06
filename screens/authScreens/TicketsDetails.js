@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
   Button,
+  ImageBackground,
 } from "react-native";
 
 import React, {
@@ -62,6 +63,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { LinearGradient } from "expo-linear-gradient";
 const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   const [index, setIndex] = useState(1);
   const { user } = useAuth();
@@ -165,352 +167,210 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
   }, []);
 
   return (
-    <>
+    <ImageBackground
+      style={{ flex: 1 }}
+      source={{ uri: ticket?.uri, width, height }}
+      blurRadius={3}
+    >
+      <LinearGradient
+        // colors={["#00000000", "#000000"]}
+        colors={[
+          colors.background,
+          colors.background,
+          "rgba(0,0,0,0.6)",
+          "rgba(0,0,0,0.6)",
+
+          "rgba(0,0,0,0.6)",
+          "rgba(0,0,0,0.6)",
+          "rgba(0,0,0,0.6)",
+          "rgba(0,0,0,0.6)",
+          "rgba(0,0,0,0.6)",
+        ]}
+        style={{
+          height,
+          width,
+          position: "absolute",
+          bottom: 0,
+          alignItems: "baseline",
+        }}
+      />
+      <TouchableOpacity
+        style={{
+          // position: "absolute",
+          // right: 30,
+
+          // height: 50,
+          // width: 50,
+          // bottom: 10,
+          // alignItems: "center",
+          // justifyContent: "center",
+          // shadowOffset: { width: 1, height: 1 },
+          // shadowOpacity: 1,
+          // shadowRadius: 1,
+          // elevation: 3,
+          right: 35,
+        }}
+        // onPress={() => setShowScanModal(true)}
+        onPress={handleStoreSheet}
+      >
+        <FontAwesome6 name="shop" size={22} color={colors.white} />
+      </TouchableOpacity>
+      <View
+        style={{
+          padding: 10,
+          marginLeft: 10,
+          marginTop: 20,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "500",
+            // textAlign: "center",
+            color: colors.t3,
+            marginBottom: 10,
+          }}
+        >
+          {ticket?.event?.title}
+        </Text>
+        <Text
+          style={{
+            fontSize: 17,
+            fontWeight: "500",
+            // textAlign: "center",
+            color: colors.t4,
+            // marginTop: 10,
+            marginBottom: 10,
+          }}
+        >
+          {ticket?.event?.venue?.displayName},
+          {" " + ticket?.event?.venue?.address?.city}{" "}
+        </Text>
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "500",
+            // textAlign: "center",
+            color: colors.t4,
+            // marginTop: 10,
+          }}
+        >
+          {ticket?.event?.dates[ticket?.event?.dates?.length - 1]?.displayDate +
+            " - " +
+            ticket?.event?.dates[ticket?.event?.dates?.length - 1]?.hour}
+        </Text>
+      </View>
+
       <FlatList
-        bounces={false}
-        style={{ backgroundColor: colors.background }}
-        ListHeaderComponent={
-          <>
-            <View style={{ backgroundColor: colors.background, zIndex: 2 }}>
+        // entering={FadeIn.duration(100)}
+
+        style={{ zIndex: 0, marginTop: 60 }}
+        showsHorizontalScrollIndicator={false}
+        pagingEnabled
+        // scrollEnabled={ticket?.tickets?.length > 1}
+        onScroll={(e) => handleMediaScroll(e)}
+        horizontal
+        data={ticket?.tickets}
+        keyExtractor={(item) => item?.uuid}
+        renderItem={({ item }) => {
+          return (
+            <View
+              style={{
+                width,
+                alignItems: "center",
+              }}
+            >
               <View
                 style={{
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 1,
+                  elevation: 0.7,
+                  backgroundColor: colors.t2,
                   padding: 10,
-                  backgroundColor: colors.background,
-                  zIndex: 2,
+                  paddingHorizontal: 20,
+                  borderRadius: 10,
+                  marginBottom: 1,
                 }}
               >
+                {/* <Text>{item?.uuid}</Text> */}
                 <Text
                   style={{
-                    fontSize: 18,
+                    fontSize: 25,
                     fontWeight: "600",
-                    color: colors.white,
-                    alignSelf: "center",
                     textAlign: "center",
+                    color:
+                      item?.category == "VIP" ? colors.darkGold : colors.dark2,
                     marginBottom: 10,
-                    // marginVertical: 20,
+                    //   marginLeft: 10,
+                    //   textDecorationLine: "underline",
                   }}
                 >
-                  {ticket?.event?.title}
+                  {item?.category}
                 </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginVertical: 10,
-                  }}
-                >
-                  <MaterialCommunityIcons
-                    style={{ left: 3 }}
-                    name="calendar-month"
-                    size={23}
-                    color={colors.white}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      fontWeight: "600",
-                      // width: "80%",
-                      color: colors.lightGrey,
-                      marginLeft: 14,
-                    }}
-                  >
-                    {ticket?.event?.dates[ticket?.event?.dates?.length - 1]
-                      ?.displayDate +
-                      " - " +
-                      ticket?.event?.dates[ticket?.event?.dates?.length - 1]
-                        ?.hour}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    // marginBottom: 10,
-                  }}
-                >
-                  <Entypo
-                    style={{ left: 5 }}
-                    name="location"
-                    size={20}
-                    color={colors.white}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "600",
-                      //   width: "70%",
-                      color: colors.lightGrey,
-                      marginLeft: 18,
-                      // textDecorationLine: "underline",
-                    }}
-                  >
-                    {ticket?.event?.venue?.displayName},
-                    {" " + ticket?.event?.venue?.city}
-                  </Text>
-                </View>
+
+                <QRCode
+                  // key={ite}
+                  // value={item.uuid}
+
+                  value={item.uuid}
+                  size={260}
+                  enableLinearGradient={item?.category !== "VIP"}
+                  color={colors.darkGold}
+                  //   quietZone={10}
+                  backgroundColor={colors.t2}
+                  // linearGradient={[
+                  //   colors.primary,
+                  //   colors.background,
+                  //   colors.primary,
+                  //   colors.primary,
+                  // ]}
+                  linearGradient={[colors.background, colors.primary]}
+                />
+              </View>
+              {item?.checkedIn && (
                 <View
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
                     marginTop: 10,
-                    // marginBottom: 60,
-                    // marginBottom: 10,
                   }}
                 >
-                  <MaterialCommunityIcons
-                    style={{ left: 2 }}
-                    name="account-outline"
-                    size={28}
-                    color={colors.white}
-                  />
                   <Text
                     style={{
-                      fontSize: 17,
-                      fontWeight: "600",
-                      color: colors.lightGrey,
-                      // alignSelf: "flex-start",
-                      marginLeft: 10,
-                    }}
-                  >
-                    {ticket?.buyer?.displayName}
-                  </Text>
-                </View>
-
-                {ticket?.tickets?.length > 1 && (
-                  <Text
-                    style={{
-                      color: colors.white,
                       fontSize: 15,
                       fontWeight: "600",
-                      alignSelf: "flex-end",
-                      position: "absolute",
-                      // marginBottom: 40,
-                      // top: 40,
-                      right: 10,
-                      bottom: -50,
+                      textAlign: "center",
+                      color:
+                        item?.category == "VIP"
+                          ? colors.darkGold
+                          : colors.dark2,
+                      // marginBottom: 10,
+                      //   marginLeft: 10,
+                      //   textDecorationLine: "underline",
                     }}
                   >
-                    {Number(mediaIndex) + 1 + "/" + ticket?.tickets?.length}
+                    Check In:{" "}
                   </Text>
-                )}
-              </View>
-              <View
-                style={{
-                  height: 220,
-                  backgroundColor: colors.background,
-                  width,
-                  zIndex: 0,
-                  position: "absolute",
-                }}
-              />
-
-              <FlatList
-                // entering={FadeIn.duration(100)}
-
-                style={{ zIndex: 0 }}
-                showsHorizontalScrollIndicator={false}
-                pagingEnabled
-                onScroll={(e) => handleMediaScroll(e)}
-                horizontal
-                data={ticket?.tickets}
-                keyExtractor={(item) => item?.uuid}
-                renderItem={({ item }) => {
-                  return (
-                    <View
-                      style={{
-                        width,
-                        alignItems: "center",
-                      }}
-                    >
-                      <View
-                        style={{
-                          shadowOffset: { width: 0.5, height: 0.5 },
-                          shadowOpacity: 0.2,
-                          shadowRadius: 1,
-                          elevation: 0.7,
-                          backgroundColor: colors.t1,
-                          padding: 10,
-                          paddingHorizontal: 20,
-                          borderRadius: 10,
-                          marginBottom: 1,
-                        }}
-                      >
-                        {/* <Text>{item?.uuid}</Text> */}
-                        <Text
-                          style={{
-                            fontSize: 25,
-                            fontWeight: "600",
-                            textAlign: "center",
-                            color:
-                              item?.category == "VIP"
-                                ? colors.darkGold
-                                : colors.dark2,
-                            marginBottom: 10,
-                            //   marginLeft: 10,
-                            //   textDecorationLine: "underline",
-                          }}
-                        >
-                          {item?.category}
-                        </Text>
-
-                        <QRCode
-                          // key={ite}
-                          // value={item.uuid}
-
-                          value={item.uuid}
-                          size={260}
-                          enableLinearGradient={item?.category !== "VIP"}
-                          color={colors.darkGold}
-                          //   quietZone={10}
-                          backgroundColor={colors.white}
-                          linearGradient={[
-                            colors.primary,
-                            colors.background,
-                            colors.primary,
-                            colors.primary,
-                          ]}
-                        />
-                      </View>
-                      {item?.checkedIn && (
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginTop: 10,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              fontWeight: "600",
-                              textAlign: "center",
-                              color:
-                                item?.category == "VIP"
-                                  ? colors.darkGold
-                                  : colors.dark2,
-                              // marginBottom: 10,
-                              //   marginLeft: 10,
-                              //   textDecorationLine: "underline",
-                            }}
-                          >
-                            Check In:{" "}
-                          </Text>
-                          <Text
-                            style={{
-                              fontSize: 15,
-                              fontWeight: "600",
-                              textAlign: "center",
-                              color: "green",
-                              // marginBottom: 10,
-                              //   marginLeft: 10,
-                              //   textDecorationLine: "underline",
-                            }}
-                          >
-                            {item?.checkedAt}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  );
-                }}
-              />
-            </View>
-            {selectedEvent?.store?.length > 0 && (
-              <View style={{ marginVertical: 10 }}>
-                {orders?.length > 0 && (
                   <Text
                     style={{
-                      fontSize: 17,
-                      fontWeight: "500",
-                      color: colors.primary,
-                      marginLeft: 30,
-
-                      marginVertical: 10,
-
-                      // left: 10,
+                      fontSize: 15,
+                      fontWeight: "600",
+                      textAlign: "center",
+                      color: "green",
+                      // marginBottom: 10,
+                      //   marginLeft: 10,
+                      //   textDecorationLine: "underline",
                     }}
                   >
-                    Pedidos
+                    {item?.checkedAt}
                   </Text>
-                )}
-              </View>
-            )}
-          </>
-        }
-        data={orders}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item?.orderId}
-        renderItem={({ item }) => {
-          const statusColor = (item) => {
-            if (item?.status == "preparando") {
-              return colors.primary;
-            } else if (item?.status == "pronto") {
-              return "green";
-            } else if (item?.status == "concluído") {
-              return colors.softGrey;
-            } else {
-              return colors.primary2;
-            }
-          };
-          const color = statusColor(item);
-          return selectedEvent?.store?.length > 0
-            ? orders?.length > 0 && (
-                <Animated.View entering={FadeIn.duration(180)}>
-                  <TouchableOpacity
-                    onPress={() => handleOrderSheet(item)}
-                    activeOpacity={0.5}
-                    style={{
-                      shadowOffset: { width: 0.5, height: 0.5 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 1,
-                      elevation: 2,
-                      width: "100%",
-                      // marginTop: 10,
-                    }}
-                    // onPress={() => navigation.navigate("event", item)}
-                  >
-                    <Animated.View
-                      style={styles.userCard}
-                      // entering={FadeIn}
-                      // exiting={FadeOut}
-                    >
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <Text numberOfLines={2} style={[styles.userName]}>
-                          número:
-                        </Text>
-                        <Text numberOfLines={2} style={[styles.displayName]}>
-                          {item?.orderNum}
-                        </Text>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          position: "absolute",
-                          left: 120,
-                        }}
-                      >
-                        <Text numberOfLines={2} style={[styles.userName]}>
-                          estado:
-                        </Text>
-                        <Text
-                          numberOfLines={2}
-                          style={[styles.displayName, { color }]}
-                        >
-                          {item?.status}
-                        </Text>
-                      </View>
-                    </Animated.View>
-                  </TouchableOpacity>
-                </Animated.View>
-              )
-            : null;
+                </View>
+              )}
+            </View>
+          );
         }}
-        ListFooterComponent={<View style={{ marginBottom: 20 }} />}
       />
-
       <EventStoreSheet
         // users={members}
 
@@ -528,7 +388,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
         // storeSheetUp={storeSheetUp}
         // setStoreSheetUp={setStoreSheetUp}
       />
-    </>
+    </ImageBackground>
   );
 };
 

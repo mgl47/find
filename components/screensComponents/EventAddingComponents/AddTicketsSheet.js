@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -26,6 +27,7 @@ import {
   BottomSheetView,
   BottomSheetModalProvider,
   BottomSheetScrollView,
+  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import RNPickerSelect from "react-native-picker-select";
 
@@ -53,6 +55,7 @@ import Animated, {
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { TextInput } from "react-native-paper";
 import colors from "../../colors";
+import { set } from "firebase/database";
 
 const { height, width } = Dimensions.get("window");
 export default AddTicketsSheet = ({
@@ -64,14 +67,19 @@ export default AddTicketsSheet = ({
 }) => {
   const snapPoints = useMemo(() => ["70%", "90%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  //   const [selectedTicket, setSelectedTicket] = useState(edit);
-  // const [tickets, setTickets] = useState([]);
 
   const [price, setPrice] = useState("");
   const [available, setAvailable] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState({ label: "Promo", value: "Promo" });
   const [ticketDates, setTicketDates] = useState([]);
+  const [coupon, setCoupon] = useState({
+    label: "",
+    value: 0,
+    quantity: 0,
+  });
+
+  const [couponActive, setCouponActive] = useState(false);
 
   // console.log(selectedTicket);
 
@@ -96,7 +104,13 @@ export default AddTicketsSheet = ({
     setTicketDates(dates);
   };
   const addTicket = async () => {
-    if (!price || !available || !description) return;
+    if (
+      !price ||
+      !available ||
+      !description ||
+      (couponActive && (!coupon?.value || !coupon?.label || !coupon?.quantity))
+    )
+      return;
 
     // let tempTickets = [...tickets];
     let tempTickets = [...tickets];
@@ -106,6 +120,7 @@ export default AddTicketsSheet = ({
       available: Number(available),
       // quantity: Number(available),
       amount: 0,
+      coupon: couponActive ? coupon : null,
 
       description,
       category: category?.value,
@@ -135,6 +150,10 @@ export default AddTicketsSheet = ({
     };
   }, []);
   const handleSheetChanges = useCallback((index) => {}, []);
+  const renderBackdrop = useCallback(
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    []
+  );
 
   return (
     <BottomSheetModalProvider>
@@ -144,10 +163,15 @@ export default AddTicketsSheet = ({
         index={1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
+        backdropComponent={renderBackdrop}
+        handleStyle={{
+          backgroundColor: colors.background,
+        }}
+        handleIndicatorStyle={{ backgroundColor: colors.t5 }}
         onDismiss={clear}
       >
-        <BottomSheetScrollView
-          contentContainerStyle={{
+        <KeyboardAwareScrollView
+          style={{
             flex: 1,
             padding: 10,
             backgroundColor: colors.background,
@@ -166,15 +190,16 @@ export default AddTicketsSheet = ({
                 fontSize: 17,
                 fontWeight: "500",
                 // alignSelf: "center",
+                color: colors.t4,
                 left: 10,
               }}
             >
-              Adicionar Bilhete
+              Bilhetes
             </Text>
             <TouchableOpacity onPress={() => ticketsSheetRef.current.close()}>
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.t3,
                   fontSize: 16,
                   fontWeight: "600",
                 }}
@@ -187,7 +212,7 @@ export default AddTicketsSheet = ({
             style={[
               styles.switchText,
               {
-                color: colors.primary,
+                color: colors.t4,
                 marginVertical: 10,
                 marginRight: 10,
                 alignSelf: "flex-end",
@@ -209,7 +234,7 @@ export default AddTicketsSheet = ({
             //   fontWeight: "500",
             // }}
             mode="outlined"
-            activeOutlineColor={colors.primary}
+            activeOutlineColor={colors.t4}
             label="preço"
             activeUnderlineColor={colors.primary}
             // defaultValue={String(selectedTicket?.ticket?.price)}
@@ -279,11 +304,7 @@ export default AddTicketsSheet = ({
             ]}
           >
             <View style={[styles.switchContainer, {}]}>
-              <Text
-                style={[styles.switchText, { color: colors.darkSeparator }]}
-              >
-                Categoria
-              </Text>
+              <Text style={[styles.switchText]}>Categoria</Text>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text
                   numberOfLines={2}
@@ -291,7 +312,7 @@ export default AddTicketsSheet = ({
                     alignSelf: "flex-start",
                     fontSize: 17,
                     fontWeight: "400",
-                    color: colors.primary2,
+                    color: colors.t3,
                     marginVertical: 3,
                     marginLeft: 30,
                   }}
@@ -334,12 +355,11 @@ export default AddTicketsSheet = ({
             // }}
             label="descrição"
             mode="outlined"
-            activeOutlineColor={colors.primary}
+            activeOutlineColor={colors.t4}
             underlineColor={colors.primary}
-            outlineColor={colors.primary}
             activeUnderlineColor={colors.primary}
-            value={description}
             cursorColor={colors.primary}
+            value={description}
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setDescription}
           />
@@ -355,7 +375,7 @@ export default AddTicketsSheet = ({
             // }}
             keyboardType="number-pad"
             mode="outlined"
-            activeOutlineColor={colors.primary}
+            activeOutlineColor={colors.t4}
             label="Quantidade"
             activeUnderlineColor={colors.primary}
             value={available}
@@ -363,6 +383,97 @@ export default AddTicketsSheet = ({
             // onChangeText={(text) => setPerson({ ...person, email: text })}
             onChangeText={setAvailable}
           />
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText]}>Coupons</Text>
+            <Switch
+              trackColor={{
+                true: colors.primary,
+              }}
+              thumbColor={colors.white}
+              style={styles.switch}
+              value={couponActive}
+              onValueChange={(newValue) => {
+                setCouponActive(newValue),
+                  setCoupon({ label: "", value: 0, quantity: 0 });
+              }}
+            />
+          </View>
+          {couponActive && (
+            <>
+              <TextInput
+                // error={!cuponLabel}
+                style={{ marginBottom: 5, backgroundColor: colors.background }}
+                // autoFocus
+                underlineStyle={{ backgroundColor: colors.primary }}
+                // contentStyle={{
+                //   backgroundColor: colors.background,
+                //   fontWeight: "500",
+                // }}
+                // keyboardType="number-pad"
+                mode="outlined"
+                activeOutlineColor={colors.t4}
+                label="Nome do coupon"
+                activeUnderlineColor={colors.primary}
+                value={coupon?.label}
+                onChangeText={(text) =>
+                  setCoupon({
+                    ...coupon,
+                    label: Number(text),
+                  })
+                }
+                cursorColor={colors.primary}
+                // onChangeText={(text) => setPerson({ ...person, email: text })}
+              />
+              <TextInput
+                // error={!available}
+                style={{ marginBottom: 5, backgroundColor: colors.background }}
+                // autoFocus
+                underlineStyle={{ backgroundColor: colors.primary }}
+                // contentStyle={{
+                //   backgroundColor: colors.background,
+                //   fontWeight: "500",
+                // }}
+                keyboardType="number-pad"
+                mode="outlined"
+                activeOutlineColor={colors.t4}
+                label="Valor do coupon"
+                activeUnderlineColor={colors.primary}
+                cursorColor={colors.primary}
+                // onChangeText={(text) => setPerson({ ...person, email: text })}
+                value={coupon?.value}
+                onChangeText={(text) =>
+                  setCoupon({
+                    ...coupon,
+                    value: Number(text),
+                  })
+                }
+              />
+              <TextInput
+                // error={!available}
+                style={{ marginBottom: 5, backgroundColor: colors.background }}
+                // autoFocus
+                underlineStyle={{ backgroundColor: colors.primary }}
+                // contentStyle={{
+                //   backgroundColor: colors.background,
+                //   fontWeight: "500",
+                // }}
+                keyboardType="number-pad"
+                mode="outlined"
+                activeOutlineColor={colors.t4}
+                label="Quantidade do coupon"
+                activeUnderlineColor={colors.primary}
+                cursorColor={colors.primary}
+                // onChangeText={(text) => setPerson({ ...person, email: text })}
+                value={coupon?.quantity}
+                onChangeText={(text) =>
+                  setCoupon({
+                    ...coupon,
+                    quantity: Number(text),
+                  })
+                }
+              />
+            </>
+          )}
           {dates?.map((date) => (
             <View
               key={date.id}
@@ -371,20 +482,83 @@ export default AddTicketsSheet = ({
                 alignItems: "center",
                 justifyContent: "space-between",
                 // marginHorizontal: 10,
-                marginVertical: 2,
+                marginVertical: 5,
               }}
             >
-              <Text
-                style={{
-                  color: colors.darkSeparator,
-                  fontSize: 15,
-                  left: 10,
-                  // padding: 3,
-                  fontWeight: "600",
-                }}
-              >
-                {date?.displayDate + " às " + date?.hour}
-              </Text>
+              <View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    // alignItems: "center",
+                    // justifyContent: "space-between",
+                    // marginHorizontal: 10,
+                    // marginBottom: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: ticketDates?.includes(date)
+                        ? colors.t5
+                        : colors.description,
+                      fontSize: 15,
+                      left: 10,
+                      // padding: 3,
+                      fontWeight: "600",
+                    }}
+                  >
+                    de:
+                  </Text>
+                  <Text
+                    style={{
+                      color: ticketDates?.includes(date)
+                        ? colors.t4
+                        : colors.t5,
+                      fontSize: 15,
+                      left: 19.5,
+                      // padding: 3,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {date?.startDisplayDate + " às " + date?.startHour}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    // alignItems: "center",
+                    // justifyContent: "space-between",
+                    // marginHorizontal: 10,
+                    // marginBottom: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: ticketDates?.includes(date)
+                        ? colors.t5
+                        : colors.description,
+                      fontSize: 15,
+                      left: 10,
+                      // padding: 3,
+                      fontWeight: "600",
+                    }}
+                  >
+                    até:
+                  </Text>
+                  <Text
+                    style={{
+                      color: ticketDates?.includes(date)
+                        ? colors.t4
+                        : colors.t5,
+                      fontSize: 15,
+                      left: 15,
+                      // padding: 3,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {date?.endDisplayDate + " às " + date?.endHour}{" "}
+                  </Text>
+                </View>
+              </View>
               <TouchableOpacity onPress={() => addDate(date)}>
                 <Text
                   style={{
@@ -416,7 +590,7 @@ export default AddTicketsSheet = ({
               shadowRadius: 1,
               elevation: 2,
               marginTop: 5,
-              marginBottom: 15,
+              marginBottom: 30,
             }}
           >
             <Text
@@ -430,7 +604,7 @@ export default AddTicketsSheet = ({
               Adicionar
             </Text>
           </TouchableOpacity>
-        </BottomSheetScrollView>
+        </KeyboardAwareScrollView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );
@@ -532,6 +706,23 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     alignSelf: "center",
+    color: colors.t3,
     left: 10,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    marginVertical: 15,
+    // height: 40,
+    width: "100%",
+    // backgroundColor: colors.light2,
+    alignItems: "center",
+    // paddingHorizontal: 20,
+
+    //padding: 10,
+  },
+  switch: {
+    position: "absolute",
+
+    right: 20,
   },
 });

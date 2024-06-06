@@ -8,16 +8,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  BottomSheetModal,
-  BottomSheetView,
-  BottomSheetModalProvider,
-} from "@gorhom/bottom-sheet";
-import SignInScreen from "../../screens/authScreens/SignInScreen";
-import SignUpScreen from "../../screens/authScreens/SignUpScreen";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Animated, { SlideInDown } from "react-native-reanimated";
-import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 
 import colors from "../colors";
 import Screen from "../Screen2";
@@ -32,14 +22,52 @@ export const DataProvider = ({ children }) => {
   const [events, setEvents] = useState([]);
   const [venues, setVenues] = useState([]);
   const [calDays, setCalDays] = useState([]);
-  const [favorites, setFavorites] = useState({});
+  const [recent, setRecent] = useState([]);
   const { headerToken, user } = useAuth();
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  let authSheetRef2 = useRef(null);
 
   const getEvents = async () => {
     const result = await axios.get(`${apiUrl}/events/`);
     // console.log(result?.data);
     setEvents(result?.data);
+  };
+
+  useEffect(() => {
+    const getRecent = async () => {
+      try {
+        const savedRecent = await AsyncStorage.getItem("recent");
+        if (savedRecent) {
+          setRecent(JSON.parse(savedRecent));
+          // console.log("Saved Recent", JSON.parse(savedRecent));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getRecent();
+  }, []);
+
+  // console.log("Redce"+recent);
+  const recentIds = recent.map((event) => event._id);
+  const addToRecent = async (event, clear) => {
+    let newRecent = recent.slice();
+
+    if (clear) {
+      setRecent([]);
+      await AsyncStorage.setItem("recent", JSON.stringify([]));
+      return;
+    }
+    if (recentIds.includes(event._id)) {
+      newRecent = recent.filter((e) => e._id !== event._id);
+    }
+    if (newRecent.length > 4) {
+      newRecent.pop();
+    }
+
+    newRecent.unshift(event);
+    setRecent(newRecent);
+    await AsyncStorage.setItem("recent", JSON.stringify(newRecent));
   };
 
   const getOneEvent = async (eventId) => {
@@ -67,21 +95,21 @@ export const DataProvider = ({ children }) => {
       console.log(error?.response?.data?.msg);
     }
   };
-  const getCalendarDates = async () => {
-    const docRef = doc(db, "Data", "activeDays");
-    const docSnap = await getDoc(docRef);
+  // const getCalendarDates = async () => {
+  //   const docRef = doc(db, "Data", "activeDays");
+  //   const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      // console.log("Document data:", docSnap.data()?.calendar);
-      setCalDays(docSnap.data()?.calendar);
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
-    }
-  };
+  //   if (docSnap.exists()) {
+  //     // console.log("Document data:", docSnap.data()?.calendar);
+  //     setCalDays(docSnap.data()?.calendar);
+  //   } else {
+  //     // docSnap.data() will be undefined in this case
+  //     console.log("No such document!");
+  //   }
+  // };
 
   useEffect(() => {
-    getCalendarDates();
+    // getCalendarDates();
     getEvents();
     getVenues();
   }, []);
@@ -110,15 +138,18 @@ export const DataProvider = ({ children }) => {
   const memoedValue = useMemo(
     () => ({
       events,
-      favorites,
+      recent,
+      authSheetRef2,
+
       getEvents,
       apiUrl,
       venues,
       formatNumber,
       getOneEvent,
       calDays,
+      addToRecent,
     }),
-    [events, venues, calDays, favorites]
+    [events, venues, calDays, authSheetRef2, recent]
   );
 
   return (

@@ -435,11 +435,13 @@ export default TicketPurchaseSheet = ({
         await purchaseSheetRef.current.close();
 
         await new Promise((resolve, reject) => setTimeout(resolve, 500));
-
+        //toFix
+        await getUpdatedUser({ field: "myTickets" });
+        await getUpdatedUser({ field: "user" });
         if (!giftedUser) {
           navigation.navigate("ticketDetails", response?.data);
         }
-        getUpdatedUser({field:"user"})  
+
         clean();
 
         setOnPayment(false);
@@ -511,7 +513,7 @@ export default TicketPurchaseSheet = ({
                 fontSize: 18,
                 color: colors.t1,
                 fontWeight: "600",
-                bottom:1
+                bottom: 1,
               }}
             >
               cve {formatNumber(state?.total)}
@@ -555,7 +557,7 @@ export default TicketPurchaseSheet = ({
               <Text
                 style={{
                   fontSize: 15,
-                  color: state?.total == 0 ?colors.t5 : colors.t2,
+                  color: state?.total == 0 ? colors.t5 : colors.t2,
                   fontWeight: "500",
                   marginRight: 10,
                 }}
@@ -578,8 +580,9 @@ export default TicketPurchaseSheet = ({
       // purchaseModalUp,
     ]
   );
+  //toFix
   const renderBackdrop = useCallback(
-    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-2} />,
     []
   );
   // if (loading) {

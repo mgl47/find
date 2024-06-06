@@ -92,7 +92,7 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
 
           width: width,
 
-          backgroundColor: colors.light2,
+          backgroundColor: colors.background2,
           borderColor: colors.description,
         },
         { ...otherprops },
@@ -103,7 +103,7 @@ function ImageImput({ imageUri, onChangeImage, ...otherprops }) {
           <Ionicons
             name={"add-circle-outline"}
             size={40}
-            color={colors.primary}
+            color={colors.t4}
             style={styles.icon}
           />
         </View>

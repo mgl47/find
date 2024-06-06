@@ -62,6 +62,8 @@ import TicketPurchaseSheet from "../../components/screensComponents/eventCompone
 import { LinearGradient } from "expo-linear-gradient";
 import { captureRef } from "react-native-view-shot";
 import { ImageBackground } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
@@ -96,6 +98,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const Event = route.params;
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
+  const [authModalUp, setAuthModalUp] = useState(false);
   const [giftedUser, setGiftedUser] = useState(null);
 
   const [giftModalUp, setGiftModalUp] = useState(false);
@@ -105,14 +108,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [scrolling, setScrolling] = useState(false);
   const [scrollingPos, setScrollingPos] = useState(0);
   const [mediaIndex, setMediaIndex] = useState(0);
-  const { apiUrl, formatNumber } = useData();
+  const { apiUrl, formatNumber, addToRecent } = useData();
   const [imageVisible, setImageVisible] = useState(false);
   const [currentImageIndex, setImageIndex] = useState(0);
   const onShowGallery = (index) => {
     setImageIndex(index);
     setImageVisible(true);
   };
-  const { user, headerToken, getUpdatedUser } = useAuth();
+  const { user, headerToken, getUpdatedUser, authSheetRef } = useAuth();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      addToRecent(Event);
+    }, [])
+  );
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     setScrollingPos(event.nativeEvent.contentOffset.y / 20);
@@ -134,16 +143,24 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   const purchaseSheetRef = useRef(null);
   const giftModalRef = useRef(null);
+  // const authSheetRef = useRef(null);
 
-  const handlePurchaseSheet = useCallback((gift) => {
-    if (gift) {
-      setGiftModalUp(true);
-      giftModalRef.current?.present();
-    } else {
-      purchaseSheetRef.current?.present();
-      setPurchaseModalUp(true);
-    }
-  }, []);
+  const handlePurchaseSheet = useCallback(
+    (gift) => {
+      if (!user) {
+        authSheetRef.current?.present(), setAuthModalUp(true);
+        return;
+      }
+      if (gift) {
+        setGiftModalUp(true);
+        giftModalRef.current?.present();
+      } else {
+        purchaseSheetRef.current?.present();
+        setPurchaseModalUp(true);
+      }
+    },
+    [user]
+  );
 
   const renderViewMore = (onPress) => {
     return (
@@ -271,39 +288,20 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
   }, [user]);
 
-  const likeEvent = async () => {
-    let updateInterested = [];
-    let updatedGoing = [];
-
-    updatedGoing = user?.goingToEvents || [];
-    updateInterested = user?.likedEvents || [];
-
-    const index = updateInterested.indexOf(Event?._id);
-    if (user?.likedEvents?.includes(Event?._id) && index !== -1) {
-      setInterested(false);
-
-      updateInterested.splice(index, 1);
-    } else {
-      setInterested(true);
-      setGoing(false);
-
-      updateInterested.push(Event?._id);
-    }
-    if (user?.goingToEvents?.includes(Event?._id)) {
-      const index = updatedGoing.indexOf(Event?._id);
-      if (index !== -1) {
-        // setGoing(false);
-        updatedGoing.splice(index, 1);
-      }
-    }
+  const updateUserEvents = async (
+    task,
+    eventId,
+    updateInterested,
+    updatedGoing
+  ) => {
     try {
       const response = await axios.patch(
         `${apiUrl}/user/current/${user?._id}`,
         {
           operation: {
             type: "eventStatus",
-            task: "interest",
-            eventId: Event?._id,
+            task,
+            eventId,
           },
           updates: {
             likedEvents: updateInterested,
@@ -318,53 +316,72 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
       console.log(error?.response?.data?.msg);
     }
   };
-  const goingtoEvent = async () => {
-    let updateInterested = [];
-    let updatedGoing = [];
 
-    updatedGoing = user?.goingToEvents || [];
-    updateInterested = user?.likedEvents || [];
+  const likeEvent = async () => {
+    if (!user) {
+            setAuthModalUp(true);
 
-    const index = updatedGoing.indexOf(Event?._id);
-    if (user?.goingToEvents?.includes(Event?._id) && index !== -1) {
+      authSheetRef.current?.present();
+      return;
+    }
+    let updatedInterested = [...(user?.likedEvents || [])];
+    let updatedGoing = [...(user?.goingToEvents || [])];
+
+    const isLiked = updatedInterested.includes(Event?._id);
+    const isGoing = updatedGoing.includes(Event?._id);
+
+    if (isLiked) {
+      setInterested(false);
+      updatedInterested = updatedInterested.filter((id) => id !== Event?._id);
+    } else {
+      setInterested(true);
       setGoing(false);
+      updatedInterested.push(Event?._id);
+    }
 
-      updatedGoing.splice(index, 1);
+    if (isGoing) {
+      updatedGoing = updatedGoing.filter((id) => id !== Event?._id);
+    }
+
+    await updateUserEvents(
+      "interest",
+      Event?._id,
+      updatedInterested,
+      updatedGoing
+    );
+  };
+
+  const goingtoEvent = async () => {
+    if (!user) {
+      authSheetRef.current?.present();
+      setAuthModalUp(true);
+      return;
+    }
+    let updatedInterested = [...(user?.likedEvents || [])];
+    let updatedGoing = [...(user?.goingToEvents || [])];
+
+    const isGoing = updatedGoing.includes(Event?._id);
+    const isLiked = updatedInterested.includes(Event?._id);
+
+    if (isGoing) {
+      setGoing(false);
+      updatedGoing = updatedGoing.filter((id) => id !== Event?._id);
     } else {
       setGoing(true);
       setInterested(false);
-
       updatedGoing.push(Event?._id);
     }
-    if (user?.likedEvents?.includes(Event?._id)) {
-      const index = updateInterested.indexOf(Event?._id);
-      if (index !== -1) {
-        // setGoing(false);
-        updateInterested.splice(index, 1);
-      }
+
+    if (isLiked) {
+      updatedInterested = updatedInterested.filter((id) => id !== Event?._id);
     }
 
-    try {
-      const response = await axios.patch(
-        `${apiUrl}/user/current/${user?._id}`,
-        {
-          operation: {
-            type: "eventStatus",
-            task: "going",
-            eventId: Event?._id,
-          },
-          updates: {
-            likedEvents: updateInterested,
-            goingToEvents: updatedGoing,
-          },
-        },
-        { headers: { Authorization: headerToken } }
-      );
-
-      await getUpdatedUser({ field: "favEvents" });
-    } catch (error) {
-      console.log(error?.response?.data?.msg);
-    }
+    await updateUserEvents(
+      "going",
+      Event?._id,
+      updatedInterested,
+      updatedGoing
+    );
   };
 
   return (
@@ -839,7 +856,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               Local
             </Text>
             <TouchableOpacity
-              activeOpacity={0.6}
+              activeOpacity={0.7}
               onPress={
                 () => navigation.navigate("venue", { item: Event?.venue })
                 // navigation.navigate("venue", {
@@ -1017,9 +1034,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             style={{ padding: 10 }}
             contentContainerStyle={{}}
             data={Event?.organizers}
-
             keyExtractor={(item) => item?.uuid}
-           
             renderItem={({ item }) => {
               return (
                 <View
@@ -1035,6 +1050,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   <TouchableOpacity
+                    activeOpacity={0.6}
                     onPress={() => navigation.navigate("artist", { item })}
                     // onPress={() =>
                     //   navigation.navigate("artist", { artistId: "neyna" })
@@ -1076,6 +1092,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   <View style={[styles.separator, { width: "90%" }]} />
 
                   <TouchableOpacity
+                    activeOpacity={0.6}
                     style={{
                       padding: 5,
                       paddingHorizontal: 10,
@@ -1134,8 +1151,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         setGift={setGift}
         gift={gift}
       />
+
+      <AuthBottomSheet setAuthModalUp={setAuthModalUp} />
       {/* {!inFullscreen && ( */}
-      {!inFullscreen && !purchaseModalUp && !giftModalUp && (
+      {!inFullscreen && !purchaseModalUp && !giftModalUp && !authModalUp && (
         <Animated.View
           entering={!firstMount && SlideInDown.duration(180)}
           exiting={SlideOutDown}

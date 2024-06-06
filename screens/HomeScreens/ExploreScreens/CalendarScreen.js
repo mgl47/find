@@ -111,71 +111,67 @@ const CalendarScreen = () => {
     today: "hoje",
   };
   LocaleConfig.defaultLocale = "pt";
-  const navigation = useNavigation();
-  // const { height, width }=useDesign()
-  const { calDays, apiUrl } = useData();
-  const [events, setEvents] = useState([]);
-  const [selectedDay, setSelectedDay] = useState("");
+  const { calDays, apiUrl, events } = useData();
   const [calendarEvents, setCalendarEvents] = useState([]);
+  const [selectedDay, setSelectedDay] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const filteredDays = calDays?.map((item) => {
-    return {
-      [item]: {
+  let calObj = {};
+
+  events.forEach((event) =>
+    event.dates.forEach((date) => {
+      calObj[date.calendarDate] = calObj[date.calendarDate] + 1 || 1;
+    })
+  );
+
+  let markedDatesData = {};
+
+  for (let key in calObj) {
+    if (calObj[key] >= 1) {
+      markedDatesData[key] = {
         marked: true,
-        selected: selectedDay == item,
+        selected: selectedDay == key,
         dotColor: colors.primary,
         selectedColor: colors.primary,
-      },
-    };
-  });
-  const markedDatesData = filteredDays?.reduce((acc, curr) => {
-    return { ...acc, ...curr };
-  }, {});
-
-  const getVenues = async () => {
-    try {
-      const result = await axios.get(`${apiUrl}/events/?date=${selectedDay}`);
-      // console.log(result?.data);
-      setEvents(result?.data);
-      console.log("rrefef");
-      if (result?.data != venues) setEvents(result?.data);
-    } catch (error) {
-      console.log(error?.response?.data?.msg);
+      };
     }
-  };
+  }
+
+  // console.log(markedDatesData);
+
+  //Tip: You can use the reduce method to flatten the array of objects into a single object
+  // const markedDatesData = filteredDays?.reduce((acc, curr) => {
+  //   return { ...acc, ...curr };
+  // }, {});
 
   const getCalendarEvents = async (day) => {
-    if (day?.dateString == selectedDay || !calDays?.includes(day?.dateString))
+    if (
+      day?.dateString == selectedDay ||
+      markedDatesData[day.dateString] == undefined
+    )
       return;
+    try {
+      setLoading(true);
+      setSelectedDay(day.dateString);
 
-    setLoading(true);
-    setSelectedDay(day.dateString);
-    let arr = [];
-    // events?.filter((item) =>
-    //   item?.dates.forEach((item2) => {
-    //     if (item2?.calendarDate == day?.dateString) arr.push(item);
-    //   })
-    // );
+      const result = await axios.get(
+        `${apiUrl}/events/?date=${day.dateString}`
+      );
 
-    const result = await axios.get(`${apiUrl}/events/?date=${day.dateString}`);
-    // console.log(result?.data);
-    console.log(result?.data);
-
-    setEvents(result?.data);
-    // await new Promise((resolve, reject) => {
-    //   setTimeout(resolve, 1000);
-    // });
-    setCalendarEvents(arr);
-    setLoading(false);
+      setCalendarEvents(result?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Animated.FlatList
-      entering={SlideInDown}
+      entering={FadeIn.duration(200)}
       exiting={SlideOutDown}
       style={{ flex: 1, backgroundColor: colors.background }}
-      data={events}
+      data={calendarEvents}
       showsVerticalScrollIndicator={false}
       keyExtractor={(item) => item._id}
       ListHeaderComponent={
@@ -206,7 +202,6 @@ const CalendarScreen = () => {
               textDayHeaderFontWeight: "500",
               monthTextColor: colors.t2,
               dayTextColor: colors.t4,
-              
 
               // backgroundColor: colors.background,
               calendarBackground: colors.background2,

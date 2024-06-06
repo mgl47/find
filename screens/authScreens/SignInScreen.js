@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ActivityIndicator, TextInput } from "react-native-paper";
 import colors from "../../components/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -31,10 +31,17 @@ import { useNavigation } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { ScrollView } from "react-native-gesture-handler";
 
-const SignInScreen = () => {
+const SignInScreen = ({}) => {
   const navigation = useNavigation();
 
-  const { getUpdatedUser, setUser, setHeaderToken, authSheetRef } = useAuth();
+  const {
+    getUpdatedUser,
+    setUser,
+    setHeaderToken,
+    authSheetRef,
+    setCloseSheet,
+    closeSheet
+  } = useAuth();
   const [person, setPerson] = useState({ email: "", password: "" });
   const [firstMount, setFirstMount] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -47,7 +54,7 @@ const SignInScreen = () => {
   }, []);
   const url = process.env.EXPO_PUBLIC_API_URL;
   const validated = person.email && person.password;
-
+  const passwordRef = useRef(null);
   const signIn = async () => {
     Keyboard.dismiss();
     setErrorMsg("");
@@ -83,13 +90,15 @@ const SignInScreen = () => {
           await AsyncStorage.setItem("user", jsonValue);
           navigation.openDrawer();
 
-             authSheetRef?.current?.close();
-          await   new Promise((resolve, reject) => setTimeout(resolve, 500));
+          setCloseSheet(!closeSheet);
+          authSheetRef?.current?.dismiss();
+
+          await new Promise((resolve, reject) => setTimeout(resolve, 500));
           getUpdatedUser({
             // response.data.user?._id,
-field:"all", 
-           token: "Bearer " + response.data.token}
-          );
+            field: "all",
+            token: "Bearer " + response.data.token,
+          });
         }
         // await new Promise((resolve,reject) => setTimeout(resolve, 1500));
       }
@@ -127,17 +136,19 @@ field:"all",
         <BlockModal active={loading} />
         <TextInput
           error={!firstAttempt && !person.email}
-          style={{ marginBottom: 5, backgroundColor: colors.background }}
-          // autoFocus
-          mode="outlined"
-          activeOutlineColor={colors.primary}
+          style={{ marginBottom: 20, backgroundColor: colors.background }}
+          outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
           underlineStyle={{ backgroundColor: colors.primary }}
-          outlineColor={colors.primary}
-          // contentStyle={{  fontWeight: "500",borderColor:"red" }}
-          label="Nome de usuário ou Email"
+          outlineColor={colors.background2}
           activeUnderlineColor={colors.primary}
+          activeOutlineColor={colors.t2}
+          cursorColor={colors.primary}
+          mode="outlined"
+          label="Nome de usuário ou Email"
+          returnKeyType="next"
           value={person?.email}
           onChangeText={(text) => setPerson({ ...person, email: text })}
+          onSubmitEditing={() => passwordRef.current.focus()}
         />
 
         {!onPassRecovery && (
@@ -148,13 +159,18 @@ field:"all",
           >
             <TextInput
               error={!firstAttempt && !person.password}
+              ref={passwordRef}
               style={{ marginBottom: 20, backgroundColor: colors.background }}
+              outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
               underlineStyle={{ backgroundColor: colors.primary }}
-              mode="outlined"
-              outlineColor={colors.primary}
-              activeOutlineColor={colors.primary}
-              label="Palavra Passe"
+              outlineColor={colors.background2}
               activeUnderlineColor={colors.primary}
+              activeOutlineColor={colors.t2}
+              cursorColor={colors.primary}
+              mode="outlined"
+              label="Palavra Passe"
+              returnKeyType="go"
+              returnKeyLabel="Entrar"
               right={
                 <TextInput.Icon
                   onPress={() => setShowPassword(!showPassword)}
@@ -253,12 +269,12 @@ field:"all",
                 />
 
                 <Animated.Text
-                  entering={firstMount ? null : SlideInRight.duration(500)}
-                  exiting={firstMount ? null : SlideOutRight.duration(500)}
+                  // entering={firstMount ? null : SlideInRight.duration(500)}
+                  // exiting={firstMount ? null : SlideOutRight.duration(500)}
                   style={{
                     color: colors.white,
                     marginLeft: 5,
-                    fontSize: 17,
+                    fontSize: 16,
                     fontWeight: "500",
                   }}
                 >

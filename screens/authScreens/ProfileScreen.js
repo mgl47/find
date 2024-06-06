@@ -142,13 +142,13 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerStyle: {
-        backgroundColor: colors.primary2,
-        // shadowColor: colors.transparent,
-        shadowColor: colors.primary2,
+      // headerStyle: {
+      //   backgroundColor: colors.background,
+      //   // shadowColor: colors.background,
+      //   // shadowColor: colors.primary2,
 
-        elevation: 0,
-      },
+      //   // elevation: 0,
+      // },
       headerLeft: () => (
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -174,21 +174,21 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
       headerRight: () => null,
 
       headerTitle: () =>
-        scrolling ? (
+        // scrolling ? (
           <Animated.Text
             entering={SlideInDown}
             // exiting={SlideOutDown}
             numberOfLines={1}
             style={{
-              fontSize: 18,
-              fontWeight: "500",
-              // top: 40,
-              color: colors.white,
+              fontSize: 21,
+              fontWeight: "600",
+
+              color: colors.t2,
             }}
           >
-            {artist?.displayName}
+            {user?.displayName}
           </Animated.Text>
-        ) : null,
+        // ) : null,
     });
   }, [scrolling]);
 
@@ -311,8 +311,8 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
 
       if (response.status === 200) {
         setModalVisible(false);
-        getUpdatedUser({field:"user"})  
-                setAvatarUri(null);
+        getUpdatedUser({ field: "user" });
+        setAvatarUri(null);
         setCoverUri(null);
       }
     } catch (error) {
@@ -332,7 +332,7 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
       scrollEventThrottle={16}
       onScroll={handleScroll}
       contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}
-      style={{ backgroundColor: colors.primary2 }}
+      style={{ backgroundColor: colors.background }}
       bounces={false}
     >
       {/* <View
@@ -381,21 +381,11 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
           />
         </TouchableHighlight>
 
-        <Text
-          style={{
-            fontSize: 21,
-            fontWeight: "600",
-            marginVertical: 5,
-            color: colors.primary2,
-          }}
-        >
-          {user?.displayName}
-        </Text>
-        <Text style={{ fontSize: 16, color: colors.description }}>
+        <Text style={{ fontSize: 16, color: colors.t4 ,marginTop:5}}>
           @{user?.username}
         </Text>
       </View>
-      <QRCode
+      {/* <QRCode
         // key={ite}
         // value={item.uuid}
 
@@ -405,10 +395,10 @@ const ProfileScreen = ({ navigation, navigation: { goBack }, route }) => {
         color={colors.darkGold}
         //   quietZone={10}
         backgroundColor={colors.white}
-      />
+      /> */}
       <View
         style={{
-          backgroundColor: colors.white,
+          backgroundColor: colors.background2,
           shadowOffset: { width: 0.5, height: 0.5 },
           shadowOpacity: 0.2,
           shadowRadius: 2,

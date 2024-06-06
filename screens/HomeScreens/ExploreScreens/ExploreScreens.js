@@ -24,6 +24,7 @@ import {
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import colors from "../../../components/colors";
 import Animated, {
+  FadeIn,
   SlideInDown,
   SlideInRight,
   SlideOutRight,
@@ -256,7 +257,7 @@ const ExploreScreens = ({
             position: "absolute",
             zIndex: 2,
           }}
-          // entering={firstMount ? SlideInRight.duration(580) : null}
+         entering={firstMount ? FadeIn.duration(300) : null}
         >
           <TouchableOpacity
             style={{ left: inSearch ? 20 : 5 ,padding:10}}
@@ -293,30 +294,37 @@ const ExploreScreens = ({
           })}
         >
           <Tab.Screen
-            // options={(active) => ({
-            //   tabBarLabelStyle: {
-            //     color: active ? colors.t2 : colors.t5,
-            //   },
-            // })}
+            options={(active) => ({
+              // tabBarLabelStyle: {
+              //   color: active ? colors.t2 : colors.t5,
+              // },
+              lazy: true,
+
+            })}
+            
             name="Explorar"
             component={SearchScreen}
           />
 
           <Tab.Screen
-            // options={(active) => ({
-            //   tabBarLabelStyle: {
-            //     color: active ? colors.t2 : colors.t5,
-            //   },
-            // })}
+            options={(active) => ({
+              // tabBarLabelStyle: {
+              //   color: active ? colors.t2 : colors.t5,
+              // },
+
+              lazy: true,
+            })}
             name="Lugares"
             component={VenuesExplorer}
           />
           <Tab.Screen
-            // options={(active) => ({
-            //   tabBarLabelStyle: {
-            //     color: active ? colors.t2 : colors.t5,
-            //   },
-            // })}
+            options={(active) => ({
+              // tabBarLabelStyle: {
+              //   color: active ? colors.t2 : colors.t5,
+              // },
+              lazy: true,
+
+            })}
             name="Calendário"
             component={CalendarScreen}
           />

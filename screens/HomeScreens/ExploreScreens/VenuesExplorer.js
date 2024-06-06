@@ -210,7 +210,7 @@ const VenuesExplorer = () => {
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => {
-                    navigation.navigate("venue",{item:venueDetails});
+                    navigation.navigate("venue", { item: venueDetails });
                   }}
                   style={{
                     flexDirection: "row",
@@ -352,28 +352,14 @@ const VenuesExplorer = () => {
 
         data={venueDetails ? events : venues}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.uuid}
+        keyExtractor={(item) => item._id}
         renderItem={({ item }) => {
           // console.log("rrefef");
 
           return !venueDetails ? (
             <VenuesList {...item} />
           ) : (
-            // <TouchableOpacity
-            //   activeOpacity={0.8}
-            //   style={{
-            //     shadowOffset: { width: 0.5, height: 0.5 },
-            //     shadowOpacity: 0.1,
-            //     shadowRadius: 1,
-            //     elevation: 1,
-            //     // padding: 10,
-            //     marginTop: 10,
-            //     paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
-            //   }}
-            //   onPress={() => navigation.navigate("event", item)}
-            // >
             <SmallCard {...item} />
-            // </TouchableOpacity> */}
           );
         }}
         ListFooterComponent={<View style={{ marginBottom: 10 }} />}
@@ -385,8 +371,8 @@ const VenuesExplorer = () => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <Animated.View
         style={{ flex: 1 }}
-        entering={SlideInDown}
-        exiting={SlideOutDown}
+        entering={FadeIn.duration(200)}
+        exiting={FadeOut.duration(200)}
       >
         <View
           style={{
@@ -578,7 +564,7 @@ const VenuesExplorer = () => {
         <BottomSheetModalProvider>
           <View style={styles.sheetContainer}>
             <BottomSheetModal
-            style={{backgroundColor: colors.background }}
+              style={{ backgroundColor: colors.background }}
               handleStyle={{ backgroundColor: colors.background }}
               handleIndicatorStyle={{ backgroundColor: colors.t5 }}
               // enableDismissOnClose={false}
@@ -587,6 +573,7 @@ const VenuesExplorer = () => {
               index={venueDetails ? 2 : 1}
               snapPoints={snapPoints}
               onChange={handleSheetChanges}
+              enableOverDrag={false}
             >
               {loading ? (
                 <Animated.View

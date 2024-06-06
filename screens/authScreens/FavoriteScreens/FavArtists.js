@@ -9,12 +9,14 @@ import {
 import React from "react";
 import colors from "../../../components/colors";
 import { useAuth } from "../../../components/hooks/useAuth";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export default function FavArtists({ navigation }) {
   const { userData } = useAuth();
 
   return (
-    <FlatList
+    <Animated.FlatList
+    entering={FadeIn.duration(200)}
       data={userData?.favArtists}
       showsVerticalScrollIndicator={false}
       keyExtractor={(item) => item._id}

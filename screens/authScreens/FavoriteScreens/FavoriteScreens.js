@@ -64,10 +64,14 @@ const FavoriteScreens = ({
           },
         })}
       >
-        <Tab.Screen name="Artistas" component={FavArtists} />
+        <Tab.Screen name="Artistas" component={FavArtists}   options={(active) => ({
+                lazy: true,
+              })} />
 
         <Tab.Screen name="Eventos" component={FavEvents} />
-        <Tab.Screen name="Lugares" component={FavVenues} />
+        <Tab.Screen name="Lugares" component={FavVenues}   options={(active) => ({
+                lazy: true,
+              })}/>
       </Tab.Navigator>
     </TouchableWithoutFeedback>
   );

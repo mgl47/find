@@ -226,23 +226,17 @@ export default GiftSheet = ({
                 backgroundColor: colors.background,
                 borderRadius: 20,
               }}
-              // autoFocus
               outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
               underlineStyle={{ backgroundColor: colors.primary }}
-              // contentStyle={{
-              //   backgroundColor: colors.background,
-              //   fontWeight: "500",
-              // }}
-
               outlineColor={colors.background2}
+              activeUnderlineColor={colors.primary}
+              activeOutlineColor={colors.primary}
+              cursorColor={colors.primary}
               mode="outlined"
               // placeholder="Pesquise por um usuário"
-              activeOutlineColor={colors.primary}
               label="Nome de usuário"
-              activeUnderlineColor={colors.primary}
               returnKeyType="search"
               value={search}
-              cursorColor={colors.primary}
               // onChangeText={(text) => setPerson({ ...person, email: text })}
               onChangeText={setSearch}
               onSubmitEditing={findUser}

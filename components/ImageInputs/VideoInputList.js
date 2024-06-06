@@ -35,5 +35,6 @@ const styles = StyleSheet.create({
   },
   image: {
     // marginRight: 10,
+    
   },
 });

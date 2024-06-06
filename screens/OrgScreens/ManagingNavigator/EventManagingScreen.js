@@ -43,7 +43,7 @@ import Overview from "./Overview";
 import Attendees from "./Attendees";
 import Staff from "./Staff";
 import Screen from "../../../components/Screen";
-import { Camera } from 'expo-camera/legacy';
+import { Camera } from "expo-camera/legacy";
 import { useAuth } from "../../../components/hooks/useAuth";
 import axios from "axios";
 import { useData } from "../../../components/hooks/useData";
@@ -79,7 +79,6 @@ const EventManagingScreen = ({
   const { getUpdatedUser, headerToken, user } = useAuth();
   const { apiUrl, getOneEvent } = useData();
   const { isIPhoneWithNotch } = useDesign();
-
 
   const getSelectedEvent = async () => {
     setLoading(true);
@@ -123,7 +122,6 @@ const EventManagingScreen = ({
           },
         }
       );
-
 
       if (result.status == 200 || result.status == 201) {
         setLoading(false);
@@ -199,7 +197,7 @@ const EventManagingScreen = ({
   }, [navigation, event]);
 
   useEffect(() => {
-    getUpdatedUser({field:"myEvents"})
+    getUpdatedUser({ field: "myEvents" });
   }, []);
   const toggleFlashMode = () => {
     setFlashMode(
@@ -289,8 +287,13 @@ const EventManagingScreen = ({
               initialParams={event}
               name="Attendees"
               component={Attendees}
+              options={(active) => ({
+                lazy: true,
+              })}
             />
-            <Tab.Screen initialParams={event} name="Staff" component={Staff} />
+            <Tab.Screen initialParams={event} name="Staff" component={Staff}   options={(active) => ({
+                lazy: true,
+              })} />
           </Tab.Navigator>
         </Animated.View>
       ) : (

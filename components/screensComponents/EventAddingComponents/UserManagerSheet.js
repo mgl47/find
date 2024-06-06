@@ -27,22 +27,13 @@ import {
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import MapView, { Marker } from "react-native-maps";
-import {
-  MaterialCommunityIcons,
-  MaterialIcons,
-  Entypo,
-  FontAwesome5,
-  Feather,
-  Ionicons,
-  AntDesign,
-} from "@expo/vector-icons";
+
 
 import { ActivityIndicator, Checkbox, Chip } from "react-native-paper";
 
-import { markers } from "../../components/Data/markers";
 
-import uuid from "react-native-uuid";
+
+
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import colors from "../../colors";
 import Animated, {
@@ -50,11 +41,9 @@ import Animated, {
   FadeOut,
   SlideInDown,
 } from "react-native-reanimated";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
 import { TextInput } from "react-native-paper";
-import Screen from "../../Screen";
-import { Calendar } from "react-native-calendars";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+
 import axios from "axios";
 import { useData } from "../../hooks/useData";
 import { useAuth } from "../../hooks/useAuth";

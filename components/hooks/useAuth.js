@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
   const navigation = useNavigation();
 
   const [user, setUser] = useState(null);
+  const [closeSheet, setCloseSheet] = useState(false);
   const [userData, setUserData] = useState({
     myEvents: [],
     myTickets: [],
@@ -41,6 +42,8 @@ export const AuthProvider = ({ children }) => {
 
   const [authLoading, setAuthLoading] = useState(false);
   const authSheetRef = useRef(null);
+  // const authSheetRef2 = useRef(null);
+
   const [userLocation, setUserLocation] = useState({
     latitude: 14.905696 - 0.004,
     longitude: -23.519001,
@@ -115,8 +118,9 @@ export const AuthProvider = ({ children }) => {
         field === "all" ||
         field === "user" ||
         field === "favVenues" ||
-        field === "favArtists" 
-    
+        field === "favArtists" ||
+        field === "favEvents" ||
+        field === "myTickets"
       ) {
         setUser(user);
 
@@ -167,6 +171,7 @@ export const AuthProvider = ({ children }) => {
   const logOut = async () => {
     await AsyncStorage.removeItem("user");
     await AsyncStorage.removeItem("headerToken");
+    setCloseSheet(false);
     setCacheChecked(false);
     setHeaderToken(null);
 
@@ -223,19 +228,30 @@ export const AuthProvider = ({ children }) => {
     () => ({
       user,
       userData,
-      AuthModalUp,
+      closeSheet,
       headerToken,
+      AuthModalUp,
       authSheetRef,
       userLocation,
+      // authSheetRef2,
       logOut,
       setUser,
       getLocation,
       followVenue2,
+      setCloseSheet,
       getUpdatedUser,
       setAuthModalUp,
       setHeaderToken,
     }),
-    [headerToken, user, userData, AuthModalUp, authSheetRef, userLocation]
+    [
+      headerToken,
+      user,
+      userData,
+      AuthModalUp,
+      closeSheet,
+      authSheetRef,
+      userLocation,
+    ]
   );
 
   return (

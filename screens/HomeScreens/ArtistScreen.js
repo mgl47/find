@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeIn, SlideOutUp } from "react-native-reanimated";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import colors from "../../components/colors";
 import {
   MaterialCommunityIcons,
@@ -46,7 +46,18 @@ import {
 } from "rn-placeholder";
 import axios from "axios";
 import { useAuth } from "../../components/hooks/useAuth";
+import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
+  const { user, headerToken, getUpdatedUser, closeSheet } = useAuth();
+  const authSheetRef2 = useRef(null);
+
+  useEffect(() => {
+    // if (closeSheet) {
+    //   authSheetRef2.current?.close();
+    // }
+    authSheetRef2.current?.close();
+  }, [closeSheet]);
+
   const { width, height, isIPhoneWithNotch } = useDesign();
   const { apiUrl } = useData();
   const { artistId, item } = route.params;
@@ -68,7 +79,6 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [followBlock, setFollowBlock] = useState(false);
   const [events, setEvents] = useState([]);
   const [fetched, setFetched] = useState(false);
-  const { user, headerToken, getUpdatedUser } = useAuth();
   const findUser = async () => {
     setLoading(true);
 
@@ -87,7 +97,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
     }
     // setSearched(true);
   };
-  console.log(item?.username);
+
   useEffect(() => {
     if (artistId) {
       findUser();
@@ -113,9 +123,18 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   useEffect(() => {
     if (user?.followedArtists?.includes(artist?._id)) setFollowing(true);
-  }, [artist]);
+  }, [artist, user]);
 
   const followUser = async () => {
+    if (!user) {
+      authSheetRef2.current?.present();
+      return;
+    }
+
+    if (user?._id == artist?._id) {
+      return;
+    }
+
     setFollowBlock(true);
     let updateFollowedArtist = [];
 
@@ -512,6 +531,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
                     )}
                     textStyle={{
                       color: following ? colors.t2 : colors.t3,
+                      bottom: 1,
                     }}
                     style={{
                       backgroundColor: following
@@ -789,6 +809,7 @@ const ArtistScreen = ({ navigation, navigation: { goBack }, route }) => {
           )
         }
       />
+      <AuthBottomSheet authSheetRef2={authSheetRef2} />
     </>
   );
 };

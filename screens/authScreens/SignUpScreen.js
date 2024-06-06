@@ -23,7 +23,8 @@ const SignUpScreen = () => {
   const navigation = useNavigation();
 
   const url = process.env.EXPO_PUBLIC_API_URL;
-  const { setUser ,authSheetRef,setHeaderToken} = useAuth();
+  const { setUser, authSheetRef, setHeaderToken, setCloseSheet, closeSheet } =
+    useAuth();
 
   const [person, setPerson] = useState({
     username: "",
@@ -73,7 +74,7 @@ const SignUpScreen = () => {
             username: person.username.toLocaleLowerCase(),
             email: person.email.toLocaleLowerCase(),
             password: person.confPassword.toLocaleLowerCase(),
-            uuid:uuid.v4()
+            uuid: uuid.v4(),
           },
           {
             headers: {
@@ -81,13 +82,20 @@ const SignUpScreen = () => {
             },
           }
         );
-        setHeaderToken("Bearer " + response.data.token)
+        setHeaderToken("Bearer " + response.data.token);
 
         setUser(response.data.user);
-        await AsyncStorage.setItem("headerToken", "Bearer "+response.data.token);
-        navigation.openDrawer();
+        await AsyncStorage.setItem(
+          "headerToken",
+          "Bearer " + response.data.token
+        );
+        const jsonValue = JSON.stringify(response.data.user);
 
-             authSheetRef?.current?.close();
+        await AsyncStorage.setItem("user", jsonValue);
+
+        navigation.openDrawer();
+        setCloseSheet(!closeSheet);
+        authSheetRef?.current?.close();
       }
     } catch (error) {
       if (error.response) {
@@ -116,13 +124,15 @@ const SignUpScreen = () => {
         <TextInput
           error={!isUsernameValid}
           style={{ marginBottom: 10, backgroundColor: colors.background }}
+          outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
           underlineStyle={{ backgroundColor: colors.primary }}
+          outlineColor={colors.background2}
+          activeUnderlineColor={colors.primary}
+          activeOutlineColor={colors.t2}
+          cursorColor={colors.primary}
           mode="outlined"
-          outlineColor={colors.primary}
-          activeOutlineColor={colors.primary}
           // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
           label="Nome de usuário (único)"
-          activeUnderlineColor={colors.primary}
           value={person?.username}
           onChangeText={validateUsername}
           autoCapitalize="none"
@@ -130,13 +140,14 @@ const SignUpScreen = () => {
         <TextInput
           error={!isEmailValid}
           style={{ marginBottom: 10, backgroundColor: colors.background }}
+          outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
           underlineStyle={{ backgroundColor: colors.primary }}
-          mode="outlined"
-          activeOutlineColor={colors.primary}
-          outlineColor={colors.primary}
-          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
-          label="Email"
+          outlineColor={colors.background2}
           activeUnderlineColor={colors.primary}
+          activeOutlineColor={colors.t2}
+          cursorColor={colors.primary}
+          mode="outlined"
+          label="Email"
           value={person?.email}
           onChangeText={validateEmail}
           autoCapitalize="none"
@@ -145,11 +156,13 @@ const SignUpScreen = () => {
         />
         <TextInput
           style={{ marginBottom: 10, backgroundColor: colors.background }}
+          outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
           underlineStyle={{ backgroundColor: colors.primary }}
+          outlineColor={colors.background2}
+          activeUnderlineColor={colors.primary}
+          activeOutlineColor={colors.t2}
+          cursorColor={colors.primary}
           mode="outlined"
-          outlineColor={colors.primary}
-          activeOutlineColor={colors.primary}
-          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
           right={
             <TextInput.Icon
               onPress={() => setShowPassword(!showPassword)}
@@ -158,7 +171,6 @@ const SignUpScreen = () => {
           }
           secureTextEntry={!showPassword}
           label="Palavra Passe"
-          activeUnderlineColor={colors.primary}
           value={person?.password}
           onChangeText={(text) => setPerson({ ...person, password: text })}
           autoCapitalize="none"
@@ -166,12 +178,13 @@ const SignUpScreen = () => {
         <TextInput
           error={!isPasswordValid}
           mode="outlined"
-          outlineColor={colors.primary}
-          activeOutlineColor={colors.primary}
           style={{ marginBottom: 20, backgroundColor: colors.background }}
-          // style={{ marginBottom: 30, backgroundColor: colors.background }}
+          outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
           underlineStyle={{ backgroundColor: colors.primary }}
-          // contentStyle={{ backgroundColor: colors.background, fontWeight: "500" }}
+          outlineColor={colors.background2}
+          activeUnderlineColor={colors.primary}
+          activeOutlineColor={colors.t2}
+          cursorColor={colors.primary}
           right={
             <TextInput.Icon
               onPress={() => setShowRepPassword(!showRepPassword)}
@@ -180,7 +193,6 @@ const SignUpScreen = () => {
           }
           secureTextEntry={!showRepPassword}
           label="Confirmar Palavra Passe"
-          activeUnderlineColor={colors.primary}
           value={person.confPassword}
           onChangeText={validatePassword}
           onSubmitEditing={validated ? signUp : null}
@@ -224,7 +236,7 @@ const SignUpScreen = () => {
               style={{
                 color: colors.white,
                 marginLeft: 5,
-                fontSize: 17,
+                fontSize: 16,
                 fontWeight: "500",
               }}
             >

@@ -96,9 +96,100 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [dates, setDates] = useState([]);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [storeModal, setStoreModal] = useState(false);
+  const [init, setInit] = useState(new Date());
 
+  // let fullDisplayDate =
+  //   dates?.length > 0
+  //     ? `${dates[0]?.displayDate.split(",")[0]}, ${
+  //         dates[0]?.displayDate.split(" ")[2] !== month[dateMonth]
+  //           ? dates[0]?.displayDate.split(" ")[1] +
+  //             " " +
+  //             dates[0]?.displayDate.split(" ")[2] +
+  //             " - " +
+  //             dateDay +
+  //             " " +
+  //             month[dateMonth]
+  //           : dates[0]?.displayDate.split(" ")[1] +
+  //             "-" +
+  //             dateDay +
+  //             " " +
+  //             month[dateMonth]
+  //       }`
+  //     : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`;
+  // let fullDisplayDate =
+  // dates?.length > 0
+  //   ?
+  // `${dates[0]?.startDisplayDate.split(",")[0]}, ${
+  //     dates[0]?.startDisplayDate.split(" ")[2] !== month?.[dateMonth]
+  //       ? dates[0]?.startDisplayDate.split(" ")[1] +
+  //         " " +
+  //         dates[0]?.startDisplayDate.split(" ")[2] +
+  //         " - " +
+  //         dateDay +
+  //         " " +
+  //         month?.[dateMonth]
+  //       : dates[0]?.displayDate.split(" ")[1] +
+  //         "-" +
+  //         dateDay +
+  //         " " +
+  //         month[dateMonth]
+  //   }`
+  // : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`;
+  const dummy = [
+    {
+      endCalendarDate: "2024-06-07",
+      endDate: new Date("2024-06-06T23:37:00.000Z"),
+      endDisplayDate: "Sex, 7 Jun",
+      endHour: "00:37",
+      fullEndDisplayDate: "Sex, 7 Jun",
+      id: "318ed806-bc5d-4429-931e-922f33a4a651",
+      startCalendarDate: "2024-06-06",
+      startDate: new Date("2024-06-05T23:21:05.919Z"),
+      startDisplayDate: "Qui, 6 Jun",
+      startHour: "00:21",
+    },
+    // {
+    //   endCalendarDate: "2024-06-08",
+    //   endDate: new Date("2024-06-08T23:37:00.000Z"),
+    //   endDisplayDate: "Sab, 8 Jul",
+    //   endHour: "00:37",
+    //   fullEndDisplayDate: "Sab, 8 Jun",
+    //   id: "318ed806-bc5d-4429-931e-922f33a4a651",
+    //   startCalendarDate: "2024-06-07",
+    //   startDate: new Date("2024-06-07T23:21:05.919Z"),
+    //   startDisplayDate: "Sex, 7 Jun",
+    //   startHour: "20:21",
+    // },
+  ];
+  let fullDisplayDate = "";
+  useEffect(() => {
+    setInit(
+      dates[dates.length - 1]?.endDate
+        ? dates[dates.length - 1]?.endDate
+        : dates[dates.length - 1]?.startDate || new Date()
+    );
+    const fistWeekDay = dates?.[0]?.startDisplayDate?.split(",")[0];
+    const fistDay = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[1];
+    const fistMonth = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[2];
+    const fistHour = dates?.[0]?.startHour;
+    const lastWeekDay =
+      dates?.[dates?.length - 1]?.endDisplayDate?.split(",")[0];
+    const lastDay = dates?.[dates?.length - 1]?.endDisplayDate
+      ?.split(",")[1]
+      .split(" ")[1];
+    const lastMonth = dates?.[dates?.length - 1]?.endDisplayDate
+      ?.split(",")[1]
+      .split(" ")[2];
+    const lastHour = dates?.[dates?.length - 1]?.endHour;
+    fullDisplayDate =
+      dates?.length > 1
+        ? fistMonth !== lastMonth
+          ? `${fistWeekDay}, ${fistDay} ${fistMonth} - ${lastDay} ${lastMonth} às ${fistHour}`
+          : `${fistWeekDay}, ${fistDay} - ${lastDay} ${lastMonth} às ${fistHour}`
+        : `${fistWeekDay}, ${fistDay} ${fistMonth} às ${fistHour}`;
+  }, [dates]);
+  console.log(fullDisplayDate);
   const handleConfirm = (selectedDate) => {
-    // console.warn("A date has been picked: ", date);
     const month = [
       "Jan",
       "Fev",
@@ -111,65 +202,75 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       "Set",
       "Out",
       "Nov",
-      "Dec",
+      "Dez",
     ];
     const weekday = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
-    // const dateDay = dates[0]?.getDate();
-    // const dateWeekDay = dates[0]?.getDay();
-    // const dateMonth = dates[0]?.getMonth();
-
+    const seconds = selectedDate?.getTime();
     const hour = selectedDate?.getHours();
     const minutes = selectedDate?.getMinutes();
-
     const dateDay = selectedDate?.getDate();
     const dateWeekDay = selectedDate?.getDay();
     const dateMonth = selectedDate?.getMonth();
+    // const fistWeekDay = dates?.[0]?.startDisplayDate?.split(",")[0];
+    // const fistDay = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[1];
+    // const fistMonth = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[2];
+    // const fistHour = dates?.[0]?.startHour;
 
+    // let fullDisplayDate =
+    //   dates?.length > 0
+    //     ? fistMonth !== month[dateMonth]
+    //       ? `${fistWeekDay}, ${fistDay} ${fistMonth} - ${dateDay} ${month[dateMonth]} às ${fistHour}`
+    //       : `${fistWeekDay}, ${fistDay} - ${dateDay} ${month[dateMonth]} às ${fistHour}`
+    //     : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]} às ${
+    //         hour < 10 ? "0" + hour : hour
+    //       }:${minutes < 10 ? "0" + minutes : minutes}`;
 
+    let date = {};
 
-    
-    const date = {
-      id: uuid.v4(),
-      date: selectedDate,
-      hour: `${hour < 10 ? "0" + hour : hour}:${
-        minutes < 10 ? "0" + minutes : minutes
-      }`,
+    if (dates.length > 0 && dates[dates.length - 1].endDate === undefined) {
+      if (seconds <= dates[dates.length - 1].startDate?.getTime()) {
+        return Alert.alert("Data inválida");
+      }
 
-      fullDisplayDate:
-        dates?.length > 0
-          ? `${dates[0]?.displayDate.split(",")[0]},${
-              dates[0]?.displayDate.split(" ")[2] != month[dateMonth]
-                ? " " + dates[0]?.displayDate.split(" ")[1]
-                : ""
-            } ${
-              dates[0]?.displayDate.split(" ")[2] != month[dateMonth]
-                ? dates[0]?.displayDate.split(" ")[2] +
-                  " - " +
-                  dateDay +
-                  " " +
-                  month[dateMonth]
-                : dates[0]?.displayDate.split(" ")[1] +
-                  "-" +
-                  dateDay +
-                  " " +
-                  month[dateMonth]
-            }`
-          : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+      date = {
+        ...dates[dates.length - 1],
+        endDate: selectedDate,
+        endHour: `${hour < 10 ? "0" + hour : hour}:${
+          minutes < 10 ? "0" + minutes : minutes
+        }`,
+        fullDisplayDate,
+        endDisplayDate: `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+        endCalendarDate: `${selectedDate.getFullYear()}-${
+          selectedDate.getMonth() + 1 < 10 ? "0" : ""
+        }${selectedDate.getMonth() + 1}-${
+          dateDay < 10 ? "0" + dateDay : dateDay
+        }`,
+      };
 
-      displayDate: `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+      // Push the complete event to the dates array
+      setDates([...dates.slice(0, -1), date]);
 
-      calendarDate: `${selectedDate.getFullYear()}-${
-        selectedDate.getMonth() + 1 < 10 ? "0" : ""
-      }${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`,
-    };
-    setShowTimePicker(false);
-    let newDates = dates;
-    newDates.push(date);
-    setDates(dates);
+      setShowTimePicker(false);
+    } else {
+      date = {
+        id: uuid.v4(),
+        startDate: selectedDate,
+        startHour: `${hour < 10 ? "0" + hour : hour}:${
+          minutes < 10 ? "0" + minutes : minutes
+        }`,
+        startDisplayDate: `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`,
+        startCalendarDate: `${selectedDate.getFullYear()}-${
+          selectedDate.getMonth() + 1 < 10 ? "0" : ""
+        }${selectedDate.getMonth() + 1}-${
+          dateDay < 10 ? "0" + dateDay : dateDay
+        }`,
+      };
+
+      // Only set the new start date without pushing to the dates array
+      setDates([...dates, date]);
+    }
   };
-  // console.log(dates);
-  // console.log(dates[0]?.displayDate.split(" ")[1]);
 
   const ticketsSheetRef = useRef(null);
   const editTicketSheeRef = useRef(null);
@@ -179,12 +280,16 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [tickets, setTickets] = useState([]);
   const [ticketsLimit, setTicketsLimit] = useState({ label: "0", value: "0" });
   const [selectedTicket, setSelectedTicket] = useState("");
+ 
   const handleTicketSheet = useCallback((ticket, index) => {
+    if (!dates.length > 0) {
+      return Alert.alert("Adicione uma data ao evento!");
+    }
     // setTicketsSheetup(true);
     setSelectedTicket({ ticket, index });
     ticketsSheetRef.current?.present();
     // setSelectedTicket("");
-  }, []);
+  }, [dates ]);
   const handleEditTicketSheet = useCallback((ticket, index) => {
     setSelectedTicket({ ticket, index });
 
@@ -443,47 +548,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       console.log("erro ao processarr");
     }
   };
-  const venues2 = {
-    id: 1,
-    displayName: "Kebra Cabana",
-    address: {
-      city: "Praia",
-      zone: "Quebra Canela",
-      lat: 14.904463,
-      long: -23.517431,
-    },
-    phone1: 9123456,
-    upcomingEvents: [
-      {
-        id: 2,
-        title: "Quinta Quentes",
-        date: "Quinta, 20 Mai - 22:00",
-        promoter: "Kebra Cabana",
-      },
-      {
-        id: 1,
-        title: "Rolling Loud Cv: Edição 2024",
-        date: "Quarta, 06-08 Jul - 15:00",
-        promoter: "Sigue Sabura",
-      },
-    ],
-    photos: [
-      {
-        id: 1,
-        uri: "https://scontent.fopo3-2.fna.fbcdn.net/v/t31.18172-8/13220730_1347686511913909_1118731680861521309_o.jpg?_nc_cat=102&ccb=1-7&_nc_sid=4dc865&_nc_eui2=AeHynjX1ye85plORdI-EY4s7-9foNdj7fU371-g12Pt9TWRIT-0ZBtFlguV4yzjJISh8S4V0Axsi1rxa25KNSVPM&_nc_ohc=vi-qKdNEL0EAX9tox6R&_nc_ht=scontent.fopo3-2.fna&oh=00_AfCQUJ24zOBjvG7fCHW1FcHxapBhxQ7GeTLNdU4aqBy2oQ&oe=660CA567",
-      },
-      {
-        id: 2,
-        uri: "https://lh5.googleusercontent.com/p/AF1QipNUHVeb6i6i0_73l32v7lM3cC1AX63xiZz4vnbd=s1600",
-      },
-      {
-        id: 3,
-        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSfESMUWnwWeRqQ3LL4bVbdLlOgjF_dCNdtpU5yEWCUw&s",
-      },
-    ],
-    description:
-      "Com uma bela vista sobre a praia de Quebra Canela, este é um ótimo local para um lanche e uma cerveja fresca. Comida boa e barata.",
-  };
 
   const addEvent = async () => {
     setLoading(true);
@@ -500,6 +564,10 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
       await updatePhotos();
       console.log(resized2);
+      const updatedDates = dates.map((date) => ({
+        ...date,
+        fullDisplayDate,
+      }));
 
       const event = {
         uuid: uuidKey,
@@ -509,7 +577,8 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
         description: description,
         category: category,
-        dates,
+        dates: updatedDates,
+
         clicks: 0,
         photos,
         videos,
@@ -522,7 +591,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
         // pushToken: token,
         creatorId: user.uid,
         createdBy: {
-          uuid:user?.uuid,
+          uuid: user?.uuid,
           avatar: user?.photos?.avatar?.[0]?.uri,
           displayName: user?.displayName,
         },
@@ -656,7 +725,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   } else {
     result = "Invalid number";
   }
-
   // const getIp = () => {
   //   publicIP()
   //     .then((ip) => {
@@ -695,7 +763,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             style={[
               styles.switchText,
               {
-                color: colors.darkSeparator,
                 marginVertical: 10,
                 alignSelf: "flex-start",
               },
@@ -707,7 +774,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             style={[
               styles.switchText,
               {
-                color: colors.primary,
+                // color: colors.primary,
                 marginVertical: 10,
                 alignSelf: "flex-start",
               },
@@ -734,7 +801,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             style={[
               styles.switchText,
               {
-                color: colors.darkSeparator,
                 marginVertical: 10,
                 alignSelf: "flex-start",
               },
@@ -746,7 +812,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             style={[
               styles.switchText,
               {
-                color: colors.primary,
                 marginVertical: 10,
                 alignSelf: "flex-start",
               },
@@ -765,16 +830,17 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
         <View style={styles.container}>
           <TextInput
-            error={!title}
+            // error={!title}
             style={{ marginBottom: 10, backgroundColor: colors.background }}
             // autoFocus
-            underlineStyle={{ backgroundColor: colors.primary }}
             // contentStyle={{
             //   backgroundColor: colors.background,
             //   fontWeight: "500",
             // }}
+            outlineColor={colors.description}
+
             mode="outlined"
-            activeOutlineColor={colors.primary}
+            activeOutlineColor={colors.t4}
             label="título"
             activeUnderlineColor={colors.primary}
             // defaultValue={String(selectedTicket?.ticket?.price)}
@@ -786,12 +852,11 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           />
 
           <TextInput
-            error={!description}
+            // error={!description}
             style={{ marginBottom: 10, backgroundColor: colors.background }}
-            underlineStyle={{ backgroundColor: colors.primary }}
             mode="outlined"
-            outlineColor={colors.primary}
-            activeOutlineColor={colors.primary}
+            outlineColor={colors.description}
+            activeOutlineColor={colors.t4}
             activeUnderlineColor={colors.primary}
             label="descrição"
             value={description}
@@ -811,48 +876,157 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             // display="inline"
             display="inline"
             locale="Pt"
-            minimumDate={dates[dates?.length - 1]?.date || new Date()}
+            minimumDate={init}
+            // minimumDate={
+            //   dates[dates?.length - 1]?.endDate
+            //     ? dates[dates?.length - 1]?.endDate
+            //     : dates[dates?.length - 1]?.startDate || new Date()
+            // }
           />
-          {dates?.length > 0 && (
-            <Text
-              style={{
-                fontSize: 19,
-                color: colors.primary,
-                fontWeight: "500",
-                marginLeft: 20,
-                // marginRight: 10,
-                marginBottom: 10,
-              }}
+
+          <View style={[styles.switchContainer]}>
+            <Text style={[styles.switchText]}>Datas</Text>
+            <TouchableOpacity
+              style={styles.switch}
+              onPress={() => setShowTimePicker(true)}
             >
-              Datas
-            </Text>
-          )}
+              {/* <Ionicons
+            name={"add-circle-outline"}
+            size={30}
+            color={colors.primary}
+          /> */}
+              <Text
+                style={{
+                  color: colors.t2,
+                  fontSize: 14,
+                  left: 20,
+                  padding: 3,
+                  fontWeight: "600",
+                }}
+              >
+                Adicionar
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {dates?.map((date) => (
             <View
               key={date.id}
               style={{
                 flexDirection: "row",
-                alignItems: "center",
+                // alignItems: "center",
                 justifyContent: "space-between",
                 // marginHorizontal: 10,
                 marginBottom: 10,
               }}
             >
-              <Text
-                style={{
-                  color: colors.darkSeparator,
-                  fontSize: 15,
-                  left: 10,
-                  // padding: 3,
-                  fontWeight: "600",
-                }}
-              >
-                {date?.displayDate + " às " + date?.hour}
-              </Text>
+              {date?.endDate ? (
+                <View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      // alignItems: "center",
+                      // justifyContent: "space-between",
+                      // marginHorizontal: 10,
+                      // marginBottom: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.t5,
+                        fontSize: 15,
+                        left: 10,
+                        // padding: 3,
+                        fontWeight: "600",
+                      }}
+                    >
+                      de:
+                    </Text>
+                    <Text
+                      style={{
+                        color: colors.t4,
+                        fontSize: 15,
+                        left: 19.5,
+                        // padding: 3,
+                        fontWeight: "600",
+                      }}
+                    >
+                      {date?.startDisplayDate + " às " + date?.startHour}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      // alignItems: "center",
+                      // justifyContent: "space-between",
+                      // marginHorizontal: 10,
+                      // marginBottom: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: colors.t5,
+                        fontSize: 15,
+                        left: 10,
+                        // padding: 3,
+                        fontWeight: "600",
+                      }}
+                    >
+                      até:
+                    </Text>
+                    <Text
+                      style={{
+                        color: colors.t4,
+                        fontSize: 15,
+                        left: 15,
+                        // padding: 3,
+                        fontWeight: "600",
+                      }}
+                    >
+                      {date?.endDisplayDate + " às " + date?.endHour}{" "}
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    color: colors.t5,
+                    fontSize: 15,
+                    left: 10,
+                    // padding: 3,
+                    fontWeight: "600",
+                    top: 5,
+                  }}
+                >
+                  Data Incompleta
+                </Text>
+              )}
+
               <TouchableOpacity
                 onPress={() =>
-                  setDates(dates?.filter((item) => item?.date != date?.date))
+                  tickets?.length > 0
+                    ? Alert.alert(
+                        "Remover Data!",
+                        "Ao remover uma data os Bilhetes criados serão removidos",
+                        [
+                          {
+                            text: "Cancelar",
+                            onPress: () => console.log("Cancel Pressed"),
+                            style: "cancel",
+                          },
+                          {
+                            text: "OK",
+                            style: "destructive",
+                            onPress: () => {
+                              setDates(
+                                dates.filter((item) => item.id != date.id)
+                              );
+                              setTickets([]);
+                            },
+                          },
+                        ]
+                      )
+                    : setDates(dates.filter((item) => item.id != date.id))
                 }
               >
                 <Text
@@ -870,7 +1044,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             </View>
           ))}
 
-          {dates?.length > 1 && (
+          {/* {dates?.length > 1 && (
             <View
               style={{
                 flexDirection: "row",
@@ -899,44 +1073,16 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   fontWeight: "600",
                 }}
               >
-                {dates[dates?.length - 1]?.fullDisplayDate +
+                {dates[dates?.length - 1]?.fullStartDisplayDate +
                   " às " +
-                  dates[0]?.hour}
+                  dates[0]?.StartHour}
               </Text>
             </View>
-          )}
-          <View style={[styles.switchContainer]}>
-            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Datas
-            </Text>
-            <TouchableOpacity
-              style={styles.switch}
-              onPress={() => setShowTimePicker(true)}
-            >
-              {/* <Ionicons
-            name={"add-circle-outline"}
-            size={30}
-            color={colors.primary}
-          /> */}
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 14,
-                  left: 20,
-                  padding: 3,
-                  fontWeight: "600",
-                }}
-              >
-                Adicionar
-              </Text>
-            </TouchableOpacity>
-          </View>
+          )} */}
 
           <View style={styles.separator} />
           <View style={[styles.switchContainer]}>
-            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Evento Gratuito
-            </Text>
+            <Text style={[styles.switchText]}>Evento Gratuito</Text>
             <Switch
               trackColor={{
                 true: colors.primary,
@@ -947,7 +1093,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               onValueChange={(newValue) => setFreeEvent(newValue)}
             />
           </View>
-          {!freeEvent && tickets?.length > 0 && (
+          {/* {!freeEvent && tickets?.length > 0 && (
             <Text
               style={{
                 fontSize: 19,
@@ -960,7 +1106,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             >
               Bilhetes
             </Text>
-          )}
+          )} */}
           {!freeEvent &&
             tickets?.map((item, index) => {
               return (
@@ -1006,7 +1152,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                               numberOfLines={2}
                               style={{
                                 fontSize: 15,
-                                color: colors.black2,
+                                color: colors.t5,
                                 marginRight: 5,
                               }}
                             >
@@ -1016,7 +1162,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                               numberOfLines={2}
                               style={{
                                 fontSize: 15,
-                                color: colors.darkSeparator,
+                                color: colors.t5,
                               }}
                             >
                               {item?.amount}
@@ -1024,7 +1170,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                           </View>
                         </View>
 
-                        <Text style={styles.description}>
+                        <Text style={{ color: colors.t5 }}>
                           {item?.description}
                         </Text>
                       </View>
@@ -1088,11 +1234,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           {!freeEvent && (
             <>
               <View style={[styles.switchContainer]}>
-                <Text
-                  style={[styles.switchText, { color: colors.darkSeparator }]}
-                >
-                  Bilhetes
-                </Text>
+                <Text style={[styles.switchText]}>Bilhetes</Text>
                 <TouchableOpacity
                   style={styles.switch}
                   onPress={handleTicketSheet}
@@ -1104,7 +1246,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             /> */}
                   <Text
                     style={{
-                      color: colors.primary,
+                      color: colors.t2,
                       fontSize: 14,
                       left: 20,
                       padding: 3,
@@ -1140,11 +1282,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 ]}
               >
                 <View style={[styles.switchContainer, {}]}>
-                  <Text
-                    style={[styles.switchText, { color: colors.darkSeparator }]}
-                  >
-                    Limite por usuário
-                  </Text>
+                  <Text style={[styles.switchText]}>Limite por usuário</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text
                       numberOfLines={2}
@@ -1152,7 +1290,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         alignSelf: "flex-start",
                         fontSize: 17,
                         fontWeight: "400",
-                        color: colors.primary2,
+                        color: colors.t4,
                         marginVertical: 3,
                         marginLeft: 30,
                       }}
@@ -1173,7 +1311,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       // alignSelf: "flex-start",
                       fontSize: 15,
                       fontWeight: "400",
-                      color: colors.darkGrey,
+                      color: colors.description,
                       marginVertical: 3,
                       marginLeft: 10,
                       position: "absolute",
@@ -1189,11 +1327,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           <View style={styles.separator} />
           <View style={[styles.switchContainer]}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text
-                style={[styles.switchText, { color: colors.darkSeparator }]}
-              >
-                Loja
-              </Text>
+              <Text style={[styles.switchText]}>Loja</Text>
               {products?.length > 0 && (
                 <Text style={[styles.switchText, { color: colors.primary }]}>
                   {"(" + products?.length + ")" + products?.length > 1
@@ -1214,7 +1348,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           /> */}
               <Text
                 style={{
-                  color: colors.primary,
+                  color: colors.t2,
                   fontSize: 14,
                   left: 20,
                   padding: 3,
@@ -1229,11 +1363,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
 
           {!venue && (
             <View style={[styles.switchContainer]}>
-              <Text
-                style={[styles.switchText, { color: colors.darkSeparator }]}
-              >
-                Local
-              </Text>
+              <Text style={[styles.switchText]}>Local</Text>
               <TouchableOpacity
                 style={styles.switch}
                 onPress={() => setVenueModal(true)}
@@ -1241,7 +1371,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                 <Ionicons
                   name={"add-circle-outline"}
                   size={30}
-                  color={colors.primary}
+                  color={colors.t3}
                 />
               </TouchableOpacity>
             </View>
@@ -1380,20 +1510,24 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           <View style={styles.separator} />
 
           <Text
-            style={{
-              fontSize: 19,
-              color: colors.primary,
-              fontWeight: "500",
-              marginLeft: 10,
-              // marginRight: 10,
-            }}
+            // style={{
+            //   fontSize: 19,
+            //   color: colors.primary,
+            //   fontWeight: "500",
+            //   marginLeft: 10,
+            //   // marginRight: 10,
+            // }}
+            style={[
+              styles.switchText,
+              { marginTop: 10, alignSelf: "flex-start" },
+            ]}
           >
             Artistas
           </Text>
 
           <View>
             <FlatList
-              style={{ marginVertical: 10 }}
+              // style={{ marginVertical: 10 }}
               horizontal
               showsHorizontalScrollIndicator={false}
               data={artists}
@@ -1406,7 +1540,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       alignItems: "center",
                       // justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("artist", {item})}
+                    onPress={() => navigation.navigate("artist", { item })}
                   >
                     <Image
                       style={{
@@ -1432,7 +1566,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               ListFooterComponent={
                 <TouchableOpacity
                   style={{
-                    backgroundColor: colors.lightGrey,
+                    backgroundColor: colors.background2,
                     alignSelf: "center",
                     alignItems: "center",
                     justifyContent: "center",
@@ -1451,49 +1585,27 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   <Ionicons
                     name={"add-circle-outline"}
                     size={40}
-                    color={colors.primary}
+                    color={colors.t3}
                     // style={{ alignSelf: "center", marginBottom: 50 }}
                   />
                 </TouchableOpacity>
               }
             />
           </View>
-          {/* <View style={[styles.switchContainer]}>
-            <Text style={[styles.switchText, { color: colors.darkSeparator }]}>
-              Artistas
-            </Text>
-            <TouchableOpacity style={styles.switch} onPress={handleArtSheet}>
-           
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 14,
-                  left: 20,
-                  padding: 3,
-                  fontWeight: "600",
-                }}
-              >
-                Adicionar
-              </Text>
-            </TouchableOpacity>
-          </View> */}
+
           <View style={styles.separator} />
 
           <Text
-            style={{
-              fontSize: 19,
-              color: colors.primary,
-              fontWeight: "500",
-              marginLeft: 10,
-              // marginRight: 10,
-            }}
+            style={[
+              styles.switchText,
+              { marginTop: 10, alignSelf: "flex-start" },
+            ]}
           >
             Organizadores
           </Text>
 
           <View>
             <FlatList
-              style={{ marginVertical: 10 }}
               horizontal
               showsHorizontalScrollIndicator={false}
               data={organizers}
@@ -1534,7 +1646,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       alignItems: "center",
                       // justifyContent: "center",
                     }}
-                    onPress={() => navigation.navigate("artist", {item})}
+                    onPress={() => navigation.navigate("artist", { item })}
                   >
                     <Image
                       style={{
@@ -1560,7 +1672,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               ListFooterComponent={
                 <TouchableOpacity
                   style={{
-                    backgroundColor: colors.lightGrey,
+                    backgroundColor: colors.background2,
                     alignSelf: "center",
                     alignItems: "center",
                     justifyContent: "center",
@@ -1579,7 +1691,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                   <Ionicons
                     name={"add-circle-outline"}
                     size={40}
-                    color={colors.primary}
+                    color={colors.t3}
                     // style={{ alignSelf: "center", marginBottom: 50 }}
                   />
                 </TouchableOpacity>
@@ -1877,6 +1989,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     alignSelf: "center",
+    color: colors.t4,
     left: 10,
   },
   card: {
@@ -1885,7 +1998,7 @@ const styles = StyleSheet.create({
     padding: 10,
 
     // height: 95,
-    backgroundColor: colors.white,
+    backgroundColor: colors.background2,
     overflow: "hidden",
     width: "95%",
     alignSelf: "center",
@@ -1901,11 +2014,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     fontSize: 21,
     fontWeight: "600",
-    color: colors.primary,
+    color: colors.t1,
     lineHeight: 30,
     // width: "65%",
     // marginBottom: 5,
   },
+
   priceType: {
     alignSelf: "flex-start",
     fontSize: 15,
@@ -1918,7 +2032,7 @@ const styles = StyleSheet.create({
   separator: {
     width: "100%",
     height: 1,
-    backgroundColor: colors.grey,
+    backgroundColor: colors.separator,
     marginVertical: 5,
     alignSelf: "center",
   },

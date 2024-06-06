@@ -28,7 +28,7 @@ import { useNavigation } from "@react-navigation/native";
 import CalendarScreen from "../../screens/HomeScreens/ExploreScreens/CalendarScreen";
 import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useAuth } from "../hooks/useAuth";
-import SearchScreen2 from "../../screens/HomeScreens/SearchScreen2";
+import SearchScreen2 from "../../screens/HomeScreens/ExploreScreens/SearchScreen2";
 import ExploreScreens from "../../screens/HomeScreens/ExploreScreens/ExploreScreens";
 import EventAddingScreen from "../../screens/OrgScreens/EventAddingScreen";
 import MyTickets from "../../screens/authScreens/MyTickets";
@@ -340,10 +340,12 @@ function StackNavigator() {
       />
 
       <Stack.Screen
-        options={{
-          // headerTransparent: true,
-          headerBackgroundContainerStyle: { backgroundColor: "transparent" },
-        }}
+        options={
+          {
+            // headerTransparent: true,
+            // headerBackgroundContainerStyle: { backgroundColor: "transparent" },
+          }
+        }
         name="profile"
         component={ProfileScreen}
       />

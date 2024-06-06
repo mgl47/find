@@ -95,7 +95,7 @@ function VideoImput({ videoUri, onChangeVideo, ...otherprops }) {
 
           width: width,
 
-          backgroundColor: colors.light2,
+          backgroundColor: colors.background2,
           borderColor: colors.description,
         },
         { ...otherprops },
@@ -106,7 +106,7 @@ function VideoImput({ videoUri, onChangeVideo, ...otherprops }) {
           <Ionicons
             name={"add-circle-outline"}
             size={40}
-            color={colors.primary}
+            color={colors.t4}
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -171,7 +171,6 @@ export default VideoImput;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.light2,
     // borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -182,6 +181,8 @@ const styles = StyleSheet.create({
   },
   photos: {
     // alignSelf: "center",
+    backgroundColor: colors.background,
+
     width: "100%",
     height: "100%",
 

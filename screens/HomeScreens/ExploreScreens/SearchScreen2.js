@@ -21,7 +21,7 @@ import React, {
   useState,
 } from "react";
 
-import colors from "../../components/colors";
+import colors from "../../../components/colors";
 
 import { Tab, Text as Text2, TabView } from "@rneui/themed";
 
@@ -44,23 +44,23 @@ import Animated, {
 } from "react-native-reanimated";
 import { MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 
-import { categories } from "../../components/Data/categories";
-import { recommendedEvents } from "../../components/Data/stockEvents";
-import { artist } from "../../components/Data/artist";
+import { categories } from "../../../components/Data/categories";
+import { recommendedEvents } from "../../../components/Data/stockEvents";
+import { artist } from "../../../components/Data/artist";
 
-import SmallCard from "../../components/cards/SmallCard";
-import MediumCard from "../../components/cards/MediumCard";
-import { markers } from "../../components/Data/markers";
-import { useData } from "../../components/hooks/useData";
+import SmallCard from "../../../components/cards/SmallCard";
+import MediumCard from "../../../components/cards/MediumCard";
+import { markers } from "../../../components/Data/markers";
+import { useData } from "../../../components/hooks/useData";
 import axios from "axios";
-import VenuesList from "../../components/cards/Venues/VenueList";
-import Screen from "../../components/Screen";
+import VenuesList from "../../../components/cards/Venues/VenueList";
+import Screen from "../../../components/Screen";
 const SearchScreen2 = ({
   navigation,
   navigation: { goBack, canGoBack },
   route,
 }) => {
-  const { text, category } = route.params;
+  const { text, category, code } = route.params;
   const { apiUrl } = useData();
   const [searchText, setSearchText] = useState(text);
   const [events, setEvents] = useState([]);
@@ -68,8 +68,8 @@ const SearchScreen2 = ({
   const [users, setUsers] = useState([]);
 
   const [firstMount, setFirstMount] = useState(true);
-  const [inSearch, setInSearch] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [inSearch, setInSearch] = useState(text ? true : false);
+  const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(1);
 
   const fetchData = async (endpoint, setter) => {
@@ -98,15 +98,33 @@ const SearchScreen2 = ({
     await fetchData("venues", setVenues);
   };
 
+  const getCategoryEvents = async () => {
+    try {
+      const result = await axios.get(`${apiUrl}/events/?category=${code}`);
+      setEvents(result?.data);
+    } catch (error) {
+    } finally {
+      // setFetched(true);
+      setLoading(false);
+    }
+    // console.log(result?.data);
+  };
+
   useEffect(() => {
-    getEvents();
-    getVenues();
-    getUsers();
+    if (!inSearch) {
+      getCategoryEvents();
+    } else {
+      getEvents();
+      getVenues();
+      getUsers();
+    }
+
     setFirstMount(false);
-    getResults();
+    // getResults();
   }, []);
 
   const getResults = async () => {
+    setInSearch(true);
     setLoading(true);
     getEvents();
     getVenues();
@@ -124,7 +142,6 @@ const SearchScreen2 = ({
     } else if (maxLength === users.length) {
       setIndex(0);
     }
-
   }, [users, events, venues]);
 
   return (
@@ -149,7 +166,6 @@ const SearchScreen2 = ({
           alignItems: "center",
           zIndex: 2,
           width: "100%",
-
         }}
       >
         <View
@@ -197,172 +213,187 @@ const SearchScreen2 = ({
             </TouchableOpacity>
           )}
         </View>
-   
-          <TouchableOpacity
-            style={{   right: 5,
-              position: "absolute", padding: 10 }}
-            onPress={() => {
-              //   setcategory(false),
-              //     setSearchText(""),
-              Keyboard.dismiss(), navigation.goBack();
+
+        <TouchableOpacity
+          style={{ right: 5, position: "absolute", padding: 10 }}
+          onPress={() => {
+            //   setcategory(false),
+            //     setSearchText(""),
+            Keyboard.dismiss(), navigation.goBack();
+          }}
+        >
+          <Text
+            style={{
+              color: colors.t3,
+              fontSize: 16,
+              fontWeight: "600",
             }}
           >
-            <Text
-              style={{
-                color: colors.t3,
-                fontSize: 16,
-                fontWeight: "600",
-              }}
-            >
-              Voltar
-            </Text>
-          </TouchableOpacity>
-
+            Voltar
+          </Text>
+        </TouchableOpacity>
       </View>
-      {!category && !loading && (
-        <Tab
-          indicatorStyle={{
-            backgroundColor: colors.primary,
-            height: 2,
-            width: "33%",
-          }}
-          value={index}
-          onChange={setIndex}
-          style={{ marginVertical: 5 }}
-          disableIndicator
-          titleStyle={(active) => ({
-            color: active ? colors.primary : colors.darkGrey,
-            fontSize: active ? 16 : 14,
-            fontWeight: "500",
-          })}
-        >
-          <Tab.Item
-            icon={(active) => (
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  left: 10,
-                  backgroundColor: active ? colors.primary : colors.darkGrey,
-                  // padding: 5 ,
-                  borderRadius: 30,
-                  // position: "absolute",
-                  height: 20,
-                  width: 20,
-                }}
-              >
-                <Text
+      {inSearch && !loading && (
+        <Animated.View entering={FadeIn.duration(250)}>
+          <Tab
+            indicatorStyle={{
+              backgroundColor: colors.primary,
+              height: 2,
+              width: "33%",
+            }}
+            value={index}
+            onChange={setIndex}
+            style={{ top: 5 }}
+            disableIndicator
+            titleStyle={(active) => ({
+              color: active ? colors.primary : colors.t5,
+              fontSize: active ? 16 : 14,
+              fontWeight: "500",
+            })}
+          >
+            <Tab.Item
+              icon={(active) => (
+                <View
                   style={{
-                    color: colors.white,
-                    fontSize: 12,
-                    fontWeight: "500",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    left: 10,
+                    backgroundColor: active ? colors.primary : colors.t4,
+                    // padding: 5 ,
+                    borderRadius: 30,
+                    // position: "absolute",
+                    height: 20,
+                    width: 20,
                   }}
                 >
-                  {users?.length}
-                </Text>
-              </View>
-            )}
-            title={"Artistas"}
-            iconPosition="right"
-          />
+                  <Text
+                    style={{
+                      color: active ? colors.t2 : colors.black,
+                      fontSize: 12,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {users?.length}
+                  </Text>
+                </View>
+              )}
+              title={"Artistas"}
+              iconPosition="right"
+            />
 
-          <Tab.Item
-            icon={(active) => (
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  left: 10,
-                  backgroundColor: active ? colors.primary : colors.darkGrey,
-                  // padding: 5 ,
-                  borderRadius: 30,
-                  // position: "absolute",
-                  height: 20,
-                  width: 20,
-                }}
-              >
-                <Text
+            <Tab.Item
+              icon={(active) => (
+                <View
                   style={{
-                    color: colors.white,
-                    fontSize: 12,
-                    fontWeight: "500",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    left: 10,
+                    backgroundColor: active ? colors.primary : colors.t4,
+                    // padding: 5 ,
+                    borderRadius: 30,
+                    // position: "absolute",
+                    height: 20,
+                    width: 20,
                   }}
                 >
-                  {events?.length}
-                </Text>
-              </View>
-            )}
-            title={"Eventos"}
-            iconPosition="right"
-          />
-          <Tab.Item
-            icon={(active) => (
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  left: 10,
-                  backgroundColor: active ? colors.primary : colors.darkGrey,
-                  // padding: 5 ,
-                  borderRadius: 30,
-                  // position: "absolute",
-                  height: 20,
-                  width: 20,
-                }}
-              >
-                <Text
+                  <Text
+                    style={{
+                      color: active ? colors.t2 : colors.black,
+                      fontSize: 12,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {events?.length}
+                  </Text>
+                </View>
+              )}
+              title={"Eventos"}
+              iconPosition="right"
+            />
+            <Tab.Item
+              icon={(active) => (
+                <View
                   style={{
-                    color: colors.white,
-                    fontSize: 12,
-                    fontWeight: "500",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    left: 10,
+                    backgroundColor: active ? colors.primary : colors.t4,
+                    // padding: 5 ,
+                    borderRadius: 30,
+                    // position: "absolute",
+                    height: 20,
+                    width: 20,
                   }}
                 >
-                  {venues?.length}
-                </Text>
-              </View>
-            )}
-            title={"Lugares"}
-            iconPosition="right"
-          />
-        </Tab>
+                  <Text
+                    style={{
+                      color: active ? colors.t2 : colors.black,
+                      fontSize: 12,
+                      fontWeight: "600",
+                    }}
+                  >
+                    {venues?.length}
+                  </Text>
+                </View>
+              )}
+              title={"Lugares"}
+              iconPosition="right"
+            />
+          </Tab>
+        </Animated.View>
       )}
-      {category && !loading && (
+      {!inSearch && !loading && (
         <Animated.FlatList
-          //  entering={index == 0 ? SlideInRight : SlideInLeft}
-          // exiting={index == 0? SlideOutRight : SlideOutLeft}
-          contentContainerStyle={{ alignItems: "center" }}
           entering={FadeIn.duration(250)}
-          // data={newEvents?.slice().reverse()}
           data={events}
           showsVerticalScrollIndicator={false}
-          // numColumns={2}
           keyExtractor={(item) => item._id}
-          ListHeaderComponent={<View style={{ marginTop: 5 }} />}
+          ListHeaderComponent={
+            !inSearch ? (
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "500",
+                  // padding: 5,
+                  zIndex: 2,
+                  left: 20,
+                  marginTop: 20,
+                  color: colors.t2,
+                }}
+              >
+                {category}
+              </Text>
+            ) : (
+              <View style={{ marginTop: 0 }} />
+            )
+          }
           renderItem={({ item }) => {
             return (
-              <SmallCard {...item} />
-
-              // <TouchableOpacity
-              //   activeOpacity={0.8}
-              //   style={{
-              //     shadowOffset: { width: 1, height: 1 },
-              //     shadowOpacity: 1,
-              //     shadowRadius: 1,
-              //     elevation: 3,
-              //     // marginVertical: 5,
-
-              //     // alignSelf: "center",
-              //   }}
-              //   onPress={() => navigation.navigate("event", item)}
-              // >
-              //* <MediumCard {...item} /> *
-              // </TouchableOpacity>
+              <Animated.View entering={FadeIn} exiting={FadeOut.duration(200)}>
+                <SmallCard {...item} />
+              </Animated.View>
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+          ListEmptyComponent={
+            !loading && (
+              <Animated.Text
+                entering={FadeIn}
+                style={{
+                  color: colors.t4,
+                  fontSize: 16,
+                  fontWeight: "500",
+                  textAlign: "center",
+                  marginTop: 20,
+                }}
+              >
+                Nenhum evento encontrado
+              </Animated.Text>
+            )
+          }
         />
       )}
-      {!category && !loading && (
+      {inSearch && !loading && (
         <Animated.FlatList
           style={{
             width: index != 0 ? 0 : "",
@@ -378,7 +409,7 @@ const SearchScreen2 = ({
           renderItem={({ item }) => {
             return (
               <TouchableOpacity
-                onPress={() => navigation.navigate("artist", {item})}
+                onPress={() => navigation.navigate("artist", { item })}
                 activeOpacity={0.5}
                 style={{
                   shadowOffset: { width: 0.5, height: 0.5 },
@@ -423,9 +454,25 @@ const SearchScreen2 = ({
             );
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+          ListEmptyComponent={
+            !loading && (
+              <Animated.Text
+                entering={FadeIn}
+                style={{
+                  color: colors.t4,
+                  fontSize: 16,
+                  fontWeight: "500",
+                  textAlign: "center",
+                  marginTop: 20,
+                }}
+              >
+                Nenhum artista encontrado
+              </Animated.Text>
+            )
+          }
         />
       )}
-      {!category && !loading && (
+      {inSearch && !loading && (
         <>
           <Animated.FlatList
             style={{
@@ -444,42 +491,35 @@ const SearchScreen2 = ({
             keyExtractor={(item) => item._id}
             ListHeaderComponent={<View style={{ marginTop: 5 }} />}
             renderItem={({ item }) => {
-              return (
-                // <TouchableOpacity
-                //   activeOpacity={0.8}
-                //   style={{
-                //     shadowOffset: { width: 1, height: 1 },
-                //     shadowOpacity: 1,
-                //     shadowRadius: 1,
-                //     elevation: 3,
-                //     // marginVertical: 5,
-
-                //     // alignSelf: "center",
-                //   }}
-                //   onPress={() => navigation.navigate("event", item)}
-                // >
-                //                   {/* <MediumCard {...item} />
-
-                //  */}
-
-                <SmallCard {...item} />
-                // {/* </TouchableOpacity> */}
-              );
+              return <SmallCard {...item} />;
             }}
             ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+            ListEmptyComponent={
+              !loading && (
+                <Animated.Text
+                  entering={FadeIn}
+                  style={{
+                    color: colors.t4,
+                    fontSize: 16,
+                    fontWeight: "500",
+                    textAlign: "center",
+                    marginTop: 20,
+                  }}
+                >
+                  Nenhum evento encontrado
+                </Animated.Text>
+              )
+            }
           />
         </>
       )}
-      {!category && !loading && (
+      {inSearch && !loading && (
         <Animated.FlatList
           style={{
             width: index != 2 ? 0 : "",
             height: index != 2 ? 0 : "",
             position: index != 2 ? "absolute" : "relative",
           }}
-          // entering={SlideInRight}
-          // exiting={SlideOutRight}
-          //   style={{ zIndex: 0 }}
           data={venues}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item._id}
@@ -488,6 +528,22 @@ const SearchScreen2 = ({
             return <VenuesList {...item} />;
           }}
           ListFooterComponent={<View style={{ marginBottom: 50 }} />}
+          ListEmptyComponent={
+            !loading && (
+              <Animated.Text
+                entering={FadeIn}
+                style={{
+                  color: colors.t4,
+                  fontSize: 16,
+                  fontWeight: "500",
+                  textAlign: "center",
+                  marginTop: 20,
+                }}
+              >
+                Nenhum lugar encontrado
+              </Animated.Text>
+            )
+          }
         />
       )}
     </Screen>

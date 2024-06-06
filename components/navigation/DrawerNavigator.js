@@ -53,19 +53,32 @@ export function DrawerContent(props) {
           alignItems: "center",
         }}
       >
-        <Image
-          source={{
-            uri: user?.photos?.avatar[0]?.uri,
-          }}
-          style={{
-            width: 55,
-            height: 55,
-            borderRadius: 50,
-            marginLeft: 20,
-            //   marginTop: 5,
-            // position: "absolute",
-          }}
-        />
+        {user?.photos?.avatar[0]?.uri? (
+          <Image
+            source={{
+              uri: user?.photos?.avatar[0]?.uri,
+            }}
+            style={{
+              width: 55,
+              height: 55,
+              borderRadius: 50,
+              marginLeft: 20,
+              //   marginTop: 5,
+              // position: "absolute",
+            }}
+          />
+        ) : (
+          <MaterialCommunityIcons
+            style={{
+              marginLeft: 20,
+              //   marginTop: 5,
+              // position: "absolute",
+            }}
+            name="account-circle"
+            size={50}
+            color={colors.t3}
+          />
+        )}
         <TouchableOpacity style={{ marginRight: 20 }}>
           {/* <MaterialCommunityIcons name="logout" size={25} color="white" /> */}
         </TouchableOpacity>
@@ -81,7 +94,7 @@ export function DrawerContent(props) {
           color: colors.white,
         }}
       >
-        {user?.displayName}
+        {user?.displayName || "Nome"}
       </Text>
       <Text
         style={{
@@ -179,12 +192,10 @@ export function DrawerContent(props) {
         <DrawerItem
           style={{}}
           icon={({ color, size }) => (
-      
-            
             <MaterialCommunityIcons
               name={"heart"}
               color={colors.t2}
-              size={28  }
+              size={28}
             />
           )}
           label="Favoritos"

@@ -18,7 +18,7 @@ import React, {
 } from "react";
 import {
   BottomSheetModal,
-  BottomSheetView,
+  BottomSheetBackdrop,
   BottomSheetModalProvider,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
@@ -30,11 +30,12 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import colors from "../../colors";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useAuth } from "../../hooks/useAuth";
 
 const Tab = createMaterialTopTabNavigator();
-const AuthBottomSheet = ({ Event, authSheetRef, setAuthModalUp }) => {
-  // const{authSheetRef}=useAuth()
-  const snapPoints = useMemo(() => ["60", "85%"], []);
+const AuthBottomSheet = ({ Event, setAuthModalUp, authSheetRef2 }) => {
+  const { authSheetRef } = useAuth();
+  const snapPoints = useMemo(() => ["60", "75%", "85%"], []);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -52,59 +53,79 @@ const AuthBottomSheet = ({ Event, authSheetRef, setAuthModalUp }) => {
       keyboardDidHideListener.remove();
     };
   }, []);
+
+  const renderBackdrop = useCallback(
+    (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-1} />,
+    []
+  );
   const handleSheetChanges = useCallback((index) => {}, []);
   return (
     <BottomSheetModalProvider>
       <BottomSheetModal
-      // keyboardBehavior=""
-        ref={authSheetRef}
+        // keyboardBehavior=""
+        ref={authSheetRef2 ?? authSheetRef}
         // index={keyboardVisible ? 1 : 0}
-        index={1}
+        // style={{zIndex:1000}}
+        backdropComponent={renderBackdrop}
+        index={keyboardVisible ? 2 : 1}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         onDismiss={() => {
-          Keyboard.dismiss(), setAuthModalUp(false);
+          Keyboard.dismiss();
+          setAuthModalUp && setAuthModalUp(false);
         }}
+        enableOverDrag={false}
+        handleStyle={{
+          backgroundColor: colors.background,
+        }}
+        handleIndicatorStyle={{ backgroundColor: colors.t5 }}
       >
-        <KeyboardAwareScrollView
-          contentContainerStyle={{ flex: 1 }}
-          style={{
-            padding: 10,
-            flex: 1,
-            backgroundColor: colors.background,
-            // marginBottom: 200,
-          }}
+        <TouchableWithoutFeedback
+          onPressIn={() => Keyboard.dismiss()}
+          style={{ flex: 1 }}
         >
-          {/* <BottomSheetView style={styles.contentContainer}> */}
-          <BottomSheetScrollView contentContainerStyle={{ flex: 1 }}>
-            {/* <View style={{ flex: 1 }}> */}
-            <Tab.Navigator
-              screenOptions={{
-                tabBarActiveTintColor: colors.primary,
+          <KeyboardAwareScrollView
+            contentContainerStyle={{ flex: 1 }}
+            style={{
+              padding: 10,
+              flex: 1,
+              backgroundColor: colors.background,
+              // marginBottom: 200,
+            }}
+          >
+            {/* <BottomSheetView style={styles.contentContainer}> */}
+            <BottomSheetScrollView contentContainerStyle={{ flex: 1 }}>
+              {/* <View style={{ flex: 1 }}> */}
+              <Tab.Navigator
+                screenOptions={{
+                  tabBarActiveTintColor: colors.t1,
 
-                tabBarInactiveTintColor: colors.darkGrey,
-                tabBarIndicatorContainerStyle: {
-                  backgroundColor: colors.background,
-                },
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 14,
-                  color: colors.black2,
-                },
-                tabBarIndicatorStyle: {
-                  width: "40%",
-                  left: "5%",
-                  backgroundColor: colors.primary,
-                },
-              }}
-            >
-              <Tab.Screen name="Entrar" component={SignInScreen} />
-              <Tab.Screen name="Criar Conta" component={SignUpScreen} />
-            </Tab.Navigator>
-            {/* </View> */}
-            {/* </BottomSheetView> */}
-          </BottomSheetScrollView>
-        </KeyboardAwareScrollView>
+                  tabBarInactiveTintColor: colors.t5,
+
+                  tabBarIndicatorContainerStyle: {
+                    backgroundColor: colors.background,
+                  },
+
+                  tabBarLabelStyle: {
+                    fontWeight: "500",
+                    fontSize: 14,
+                    // color: colors.t2,
+                  },
+                  tabBarIndicatorStyle: {
+                    width: "40%",
+                    left: "5%",
+                    backgroundColor: colors.t1,
+                  },
+                }}
+              >
+                <Tab.Screen name="Entrar" component={SignInScreen} />
+                <Tab.Screen name="Criar Conta" component={SignUpScreen} />
+              </Tab.Navigator>
+              {/* </View> */}
+              {/* </BottomSheetView> */}
+            </BottomSheetScrollView>
+          </KeyboardAwareScrollView>
+        </TouchableWithoutFeedback>
       </BottomSheetModal>
     </BottomSheetModalProvider>
   );

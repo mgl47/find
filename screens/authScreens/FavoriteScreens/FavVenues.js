@@ -3,12 +3,15 @@ import React from "react";
 
 import VenuesList from "../../../components/cards/Venues/VenueList";
 import { useAuth } from "../../../components/hooks/useAuth";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export default function FavVenues() {
   const { userData } = useAuth();
 
   return (
-    <FlatList
+    <Animated.FlatList
+    entering={FadeIn.duration(200)}
+
       data={userData?.favVenues}
       showsVerticalScrollIndicator={false}
       keyExtractor={(item) => item._id}

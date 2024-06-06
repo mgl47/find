@@ -69,6 +69,20 @@ export default function HomeScreen({ navigation }) {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
     // setScrollingPos(event.nativeEvent.contentOffset.y / 20);
   };
+  // let Caldates = [];
+  // const dates = events.forEach((event) =>
+  //   event.dates.forEach((date) => Caldates.push(date.calendarDate))
+  // );
+
+  // console.log(Caldates);
+
+  // let Caldates = [];
+  // const dates = events.forEach((event) =>
+  //   event.dates.forEach((date) => Caldates.push(date.calendarDate))
+  // );
+
+  // console.log(Caldates);
+
   const carouselRef = useRef(null);
   // const user = false;
   _renderItem = ({ item, index }) => {
@@ -76,7 +90,9 @@ export default function HomeScreen({ navigation }) {
   };
   const currentDate = new Date();
   // Target date
-  const targetDate = new Date(userData?.myTickets?.[0]?.event?.dates?.[0]?.date);
+  const targetDate = new Date(
+    userData?.myTickets?.[0]?.event?.dates?.[0]?.date
+  );
   // Calculate the difference in milliseconds between the two dates
   const differenceInMilliseconds = targetDate.getTime() - currentDate.getTime();
   // Convert milliseconds to seconds
@@ -84,11 +100,14 @@ export default function HomeScreen({ navigation }) {
 
   const reco = [...events];
 
+  console.log(events?.[0]?.attendees);
+
   reco?.reverse();
   useEffect(() => {
     const unsubscribe = navigation?.addListener("tabPress", (e) => {
       authSheetRef?.current?.close();
-      if (isFocused) {
+
+      if (isFocused&&events?.length > 0) {
         homeTabRef?.current?.scrollToOffset({ offset: 0, animated: true });
       }
     });
@@ -112,7 +131,7 @@ export default function HomeScreen({ navigation }) {
           top: 0,
           zIndex: 3,
           width: "100%",
-          paddingBottom:5
+          paddingBottom: 5,
           // backgroundColor:"transparent"
         }}
       >
@@ -125,17 +144,50 @@ export default function HomeScreen({ navigation }) {
           style={{ left: 20, bottom: 1 }}
         >
           {user ? (
-            <Image
-              source={{
-                uri: user?.photos?.avatar[0]?.uri,
-              }}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 50,
-                // left:20
-              }}
-            />
+            user?.photos?.avatar[0]?.uri ? (
+              <Image
+                source={{
+                  uri: user?.photos?.avatar[0]?.uri,
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 50,
+                  // left:20
+                }}
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="account-circle"
+                size={40}
+                color={colors.t3}
+              />
+
+              // <View
+              //   style={{
+              //     width: 40,
+              //     height: 40,
+              //     borderRadius: 50,
+              //     backgroundColor: colors.t5,
+              //     alignItems: "center",
+              //     justifyContent: "center",
+              //     // left:20
+              //   }}
+              // >
+              //   <Text
+              //     style={{
+              //       // textAlign: "center",
+              //       fontSize: 30,
+              //       color: colors.black,
+              //       // fontWeight: "bold",
+              //       // marginTop: 5,
+              //       bottom: 2,
+              //     }}
+              //   >
+              //     {user?.username?.charAt(0)}
+              //   </Text>
+              // </View>
+            )
           ) : (
             <MaterialCommunityIcons
               name="account-outline"
@@ -272,9 +324,8 @@ export default function HomeScreen({ navigation }) {
                   itemWidth={width * 0.85}
                   loop={true}
                 />
-
-                // null
               ) : (
+                // null
                 // null
                 // <Animated.View
                 //   style={{ flex: 1 }}
@@ -421,7 +472,7 @@ export default function HomeScreen({ navigation }) {
         />
         <AuthBottomSheet
           authSheetRef={authSheetRef}
-          setAuthModalUp={setAuthModalUp}
+          // setAuthModalUp={setAuthModalUp}
         />
       </View>
     </View>

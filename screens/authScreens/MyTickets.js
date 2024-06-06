@@ -45,32 +45,50 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Tab
-        // titleStyle={{ color: colors.primary }}
-
-        indicatorStyle={{
-          backgroundColor: colors.primary2,
-          //   height: 2,
-          //   width: "33%",
+      <View
+        style={{
+          height: 40,
+          width: "100%",
+          backgroundColor: "rgba(5, 19, 29,0.9)",
+          // flexDirection: "row",
+          // alignItems: "center",
+          position: "absolute",
+          zIndex: 1,
         }}
-        value={index}
-        onChange={setIndex}
-        // dense
-
-        style={{ backgroundColor: colors.background }}
-        disableIndicator
-        titleStyle={(active) => ({
-          color: active ? colors.t1 : colors.t5,
-          fontSize: active ? 16 : 15,
-          fontWeight: "500",
-        })}
       >
-        <Tab.Item>Passados</Tab.Item>
+        <Tab
+          // titleStyle={{ color: colors.primary }}
 
-        <Tab.Item>Activos</Tab.Item>
-      </Tab>
+          indicatorStyle={{
+            backgroundColor: colors.primary2,
+            //   height: 2,
+            //   width: "33%",
+          }}
+          value={index}
+          onChange={setIndex}
+          // dense
+
+          style={{
+            backgroundColor: "trasparent",
+            // position: "absolute",
+            // top: 0,
+            // width: width,
+          }}
+          disableIndicator
+          titleStyle={(active) => ({
+            color: active ? colors.t1 : colors.t5,
+            fontSize: active ? 16 : 15,
+            fontWeight: "500",
+          })}
+        >
+          <Tab.Item>Passados</Tab.Item>
+
+          <Tab.Item>Activos</Tab.Item>
+        </Tab>
+      </View>
 
       <FlatList
+        contentContainerStyle={{ top: 60 }}
         data={userData?.myTickets}
         keyExtractor={(item) => item?.purchaseId}
         renderItem={({ item }) => {

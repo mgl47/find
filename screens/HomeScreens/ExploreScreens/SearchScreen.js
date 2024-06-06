@@ -50,163 +50,26 @@ import {
 } from "../../../components/Data/stockEvents";
 import SmallCard from "../../../components/cards/SmallCard";
 import MediumCard from "../../../components/cards/MediumCard";
+import { useData } from "../../../components/hooks/useData";
 const SearchScreen = ({
   navigation,
   navigation: { goBack, canGoBack },
   route,
 }) => {
-  const [searchText, setSearchText] = useState("");
-  const [firstMount, setFirstMount] = useState(true);
+
   const [inSearch, setInSearch] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [recent, setRecent] = useState(recommendedEvents.slice().reverse());
-
+  // const [recent, setRecent] = useState(recommendedEvents.slice().reverse());
+  const { recent, addToRecent } = useData();
 
 
 
   
-  useEffect(() => {
-
-    setFirstMount(false);
-  }, []);
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => null,
-      headerRight: () => (
-        <Animated.View
-          style={{
-            padding: 10,
-            right: 10,
-            // alignSelf: "flex-end",
-            position: "absolute",
-            // marginBottom: 10,
-            zIndex: 2,
-          }}
-          entering={SlideInRight.duration(580)}
-        >
-          <TouchableOpacity
-            style={{ left: inSearch ? 5 : 0 }}
-            onPress={() => {
-              navigation.navigate("home"), Keyboard.dismiss();
-            }}
-          >
-            <Text
-              style={{
-                color: colors.white,
-                fontSize: 16,
-                fontWeight: "600",
-              }}
-            >
-              sair
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
-      ),
-
-      headerTitle: () => (
-        <View
-          style={{
-            // marginTop: 40,
-            flexDirection: "row",
-            alignItems: "center",
-            // backgroundColor: colors.white,
-            zIndex: 2,
-          }}
-        >
-          {/* {navigation.canGoBack("calendar") && (
-            <TouchableOpacity
-              style={{ position: "absolute", zIndex: 3, left: 4 }}
-              onPress={() =>
-                navigation.canGoBack("calendar")
-                  ? navigation.goBack()
-                  : navigation.navigate("calendar")
-              }
-            >
-              <Entypo name="chevron-left" size={30} color={colors.primary} />
-            </TouchableOpacity>
-          )} */}
-          <Animated.View
-            entering={SlideInRight.duration(500)}
-            exiting={SlideOutRight.duration(250)}
-            style={{
-              width: "100%",
-
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexDirection: "row",
-
-              zIndex: 1,
-              // padding: 5,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                width: "85%",
-                // left: 10,
-                // width: "75%",
-                // left: 40,
-              }}
-            >
-              <Entypo
-                style={{ position: "absolute", zIndex: 1, left: 10, top: 10 }}
-                name="magnifying-glass"
-                size={19}
-                color={colors.description}
-              />
-
-              <TextInput
-                value={searchText}
-                onChangeText={setSearchText}
-                // onSubmitEditing={() => navigation.navigate("search", searchText)}
-                onSubmitEditing={() => {
-                  Keyboard.dismiss(),
-                    navigation.navigate("search2", { text: searchText });
-                }}
-                // placeholder="encontre artistas, eventos ou lugares"
-                placeholder=" artistas, eventos ou lugares"
-                placeholderTextColor={colors.description}
-                cursorColor={colors.t3}
-                returnKeyType="search"
-                autoFocus
-                style={[styles.search, { width: "100%" }]}
-              />
-              {searchText && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setSearchText("");
-                  }}
-                >
-                  <Entypo
-                    style={{
-                      position: "absolute",
-                      zIndex: 1,
-                      right: 10,
-                      top: 8,
-                    }}
-                    name="circle-with-cross"
-                    size={20}
-                    color={colors.grey}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          </Animated.View>
-        </View>
-      ),
-    });
-  }, [searchText]);
   return (
-    ///////////////
-    ///////////////
-    //Tutorials
-    ///////////////
-    ///////////////
     <Animated.FlatList
       style={{ backgroundColor: colors.background }}
       // contentContainerStyle={{ alignItems: "center" }}
-      // entering={firstMount && SlideInDown}
+      // entering={firstMount && SlideInDown.duration(300)}
       ListFooterComponent={
         <>
           {!inSearch && !loading && (
@@ -219,7 +82,7 @@ const SearchScreen = ({
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={categories}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.code}
                 renderItem={({ item }) => {
                   return (
                     <Chip
@@ -243,6 +106,7 @@ const SearchScreen = ({
                       // onPress={() => console.log("Pressed")}
                       onPress={() =>
                         navigation.navigate("search2", {
+                          code: item?.code,
                           category: item?.label,
                         })
                       }
@@ -303,7 +167,7 @@ const SearchScreen = ({
                     >
                       <TouchableOpacity
                         onPress={() => {
-                          setRecent("");
+                          addToRecent("", true);
                         }}
                       >
                         <Text
@@ -327,30 +191,10 @@ const SearchScreen = ({
                 // data={recommendedEvents.slice().reverse()}
                 data={recent}
                 showsVerticalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item._id}
                 // ListHeaderComponent={<View style={{ marginTop: 10 }} />}
                 renderItem={({ item }) => {
-                  return (
-                    // <TouchableOpacity
-                    //   activeOpacity={0.8}
-                    //   style={{
-                    //     // shadowOffset: { width: 0.5, height: 0.5 },
-                    //     // shadowOpacity: 0.3,
-                    //     // shadowRadius: 1,
-                    //     // elevation: 2,
-                    //     shadowOffset: { width: 0.5, height: 0.5 },
-                    //     shadowOpacity: 0.1,
-                    //     shadowRadius: 1,
-                    //     elevation: 0.5,
-                    //     // padding: 10,
-                    //     paddingHorizontal: 10,
-                    //     // marginTop: 10,
-                    //   }}
-                    //   // onPress={() => navigation.navigate("event", item)}
-                    // >
-                    <SmallCard {...item} />
-                    // {/* </TouchableOpacity> */}
-                  );
+                  return <SmallCard {...item} />;
                 }}
                 ListFooterComponent={<View style={{ marginBottom: 50 }} />}
               />
