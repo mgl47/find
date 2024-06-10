@@ -573,7 +573,7 @@ export default TicketPurchaseSheet = ({
                     elevation: 2,
                     width: "100%",
                   }}
-                  // onPress={() => navigation.navigate("event", item)}
+                  // onPress={() => navigation.navigate("event", {item})}
                 >
                   <View style={styles.card}>
                     <View

@@ -521,7 +521,7 @@ export default function StoreScreen({
                     width: "100%",
                     // marginTop: 10,
                   }}
-                  // onPress={() => navigation.navigate("event", item)}
+                  // onPress={() => navigation.navigate("event", {item})}
                 >
                   <Animated.View
                     style={styles.userCard}

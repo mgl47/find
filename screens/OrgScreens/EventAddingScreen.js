@@ -98,43 +98,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [storeModal, setStoreModal] = useState(false);
   const [init, setInit] = useState(new Date());
 
-  // let fullDisplayDate =
-  //   dates?.length > 0
-  //     ? `${dates[0]?.displayDate.split(",")[0]}, ${
-  //         dates[0]?.displayDate.split(" ")[2] !== month[dateMonth]
-  //           ? dates[0]?.displayDate.split(" ")[1] +
-  //             " " +
-  //             dates[0]?.displayDate.split(" ")[2] +
-  //             " - " +
-  //             dateDay +
-  //             " " +
-  //             month[dateMonth]
-  //           : dates[0]?.displayDate.split(" ")[1] +
-  //             "-" +
-  //             dateDay +
-  //             " " +
-  //             month[dateMonth]
-  //       }`
-  //     : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`;
-  // let fullDisplayDate =
-  // dates?.length > 0
-  //   ?
-  // `${dates[0]?.startDisplayDate.split(",")[0]}, ${
-  //     dates[0]?.startDisplayDate.split(" ")[2] !== month?.[dateMonth]
-  //       ? dates[0]?.startDisplayDate.split(" ")[1] +
-  //         " " +
-  //         dates[0]?.startDisplayDate.split(" ")[2] +
-  //         " - " +
-  //         dateDay +
-  //         " " +
-  //         month?.[dateMonth]
-  //       : dates[0]?.displayDate.split(" ")[1] +
-  //         "-" +
-  //         dateDay +
-  //         " " +
-  //         month[dateMonth]
-  //   }`
-  // : `${weekday[dateWeekDay]}, ${dateDay} ${month[dateMonth]}`;
+
   const dummy = [
     {
       endCalendarDate: "2024-06-07",
@@ -148,46 +112,30 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       startDisplayDate: "Qui, 6 Jun",
       startHour: "00:21",
     },
-    // {
-    //   endCalendarDate: "2024-06-08",
-    //   endDate: new Date("2024-06-08T23:37:00.000Z"),
-    //   endDisplayDate: "Sab, 8 Jul",
-    //   endHour: "00:37",
-    //   fullEndDisplayDate: "Sab, 8 Jun",
-    //   id: "318ed806-bc5d-4429-931e-922f33a4a651",
-    //   startCalendarDate: "2024-06-07",
-    //   startDate: new Date("2024-06-07T23:21:05.919Z"),
-    //   startDisplayDate: "Sex, 7 Jun",
-    //   startHour: "20:21",
-    // },
+
+  
   ];
   let fullDisplayDate = "";
-  useEffect(() => {
-    setInit(
-      dates[dates.length - 1]?.endDate
-        ? dates[dates.length - 1]?.endDate
-        : dates[dates.length - 1]?.startDate || new Date()
-    );
-    const fistWeekDay = dates?.[0]?.startDisplayDate?.split(",")[0];
-    const fistDay = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[1];
-    const fistMonth = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[2];
-    const fistHour = dates?.[0]?.startHour;
-    const lastWeekDay =
-      dates?.[dates?.length - 1]?.endDisplayDate?.split(",")[0];
-    const lastDay = dates?.[dates?.length - 1]?.endDisplayDate
-      ?.split(",")[1]
-      .split(" ")[1];
-    const lastMonth = dates?.[dates?.length - 1]?.endDisplayDate
-      ?.split(",")[1]
-      .split(" ")[2];
-    const lastHour = dates?.[dates?.length - 1]?.endHour;
-    fullDisplayDate =
-      dates?.length > 1
-        ? fistMonth !== lastMonth
-          ? `${fistWeekDay}, ${fistDay} ${fistMonth} - ${lastDay} ${lastMonth} às ${fistHour}`
-          : `${fistWeekDay}, ${fistDay} - ${lastDay} ${lastMonth} às ${fistHour}`
-        : `${fistWeekDay}, ${fistDay} ${fistMonth} às ${fistHour}`;
-  }, [dates]);
+
+  const fistWeekDay = dates?.[0]?.startDisplayDate?.split(",")[0];
+  const fistDay = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[1];
+  const fistMonth = dates?.[0]?.startDisplayDate?.split(",")[1].split(" ")[2];
+  const fistHour = dates?.[0]?.startHour;
+  const lastWeekDay =
+    dates?.[dates?.length - 1]?.endDisplayDate?.split(",")[0];
+  const lastDay = dates?.[dates?.length - 1]?.endDisplayDate
+    ?.split(",")[1]
+    .split(" ")[1];
+  const lastMonth = dates?.[dates?.length - 1]?.endDisplayDate
+    ?.split(",")[1]
+    .split(" ")[2];
+  const lastHour = dates?.[dates?.length - 1]?.endHour;
+  fullDisplayDate =
+    dates?.length > 1
+      ? fistMonth !== lastMonth
+        ? `${fistWeekDay}, ${fistDay} ${fistMonth} - ${lastDay} ${lastMonth} às ${fistHour}`
+        : `${fistWeekDay}, ${fistDay} - ${lastDay} ${lastMonth} às ${fistHour}`
+      : `${fistWeekDay}, ${fistDay} ${fistMonth} às ${fistHour}`;
   console.log(fullDisplayDate);
   const handleConfirm = (selectedDate) => {
     const month = [
@@ -247,10 +195,13 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
           dateDay < 10 ? "0" + dateDay : dateDay
         }`,
       };
+      if (new Date(selectedDate).getTime() <= date.startDate.getTime()) {
+        return alert("Data inválida");
+      }
 
       // Push the complete event to the dates array
       setDates([...dates.slice(0, -1), date]);
-
+      // setInit(new Date(selectedDate));
       setShowTimePicker(false);
     } else {
       date = {
@@ -268,9 +219,31 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
       };
 
       // Only set the new start date without pushing to the dates array
+
+      if (
+        new Date(selectedDate).getTime() <=
+        dates[dates.length - 1]?.endDate?.getTime()
+      ) {
+        return alert("Data inválida");
+      }
+
+      // setInit(new Date(selectedDate));
+
       setDates([...dates, date]);
     }
   };
+
+  useEffect(() => {
+    setInit(
+      dates[dates.length - 1]?.endDate
+        ? dates[dates.length - 1]?.endDate
+        : dates[dates.length - 1]?.startDate || new Date()
+    );
+  }, [
+    dates,
+    dates[dates.length - 1]?.endDate,
+    dates[dates.length - 1]?.startDate,
+  ]);
 
   const ticketsSheetRef = useRef(null);
   const editTicketSheeRef = useRef(null);
@@ -280,16 +253,19 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
   const [tickets, setTickets] = useState([]);
   const [ticketsLimit, setTicketsLimit] = useState({ label: "0", value: "0" });
   const [selectedTicket, setSelectedTicket] = useState("");
- 
-  const handleTicketSheet = useCallback((ticket, index) => {
-    if (!dates.length > 0) {
-      return Alert.alert("Adicione uma data ao evento!");
-    }
-    // setTicketsSheetup(true);
-    setSelectedTicket({ ticket, index });
-    ticketsSheetRef.current?.present();
-    // setSelectedTicket("");
-  }, [dates ]);
+
+  const handleTicketSheet = useCallback(
+    (ticket, index) => {
+      if (!dates.length > 0) {
+        return Alert.alert("Adicione uma data ao evento!");
+      }
+      // setTicketsSheetup(true);
+      setSelectedTicket({ ticket, index });
+      ticketsSheetRef.current?.present();
+      // setSelectedTicket("");
+    },
+    [dates]
+  );
   const handleEditTicketSheet = useCallback((ticket, index) => {
     setSelectedTicket({ ticket, index });
 
@@ -838,7 +814,6 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             //   fontWeight: "500",
             // }}
             outlineColor={colors.description}
-
             mode="outlined"
             activeOutlineColor={colors.t4}
             label="título"
@@ -877,6 +852,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
             display="inline"
             locale="Pt"
             minimumDate={init}
+
             // minimumDate={
             //   dates[dates?.length - 1]?.endDate
             //     ? dates[dates?.length - 1]?.endDate
@@ -1011,7 +987,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         [
                           {
                             text: "Cancelar",
-                            onPress: () => console.log("Cancel Pressed"),
+                            onPress: () => null,
                             style: "cancel",
                           },
                           {
@@ -1090,7 +1066,30 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
               thumbColor={colors.white}
               style={styles.switch}
               value={freeEvent}
-              onValueChange={(newValue) => setFreeEvent(newValue)}
+              onValueChange={(newValue) =>
+                freeEvent == false && tickets?.length > 0
+                  ? Alert.alert(
+                      "Evento Gratuito!",
+                      "Ao declarar que este evento é gratuito, os Bilhetes criados serão removidos",
+                      [
+                        {
+                          text: "Cancelar",
+                          onPress: () => null,
+                          style: "cancel",
+                        },
+                        {
+                          text: "OK",
+                          style: "destructive",
+                          onPress: () => {
+                            {
+                              setFreeEvent(newValue), setTickets([]);
+                            }
+                          },
+                        },
+                      ]
+                    )
+                  : setFreeEvent(newValue)
+              }
             />
           </View>
           {/* {!freeEvent && tickets?.length > 0 && (
@@ -1120,7 +1119,7 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                       elevation: 2,
                       width: "100%",
                     }}
-                    // onPress={() => navigation.navigate("event", item)}
+                    // onPress={() => navigation.navigate("event", {item})}
                   >
                     <View style={styles.card}>
                       <View
@@ -1175,21 +1174,42 @@ function EventAddingScreen({ navigation, route, navigation: { goBack } }) {
                         </Text>
                       </View>
                     </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      {item?.dates?.length < 2 && (
+                        <Text
+                          numberOfLines={2}
+                          style={{
+                            fontSize: 15,
+                            color: colors.t5,
+                            // position: "absolute",
+                            // bottom: 10,
+                            left: 30,
+                          }}
+                        >
+                          {item?.dates?.length > 1
+                            ? `${item?.dates?.length} dias`
+                            : item?.dates[0]?.startDisplayDate + " - "}
+                        </Text>
+                      )}
+                      <Text
+                        numberOfLines={2}
+                        style={{
+                          fontSize: 15,
+                          color: colors.t5,
+                          // position: "absolute",
+                          // bottom: 10,
+                          left: 30,
+                        }}
+                      >
+                        {item?.dates?.length > 1
+                          ? `${item?.dates?.length} dias`
+                          : item?.dates[0]?.endDisplayDate}
+                      </Text>
+                    </View>
                   </View>
-                  <Text
-                    numberOfLines={2}
-                    style={{
-                      fontSize: 15,
-                      color: colors.darkSeparator,
-                      position: "absolute",
-                      bottom: 10,
-                      left: 30,
-                    }}
-                  >
-                    {item?.dates?.length > 1
-                      ? `${item?.dates?.length} dias`
-                      : item?.dates[0]?.displayDate}
-                  </Text>
+
                   <View
                     style={{
                       flexDirection: "row",

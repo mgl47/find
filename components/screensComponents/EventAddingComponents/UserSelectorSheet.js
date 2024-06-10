@@ -306,7 +306,7 @@ export default UserSelectorSheet = ({
                     width: "100%",
                     marginTop: 10,
                   }}
-                  // onPress={() => navigation.navigate("event", item)}
+                  // onPress={() => navigation.navigate("event", {item})}
                 >
                   <Animated.View entering={FadeIn} exiting={FadeOut}>
                     <View style={styles.userCard}>

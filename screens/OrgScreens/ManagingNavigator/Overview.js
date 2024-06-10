@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  TouchableHighlight,
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import uuid from "react-native-uuid";
@@ -23,7 +24,7 @@ import {
 import { useData } from "../../../components/hooks/useData";
 import { Switch } from "react-native";
 import axios from "axios";
-import { set } from "firebase/database";
+import { set, update } from "firebase/database";
 import TicketPurchaseSheet from "../../../components/screensComponents/eventComponents/TicketPurchaseSheet";
 const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
@@ -36,12 +37,14 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const [loading, setLoading] = useState(false);
   const [event, setEvent] = useState(routeEvent);
   const [firstRender, setFirstRender] = useState(true);
+  const [purchaseModalUp, setPurchaseModalUp] = useState(false);
   const [suspendTickets, setSuspendTickets] = useState(routeEvent?.haltedSales);
   const bottomSheetModalRef = useRef(null);
   const handlePurchaseSheet = useCallback(() => {
     // setPurchaseModalUp(true);
 
     bottomSheetModalRef.current?.present();
+    setPurchaseModalUp(true);
   }, []);
 
   useEffect(() => {
@@ -51,11 +54,40 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   }, []);
 
   let totalCheckin = 0;
+  const usedCoupons = [];
+
   event?.attendees?.forEach((attendee) => {
     if (attendee?.checkedIn) {
       totalCheckin += 1;
     }
+
+    const coupon = attendee?.usedCoupon;
+
+    if (coupon) {
+      const couponLabel = coupon?.label;
+      if (couponLabel) {
+        const existingCoupon = usedCoupons.find((c) => c.label === couponLabel);
+
+        if (existingCoupon) {
+          existingCoupon.timesUsed += 1;
+        } else {
+          usedCoupons.push({ ...coupon, timesUsed: 1 });
+        }
+      }
+    }
   });
+
+  const percentageCheckIn = (
+    (totalCheckin / event?.attendees?.length) *
+    100
+  ).toFixed(2);
+  const percentageBought = (
+    (event?.attendees?.length /
+      event?.tickets?.reduce((acc, item) => acc + item?.quantity, 0)) *
+    100
+  ).toFixed(2);
+
+  console.log(percentageCheckIn);
   let totalTickets = 0;
   event?.tickets?.forEach((ticket) => {
     totalTickets = totalTickets + ticket?.quantity;
@@ -74,24 +106,28 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   };
   const fee = 0.07;
 
-  const { totalTicketsSold, doorTicketSales } = event?.attendees?.reduce(
-    (acc, item) => {
-      if (item.doorTicket) {
-        acc.doorTicketSales += item.price;
-      } else {
-        acc.totalTicketsSold += item.price;
-      }
-      return acc;
-    },
-    { totalTicketsSold: 0, doorTicketSales: 0 }
-  );
+  const { totalTicketsSold, doorTicketSales, totalCouponUsed } =
+    event?.attendees?.reduce(
+      (acc, item) => {
+        if (item.doorTicket) {
+          acc.doorTicketSales += item.price;
+        } else {
+          acc.totalTicketsSold += item.price;
+        }
+        if (item?.usedCoupon) {
+          acc.totalCouponUsed += item?.usedCoupon?.value;
+        }
+        return acc;
+      },
+      { totalTicketsSold: 0, doorTicketSales: 0, totalCouponUsed: 0 }
+    );
 
   const doorTaxes = (doorTicketSales * fee).toFixed();
 
   const taxedTotal = totalTicketsSold * fee;
 
-  const haltSales = async () => {
-    setSuspendTickets(!suspendTickets);
+  const haltSales = async (item) => {
+    // setSuspendTickets(!suspendTickets);
     setLoading(true);
     try {
       const result = await axios.patch(
@@ -101,6 +137,9 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
             type: "ticketStatus",
             task: "halt",
             // eventId: event?._id,
+          },
+          updates: {
+            ticketId: item?.id,
           },
         },
         { headers: { Authorization: headerToken } }
@@ -165,7 +204,8 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
           // onPress={() => navigation.navigate("addEvent", item)}
         >
           <View style={{ flexDirection: "row" }}>
-            <View
+            <TouchableHighlight
+              onPress={() => navigation.navigate("event", { item: event })}
               style={{
                 // height: 230,
                 width: 180,
@@ -187,14 +227,20 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                 }}
                 source={{ uri: event?.photos?.[1]?.[0]?.uri }}
               />
-            </View>
+            </TouchableHighlight>
             <View style={{ padding: 10 }}>
               <Text style={styles.section}>Data:</Text>
               <Text style={styles.sectionText}>
-                {event?.dates?.[event?.dates?.length - 1]?.fullDisplayDate}
+                {
+                  event?.dates?.[
+                    event?.dates?.length - 1
+                  ]?.fullDisplayDate?.split("às")[0]
+                }
               </Text>
               <Text style={styles.section}>Hora:</Text>
-              <Text style={styles.sectionText}>{event?.dates?.[0]?.hour}</Text>
+              <Text style={styles.sectionText}>
+                {event?.dates?.[0]?.startHour}
+              </Text>
               <Text style={styles.section}>
                 {event?.tickets?.length > 1 ? "Preços:" : "Preço:"}
               </Text>
@@ -246,11 +292,39 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                 <Text style={[styles.sectionText2, { color: colors.primary }]}>
                   {event?.attendees?.length}
                 </Text>
+                <Text
+                  style={[
+                    styles.sectionText2,
+                    {
+                      position: "absolute",
+                      top: 47,
+                      color: colors.t5,
+                      left: 15,
+                      fontSize: 14,
+                    },
+                  ]}
+                >
+                  {percentageBought}%
+                </Text>
               </View>
               <View style={styles.section3}>
                 <Text style={styles.section2}>check in:</Text>
                 <Text style={[styles.sectionText2, { color: "green" }]}>
                   {totalCheckin}
+                </Text>
+                <Text
+                  style={[
+                    styles.sectionText2,
+                    {
+                      position: "absolute",
+                      top: 47,
+                      color: colors.t5,
+                      left: 15,
+                      fontSize: 14,
+                    },
+                  ]}
+                >
+                  {percentageCheckIn}%
                 </Text>
               </View>
             </View>
@@ -294,6 +368,16 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
             keyExtractor={(item) => item?.id}
             ItemSeparatorComponent={<View style={styles.separator} />}
             renderItem={({ item }) => {
+              const soldTickets =
+                event?.attendees?.filter(
+                  (ticket) =>
+                    ticket?.category === item?.category && !ticket?.doorTicket
+                )?.length || 0;
+
+              const percentageSold = item?.quantity
+                ? ((soldTickets / item.quantity) * 100).toFixed(2)
+                : 0;
+
               return (
                 <View>
                   <View
@@ -408,7 +492,43 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                           textAlign: "left",
                         }}
                       >
-                        Vendidos:
+                        %:
+                      </Text>
+                      <Text
+                        style={{
+                          color: colors.t3,
+                          marginLeft: 5,
+                          fontSize: 15,
+                          fontWeight: "600",
+                        }}
+                      >
+                        {/* {item?.quantity - item?.available} */}
+
+                        {percentageSold}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        // position: "absolute",
+
+                        // position: "absolute",
+                        // left: 80,
+                        // marginVertical: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: colors.t4,
+                          marginLeft: 10,
+                          fontSize: 15,
+                          fontWeight: "600",
+                          textAlign: "left",
+                        }}
+                      >
+                        V:
                       </Text>
                       <Text
                         style={{
@@ -508,6 +628,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                 <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
                   <View style={{ marginRight: 10 }}>
                     <Text style={styles.description}>Valor bruto:</Text>
+
                     <View
                       style={[
                         {
@@ -533,6 +654,18 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     {doorTicketSales > 0 && (
                       <Text style={styles.description}>- Taxa Porta:</Text>
                     )}
+                    {usedCoupons?.length > 0 &&
+                      usedCoupons?.map((item) => (
+                        <Text
+                          key={item?.label}
+                          style={[
+                            styles.description,
+                            { marginBottom: 10, top: 5 },
+                          ]}
+                        >
+                          - {item?.timesUsed}x coupon '{item?.label}':
+                        </Text>
+                      ))}
                     <Text style={[styles.description, { marginTop: 5 }]}>
                       Total:
                     </Text>
@@ -577,6 +710,21 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     >
                       cve
                     </Text>
+                    {usedCoupons?.length > 0 &&
+                      usedCoupons?.map((item) => (
+                        <Text
+                          style={[
+                            styles.description,
+                            {
+                              color: colors.t5,
+                              alignSelf: "flex-start",
+                              marginTop: 5,
+                            },
+                          ]}
+                        >
+                          cve
+                        </Text>
+                      ))}
                   </View>
 
                   <View>
@@ -609,18 +757,36 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                         {`${formatNumber(doorTaxes)}`}
                       </Text>
                     )}
+                    {usedCoupons?.length > 0 &&
+                      usedCoupons?.map((item) => (
+                        <Text
+                          style={[
+                            styles.amount,
+                            {
+                              color: colors.t5,
+                              alignSelf: "flex-end",
+                              marginTop: 5,
+                            },
+                          ]}
+                        >
+                          {formatNumber(item?.value * item?.timesUsed)}
+                        </Text>
+                      ))}
                     <Text
                       style={[
                         styles.amount,
                         {
-                          color: colors.t4,
+                          color: colors.t3,
                           alignSelf: "flex-end",
                           marginTop: 5,
                         },
                       ]}
                     >
                       {`${formatNumber(
-                        totalTicketsSold - taxedTotal - doorTaxes
+                        totalTicketsSold -
+                          taxedTotal -
+                          doorTaxes -
+                          totalCouponUsed
                       )}`}
                     </Text>
                   </View>
@@ -720,14 +886,10 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               onPress={handlePurchaseSheet}
               style={{ right: 10 }}
             >
-              <FontAwesome
-                name={"plus-circle"}
-                size={30}
-                color={colors.t4}
-              />
+              <FontAwesome name={"plus-circle"} size={30} color={colors.t4} />
             </TouchableOpacity>
           </View>
-
+          {/* 
           <View
             style={{
               flexDirection: "row",
@@ -770,13 +932,79 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               trackColor={{ true: colors.primary }}
             />
           </View>
+          <View style={styles.separator} /> */}
+          <FlatList
+            scrollEnabled={false}
+            data={event?.tickets}
+            keyExtractor={(item) => item?.id}
+            ItemSeparatorComponent={<View style={styles.separator} />}
+            renderItem={({ item }) => {
+              return (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    // marginVertical: 5,
+                    padding: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons
+                      name="ticket"
+                      size={24}
+                      color={ticketColor(item?.category)}
+                    />
+                    <Text
+                      style={{
+                        color: colors.t4,
+                        marginLeft: 10,
+                        fontSize: 15,
+                        fontWeight: "500",
+                      }}
+                    >
+                      Suspender {item?.category}
+                    </Text>
+                  </View>
+                  <Switch
+                    disabled={loading}
+                    value={item?.haltSale}
+                    onChange={() => {
+                      item?.haltSale
+                        ? haltSales(item)
+                        : Alert.alert(
+                            "Suspender venda deste bilhete!",
+                            "Tem certeza que deseja suspender a venda deste bilhete?",
+                            [
+                              {
+                                text: "Não",
+                                onPress: () => null,
+                                style: "cancel",
+                              },
+                              { text: "Sim", onPress: () => haltSales(item) },
+                            ]
+                          );
+                    }}
+                    thumbColor={colors.white}
+                    trackColor={{ true: colors.primary }}
+                  />
+                </View>
+              );
+            }}
+          />
         </View>
+
         <View style={{ marginBottom: 50 }} />
       </Animated.ScrollView>
       <TicketPurchaseSheet
         purchaseSheetRef={bottomSheetModalRef}
-        // setPurchaseModalUp={setPurchaseModalUp}
-        // purchaseModalUp={purchaseModalUp}
+        setPurchaseModalUp={setPurchaseModalUp}
+        purchaseModalUp={purchaseModalUp}
         doorTicket={true}
         Event={event}
       />

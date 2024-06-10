@@ -56,6 +56,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { TextInput } from "react-native-paper";
 import colors from "../../colors";
 import { set } from "firebase/database";
+import { Alert } from "react-native";
 
 const { height, width } = Dimensions.get("window");
 export default AddTicketsSheet = ({
@@ -104,13 +105,22 @@ export default AddTicketsSheet = ({
     setTicketDates(dates);
   };
   const addTicket = async () => {
+    if (couponActive && coupon?.value > price)
+      return Alert.alert(
+        "Alerta",
+        "O valor do coupon não pode ser maior que o preço do bilhete!"
+      );
     if (
+      !ticketDates?.length > 0 ||
       !price ||
       !available ||
       !description ||
       (couponActive && (!coupon?.value || !coupon?.label || !coupon?.quantity))
     )
-      return;
+      return Alert.alert(
+        "Dados em falta",
+        "Preencha todos os campos obrigatórios!"
+      );
 
     // let tempTickets = [...tickets];
     let tempTickets = [...tickets];
@@ -118,7 +128,7 @@ export default AddTicketsSheet = ({
     tempTickets.push({
       price: Number(price),
       available: Number(available),
-      // quantity: Number(available),
+      quantity: Number(available),
       amount: 0,
       coupon: couponActive ? coupon : null,
 
@@ -384,7 +394,7 @@ export default AddTicketsSheet = ({
             onChangeText={setAvailable}
           />
           <View style={[styles.switchContainer]}>
-            <Text style={[styles.switchText]}>Coupons</Text>
+            <Text style={[styles.switchText]}>Coupon</Text>
             <Switch
               trackColor={{
                 true: colors.primary,

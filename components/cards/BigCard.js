@@ -31,7 +31,10 @@ function BigCard(item) {
         marginTop: 10,
         // backgroundColor: colors.dark2,
       }}
-      onPress={() => navigation.navigate("event", item)}
+      onPress={() => navigation.navigate("event", { item })}
+
+      // onPress={() => navigation.navigate("event", {eventId:item?._id})}
+
       // activeOpacity={1}
       // underlayColor={colors.background}
     >
@@ -63,7 +66,7 @@ function BigCard(item) {
               width: "100%",
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text
                 style={[
                   styles.date,
@@ -87,6 +90,32 @@ function BigCard(item) {
               </Text>
               <Text style={[styles.date, { color: colors.lightGrey }]}>
                 {item?.dates?.[0]?.hour}
+              </Text>
+            </View> */}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text
+                style={[
+                  styles.date,
+                  {
+                    fontWeight: "500",
+                    color: colors.white,
+                    fontSize: 16,
+                    marginBottom: 3,
+                    bottom: 1,
+                    // top: title2?.length > 39 ? 1 : 0,
+                  },
+                ]}
+              >
+                {item?.dates?.[item?.dates?.length - 1]?.fullDisplayDate?.split(
+                  ", "
+                )[0] + ", "}
+              </Text>
+              <Text style={[styles.date, { color: colors.lightGrey }]}>
+                {
+                  item?.dates?.[
+                    item?.dates?.length - 1
+                  ]?.fullDisplayDate?.split(", ")[1]
+                }
               </Text>
             </View>
 

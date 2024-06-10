@@ -203,7 +203,7 @@ const Staff = ({ navigation, navigation: { goBack }, route }) => {
                 width: "100%",
                 marginHorizontal: 0.1,
               }}
-              // onPress={() => navigation.navigate("event", item)}
+              // onPress={() => navigation.navigate("event", {item})}
             >
               <Animated.View
                 style={styles.userCard}

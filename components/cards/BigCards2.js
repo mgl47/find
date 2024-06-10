@@ -32,13 +32,14 @@ function BigCard2({ title, dates, photos, Category, city, venue }) {
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={styles.venue}>{venue?.displayName}</Text>
               <Text style={styles.venue}>, </Text>
-              <Text style={styles.venue}>{venue?.city}</Text>
+              <Text style={styles.venue}>{venue?.address?.city}</Text>
             </View>
 
             <Text style={styles.date}>
-              {dates[dates?.length - 1].displayDate +
+              {/* {dates[dates?.length - 1].displayDate +
                 " - " +
-                dates[dates?.length - 1].hour}
+                dates[dates?.length - 1].hour} */}
+              { dates[dates?.length - 1]?.fullDisplayDate}  
             </Text>
           </View>
           <MaterialCommunityIcons
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     color: colors.light,
     // lineHeight: 15,
     fontWeight: "500",
-    color: colors.white,
+    color: colors.t3,
     marginBottom: 5,
 
     // bottom: 40,
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 13,
     left: 10,
-    color: colors.lightGrey2,
+    color: colors.t4,
     // lineHeight: 15,
     fontWeight: "500",
 

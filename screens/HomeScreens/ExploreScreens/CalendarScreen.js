@@ -261,7 +261,7 @@ const CalendarScreen = () => {
       renderItem={({ item }) => {
         return !loading ? (
           // <TouchableOpacity
-          //   onPress={() => navigation.navigate("event", item)}
+          //   onPress={() => navigation.navigate("event", {item})}
           //   activeOpacity={0.8}
           //   style={{
           //     // shadowOffset: { width: 0.5, height: 0.5 },
@@ -275,7 +275,7 @@ const CalendarScreen = () => {
 
           //     padding: 7,
           //   }}
-          //   // onPress={() => navigation.navigate("event", item)}
+          //   // onPress={() => navigation.navigate("event", {item})}
           // >
           <SmallCard {...item} selectedDay={selectedDay} />
         ) : // </TouchableOpacity>

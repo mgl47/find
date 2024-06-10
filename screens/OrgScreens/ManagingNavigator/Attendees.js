@@ -26,7 +26,7 @@ import {
 } from "@gorhom/bottom-sheet";
 import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const event = route.params;
 
@@ -39,6 +39,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const [pend, setPend] = useState(false);
   const [checkedIn, setCheckedIn] = useState(false);
   const [selectedCat, setSelectedCat] = useState([]);
+  const [selectedCoupon, setSelectedCoupon] = useState([]);
   const attendeeSheetRef = useRef(null);
 
   const handleAttendeeSheet = useCallback((selected) => {
@@ -66,6 +67,12 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     }
   });
   const categories = event?.tickets?.map((ticket) => ticket?.category);
+  let coupons = [];
+  event?.tickets?.forEach((ticket) => {
+    if (ticket?.coupon?.label) {
+      coupons.push(ticket?.coupon?.label);
+    }
+  });
   const addToSelectedCat = (cat) => {
     if (selectedCat.includes(cat)) {
       setSelectedCat(selectedCat.filter((c) => c !== cat));
@@ -73,13 +80,20 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
       setSelectedCat([...selectedCat, cat]);
     }
   };
+  const addToSelectedCoupon = (coupon) => {
+    if (selectedCoupon.includes(coupon)) {
+      setSelectedCoupon(selectedCoupon.filter((c) => c !== coupon));
+    } else {
+      setSelectedCoupon([...selectedCoupon, coupon]);
+    }
+  };
 
   let sortedUsers = filteredUsers?.filter(
     (ticket) =>
       (!checkedIn || ticket?.checkedIn) &&
-      (!selectedCat.length || selectedCat.includes(ticket?.category))
+      (!selectedCat.length || selectedCat.includes(ticket?.category)) &&
+      (!selectedCoupon.length || selectedCoupon.includes(ticket?.coupon?.label))
   );
-
   const ticketColor = (category) => {
     if (category?.startsWith("Promo")) {
       return colors.t4;
@@ -96,8 +110,9 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     []
   );
   return (
-    <Animated.View style={{ flex: 1, backgroundColor: colors.background }}
-    entering={FadeIn.duration(200)}
+    <Animated.View
+      style={{ flex: 1, backgroundColor: colors.background }}
+      entering={FadeIn.duration(200)}
     >
       <FlatList
         data={sortedUsers}
@@ -169,109 +184,137 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     <Text style={styles.paragraph}>{category}</Text>
                   </TouchableOpacity>
                 ))}
+              {coupons?.length > 1 &&
+                coupons.map((coupon) => (
+                  <TouchableOpacity
+                    key={coupon}
+                    activeOpacity={0.6}
+                    onPress={() => addToSelectedCoupon(coupon)}
+                    style={styles.section}
+                  >
+                    <Checkbox
+                      style={styles.checkbox}
+                      value={selectedCoupon?.includes(coupon)}
+                      onValueChange={() => addToSelectedCoupon(coupon)}
+                      color={undefined}
+                    />
+                    <Text style={styles.paragraph}>coupon '{coupon}'</Text>
+                  </TouchableOpacity>
+                ))}
             </View>
+            <Text
+              style={[
+                styles.paragraph,
+                { marginLeft: 10, color: colors.t4, top: 10 },
+              ]}
+            >
+              resultados: {sortedUsers?.length}
+            </Text>
           </View>
         }
         renderItem={({ item }) => {
           return (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              style={{
-                shadowOffset: { width: 0.5, height: 0.5 },
-                shadowOpacity: 0.1,
-                shadowRadius: 1,
-                elevation: 0.5,
-                paddingHorizontal: 10,
-                marginTop: 5,
-              }}
-              // onPress={() => navigation.navigate("addEvent", item)}
-              // onPress={() => navigation.navigate("manageEvent", item)}
-            >
+            <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => handleAttendeeSheet(item)}
-                style={[styles.card, {}]}
+                style={{
+                  shadowOffset: { width: 0.5, height: 0.5 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 1,
+                  elevation: 0.5,
+                  paddingHorizontal: 10,
+                  marginTop: 5,
+                }}
+                // onPress={() => navigation.navigate("addEvent", item)}
+                // onPress={() => navigation.navigate("manageEvent", item)}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 5,
-                    left: 2,
-                  }}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => handleAttendeeSheet(item)}
+                  style={[styles.card, {}]}
                 >
-                  <Text
+                  <View
                     style={{
-                      fontSize: 18,
-                      fontWeight: "600",
-                      color: colors.t2,
-                      left: 4,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 5,
+                      left: 2,
                     }}
                   >
-                    {item?.displayName}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 13,
-                      fontWeight: "600",
-                      marginLeft: 5,
-                      top: 1,
-                      color: colors.t4,
-                      left: 4,
-                    }}
-                  >
-                    @{item?.username}
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 5,
-                    left: 2,
-                  }}
-                >
-                  <MaterialIcons
-                    name={
-                      item?.checkedIn ? "check-circle" : "check-circle-outline"
-                    }
-                    size={22}
-                    color={item?.checkedIn ? "green" : colors.description}
-                  />
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "500",
-                      marginLeft: 5,
-                      color: item?.checkedIn ? "green" : colors.description,
-                    }}
-                  >
-                    {"CHECK IN"}
-                  </Text>
-                  {item?.checkedAt && (
                     <Text
                       style={{
-                        fontSize: 15,
-                        fontWeight: "500",
-                        marginLeft: 8,
-                        color: colors.t4,
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: colors.t2,
+                        left: 4,
                       }}
                     >
-                      {item?.checkedAt}
+                      {item?.displayName}
                     </Text>
-                  )}
-                </View>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "500",
-                    marginLeft: 5,
-                    color: ticketColor(item?.category),
-                  }}
-                >
-                  {item?.category}
-                </Text>
-                {/* <Text
+                    <Text
+                      style={{
+                        fontSize: 13,
+                        fontWeight: "600",
+                        marginLeft: 5,
+                        top: 1,
+                        color: colors.t4,
+                        left: 4,
+                      }}
+                    >
+                      @{item?.username}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginBottom: 5,
+                      left: 2,
+                    }}
+                  >
+                    <MaterialIcons
+                      name={
+                        item?.checkedIn
+                          ? "check-circle"
+                          : "check-circle-outline"
+                      }
+                      size={22}
+                      color={item?.checkedIn ? "green" : colors.description}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: "500",
+                        marginLeft: 5,
+                        color: item?.checkedIn ? "green" : colors.description,
+                      }}
+                    >
+                      {"CHECK IN"}
+                    </Text>
+                    {item?.checkedAt && (
+                      <Text
+                        style={{
+                          fontSize: 15,
+                          fontWeight: "500",
+                          marginLeft: 8,
+                          color: colors.t4,
+                        }}
+                      >
+                        {item?.checkedAt}
+                      </Text>
+                    )}
+                  </View>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "500",
+                      marginLeft: 5,
+                      color: ticketColor(item?.category),
+                    }}
+                  >
+                    {item?.category}
+                  </Text>
+                  {/* <Text
                   style={{
                     fontSize: 15,
                     fontWeight: "600",
@@ -281,8 +324,9 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 >
                   {item?.uuid}
                 </Text> */}
+                </TouchableOpacity>
               </TouchableOpacity>
-            </TouchableOpacity>
+            </Animated.View>
           );
         }}
         ListFooterComponent={<View style={{ marginBottom: 50 }} />}
@@ -429,7 +473,34 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 </View>
 
                 <View style={styles.separator} />
-
+                {selectedAttendee?.coupon && (
+                  <>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 2,
+                      }}
+                    >
+                      <Text numberOfLines={2} style={styles.label}>
+                        Coupon usado:
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={{
+                          alignSelf: "flex-start",
+                          fontSize: 17,
+                          fontWeight: "400",
+                          color: colors.t4,
+                          marginVertical: 3,
+                        }}
+                      >
+                        {selectedAttendee?.coupon?.label}
+                      </Text>
+                    </View>
+                    <View style={styles.separator} />
+                  </>
+                )}
                 <View
                   style={{
                     flexDirection: "row",
@@ -575,6 +646,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                         {item?.checkedIn ? "Sim" : "Não"}
                       </Text>
                     </View>
+
                     {/* {selectedAttendee?.uuid == item?.uuid && (
                     <AntDesign
                       name="checkcircle"

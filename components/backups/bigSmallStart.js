@@ -35,7 +35,7 @@ function SmallCard(item) {
         alignSelf: "center",
         width: "95%",
       }}
-      onPress={() => navigation.navigate("event", item)}
+      onPress={() => navigation.navigate("event", {item})}
       underlayColor={colors.darkSeparator}
     >
       <ImageBackground

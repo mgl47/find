@@ -819,7 +819,7 @@ const VenueScreen = ({ navigation, navigation: { goBack }, route }) => {
               //     paddingHorizontal: 10,
               //     marginTop: 10,
               //   }}
-              //   onPress={() => navigation.navigate("event", item)}
+              //   onPress={() => navigation.navigate("event", {item})}
               // >
 
               <Animated.View

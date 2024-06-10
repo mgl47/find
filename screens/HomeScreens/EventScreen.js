@@ -51,7 +51,12 @@ import {
   BottomSheetModalProvider,
 } from "@gorhom/bottom-sheet";
 import { Chip } from "react-native-paper";
-
+import {
+  Placeholder,
+  PlaceholderMedia,
+  PlaceholderLine,
+  Fade,
+} from "rn-placeholder";
 import axios from "axios";
 import { useData } from "../../components/hooks/useData";
 import { useAuth } from "../../components/hooks/useAuth";
@@ -64,9 +69,11 @@ import { captureRef } from "react-native-view-shot";
 import { ImageBackground } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
+import { ActivityIndicator } from "react-native";
 
 const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const { width, height, isIPhoneWithNotch } = useDesign();
+  const { eventId, item } = route.params;
 
   const defautlsizes = { width, height };
   const [print, setPrint] = useState(null);
@@ -95,7 +102,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     // takePrint();
   }, []);
 
-  const Event = route.params;
+  const [event, setEvent] = useState(item);
   const videoRef = React.useRef(null);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
   const [authModalUp, setAuthModalUp] = useState(false);
@@ -108,7 +115,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
   const [scrolling, setScrolling] = useState(false);
   const [scrollingPos, setScrollingPos] = useState(0);
   const [mediaIndex, setMediaIndex] = useState(0);
-  const { apiUrl, formatNumber, addToRecent } = useData();
+  const { apiUrl, formatNumber, addToRecent, getOneEvent } = useData();
   const [imageVisible, setImageVisible] = useState(false);
   const [currentImageIndex, setImageIndex] = useState(0);
   const onShowGallery = (index) => {
@@ -116,11 +123,34 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     setImageVisible(true);
   };
   const { user, headerToken, getUpdatedUser, authSheetRef } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const getSelectedEvent = async () => {
+    // if (storeSheetUp) {
+
+
+    // setLoading(true);
+
+    try {
+      const selectedEvent = await getOneEvent(eventId);
+      setEvent(selectedEvent);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (eventId) {
+      getSelectedEvent();
+    }
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
-      addToRecent(Event);
-    }, [])
+      if (event?._id) {
+        addToRecent(event);
+      }
+    }, [event])
   );
   const handleScroll = (event) => {
     setScrolling(event.nativeEvent.contentOffset.y > height * 0.25);
@@ -159,7 +189,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         setPurchaseModalUp(true);
       }
     },
-    [user]
+    [user,event]
   );
 
   const renderViewMore = (onPress) => {
@@ -213,7 +243,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         ) : null,
       headerRight: () =>
         !inFullscreen &&
-        !scrolling && (
+        !scrolling &&
+        event && (
           <View
             style={{
               flexDirection: "row",
@@ -254,9 +285,9 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 1 +
                 "/" +
                 Number(
-                  Event?.videos?.length > 0
-                    ? Event?.photos?.[0]?.length + 1
-                    : Event?.photos?.[0]?.length
+                  event?.videos?.length > 0
+                    ? event?.photos?.[0]?.length + 1
+                    : event?.photos?.[0]?.length
                 )}
             </Text>
           </View>
@@ -278,15 +309,15 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         // ) :
         null,
     });
-  }, [scrolling, inFullscreen, mediaIndex]);
+  }, [scrolling, inFullscreen, mediaIndex, event]);
   useEffect(() => {
-    if (user?.goingToEvents?.includes(Event?._id)) {
+    if (user?.goingToEvents?.includes(event?._id)) {
       setGoing(true);
       setInterested(false);
-    } else if (user?.likedEvents?.includes(Event?._id)) {
+    } else if (user?.likedEvents?.includes(event?._id)) {
       setInterested(true);
     }
-  }, [user]);
+  }, [user,event]);
 
   const updateUserEvents = async (
     task,
@@ -319,7 +350,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
 
   const likeEvent = async () => {
     if (!user) {
-            setAuthModalUp(true);
+      setAuthModalUp(true);
 
       authSheetRef.current?.present();
       return;
@@ -327,25 +358,25 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     let updatedInterested = [...(user?.likedEvents || [])];
     let updatedGoing = [...(user?.goingToEvents || [])];
 
-    const isLiked = updatedInterested.includes(Event?._id);
-    const isGoing = updatedGoing.includes(Event?._id);
+    const isLiked = updatedInterested.includes(event?._id);
+    const isGoing = updatedGoing.includes(event?._id);
 
     if (isLiked) {
       setInterested(false);
-      updatedInterested = updatedInterested.filter((id) => id !== Event?._id);
+      updatedInterested = updatedInterested.filter((id) => id !== event?._id);
     } else {
       setInterested(true);
       setGoing(false);
-      updatedInterested.push(Event?._id);
+      updatedInterested.push(event?._id);
     }
 
     if (isGoing) {
-      updatedGoing = updatedGoing.filter((id) => id !== Event?._id);
+      updatedGoing = updatedGoing.filter((id) => id !== event?._id);
     }
 
     await updateUserEvents(
       "interest",
-      Event?._id,
+      event?._id,
       updatedInterested,
       updatedGoing
     );
@@ -360,30 +391,315 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
     let updatedInterested = [...(user?.likedEvents || [])];
     let updatedGoing = [...(user?.goingToEvents || [])];
 
-    const isGoing = updatedGoing.includes(Event?._id);
-    const isLiked = updatedInterested.includes(Event?._id);
+    const isGoing = updatedGoing.includes(event?._id);
+    const isLiked = updatedInterested.includes(event?._id);
 
     if (isGoing) {
       setGoing(false);
-      updatedGoing = updatedGoing.filter((id) => id !== Event?._id);
+      updatedGoing = updatedGoing.filter((id) => id !== event?._id);
     } else {
       setGoing(true);
       setInterested(false);
-      updatedGoing.push(Event?._id);
+      updatedGoing.push(event?._id);
     }
 
     if (isLiked) {
-      updatedInterested = updatedInterested.filter((id) => id !== Event?._id);
+      updatedInterested = updatedInterested.filter((id) => id !== event?._id);
     }
 
     await updateUserEvents(
       "going",
-      Event?._id,
+      event?._id,
       updatedInterested,
       updatedGoing
     );
   };
 
+  if (eventId && loading) {
+
+  return (
+    <Animated.View
+      style={{ flex: 1, backgroundColor: colors.skeleton }}
+      entering={FadeIn}
+    >
+      <Placeholder>
+        <ActivityIndicator
+          style={{
+            position: "absolute",
+            zIndex: 2,
+            alignSelf: "center",
+            paddingTop: isIPhoneWithNotch ? 60 : 10,
+          }}
+          animating={true}
+          color={colors.primary}
+        />
+        <PlaceholderLine
+          style={{
+            borderRadius: 0,
+
+            width: initialWidth,
+            height: height * 0.37,
+            backgroundColor: colors.skeleton2,
+          }}
+        />
+
+        <View style={{ padding: 10 }}>
+          <PlaceholderLine
+            //title
+            style={{
+              borderRadius: 20,
+              height: 25,
+              width: "80%",
+              marginRight: 20,
+              // marginTop: 5,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+
+              // marginHorizontal: 10,
+            }}
+          />
+          <PlaceholderLine
+            style={{
+              borderRadius: 20,
+              height: 20,
+              width: "40%",
+              marginRight: 20,
+              // marginTop: 5,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+
+              // marginHorizontal: 10,
+            }}
+          />
+          <PlaceholderLine
+            style={{
+              borderRadius: 20,
+              height: 20,
+              width: "35%",
+              marginRight: 20,
+              // marginTop: 5,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+
+              // marginHorizontal: 10,
+            }}
+          />
+          <View
+            //like share
+            style={{
+              // position: "absolute",
+              flexDirection: "row",
+              alignItems: "center",
+              // top: -110,
+              width,
+              // left: 120,
+            }}
+          >
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 30,
+                width: "27%",
+                marginRight: 20,
+                backgroundColor: colors.skeleton2,
+
+                // marginHorizontal: 10,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 30,
+                width: "20%",
+                marginRight: 20,
+
+                backgroundColor: colors.skeleton2,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 20,
+                height: 30,
+                width: "27%",
+                backgroundColor: colors.skeleton2,
+              }}
+            />
+          </View>
+          <PlaceholderLine
+            style={{
+              borderRadius: 20,
+              height: 15,
+              width: "90%",
+              marginTop: 20,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
+          <PlaceholderLine
+            //venue
+
+            style={{
+              borderRadius: 20,
+              height: 15,
+              width: "90%",
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
+          <PlaceholderLine
+            //date
+            style={{
+              borderRadius: 20,
+              height: 15,
+              width: "70%",
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
+          <PlaceholderLine
+            style={{
+              borderRadius: 50,
+              height: 25,
+              width: 70,
+              marginTop: 10,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 10,
+            }}
+          >
+            <View style={{ marginRight: 15 }}>
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 55,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 15,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+            </View>
+            <View style={{ marginRight: 15 }}>
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 55,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 15,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+            </View>
+            <View style={{ marginRight: 15 }}>
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 55,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+              <PlaceholderLine
+                style={{
+                  borderRadius: 50,
+                  height: 15,
+                  width: 55,
+                  // bottom: 60,
+                  backgroundColor: colors.skeleton2,
+                }}
+              />
+            </View>
+          </View>
+          <PlaceholderLine
+            style={{
+              borderRadius: 50,
+              height: 25,
+              width: 70,
+              marginTop: 10,
+              // bottom: 60,
+              backgroundColor: colors.skeleton2,
+            }}
+          />
+          <View>
+            <PlaceholderLine
+              style={{
+                borderRadius: 10,
+                height: 80,
+                width: "100%",
+                // marginTop: 5,
+                // bottom: 60,
+                backgroundColor: colors.skeleton2,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 10,
+                position: "absolute",
+                right: 10,
+                top: 5,
+                width: 140,
+                height: 40,
+                // marginTop: 10,
+                // bottom: 60,
+                backgroundColor: colors.skeleton,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 10,
+                position: "absolute",
+                left: 10,
+                top: 5,
+                height: 20,
+                width: 70,
+                // marginTop: 10,
+                // bottom: 60,
+                backgroundColor: colors.skeleton,
+              }}
+            />
+            <PlaceholderLine
+              style={{
+                borderRadius: 30,
+                position: "absolute",
+                left: 10,
+                top: 30,
+                height: 25,
+                width: 90,
+                // marginTop: 10,
+                // bottom: 60,
+                backgroundColor: colors.skeleton,
+              }}
+            />
+          </View>
+        </View>
+      </Placeholder>
+    </Animated.View>
+  );
+  }
   return (
     <Animated.View entering={FadeIn.duration(300)}>
       {scrolling && (
@@ -422,7 +738,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               width: "75%",
             }}
           >
-            {Event?.title}
+            {event?.title}
           </Text>
         </Animated.View>
       )}
@@ -440,13 +756,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           pagingEnabled
           onScroll={(e) => handleMediaScroll(e)}
           scrollEnabled={
-            Event?.videos?.length > 0 || Event?.photos?.[0]?.length > 1
+            event?.videos?.length > 0 || event?.photos?.[0]?.length > 1
           }
           horizontal
-          data={Event?.photos?.[1]}
+          data={event?.photos?.[1]}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
-            Event?.videos?.length > 0 ? (
+            event?.videos?.length > 0 ? (
               <View>
                 {/* <LinearGradient
                   colors={[
@@ -506,7 +822,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     ref: videoRef,
 
                     source: {
-                      uri: Event?.videos[0]?.uri,
+                      uri: event?.videos[0]?.uri,
                     },
 
                     // source: require("../assets/rolling.mp4"),
@@ -527,7 +843,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <>
                   <ImageView
                     // images={savingMode ? listing?.thumb : listing?.photos}
-                    images={Event?.photos[0]}
+                    images={event?.photos[0]}
                     imageIndex={currentImageIndex}
                     onRequestClose={() => setImageVisible(false)}
                     visible={imageVisible}
@@ -579,7 +895,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 color: colors.t1,
               }}
             >
-              {Event?.title}
+              {event?.title}
             </Text>
             <View
               style={{
@@ -616,7 +932,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                       marginLeft: 5,
                     }}
                   >
-                    {Event?.venue?.displayName}, {Event?.venue?.address?.city}
+                    {event?.venue?.displayName}, {event?.venue?.address?.city}
                   </Text>
                 </View>
               </View>
@@ -642,10 +958,10 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   marginLeft: 5,
                 }}
               >
-                {Event?.dates[Event?.dates?.length - 1]?.displayDate}
+                {event?.dates[event?.dates?.length - 1]?.fullDisplayDate}
               </Text>
             </View>
-            {Event?.goingUsers?.length > 0 && (
+            {event?.goingUsers?.length > 0 && (
               <View
                 style={{
                   width: "100%",
@@ -669,8 +985,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     color: colors.t5,
                   }}
                 >
-                  {Event?.goingUsers?.length}
-                  {Event?.goingUsers?.length > 1
+                  {event?.goingUsers?.length}
+                  {event?.goingUsers?.length > 1
                     ? " Pessoas vão!"
                     : " Pessoa vai!"}
                 </Text>
@@ -752,7 +1068,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 textStyle={{ textAlign: "left" }}
               >
                 <Text style={{ fontSize: 15, color: colors.t3 }}>
-                  {Event?.description}
+                  {event?.description}
                 </Text>
               </ViewMoreText>
             </View>
@@ -779,7 +1095,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               >
                 Artistas
               </Text>
-              {Event?.artists?.length > 5 && (
+              {event?.artists?.length > 5 && (
                 <TouchableOpacity>
                   <Text
                     style={{
@@ -801,7 +1117,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             style={{ backgroundColor: colors.background, bottom: 10 }}
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={Event?.artists}
+            data={event?.artists}
             keyExtractor={(item) => item?.uuid}
             renderItem={({ item }) => {
               return (
@@ -858,7 +1174,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={
-                () => navigation.navigate("venue", { item: Event?.venue })
+                () => navigation.navigate("venue", { item: event?.venue })
                 // navigation.navigate("venue", {
                 //   venueId: "762c47cd-68a6-4d83-9655-31857d0aa9eb",
                 // })
@@ -893,8 +1209,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     marginRight: 10,
                   }}
                   source={{
-                    uri: Event?.venue?.photos?.[2]?.[
-                      Event?.venue?.photos[3]?.length - 1
+                    uri: event?.venue?.photos?.[2]?.[
+                      event?.venue?.photos[3]?.length - 1
                     ]?.uri,
                   }}
                 />
@@ -905,7 +1221,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     color: colors.t3,
                   }}
                 >
-                  {Event?.venue?.displayName}
+                  {event?.venue?.displayName}
                 </Text>
               </View>
               <Entypo name="chevron-right" size={24} color={colors.t3} />
@@ -934,8 +1250,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 zoomEnabled={false}
                 ref={mapPrintRef}
                 initialRegion={{
-                  latitude: Event?.venue?.location?.coordinates?.[1] + 0.001,
-                  longitude: Event?.venue?.location?.coordinates?.[0] - 0.001,
+                  latitude: event?.venue?.location?.coordinates?.[1] + 0.001,
+                  longitude: event?.venue?.location?.coordinates?.[0] - 0.001,
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.011,
                 }}
@@ -946,8 +1262,8 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 <Marker
                   pinColor={colors.primary}
                   coordinate={{
-                    latitude: Event?.venue?.location?.coordinates?.[1],
-                    longitude: Event?.venue?.location?.coordinates?.[0],
+                    latitude: event?.venue?.location?.coordinates?.[1],
+                    longitude: event?.venue?.location?.coordinates?.[0],
                   }}
                 />
               </MapView>
@@ -975,7 +1291,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                     Direções
                   </Text>
                   <Text style={{ color: colors.t3 }}>
-                    {Event?.venue?.address?.zone}, {Event?.venue?.address?.city}
+                    {event?.venue?.address?.zone}, {event?.venue?.address?.city}
                   </Text>
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -1027,13 +1343,13 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
               marginVertical: 10,
             }}
           >
-            {Event?.organizers?.length > 1 ? "Organizações" : "Organizaçåo"}
+            {event?.organizers?.length > 1 ? "Organizações" : "Organizaçåo"}
           </Text>
 
           <FlatList
             style={{ padding: 10 }}
             contentContainerStyle={{}}
-            data={Event?.organizers}
+            data={event?.organizers}
             keyExtractor={(item) => item?.uuid}
             renderItem={({ item }) => {
               return (
@@ -1147,7 +1463,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
         setGiftModalUp={setGiftModalUp}
         setGiftedUser={setGiftedUser}
         giftedUser={giftedUser}
-        Event={Event}
+        Event={event}
         setGift={setGift}
         gift={gift}
       />
@@ -1183,11 +1499,11 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
           }}
         >
           <View
-            style={{ top: Event?.tickets?.length > 1 ? 0 : -5, padding: 10 }}
+            style={{ top: event?.tickets?.length > 1 ? 0 : -5, padding: 10 }}
           >
             <Text
               style={{
-                fontSize: Event?.tickets?.length > 1 ? 14 : 15,
+                fontSize: event?.tickets?.length > 1 ? 14 : 15,
                 fontWeight: "500",
                 // width: "80%",
                 color: colors.t3,
@@ -1195,7 +1511,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                 // textAlign: "center",
               }}
             >
-              {Event?.tickets?.length > 1 ? "apartir de " : ""}
+              {event?.tickets?.length > 1 ? "apartir de " : ""}
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text
@@ -1222,7 +1538,7 @@ const EventScreen = ({ navigation, navigation: { goBack }, route }) => {
                   // marginLeft: 5,
                 }}
               >
-                {formatNumber(Event?.tickets[0]?.price)}
+                {formatNumber(event?.tickets[0]?.price)}
               </Text>
             </View>
           </View>

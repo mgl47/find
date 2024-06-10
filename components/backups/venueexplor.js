@@ -471,7 +471,7 @@ import {
                     marginTop: 10,
                     paddingHorizontal: Platform?.OS === "ios" ? 10 : 0,
                   }}
-                  // onPress={() => navigation.navigate("event", item)}
+                  // onPress={() => navigation.navigate("event", {item})}
                 >
                   <SmallCard {...item} />
                 </TouchableOpacity>

@@ -49,6 +49,9 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   // console.log("Redce"+recent);
+
+
+  
   const recentIds = recent.map((event) => event._id);
   const addToRecent = async (event, clear) => {
     let newRecent = recent.slice();
@@ -69,7 +72,10 @@ export const DataProvider = ({ children }) => {
     setRecent(newRecent);
     await AsyncStorage.setItem("recent", JSON.stringify(newRecent));
   };
+  // useEffect(() => {
+  //   addToRecent("", true);
 
+  // }, [])
   const getOneEvent = async (eventId) => {
     try {
       const result = await axios.get(

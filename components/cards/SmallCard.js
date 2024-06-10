@@ -20,7 +20,7 @@ function SmallCard(item, { selectedDay }) {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => navigation.navigate("event", item)}
+      onPress={() => navigation.navigate("event", {item})}
       style={styles.card}
     >
       <Image style={styles.image} source={{ uri: photos[0]?.[0]?.uri }} />
@@ -56,18 +56,19 @@ function SmallCard(item, { selectedDay }) {
                     },
                   ]}
                 >
-                  {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
+                  {/* {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
                     ", "}
                 </Text>
                 <Text style={[styles.date, { color: colors.t5 }]}>
                   {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] +
-                    " - "}
+                    " - "} */}
+                    {dates?.[0]?.fullDisplayDate }
                 </Text>
               </>
             )}
-            <Text style={[styles.date, { color: colors.t5 }]}>
+            {/* <Text style={[styles.date, { color: colors.t5 }]}>
               {dates?.[0]?.hour}
-            </Text>
+            </Text> */}
           </View>
 
           <Text

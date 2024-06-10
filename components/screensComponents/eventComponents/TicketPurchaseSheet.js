@@ -60,6 +60,10 @@ import formattedDates from "../../formattedDates";
 import DoorTicketSheet from "./DoorTicketSheet";
 import GiftSheet from "./GiftSheet";
 import TopUpSheet from "./TopUpSheet";
+import useDebounceCoupon from "../../hooks/useDebounceCoupon";
+import debounce from "lodash.debounce";
+import { set } from "firebase/database";
+
 export default TicketPurchaseSheet = ({
   Event,
   purchaseSheetRef,
@@ -86,6 +90,15 @@ export default TicketPurchaseSheet = ({
   const customSnap = `${
     TL >= 4 ? "80" : TL == 3 ? "60" : TL == 2 ? "45" : "35"
   }%`;
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardInfo: {
+      number: 0,
+      date: "",
+      ccv: 0,
+    },
+    coupon: "",
+  });
+  const [foundCoupon, setFoundCoupon] = useState(null);
   const snapPoints = useMemo(() => ["50%", `${customSnap}`, "80%"], []);
   const handleSheetChanges = useCallback((index) => {}, []);
   const [firstRender, setFirstRender] = useState(true);
@@ -101,6 +114,13 @@ export default TicketPurchaseSheet = ({
     amount: 0,
   };
   const [state, dispatch] = useReducer(reducer, initialState);
+  // const [selectedTickets, setSelectedTickets] = useState([]);
+  // useEffect(() => {
+  //   setSelectedTickets(state?.cart?.filter((item) => item?.amount != 0));
+
+  // }, [state?.cart]);
+
+  const selectedTickets = state?.cart?.filter((item) => item?.amount != 0);
   const navigation = useNavigation();
   const getSelectedEvent = async () => {
     if (purchaseModalUp) {
@@ -132,18 +152,11 @@ export default TicketPurchaseSheet = ({
     if (purchaseModalUp) {
       getSelectedEvent();
     }
+    // matchedCoupon = null;
     if (!purchaseModalUp) {
       purchaseSheetRef.current.close();
     }
-  }, []);
-  // useEffect(() => {
-  //   if (purchaseModalUp) {
-  //     getSelectedEvent();
-  //   }
-  //   if (!purchaseModalUp) {
-  //     purchaseSheetRef.current.close();
-  //   }
-  // }, [purchaseModalUp]);
+  }, [purchaseModalUp, purchaseSheetRef]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -314,7 +327,28 @@ export default TicketPurchaseSheet = ({
   const clear = (item) => {
     dispatch({ type: "CLEAR", payload: item });
   };
+  let matchedCoupon = null;
+  selectedTickets?.forEach((ticket) => {
+    if (
+      ticket?.coupon?.quantity > 0 &&
+      ticket?.coupon?.label == paymentInfo?.coupon
+    ) {
+      console.log("Matched coupon", ticket.coupon);
+
+      matchedCoupon = ticket.coupon;
+    }
+  });
+
   const clean = () => {
+    matchedCoupon = null;
+    setPaymentInfo({
+      cardInfo: {
+        number: 0,
+        date: "",
+        ccv: 0,
+      },
+      coupon: "",
+    });
     giftedUser && setGiftedUser(null);
     purchaseModalUp && setPurchaseModalUp(false);
     setFirstRender(true);
@@ -324,36 +358,85 @@ export default TicketPurchaseSheet = ({
     clear(event?.tickets);
   };
 
-  const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
+  // const cartTickets = state.cart?.filter((ticket) => ticket?.amount != 0);
+  // const separatedTickets = cartTickets?.flatMap((item) => {
+  //   couponUsed = null;
+  //   if (
+  //     ticket?.coupon?.quantity > 0 &&
+  //     ticket?.coupon?.label == paymentInfo?.coupon &&
+  //     coupon == null
+  //   ) {
+  //     console.log("Matched coupon", ticket.coupon);
+
+  //     couponUsed = ticket.coupon;
+  //   }
+
+  //   const { amount, ...rest } = item;
+  //   return Array.from({ length: item.amount }, () => ({
+  //     ...rest,
+  //     uuid: uuid.v4(),
+  //     username: giftedUser ? giftedUser?.username : user?.username,
+  //     displayName: giftedUser ? giftedUser?.displayName : user?.displayName,
+  //     coupon: couponUsed,
+  //     purchaseId,
+  //     purchaseDate: {
+  //       date: purchaseDates?.date,
+  //       displayDate: purchaseDates?.displayDate,
+  //       hour: purchaseDates?.hour,
+  //     },
+  //     eventId: event?._id,
+  //   }));
+  // });
+
+  const cartTickets = state.cart?.filter((ticket) => ticket?.amount !== 0);
+
+  let couponApplied = false;
+  
   const separatedTickets = cartTickets?.flatMap((item) => {
-    const { amount, ...rest } = item;
-    return Array.from({ length: item.amount }, () => ({
-      ...rest,
-      uuid: uuid.v4(),
-      username: giftedUser ? giftedUser?.username : user?.username,
-      displayName: giftedUser ? giftedUser?.displayName : user?.displayName,
-      purchaseId,
-      purchaseDate: {
-        date: purchaseDates?.date,
-        displayDate: purchaseDates?.displayDate,
-        hour: purchaseDates?.hour,
-      },
-      eventId: event?._id,
-    }));
+    const { amount, coupon, ...rest } = item;
+  
+    return Array.from({ length: amount }, () => {
+      let usedCoupon = null;
+  
+      if (matchedCoupon && !couponApplied) {
+        usedCoupon = matchedCoupon;
+        couponApplied = true;
+      }
+  
+      return {
+        ...rest,
+        uuid: uuid.v4(),
+        username: giftedUser ? giftedUser?.username : user?.username,
+        displayName: giftedUser ? giftedUser?.displayName : user?.displayName,
+        usedCoupon,
+        purchaseId,
+        purchaseDate: {
+          date: purchaseDates?.date,
+          displayDate: purchaseDates?.displayDate,
+          hour: purchaseDates?.hour,
+        },
+        eventId: event?._id,
+      };
+    });
   });
 
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardInfo: {
-      number: 0,
-      date: "",
-      ccv: 0,
-    },
-  });
   const buyTickets = async () => {
-    if (state.total > user?.balance?.amount) {
-      topUpModalRef.current.present();
-      return;
+    if (matchedCoupon) {
+      if (state.total > user?.balance?.amount + matchedCoupon?.value) {
+        topUpModalRef.current.present();
+        return;
+      }
+    } else {
+      if (state.total > user?.balance?.amount) {
+        topUpModalRef.current.present();
+        return;
+      }
     }
+
+    // if (state.total > user?.balance?.amount) {
+    //   topUpModalRef.current.present();
+    //   return;
+    // }
 
     setLoading(true);
     let updateInterested = [];
@@ -366,13 +449,6 @@ export default TicketPurchaseSheet = ({
     } else {
       updatedGoing.push(event?._id);
     }
-
-    const filteredEvent = { ...event };
-    delete filteredEvent.goingUsers;
-    delete filteredEvent.interestedUsers;
-    delete filteredEvent.attendees;
-    delete filteredEvent.staffIds;
-    delete filteredEvent.staff;
 
     try {
       const response = await axios.post(
@@ -407,15 +483,20 @@ export default TicketPurchaseSheet = ({
                 uri: user?.photos?.avatar?.[0]?.uri,
               },
             },
-            event: filteredEvent,
+            event,
             cardDetails: paymentInfo?.cardInfo,
+            transaction: {
+              coupon: matchedCoupon,
+              cardDetails: paymentInfo?.cardInfo,
+            },
             purchaseDate: {
               date: purchaseDates?.date,
               displayDate: purchaseDates?.displayDate,
               hour: purchaseDates?.hour,
             },
             tickets: separatedTickets,
-            total: state.total,
+            total: state.total - (matchedCoupon?.value ?? 0),
+            // paidValue: state.total - (matchedCoupon?.value ?? 0),
             uri: event?.photos[0]?.[0]?.uri,
           },
           userUpdates: {
@@ -465,6 +546,81 @@ export default TicketPurchaseSheet = ({
     }
   };
 
+  // const fetchCoupon = async (text) => {
+  //   setFoundCoupon(null);
+  //   // Fetch the result here
+  //   try {
+  //     // console.log("Fetching", text);
+
+  //     const response = await axios.get(
+  //       `${apiUrl}/purchase/?couponCode=${text}&eventId=${event?._id}`,
+  //       {
+  //         headers: { Authorization: headerToken },
+
+  //         // cardInfo: paymentInfo,
+  //         operation: {
+  //           type: "ticketPurchase",
+  //           task: "couponCheck",
+  //         },
+  //       }
+  //     );
+  //     const data = response?.data;
+
+  //     if (data) {
+
+  //       selectedTickets?.forEach((ticket) => {
+  //         console.log(ticket);
+
+  //         if (
+  //           // response.data?.id == ticket?.id &&
+  //           // response.data?.coupon?.quantity > 0 &&
+  //           // response.data?.coupon?.label == paymentInfo?.coupon
+  //           data?.id == ticket?.id &&
+  //           data?.coupon?.quantity > 0 &&
+  //           data?.coupon?.label == paymentInfo?.coupon
+  //         ) {
+  //           console.log(data);
+
+  //           setFoundCoupon(data);
+  //         }
+  //       });
+  //     } else {
+  //       setFoundCoupon(null);
+  //     }
+  //   } catch (error) {
+  //     // console.log("Fetching coupon for:", text);
+  //     setFoundCoupon(null);
+
+  //     console.log(error?.response?.data);
+  //   }
+  // };
+
+  // const findCoupon = useCallback(
+  //   async (text) => {
+  //     setFoundCoupon(null);
+  //     let matchedCoupon = null;
+
+  //     selectedTickets?.forEach((ticket) => {
+  //       console.log("Ticket", ticket);
+  //       if (ticket?.coupon?.quantity > 0 && ticket?.coupon?.label === text) {
+  //         console.log("Matched coupon", ticket.coupon);
+  //         matchedCoupon = ticket.coupon;
+  //       }
+  //     });
+
+  //     setFoundCoupon(matchedCoupon);
+  //   },
+  //   [paymentInfo?.coupon, selectedTickets]
+  // );
+
+  // // Define the debounced function with a fixed delay of 1000ms
+  // const debouncedFetchCoupon = useCallback(
+  //   debounce((text) => {
+  //     findCoupon(text);
+  //   }, 1000),
+  //   [paymentInfo?.coupon]
+  // );
+
   const renderFooter = useCallback(
     (props) => (
       // purchaseModalUp &&
@@ -501,22 +657,42 @@ export default TicketPurchaseSheet = ({
             <Text
               style={{
                 fontSize: 17,
-                color: colors.t5,
+                color: colors.t4,
                 fontWeight: "500",
                 marginRight: 5,
+                // top:matchedCoupon ?1.5 : 0,
               }}
             >
               Total:
             </Text>
+            {matchedCoupon && (
+              <Text
+                style={{
+                  fontSize: 17,
+                  color: colors.description,
+                  fontWeight: "600",
+                  bottom: 20,
+                  left: 5,
+                  textDecorationLine: "line-through",
+                  position: "absolute",
+                }}
+              >
+                cve {formatNumber(state?.total)}
+                {/* cve 1000 */}
+              </Text>
+            )}
+
             <Text
               style={{
                 fontSize: 18,
                 color: colors.t1,
                 fontWeight: "600",
-                bottom: 1,
+                // top: 1,
+                marginLeft: 5,
               }}
             >
-              cve {formatNumber(state?.total)}
+              cve {formatNumber(state?.total - (matchedCoupon?.value ?? 0))}
+              {/* cve 500 */}
             </Text>
           </View>
           <TouchableOpacity
@@ -577,6 +753,7 @@ export default TicketPurchaseSheet = ({
       firstRender,
       giftedUser,
       user,
+      matchedCoupon,
       // purchaseModalUp,
     ]
   );
@@ -585,6 +762,7 @@ export default TicketPurchaseSheet = ({
     (props) => <BottomSheetBackdrop {...props} disappearsOnIndex={-2} />,
     []
   );
+
   // if (loading) {
   //   return (
   //     <BottomSheetModalProvider>
@@ -651,7 +829,6 @@ export default TicketPurchaseSheet = ({
             const unavailable = event?.tickets?.some(
               (ticket) => ticket?.id === item?.id && ticket?.available === 0
             );
-
             return (
               !onPayment && (
                 <Animated.View
@@ -665,7 +842,7 @@ export default TicketPurchaseSheet = ({
                     elevation: 1,
                     width: "100%",
                   }}
-                  // onPress={() => navigation.navigate("event", item)}
+                  // onPress={() => navigation.navigate("event", {item})}
                 >
                   <View style={styles.card}>
                     <View
@@ -684,7 +861,7 @@ export default TicketPurchaseSheet = ({
                             styles.price,
                             {
                               color:
-                                !unavailable || event?.haltedSales
+                                !unavailable || !item?.haltSale
                                   ? colors.t1
                                   : colors.t1,
                             },
@@ -698,7 +875,7 @@ export default TicketPurchaseSheet = ({
                       </View>
 
                       <Text style={styles.description}>
-                        {unavailable || event?.haltedSales
+                        {unavailable || item?.haltSale
                           ? "Indisponível"
                           : item?.description}
                       </Text>
@@ -709,7 +886,7 @@ export default TicketPurchaseSheet = ({
                           state?.cart?.filter((cartItem) => {
                             if (cartItem?.id == item?.id)
                               return cartItem?.amount;
-                          }) == 0 || event?.haltedSales
+                          }) == 0 || item?.haltSale
                         }
                         onPress={() => decrease(item)}
                       >
@@ -720,7 +897,7 @@ export default TicketPurchaseSheet = ({
                             state?.cart?.filter((cartItem) => {
                               if (cartItem?.id == item?.id)
                                 return cartItem?.amount;
-                            }) == 0 || event?.haltedSales
+                            }) == 0 || item?.haltSale
                               ? colors.gray2
                               : colors.t4
                           }
@@ -731,7 +908,7 @@ export default TicketPurchaseSheet = ({
                           fontSize: 22,
                           fontWeight: "600",
                           color:
-                            unavailable || event?.haltedSales
+                            unavailable || item?.haltSale
                               ? colors.gray2
                               : colors.t3,
                         }}
@@ -743,7 +920,7 @@ export default TicketPurchaseSheet = ({
                           limitReached ||
                           available?.includes(item?.id) ||
                           unavailable ||
-                          event?.haltedSales
+                          item?.haltSale
                         }
                         onPress={() => increase(item)}
                       >
@@ -754,7 +931,7 @@ export default TicketPurchaseSheet = ({
                             limitReached ||
                             available?.includes(item?.id) ||
                             unavailable ||
-                            event?.haltedSales
+                            item?.haltSale
                               ? colors.gray2
                               : colors.t2
                           }
@@ -935,7 +1112,7 @@ export default TicketPurchaseSheet = ({
                       <Animated.FlatList
                         entering={FadeIn}
                         exiting={FadeOut}
-                        data={state?.cart?.filter((item) => item?.amount != 0)}
+                        data={selectedTickets}
                         keyExtractor={(item) => item?.id}
                         ListHeaderComponent={
                           <Text
@@ -975,7 +1152,7 @@ export default TicketPurchaseSheet = ({
                               style={{
                                 flexDirection: "row",
                                 alignItems: "center",
-                                marginLeft: 5,
+                                marginLeft: 12,
                               }}
                             >
                               <Text
@@ -1020,6 +1197,45 @@ export default TicketPurchaseSheet = ({
                         }}
                       />
                     </View>
+                    <TextInput
+                      error={
+                        paymentInfo?.coupon &&
+                        (!matchedCoupon || matchedCoupon?.quantity == 0)
+                      }
+                      style={{
+                        // marginBottom: 5,
+                        backgroundColor: colors.background,
+                        width: 100,
+                        // marginRight: 10,
+                        // position: "absolute",
+                        // bottom: 1,
+                        height: 30,
+                        left: 10,
+                      }}
+                      outlineStyle={{ borderRadius: 10, borderWidth: 1.5 }}
+                      // mode="outlined"
+                      activeOutlineColor={colors.primary}
+                      underlineStyle={{
+                        backgroundColor:
+                          paymentInfo?.coupon &&
+                          (!matchedCoupon || matchedCoupon?.quantity == 0)
+                            ? "red"
+                            : paymentInfo?.coupon && matchedCoupon?.quantity > 0
+                            ? "green"
+                            : colors.description,
+                      }}
+                      outlineColor={colors.primary}
+                      // contentStyle={{  fontWeight: "500",borderColor:"red" }}
+                      // label="coupon"
+                      placeholder="coupon"
+                      defaultValue={paymentInfo?.coupon}
+                      activeUnderlineColor={colors.primary}
+                      value={paymentInfo?.month}
+                      onChangeText={(text) =>
+                        setPaymentInfo({ ...paymentInfo, coupon: text })
+                      }
+                      // onChangeText={handleCouponChange}
+                    />
                   </Animated.View>
                 </>
               ) : (
@@ -1064,9 +1280,24 @@ export default TicketPurchaseSheet = ({
                   </Text>
                 </View>
               )} */}
+              {onPayment && matchedCoupon?.quantity > 0 && (
+                <Text style={{ color: "green", top: 5, left: 10 }}>
+                  Coupon válido
+                </Text>
+              )}
             </BottomSheetView>
           }
         />
+
+        {/* {
+          (foundCoupon &&
+            useMemo(
+              <Text style={{ color: "green", top: 5, left: 10 }}>
+                Coupon válido
+              </Text>
+            ),
+          [foundCoupon])
+        } */}
       </BottomSheetModal>
 
       <DoorTicketSheet
