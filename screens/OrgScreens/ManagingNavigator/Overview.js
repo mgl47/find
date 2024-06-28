@@ -26,6 +26,7 @@ import { Switch } from "react-native";
 import axios from "axios";
 import { set, update } from "firebase/database";
 import TicketPurchaseSheet from "../../../components/screensComponents/eventComponents/TicketPurchaseSheet";
+import OverviewSalesDescription from "../../../components/screensComponents/eventComponents/OverviewSalesDescription";
 const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
   const routeEvent = route.params;
@@ -40,11 +41,15 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
   const [suspendTickets, setSuspendTickets] = useState(routeEvent?.haltedSales);
   const bottomSheetModalRef = useRef(null);
+  const descriptionSheetRef = useRef(null);
   const handlePurchaseSheet = useCallback(() => {
     // setPurchaseModalUp(true);
 
     bottomSheetModalRef.current?.present();
     setPurchaseModalUp(true);
+  }, []);
+  const handleDescriptionSheet = useCallback(() => {
+    descriptionSheetRef.current?.present();
   }, []);
 
   useEffect(() => {
@@ -625,6 +630,27 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                 <View
                   style={[styles.separator, { marginTop: 5, marginBottom: 10 }]}
                 />
+                <TouchableOpacity
+                  onPress={handleDescriptionSheet}
+                  activeOpacity={0.7}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 15,
+                  }}
+                >
+                  <Text
+                    style={[
+                      {
+                        textDecorationLine: "underline",
+                        color: colors.description,
+                      },
+                    ]}
+                  >
+                    Ver Legenda
+                  </Text>
+                </TouchableOpacity>
+
                 <View style={{ flexDirection: "row", alignSelf: "flex-end" }}>
                   <View style={{ marginRight: 10 }}>
                     <Text style={styles.description}>Valor bruto:</Text>
@@ -713,6 +739,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     {usedCoupons?.length > 0 &&
                       usedCoupons?.map((item) => (
                         <Text
+                          key={item?.label}
                           style={[
                             styles.description,
                             {
@@ -760,6 +787,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                     {usedCoupons?.length > 0 &&
                       usedCoupons?.map((item) => (
                         <Text
+                          key={item?.label}
                           style={[
                             styles.amount,
                             {
@@ -1008,6 +1036,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
         doorTicket={true}
         Event={event}
       />
+      <OverviewSalesDescription sheetRef={descriptionSheetRef} />
     </>
   );
 };

@@ -391,18 +391,18 @@ export default TicketPurchaseSheet = ({
   const cartTickets = state.cart?.filter((ticket) => ticket?.amount !== 0);
 
   let couponApplied = false;
-  
+
   const separatedTickets = cartTickets?.flatMap((item) => {
     const { amount, coupon, ...rest } = item;
-  
+
     return Array.from({ length: amount }, () => {
       let usedCoupon = null;
-  
+
       if (matchedCoupon && !couponApplied) {
         usedCoupon = matchedCoupon;
         couponApplied = true;
       }
-  
+
       return {
         ...rest,
         uuid: uuid.v4(),

@@ -45,25 +45,25 @@ import { useAuth } from "../../hooks/useAuth";
 
 const { height, width } = Dimensions.get("window");
 
-export default bottomSheet = ({ sheetRef, type }) => {
+export default OverviewSalesDescription = ({ sheetRef, type }) => {
   // const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["55%", "75%"], []);
+  const snapPoints = useMemo(() => ["45%", "75%"], []);
 
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => setKeyboardVisible(false)
-    );
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => setKeyboardVisible(true)
+  //   );
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     "keyboardDidHide",
+  //     () => setKeyboardVisible(false)
+  //   );
 
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //     keyboardDidHideListener.remove();
+  //   };
+  // }, []);
   const handleSheetChanges = useCallback((index) => {}, []);
   const [loading, setLoading] = useState(false);
   const renderBackdrop = useCallback(
@@ -76,7 +76,7 @@ export default bottomSheet = ({ sheetRef, type }) => {
         enableOverDrag={false}
         ref={sheetRef}
         backdropComponent={renderBackdrop}
-        index={1}
+        index={0}
         snapPoints={snapPoints}
         onChange={handleSheetChanges}
         handleStyle={{
@@ -86,42 +86,70 @@ export default bottomSheet = ({ sheetRef, type }) => {
         // onDismiss={{}}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <View style={{ padding: 10 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 10,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 17,
-                  fontWeight: "500",
-                  // alignSelf: "center",
-                  left: 10,
-                }}
-              >
-                {type == "artist"
-                  ? "Adicionar Artista"
-                  : type == "members"
-                  ? "Adiconar Membro"
-                  : "Adicionar Organizador"}
-              </Text>
-              <TouchableOpacity onPress={{}}>
-                <Text
-                  style={{
-                    color: colors.primary,
-                    fontSize: 16,
-                    fontWeight: "600",
-                  }}
-                >
-                  Guardar
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 2,
+            }}
+          >
+            <Text numberOfLines={2} style={styles.label}>
+              Qtd:
+            </Text>
+            <Text numberOfLines={2} style={styles.description}>
+              Quantidade total do bilhete
+            </Text>
           </View>
+
+          <View style={styles.separator} />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 2,
+            }}
+          >
+            <Text numberOfLines={2} style={styles.label}>
+              %:
+            </Text>
+            <Text numberOfLines={2} style={styles.description}>
+              Percentagem do bilhete vendido
+            </Text>
+          </View>
+          <View style={styles.separator} />
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 2,
+            }}
+          >
+            <Text numberOfLines={2} style={styles.label}>
+              V:
+            </Text>
+            <Text numberOfLines={2} style={styles.description}>
+              Quantidade de bilhetes vendidos
+            </Text>
+          </View>
+          <View style={styles.separator} />
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginVertical: 2,
+            }}
+          >
+            <Text numberOfLines={2} style={styles.label}>
+              P:
+            </Text>
+            <Text numberOfLines={2} style={styles.description}>
+              Quantidade de bilhetes vendidos na porta
+            </Text>
+          </View>
+
+          <View style={styles.separator} />
         </BottomSheetView>
       </BottomSheetModal>
     </BottomSheetModalProvider>
@@ -137,6 +165,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    padding: 10,
 
     // alignItems: "center",
     backgroundColor: colors.background,
@@ -204,12 +233,26 @@ const styles = StyleSheet.create({
     color: colors.primary,
     marginTop: 10,
     marginVertical: 5,
-  }, separator: {
-    width: "95%",
+  },
+  separator: {
+    width: "100%",
     height: 1,
-    right: 10,
-    backgroundColor: colors.separator,
+    // right: 10,
+    backgroundColor: colors.black,
     marginVertical: 5,
     alignSelf: "center",
+  },
+  label: {
+    marginRight: 5,
+    fontSize: 16,
+    fontWeight: "500",
+    color: colors.t4,
+  },
+  description: {
+    alignSelf: "flex-start",
+    fontSize: 15,
+    fontWeight: "400",
+    color: colors.t5,
+    marginVertical: 3,
   },
 });

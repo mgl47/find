@@ -16,7 +16,7 @@ import { useAuth } from "../../../components/hooks/useAuth";
 import { ActivityIndicator, TextInput } from "react-native-paper";
 import colors from "../../../components/colors";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetModal,
   BottomSheetFlatList,
@@ -27,6 +27,7 @@ import {
 import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import AttendeeLotterySheet from "../../../components/screensComponents/eventComponents/AttendeeLotterySheet";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const event = route.params;
 
@@ -41,10 +42,13 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
   const [selectedCat, setSelectedCat] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState([]);
   const attendeeSheetRef = useRef(null);
-
+  const AttendeeLotterySheetRef = useRef(null);
   const handleAttendeeSheet = useCallback((selected) => {
     setSelectedAttendee(selected);
     attendeeSheetRef.current?.present();
+  }, []);
+  const handleLotterySheet = useCallback(() => {
+    AttendeeLotterySheetRef.current?.present();
   }, []);
 
   const snapPoints = useMemo(() => ["55%", "75%"], []);
@@ -119,24 +123,43 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
         keyExtractor={(item) => item?.uuid}
         ListHeaderComponent={
           <View style={{ padding: 10 }}>
-            <TextInput
-              //   error={!amount}
+            <View
               style={{
-                // marginBottom: 5,
-                backgroundColor: colors.background,
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 5,
               }}
-              // autoFocus
-              // underlineStyle={{ backgroundColor: colors.background2 }}
-              contentStyle={{}}
-              outlineColor={colors.background2}
-              mode="outlined"
-              activeOutlineColor={colors.primary2}
-              label="Pesquise por um usuário"
-              // activeUnderlineColor={colors.primary2}
-              value={search}
-              cursorColor={colors.primary}
-              onChangeText={setSearch}
-            />
+            >
+              <TextInput
+                //   error={!amount}
+                style={{
+                  //
+                  backgroundColor: colors.background,
+                  width: "80%",
+                  height: 40,
+                }}
+                // autoFocus
+                // underlineStyle={{ backgroundColor: colors.background2 }}
+
+                contentStyle={{}}
+                outlineColor={colors.background2}
+                mode="outlined"
+                activeOutlineColor={colors.primary2}
+                label="Pesquise por um usuário"
+                // activeUnderlineColor={colors.primary2}
+                value={search}
+                cursorColor={colors.primary}
+                onChangeText={setSearch}
+              />
+
+              <TouchableOpacity
+                onPress={handleLotterySheet}
+                style={{ alignItems: "center", marginLeft: 15 }}
+              >
+                <Ionicons name="dice" size={24} color={colors.t4} />
+                <Text style={{ color: colors.t4 }}>Sortear</Text>
+              </TouchableOpacity>
+            </View>
 
             <View
               // horizontal
@@ -214,7 +237,10 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
         }
         renderItem={({ item }) => {
           return (
-            <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+            >
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={{
@@ -245,7 +271,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       style={{
                         fontSize: 18,
                         fontWeight: "600",
-                        color: colors.t2,
+                        color: colors.t3,
                         left: 4,
                       }}
                     >
@@ -662,6 +688,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
+      <AttendeeLotterySheet  event={event} sheetRef={AttendeeLotterySheetRef} />
     </Animated.View>
   );
 };

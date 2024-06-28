@@ -107,7 +107,7 @@ export default function HomeScreen({ navigation }) {
     const unsubscribe = navigation?.addListener("tabPress", (e) => {
       authSheetRef?.current?.close();
 
-      if (isFocused&&events?.length > 0) {
+      if (isFocused && events?.length > 0) {
         homeTabRef?.current?.scrollToOffset({ offset: 0, animated: true });
       }
     });
@@ -135,105 +135,7 @@ export default function HomeScreen({ navigation }) {
           // backgroundColor:"transparent"
         }}
       >
-        <TouchableOpacity
-          onPress={() =>
-            user
-              ? navigation.openDrawer()
-              : (authSheetRef?.current?.present(), setAuthModalUp(true))
-          }
-          style={{ left: 20, bottom: 1 }}
-        >
-          {user ? (
-            user?.photos?.avatar[0]?.uri ? (
-              <Image
-                source={{
-                  uri: user?.photos?.avatar[0]?.uri,
-                }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 50,
-                  // left:20
-                }}
-              />
-            ) : (
-              <MaterialCommunityIcons
-                name="account-circle"
-                size={40}
-                color={colors.t3}
-              />
-
-              // <View
-              //   style={{
-              //     width: 40,
-              //     height: 40,
-              //     borderRadius: 50,
-              //     backgroundColor: colors.t5,
-              //     alignItems: "center",
-              //     justifyContent: "center",
-              //     // left:20
-              //   }}
-              // >
-              //   <Text
-              //     style={{
-              //       // textAlign: "center",
-              //       fontSize: 30,
-              //       color: colors.black,
-              //       // fontWeight: "bold",
-              //       // marginTop: 5,
-              //       bottom: 2,
-              //     }}
-              //   >
-              //     {user?.username?.charAt(0)}
-              //   </Text>
-              // </View>
-            )
-          ) : (
-            <MaterialCommunityIcons
-              name="account-outline"
-              size={35}
-              color={colors.white}
-            />
-          )}
-        </TouchableOpacity>
-        <Image
-          // source={
-          //   scrolling
-          //     ? require("../../assets/logos/logo1.png")
-          //     : require("../../assets/logos/logo_white.png")
-          // }
-          source={require("../../assets/logos/logo_white.png")}
-          style={{ width: 35, height: 35, left: !user ? 5 : 3 }}
-          resizeMode="contain"
-        />
-        <TouchableOpacity
-          style={{
-            borderRadius: 50,
-            padding: 5,
-            right: 10,
-            // backgroundColor: colors.background2,
-          }}
-          onPress={() => navigation.navigate("search")}
-        >
-          <MaterialIcons name="manage-search" size={35} color={colors.white} />
-        </TouchableOpacity>
-      </View>
-      <View
-        style={{
-          paddingTop: isIPhoneWithNotch ? 44 : Constants.statusBarHeight,
-          backgroundColor: "rgba(5, 19, 29,0.98)",
-        }}
-      >
-        {/* <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 5,
-            // backgroundColor: "rgba(5, 19, 29,0)",
-            // backgroundColor:"transparent"
-          }}
-        >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
             onPress={() =>
               user
@@ -243,17 +145,25 @@ export default function HomeScreen({ navigation }) {
             style={{ left: 20, bottom: 1 }}
           >
             {user ? (
-              <Image
-                source={{
-                  uri: user?.photos?.avatar[0]?.uri,
-                }}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 50,
-                  // left:20
-                }}
-              />
+              user?.photos?.avatar[0]?.uri ? (
+                <Image
+                  source={{
+                    uri: user?.photos?.avatar[0]?.uri,
+                  }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 50,
+                    // left:20
+                  }}
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name="account-circle"
+                  size={40}
+                  color={colors.t3}
+                />
+              )
             ) : (
               <MaterialCommunityIcons
                 name="account-outline"
@@ -262,36 +172,42 @@ export default function HomeScreen({ navigation }) {
               />
             )}
           </TouchableOpacity>
-          <Image
-            // source={
-            //   scrolling
-            //     ? require("../../assets/logos/logo1.png")
-            //     : require("../../assets/logos/logo_white.png")
-            // }
-            source={require("../../assets/logos/logo_white.png")}
-            style={{ width: 35, height: 35, left: !user ? 5 : 3 }}
-            resizeMode="contain"
-          />
-          <TouchableOpacity
+
+          <Text
             style={{
-              borderRadius: 50,
-              padding: 5,
-              right: 10,
-              // backgroundColor: colors.grey,
+              color: colors.t2,
+              fontSize: 24,
+              fontWeight: "600",
+              marginTop: 0,
+              marginLeft: 40,
             }}
-            onPress={() => navigation.navigate("search")}
           >
-            <MaterialIcons
-              name="manage-search"
-              size={35}
-              color={colors.white}
-            />
-          </TouchableOpacity>
-        </View> */}
+            Início
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={{
+            borderRadius: 50,
+            padding: 5,
+            right: 20,
+            // backgroundColor: colors.background2,
+          }}
+          onPress={() => navigation.navigate("search")}
+        >
+          <MaterialIcons name="manage-search" size={35} color={colors.t3} />
+        </TouchableOpacity>
+      </View>
+      <View
+        style={{
+          paddingTop: isIPhoneWithNotch ? 44 : Constants.statusBarHeight,
+          backgroundColor: "rgba(5, 19, 29,0.98)",
+        }}
+      >
         <FlatList
           contentContainerStyle={{
             backgroundColor: colors.background,
-            top: 40,
+            top: 50,
           }}
           onRefresh={getEvents}
           // bounces={false}
