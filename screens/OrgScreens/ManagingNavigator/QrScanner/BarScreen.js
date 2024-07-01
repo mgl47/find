@@ -89,11 +89,7 @@ import {
       if (scanned) return;
       setLoading(true);
       setScanned(true);
-      // const ticketUser = await selectedEvent?.attendees?.filter(
-      //   (attendee) => attendee?.uuid == item?.data
-      // )[0];
-  
-      // console.log(ticketUser);
+ 
       try {
         const result = await axios.patch(
           `${apiUrl}/purchase/checkin/${selectedEvent?._id}`,

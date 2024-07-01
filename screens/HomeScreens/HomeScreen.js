@@ -26,6 +26,7 @@ import {
   Entypo,
   FontAwesome5,
   MaterialIcons,
+  Feather,
 } from "@expo/vector-icons";
 
 import { useAuth } from "../../components/hooks/useAuth";
@@ -37,7 +38,11 @@ import { ImageBackground } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native";
 import Screen from "../../components/Screen";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  SlideOutLeft,
+} from "react-native-reanimated";
 import { ActivityIndicator } from "react-native-paper";
 import AuthBottomSheet from "../../components/screensComponents/AuthComponents/AuthBottomSheet";
 import OneBigTicket from "../../components/tickets/OneBigTicket";
@@ -105,6 +110,7 @@ export default function HomeScreen({ navigation }) {
   reco?.reverse();
   useEffect(() => {
     const unsubscribe = navigation?.addListener("tabPress", (e) => {
+      console.log(e);
       authSheetRef?.current?.close();
 
       if (isFocused && events?.length > 0) {
@@ -115,7 +121,6 @@ export default function HomeScreen({ navigation }) {
     return unsubscribe;
   }, [navigation, isFocused]);
   return (
-    //     <View style={{backgroundColor:colors.background}}>
 
     <View style={{ backgroundColor: colors.background, flex: 1 }}>
       <View
@@ -131,11 +136,13 @@ export default function HomeScreen({ navigation }) {
           top: 0,
           zIndex: 3,
           width: "100%",
-          paddingBottom: 5,
+          paddingBottom: 10,
           // backgroundColor:"transparent"
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View
+          style={{ flexDirection: "row", alignItems: "center", marginTop: 3 }}
+        >
           <TouchableOpacity
             onPress={() =>
               user
@@ -186,16 +193,43 @@ export default function HomeScreen({ navigation }) {
           </Text>
         </View>
 
+        {/* <Animated.View exiting={SlideOutLeft.duration(300)}> 
+          <TouchableOpacity
+            style={{
+              borderRadius: 50,
+              padding: 7,
+              right: 20,
+              backgroundColor: colors.background2,
+            }}
+            onPress={() => navigation.navigate("search")}
+          >
+            <Feather name="search" size={25} color={colors.t3} />
+          </TouchableOpacity>
+         </Animated.View> */}
+
         <TouchableOpacity
           style={{
             borderRadius: 50,
-            padding: 5,
+            padding: 7,
+            // paddingHorizontal: 10,
             right: 20,
-            // backgroundColor: colors.background2,
+            backgroundColor: colors.background2,
+            flexDirection: "row",
+            alignItems: "center",
           }}
           onPress={() => navigation.navigate("search")}
         >
-          <MaterialIcons name="manage-search" size={35} color={colors.t3} />
+          {/* <Text
+            style={{
+              color: colors.t3,
+              fontSize: 14,
+              fontWeight: "500",
+              marginRight: 5,
+            }}
+          >
+            Explorar
+          </Text> */}
+          <Feather name="search" size={25} color={colors.t3} />
         </TouchableOpacity>
       </View>
       <View
@@ -231,7 +265,7 @@ export default function HomeScreen({ navigation }) {
               {events?.length > 0 ? ( //
                 <Carousel
                   layout="stack"
-                  inactiveSlideOpacity={1}
+                  // inactiveSlideOpacity={1}
                   ref={carouselRef}
                   data={events}
                   renderItem={_renderItem}
@@ -352,27 +386,7 @@ export default function HomeScreen({ navigation }) {
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item.uuid}
                 renderItem={({ item }) => {
-                  return (
-                    // <TouchableOpacity
-                    //   activeOpacity={0.8}
-                    //   style={{
-                    //     // shadowOffset: { width: 0.5, height: 0.5 },
-                    //     // shadowOpacity: 0.3,
-                    //     // shadowRadius: 1,
-                    //     // elevation: 2,
-                    //     shadowOffset: { width: 0.5, height: 0.5 },
-                    //     shadowOpacity: 0.1,
-                    //     shadowRadius: 1,
-                    //     elevation: 0.5,
-                    //     paddingHorizontal: 10,
-                    //     marginTop: 10,
-                    //   }}
-                    //   // onPress={() => navigation.navigate("addEvent", item)}
-                    //   onPress={() => navigation.navigate("addVenue")}
-                    // >
-                    <SmallCard {...item} />
-                    //</TouchableOpacity>
-                  );
+                  return <SmallCard {...item} />;
                 }}
                 ListFooterComponent={
                   <View

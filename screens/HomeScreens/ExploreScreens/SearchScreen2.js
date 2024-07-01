@@ -168,11 +168,25 @@ const SearchScreen2 = ({
           width: "100%",
         }}
       >
+     
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={{
+              // left: 20,
+              marginLeft: 20,
+            }}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={28}
+              color={colors.t2}
+            />
+          </TouchableOpacity>
         <View
           style={{
             flexDirection: "row",
             width: "80%",
-            left: 15,
+            left: 10,
           }}
         >
           <Entypo
@@ -214,24 +228,7 @@ const SearchScreen2 = ({
           )}
         </View>
 
-        <TouchableOpacity
-          style={{ right: 5, position: "absolute", padding: 10 }}
-          onPress={() => {
-            //   setcategory(false),
-            //     setSearchText(""),
-            Keyboard.dismiss(), navigation.goBack();
-          }}
-        >
-          <Text
-            style={{
-              color: colors.t3,
-              fontSize: 16,
-              fontWeight: "600",
-            }}
-          >
-            Voltar
-          </Text>
-        </TouchableOpacity>
+       
       </View>
       {inSearch && !loading && (
         <Animated.View entering={FadeIn.duration(250)}>

@@ -1,11 +1,11 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-import colors from "../components/colors";
-import { useDesign } from "../components/hooks/useDesign";
-import { useAuth } from "../components/hooks/useAuth";
+import { useDesign } from "../../components/hooks/useDesign";
+import { useAuth } from "../../components/hooks/useAuth";
 import { TouchableOpacity } from "react-native";
 import { Image } from "react-native";
+import colors from "../../components/colors";
 const ChatsScreen = ({ navigation }) => {
   const { isIPhoneWithNotch } = useDesign();
   const { user } = useAuth();

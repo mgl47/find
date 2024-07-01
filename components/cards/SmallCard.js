@@ -33,7 +33,7 @@ function SmallCard(item, { selectedDay }) {
                   styles.date,
                   {
                     fontWeight: "500",
-                    color: colors.t5,
+                    color: colors.t4,
                     fontSize: 15,
                     // marginBottom: title?.length > 27 ? 3 : 0,
                     // bottom: 1,
@@ -47,39 +47,25 @@ function SmallCard(item, { selectedDay }) {
                 <Text
                   style={[
                     styles.date,
-                    {
-                      // color: colors.primary2,
-                      color: colors.t5,
+                    {                      color: colors.t4,
                       fontSize: 15,
-                      // marginBottom: title?.length > 27 ? 3 : 0,
                       bottom: 1,
                     },
                   ]}
                 >
-                  {/* {dates?.[dates?.length - 1]?.displayDate?.split(",")[0] +
-                    ", "}
-                </Text>
-                <Text style={[styles.date, { color: colors.t5 }]}>
-                  {dates?.[dates?.length - 1]?.displayDate?.split(", ")[1] +
-                    " - "} */}
+                
                     {dates?.[0]?.fullDisplayDate }
                 </Text>
               </>
             )}
-            {/* <Text style={[styles.date, { color: colors.t5 }]}>
-              {dates?.[0]?.hour}
-            </Text> */}
+          
           </View>
 
           <Text
             numberOfLines={2}
             style={[
               styles.title,
-              {
-                // fontSize: 18,
-                // fontSize: title?.length > 27 ? 16 : 18,
-                // lineHeight: title?.length > 27 ? 15 : 30,
-              },
+             
             ]}
           >
             {title}
@@ -89,8 +75,7 @@ function SmallCard(item, { selectedDay }) {
             <Text
               style={[
                 styles.venue,
-                // { marginBottom: title?.length > 27 ? 7 : 3, color: "#585858" },
-                { color: colors.t5 },
+                { color: colors.t4 },
               ]}
             >
               {venue?.displayName}, {venue?.address?.city}
@@ -100,9 +85,8 @@ function SmallCard(item, { selectedDay }) {
             <Text
               style={[
                 styles.venue,
-                { color: colors.t5 },
+                { color: colors.t4 },
 
-                // { marginBottom: title?.length > 27 ? 7 : 3, color: "#585858" },
               ]}
             >
               {`Apartir de `}
@@ -122,7 +106,6 @@ function SmallCard(item, { selectedDay }) {
             </Text>
           </View>
 
-          {/* <Text style={styles.interest}>{interest}</Text> */}
         </View>
       </View>
     </TouchableOpacity>

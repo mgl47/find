@@ -28,17 +28,19 @@ import Checkbox from "expo-checkbox";
 import { ScrollView } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import AttendeeLotterySheet from "../../../components/screensComponents/eventComponents/AttendeeLotterySheet";
+import { useData } from "../../../components/hooks/useData";
+import axios from "axios";
 const Attendees = ({ navigation, navigation: { goBack }, route }) => {
-  const event = route.params;
-
-  const { user } = useAuth();
-  // const { getOneEvent } = useData();
+  const { routeAttendees, routeEvent } = route.params;
+  const { user, headerToken } = useAuth();
+  const { apiUrl } = useData();
   const [loading, setLoading] = useState(false);
-  // const [event, setEvent] = useState(routeEvent);
   const [search, setSearch] = useState("");
   const [selectedAttendee, setSelectedAttendee] = useState(null);
+  const [attendees, setAttendees] = useState(routeAttendees);
   const [pend, setPend] = useState(false);
   const [checkedIn, setCheckedIn] = useState(false);
+  const [lottery, setLottery] = useState(false);
   const [selectedCat, setSelectedCat] = useState([]);
   const [selectedCoupon, setSelectedCoupon] = useState([]);
   const attendeeSheetRef = useRef(null);
@@ -53,30 +55,66 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
 
   const snapPoints = useMemo(() => ["55%", "75%"], []);
 
-  // if (loading || event == null) {
-  //   return <View style={{ backgroundColor: colors.background, flex: 1 }} />;
-  // }
+  // const getAttendees = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       // `${apiUrl}/user/event/${routeEvent?._id}`,
+  //       `${apiUrl}/purchase/attendees/?eventId=${routeEvent?._id}`,
 
-  const filteredUsers = event?.attendees?.filter(
+  //       {
+  //         headers: { Authorization: headerToken },
+  //       }
+  //     );
+  //     await new Promise((resolve, reject) => setTimeout(resolve, 2000));
+
+  //     if (response.status == 200) {
+  //       console.log("res " + response.data?.length);
+  //       setAttendees(response.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error?.response?.data?.msg);
+  //     console.log(error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getAttendees();
+  // }, []);
+  const separatedTickets = routeAttendees?.reduce((acc, purchase) => {
+    if (purchase?.tickets) {
+      acc.push(...purchase.tickets); // Use the spread operator to flatten the array
+    }
+    return acc;
+  }, []);
+
+ 
+
+
+  const filteredUsers = separatedTickets?.filter(
     (user) =>
       user.username?.toLowerCase().includes(search?.toLowerCase()) ||
       user.displayName?.toLowerCase().includes(search?.toLowerCase())
   );
 
   let totalTickets = [];
-  event?.attendees?.forEach((ticket) => {
+  separatedTickets?.forEach((ticket) => {
     if (ticket?.username == selectedAttendee?.username) {
       totalTickets.push(ticket);
       return ticket;
     }
   });
-  const categories = event?.tickets?.map((ticket) => ticket?.category);
+  const categories = routeEvent?.tickets?.map((ticket) => ticket?.category);
   let coupons = [];
-  event?.tickets?.forEach((ticket) => {
+  routeEvent?.tickets?.forEach((ticket) => {
     if (ticket?.coupon?.label) {
       coupons.push(ticket?.coupon?.label);
     }
   });
+
+  const lotteryAttendee = separatedTickets?.filter(
+    (attendee) => attendee?.lottery
+  );
+
   const addToSelectedCat = (cat) => {
     if (selectedCat.includes(cat)) {
       setSelectedCat(selectedCat.filter((c) => c !== cat));
@@ -96,17 +134,19 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
     (ticket) =>
       (!checkedIn || ticket?.checkedIn) &&
       (!selectedCat.length || selectedCat.includes(ticket?.category)) &&
-      (!selectedCoupon.length || selectedCoupon.includes(ticket?.coupon?.label))
+      (!selectedCoupon.length ||
+        selectedCoupon.includes(ticket?.coupon?.label)) &&
+      (!lottery || lotteryAttendee.includes(ticket))
   );
   const ticketColor = (category) => {
     if (category?.startsWith("Promo")) {
       return colors.t4;
     } else if (category?.startsWith("Normal")) {
-      return colors.primary2;
+      return colors.t4;
     } else if (category?.startsWith("V")) {
       return colors.darkGold;
     } else {
-      return colors.primary2;
+      return colors.t4;
     }
   };
   const renderBackdrop = useCallback(
@@ -224,6 +264,21 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     <Text style={styles.paragraph}>coupon '{coupon}'</Text>
                   </TouchableOpacity>
                 ))}
+              {lotteryAttendee.length > 0 && (
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  onPress={() => setLottery(!lottery)}
+                  style={styles.section}
+                >
+                  <Checkbox
+                    style={styles.checkbox}
+                    value={lottery}
+                    onValueChange={setLottery}
+                    color={lottery ? colors.darkGold : undefined}
+                  />
+                  <Text style={styles.paragraph}>Sorteados</Text>
+                </TouchableOpacity>
+              )}
             </View>
             <Text
               style={[
@@ -259,97 +314,97 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                   onPress={() => handleAttendeeSheet(item)}
                   style={[styles.card, {}]}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginBottom: 5,
-                      left: 2,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "600",
-                        color: colors.t3,
-                        left: 4,
-                      }}
-                    >
-                      {item?.displayName}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        fontWeight: "600",
-                        marginLeft: 5,
-                        top: 1,
-                        color: colors.t4,
-                        left: 4,
-                      }}
-                    >
-                      @{item?.username}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginBottom: 5,
-                      left: 2,
-                    }}
-                  >
-                    <MaterialIcons
-                      name={
-                        item?.checkedIn
-                          ? "check-circle"
-                          : "check-circle-outline"
-                      }
-                      size={22}
-                      color={item?.checkedIn ? "green" : colors.description}
+                  <View style={{ alignItems: "center" }}>
+                    <Ionicons
+                      name="ticket"
+                      size={24}
+                      color={ticketColor(item?.category)}
                     />
                     <Text
                       style={{
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: "500",
-                        marginLeft: 5,
-                        color: item?.checkedIn ? "green" : colors.description,
+                        // marginLeft: 5,
+                        marginTop: 5,
+                        color: ticketColor(item?.category),
                       }}
                     >
-                      {"CHECK IN"}
+                      {item?.category}
                     </Text>
-                    {item?.checkedAt && (
+                  </View>
+                  <View style={{ marginLeft: 10 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginBottom: 5,
+                        left: 2,
+                      }}
+                    >
                       <Text
                         style={{
-                          fontSize: 15,
+                          fontSize: 18,
                           fontWeight: "500",
-                          marginLeft: 8,
-                          color: colors.t4,
+                          color: colors.t3,
+                          left: 4,
                         }}
                       >
-                        {item?.checkedAt}
+                        {item?.displayName}
                       </Text>
-                    )}
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: "500",
+                          marginLeft: 5,
+                          top: 1,
+                          color: colors.t4,
+                          left: 4,
+                        }}
+                      >
+                        @{item?.username}
+                      </Text>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        // marginBottom: 5,
+                        left: 5,
+                      }}
+                    >
+                      <MaterialIcons
+                        name={
+                          item?.checkedIn
+                            ? "check-circle"
+                            : "check-circle-outline"
+                        }
+                        size={20}
+                        color={item?.checkedIn ? "green" : colors.description}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: "500",
+                          marginLeft: 5,
+                          color: item?.checkedIn ? "green" : colors.description,
+                        }}
+                      >
+                        {"CHECK IN"}
+                      </Text>
+                      {item?.checkedAt && (
+                        <Text
+                          style={{
+                            fontSize: 15,
+                            fontWeight: "500",
+                            marginLeft: 8,
+                            color: colors.t4,
+                          }}
+                        >
+                          {item?.checkedAt}
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: "500",
-                      marginLeft: 5,
-                      color: ticketColor(item?.category),
-                    }}
-                  >
-                    {item?.category}
-                  </Text>
-                  {/* <Text
-                  style={{
-                    fontSize: 15,
-                    fontWeight: "600",
-                    marginLeft: 5,
-                    color: colors.black2,
-                  }}
-                >
-                  {item?.uuid}
-                </Text> */}
                 </TouchableOpacity>
               </TouchableOpacity>
             </Animated.View>
@@ -393,7 +448,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "600",
                       // alignSelf: "center",
                       // left: 10,
-                      color: colors.t4,
+                      color: colors.t3,
                     }}
                   >
                     Attendee Details
@@ -456,7 +511,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                   }}
                 >
                   <Text numberOfLines={2} style={styles.label}>
-                    Tipo:
+                    Bilhete:
                   </Text>
                   <Text
                     numberOfLines={2}
@@ -499,34 +554,7 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                 </View>
 
                 <View style={styles.separator} />
-                {selectedAttendee?.coupon && (
-                  <>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        marginVertical: 2,
-                      }}
-                    >
-                      <Text numberOfLines={2} style={styles.label}>
-                        Coupon usado:
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={{
-                          alignSelf: "flex-start",
-                          fontSize: 17,
-                          fontWeight: "400",
-                          color: colors.t4,
-                          marginVertical: 3,
-                        }}
-                      >
-                        {selectedAttendee?.coupon?.label}
-                      </Text>
-                    </View>
-                    <View style={styles.separator} />
-                  </>
-                )}
+
                 <View
                   style={{
                     flexDirection: "row",
@@ -579,6 +607,146 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                     {selectedAttendee?.purchaseId}
                   </Text>
                 </View>
+                {selectedAttendee?.coupon && (
+                  <>
+                    <View style={styles.separator} />
+
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        // alignSelf: "center",
+                        // left: 10,
+                        color: colors.t3,
+                        marginTop: 10,
+                        marginBottom: 5,
+                      }}
+                    >
+                      Detalhes do coupon
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 2,
+                      }}
+                    >
+                      <Text numberOfLines={2} style={styles.label}>
+                        Coupon usado:
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={{
+                          alignSelf: "flex-start",
+                          fontSize: 17,
+                          fontWeight: "400",
+                          color: colors.t4,
+                          marginVertical: 3,
+                        }}
+                      >
+                        {selectedAttendee?.coupon?.label}
+                      </Text>
+                    </View>
+                  </>
+                )}
+                {selectedAttendee?.lottery && (
+                  <>
+                    <View style={styles.separator} />
+
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        // alignSelf: "center",
+                        // left: 10,
+                        color: colors.t3,
+                        marginTop: 10,
+                        marginBottom: 5,
+                      }}
+                    >
+                      Detalhes do sorteio
+                    </Text>
+                    <View style={styles.separator} />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 2,
+                      }}
+                    >
+                      <Text numberOfLines={2} style={styles.label}>
+                        Prémio Sorteado:
+                      </Text>
+                      <Text
+                        selectable
+                        // numberOfLines={1}
+                        style={{
+                          alignSelf: "flex-start",
+                          fontSize: 16,
+                          fontWeight: "400",
+                          color: colors.t4,
+                          marginVertical: 3,
+                          width: "65%",
+                        }}
+                      >
+                        {selectedAttendee?.lottery?.prize} da dsa sa fsa das d
+                        sa
+                      </Text>
+                    </View>
+                    <View style={styles.separator} />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 2,
+                      }}
+                    >
+                      <Text numberOfLines={2} style={styles.label}>
+                        Sorteado por:
+                      </Text>
+                      <Text
+                        selectable
+                        // numberOfLines={1}
+                        style={{
+                          alignSelf: "flex-start",
+                          fontSize: 16,
+                          fontWeight: "400",
+                          color: colors.t4,
+                          marginVertical: 3,
+                          width: "65%",
+                        }}
+                      >
+                        {selectedAttendee?.lottery?.staff?.username}
+                      </Text>
+                    </View>
+                    <View style={styles.separator} />
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginVertical: 2,
+                      }}
+                    >
+                      <Text numberOfLines={2} style={styles.label}>
+                        data do sorteio:
+                      </Text>
+                      <Text
+                        selectable
+                        // numberOfLines={1}
+                        style={{
+                          alignSelf: "flex-start",
+                          fontSize: 16,
+                          fontWeight: "400",
+                          color: colors.t4,
+                          marginVertical: 3,
+                          width: "65%",
+                        }}
+                      >
+                        {selectedAttendee?.lottery?.displayDate}
+                      </Text>
+                    </View>
+                  </>
+                )}
                 {totalTickets?.length > 1 && (
                   <Text
                     style={{
@@ -586,11 +754,12 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
                       fontWeight: "500",
                       // alignSelf: "center",
                       // left: 10,
-                      color: colors.t4,
-                      marginTop: 15,
+                      color: colors.t3,
+                      marginTop: 20,
+                      marginBottom: 5,
                     }}
                   >
-                    Bilhetes
+                    Outros Bilhetes
                   </Text>
                 )}
               </View>
@@ -688,7 +857,11 @@ const Attendees = ({ navigation, navigation: { goBack }, route }) => {
           />
         </BottomSheetModal>
       </BottomSheetModalProvider>
-      <AttendeeLotterySheet  event={event} sheetRef={AttendeeLotterySheetRef} />
+      <AttendeeLotterySheet
+        event={routeEvent}
+        attendees={separatedTickets}
+        sheetRef={AttendeeLotterySheetRef}
+      />
     </Animated.View>
   );
 };
@@ -708,9 +881,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   card: {
-    // flexDirection: "row",
-    // alignItems:"center",
-    height: 95,
+    flexDirection: "row",
+    alignItems: "center",
+    // height: 95,
     borderRadius: 10,
     backgroundColor: colors.background2,
     overflow: "hidden",

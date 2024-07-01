@@ -51,20 +51,22 @@ import { set } from "firebase/database";
 import axios from "axios";
 import { useData } from "../../hooks/useData";
 import { useAuth } from "../../hooks/useAuth";
+import formattedDates from "../../formattedDates";
+import uuid from "react-native-uuid";
 
 const { height, width } = Dimensions.get("window");
 
-export default AttendeeLotterySheet = ({ sheetRef, event }) => {
+export default AttendeeLotterySheet = ({ sheetRef, event, attendees }) => {
   const { apiUrl } = useData();
-  const { headerToken } = useAuth();
+  const { headerToken, user } = useAuth();
 
   const snapPoints = useMemo(() => ["55%", "100%"], []);
   const animation = useRef(null);
   const animation2 = useRef(null);
-
+  const fortmattedDate = formattedDates();
   const [sortedUser, setSortedUser] = useState(null);
   const [sorted, setSorted] = useState(false);
-  const [description, setDescription] = useState("");
+  const [prize, setPrize] = useState("");
   const [loading, setLoading] = useState(false);
   const ticketColor = (category) => {
     if (category?.startsWith("Promo")) {
@@ -90,9 +92,7 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
     animation.current.play();
     await new Promise((resolve) => setTimeout(resolve, 4200));
 
-    setSortedUser(
-      event?.attendees[Math.floor(Math.random() * event?.attendees.length)]
-    );
+    setSortedUser(attendees[Math.floor(Math.random() * attendees.length)]);
     setSorted(true);
     setLoading(false);
 
@@ -100,6 +100,10 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
   };
 
   const notifyUser = () => {
+    if (!prize.trim()) {
+      Alert.alert("Atenção!", "Por favor, insira um prêmio para o sorteado!");
+      return;
+    }
     Alert.alert(
       "Confirmar Sorteio!",
       "Ao confirmar, o usuário será notificado sobre o sorteio. Esta ação é irreversível! ",
@@ -127,16 +131,26 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
 
     try {
       const response = await axios.patch(
-        `${apiUrl}/user/event/${event?._id}`,
+        // `${apiUrl}/user/event/${event?._id}`,
+        `${apiUrl}/purchase/attendees/${sortedUser?.purchaseId}`,
+
         {
-          // cardInfo: paymentInfo,
           operation: {
             type: "attendeeLottery",
             task: "add",
             eventId: event?._id,
+            // purchaseId: sortedUser?.purchaseId,
+            ticketId: sortedUser?.uuid,
           },
           updates: {
-            lotteryAttendee: { ...sortedUser, lottery: description },
+            lottery: {
+              id: uuid.v4(),
+              prize,
+              displayDate:
+                fortmattedDate?.displayDate + " às " + fortmattedDate?.hour,
+              date: fortmattedDate?.date,
+              staff: { username: user?.username },
+            },
           },
         },
         {
@@ -174,13 +188,13 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
         onDismiss={() => {
           setSortedUser(null),
             setSorted(false),
-            setDescription(""),
+            setPrize(""),
             setLoading(false);
         }}
       >
         <BottomSheetFlatList
           style={{ backgroundColor: colors.background }}
-          data={event?.attendees?.filter((attendee) => attendee?.lottery)}
+          data={attendees?.filter((attendee) => attendee?.lottery)}
           ListHeaderComponent={
             <BottomSheetView style={styles.contentContainer}>
               {sortedUser && !sorted ? (
@@ -313,11 +327,11 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
                     activeOutlineColor={colors.t4}
                     activeUnderlineColor={colors.primary}
                     label="descrição"
-                    value={description}
+                    value={prize}
                     // multiline
                     cursorColor={colors.primary}
                     // onChangeText={(text) => setPerson({ ...person, email: text })}
-                    onChangeText={setDescription}
+                    onChangeText={setPrize}
                   />
                   <TouchableOpacity
                     disabled={loading}
@@ -543,7 +557,7 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
                 </Animated.View>
               )}
 
-              {event?.attendees?.some((attendee) => attendee?.lottery) &&
+              {attendees?.some((attendee) => attendee?.lottery) &&
                 !sortedUser &&
                 !loading && (
                   <Text
@@ -562,7 +576,7 @@ export default AttendeeLotterySheet = ({ sheetRef, event }) => {
                 )}
             </BottomSheetView>
           }
-          keyExtractor={(item) => item?.id}
+          keyExtractor={(item) => item?.uuid}
           renderItem={({ item }) =>
             !sortedUser &&
             !loading && (

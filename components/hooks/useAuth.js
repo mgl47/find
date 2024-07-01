@@ -196,27 +196,31 @@ export const AuthProvider = ({ children }) => {
     //   }
     // } else {
     // permissions check
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      // do something when permission is denied
-      return;
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        // do something when permission is denied
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync();
+
+      setUserLocation({
+        latitude: location.coords.latitude - 0.004,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+      const jsonValue = JSON.stringify({
+        latitude: location.coords.latitude - 0.004,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+
+      await AsyncStorage.setItem("lastLocation", jsonValue);
+    } catch (error) {
+      console.log(error);
     }
-    const location = await Location.getCurrentPositionAsync();
-
-    setUserLocation({
-      latitude: location.coords.latitude - 0.004,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
-    const jsonValue = JSON.stringify({
-      latitude: location.coords.latitude - 0.004,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
-
-    await AsyncStorage.setItem("lastLocation", jsonValue);
     // }
   };
 

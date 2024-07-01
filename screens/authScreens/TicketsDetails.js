@@ -91,6 +91,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
       parseInt(event.nativeEvent.contentOffset.x / width).toFixed()
     );
   }
+  console.log(ticket?.tickets?.[0]?.dates);
 
   const eventStoreSheetRef = useRef(null);
   const orderSheetRef = useRef(null);
@@ -145,26 +146,26 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
     });
   }, [navigation]);
 
-  useEffect(() => {
-    const q = query(
-      collection(db, "transactions"),
-      where("orderedBy", "==", user?._id),
-      where("eventId", "==", ticket?.tickets?.[0]?.eventId),
-      orderBy("time", "desc")
-    );
+  // useEffect(() => {
+  //   const q = query(
+  //     collection(db, "transactions"),
+  //     where("orderedBy", "==", user?._id),
+  //     where("eventId", "==", ticket?.tickets?.[0]?.eventId),
+  //     orderBy("time", "desc")
+  //   );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const newOrders = [];
-      querySnapshot.forEach((doc) => {
-        newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
-      });
+  //   const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  //     const newOrders = [];
+  //     querySnapshot.forEach((doc) => {
+  //       newOrders.push({ id: doc?.id, ...doc?.data() }); // Add unique identifier to each order
+  //     });
 
-      setOrders(newOrders);
-    });
+  //     setOrders(newOrders);
+  //   });
 
-    // Cleanup function
-    return () => unsubscribe();
-  }, []);
+  //   // Cleanup function
+  //   return () => unsubscribe();
+  // }, []);
 
   return (
     <ImageBackground
@@ -371,7 +372,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
           );
         }}
       />
-      <EventStoreSheet
+      {/* <EventStoreSheet
         // users={members}
 
         ticket={ticket}
@@ -387,7 +388,7 @@ const TicketDetails = ({ navigation, navigation: { goBack }, route }) => {
         eventId={ticket?.event?._id}
         // storeSheetUp={storeSheetUp}
         // setStoreSheetUp={setStoreSheetUp}
-      />
+      /> */}
     </ImageBackground>
   );
 };

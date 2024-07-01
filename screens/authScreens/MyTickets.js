@@ -42,7 +42,6 @@ const MyTickets = ({ navigation, navigation: { goBack }, route }) => {
   const { height, width } = useDesign();
 
   const uuidKey = uuid.v4();
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View

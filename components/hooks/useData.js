@@ -50,8 +50,6 @@ export const DataProvider = ({ children }) => {
 
   // console.log("Redce"+recent);
 
-
-  
   const recentIds = recent.map((event) => event._id);
   const addToRecent = async (event, clear) => {
     let newRecent = recent.slice();
@@ -76,10 +74,10 @@ export const DataProvider = ({ children }) => {
   //   addToRecent("", true);
 
   // }, [])
-  const getOneEvent = async (eventId) => {
+  const getOneEvent = async (eventId, attendees) => {
     try {
       const result = await axios.get(
-        `${apiUrl}/user/event/one/?eventId=${eventId}`,
+        `${apiUrl}/user/event/one/?eventId=${eventId}&attendees=${attendees}`,
         {
           headers: {
             Authorization: headerToken,

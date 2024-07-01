@@ -37,7 +37,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Tab as Tab2, Text as Text2, TabView } from "@rneui/themed";
 
-import { Camera } from 'expo-camera/legacy';
+import { Camera } from "expo-camera/legacy";
 import axios from "axios";
 import { useData } from "../../../../components/hooks/useData";
 import { Button } from "react-native";
@@ -115,6 +115,7 @@ export default function ValidatorScreen({
       // console.log(result?.data?.msg);
 
       if (result.status == 200 || 201 || 202 || 204) {
+        console.log(result?.status);
         setLoading(false);
         setStatusCode(result?.status);
         setScannedTicket(result?.data);
@@ -144,7 +145,7 @@ export default function ValidatorScreen({
   //   }, [navigation]);
 
   useEffect(() => {
-    getUpdatedUser({field:"myEvents"});
+    getUpdatedUser({ field: "myEvents" });
   }, []);
   const toggleFlashMode = () => {
     setFlashMode(

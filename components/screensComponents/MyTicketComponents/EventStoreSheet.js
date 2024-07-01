@@ -230,7 +230,7 @@ export default EventStoreSheet = ({
             amount: 0,
           }
         );
-        total = parseFloat(total?.toFixed(2));
+        total = parseFloat(total?.toFixed(2)||0);
         return { ...state, total, amount };
       }
     }

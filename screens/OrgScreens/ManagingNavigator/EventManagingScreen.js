@@ -74,8 +74,9 @@ const EventManagingScreen = ({
   const [scanned, setScanned] = useState(false);
   const [statusCode, setStatusCode] = useState(0);
   const [scannedTicket, setScannedTicket] = useState("");
-  const [event, setEvent] = useState(null);
-
+  const [routeEvent, setRouteEvent] = useState(null);
+  const [routeAttendees, setRouteAttendees] = useState([]);
+  const [attendeesFetched, setAttendeesFetched] = useState(false);
   const { getUpdatedUser, headerToken, user } = useAuth();
   const { apiUrl, getOneEvent } = useData();
   const { isIPhoneWithNotch } = useDesign();
@@ -83,16 +84,20 @@ const EventManagingScreen = ({
   const getSelectedEvent = async () => {
     setLoading(true);
     try {
-      const selectedEvent = await getOneEvent(item?._id);
-      setEvent(selectedEvent);
+      const { event, attendees } = await getOneEvent(item?._id, true);
+      setRouteEvent(event);
+      setRouteAttendees(attendees);
       setLoading(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setAttendeesFetched(true);
     }
   };
   useEffect(() => {
     getSelectedEvent();
   }, []);
+  console.log("routeAttendees", routeAttendees?.length);
 
   const clean = () => {
     setFlashMode(FlashMode.off);
@@ -106,14 +111,10 @@ const EventManagingScreen = ({
     if (scanned) return;
     setLoading(true);
     setScanned(true);
-    // const ticketUser = await selectedEvent?.attendees?.filter(
-    //   (attendee) => attendee?.uuid == item?.data
-    // )[0];
-
-    // console.log(ticketUser);
+   
     try {
       const result = await axios.patch(
-        `${apiUrl}/purchase/checkin/${event?._id}`,
+        `${apiUrl}/purchase/checkin/${routeEvent?._id}`,
         { uuid: item?.data },
         {
           headers: {
@@ -169,21 +170,21 @@ const EventManagingScreen = ({
     navigation.setOptions({
       headerRight: () => (
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {event?.store?.length > 0 && (
+          {routeEvent?.store?.length > 0 && (
             <TouchableOpacity
-              disabled={!event}
+              disabled={!routeEvent}
               style={{ right: 40 }}
               // onPress={() => setShowScanModal(true)}
-              onPress={() => navigation.navigate("eventStore", event)}
+              onPress={() => navigation.navigate("eventStore", routeEvent)}
             >
               <FontAwesome6 name="shop" size={23} color={colors.t3} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            disabled={!event}
+            disabled={!routeEvent}
             style={{ right: 20 }}
             // onPress={() => setShowScanModal(true)}
-            onPress={() => navigation.navigate("qrValidator", event)}
+            onPress={() => navigation.navigate("qrValidator", routeEvent)}
           >
             <MaterialCommunityIcons
               name="qrcode-scan"
@@ -194,7 +195,7 @@ const EventManagingScreen = ({
         </View>
       ),
     });
-  }, [navigation, event]);
+  }, [navigation, routeEvent]);
 
   useEffect(() => {
     getUpdatedUser({ field: "myEvents" });
@@ -237,7 +238,7 @@ const EventManagingScreen = ({
 
   return (
     <>
-      {event ? (
+      {routeEvent && attendeesFetched ? (
         <Animated.View
           style={{ flex: 1 }}
           // entering={FadeIn}
@@ -279,89 +280,31 @@ const EventManagingScreen = ({
             })}
           >
             <Tab.Screen
-              initialParams={event}
+              initialParams={{ routeEvent, routeAttendees }}
               name="Overview"
               component={Overview}
             />
             <Tab.Screen
-              initialParams={event}
+              initialParams={{ routeEvent, routeAttendees }}
               name="Attendees"
               component={Attendees}
               options={(active) => ({
                 lazy: true,
               })}
             />
-            <Tab.Screen initialParams={event} name="Staff" component={Staff}   options={(active) => ({
+            <Tab.Screen
+              initialParams={{ routeEvent }}
+              name="Staff"
+              component={Staff}
+              options={(active) => ({
                 lazy: true,
-              })} />
+              })}
+            />
           </Tab.Navigator>
         </Animated.View>
       ) : (
         <View style={{ height: 50, backgroundColor: colors.background }} />
       )}
-
-      {/* {event && (
-        <Animated.View
-        style={{flex:1}}
-        entering={FadeIn}
-        >
-          <Tab.Navigator
-            screenOptions={{
-              tabBarActiveTintColor: colors.primary,
-
-              tabBarInactiveTintColor: colors.darkGrey,
-              tabBarIndicatorContainerStyle: {
-                backgroundColor: colors.primary2,
-              },
-              tabBarIndicatorStyle: {
-                backgroundColor: colors.white_shade,
-                // bottom: 2,
-                height: 4,
-              },
-              tabBarLabelStyle: (active) => ({
-                color: active ? colors.white : colors.lightGrey,
-              }),
-            }}
-          >
-            <Tab.Screen
-              initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
-              name="Overview"
-              component={Overview}
-            />
-            <Tab.Screen
-              initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
-              name="Attendees"
-              component={Attendees}
-            />
-            <Tab.Screen
-              initialParams={event}
-              options={{
-                tabBarLabelStyle: {
-                  fontWeight: "600",
-                  fontSize: 13,
-                  color: colors.white,
-                },
-              }}
-              name="Staff"
-              component={Staff}
-            />
-          </Tab.Navigator>
-        </Animated.View>
-      )} */}
 
       {loading && (
         <View
@@ -375,7 +318,6 @@ const EventManagingScreen = ({
           <ActivityIndicator animating={true} color={colors.primary} />
         </View>
       )}
-      {/* </View> */}
       <Modal
         // presentationStyle="formSheet"
         style={{ backgroundColor: colors.background }}
@@ -434,23 +376,7 @@ const EventManagingScreen = ({
               </Text>
             </TouchableOpacity>
           </View>
-          {/* <Tab2
-            titleStyle={{ color: colors.primary }}
-            indicatorStyle={{
-              backgroundColor: colors.background,
-              //   height: 2,
-              //   width: "33%",
-            }}
-            value={index}
-            onChange={setIndex}
-            // dense
 
-            style={{ backgroundColor: colors.background }}
-          >
-            <Tab2.Item>Passados</Tab2.Item>
-
-            <Tab2.Item>Activos</Tab2.Item>
-          </Tab2> */}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
               onPress={() => setIndex(0)}
@@ -606,8 +532,6 @@ const EventManagingScreen = ({
               marginTop: 40,
               zIndex: 2,
             }}
-            // onPress={() => navigation.navigate("addEvent", item)}
-            // onPress={() => navigation.navigate("manageEvent", item)}
           >
             <Animated.View
               style={[styles.card, {}]}
@@ -736,16 +660,6 @@ const EventManagingScreen = ({
                         left: 4,
                       }}
                     />
-                    {/* <View
-                      style={{
-                        height: 15,
-                        width: 60,
-                        backgroundColor: colors.grey,
-                        borderRadius: 20,
-                        left: 10,
-                        top: 2,
-                      }}
-                    /> */}
                   </View>
                   <View
                     style={{

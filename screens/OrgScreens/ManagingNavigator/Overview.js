@@ -29,14 +29,14 @@ import TicketPurchaseSheet from "../../../components/screensComponents/eventComp
 import OverviewSalesDescription from "../../../components/screensComponents/eventComponents/OverviewSalesDescription";
 const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const uuidKey = uuid.v4();
-  const routeEvent = route.params;
+  const { routeAttendees, routeEvent } = route.params;
   const [index, setIndex] = useState(1);
   const { height, width } = useDesign();
   const { formatNumber, apiUrl } = useData();
-
   const { user, headerToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [event, setEvent] = useState(routeEvent);
+  const [attendees, setAttendees] = useState(routeAttendees);
   const [firstRender, setFirstRender] = useState(true);
   const [purchaseModalUp, setPurchaseModalUp] = useState(false);
   const [suspendTickets, setSuspendTickets] = useState(routeEvent?.haltedSales);
@@ -61,7 +61,14 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   let totalCheckin = 0;
   const usedCoupons = [];
 
-  event?.attendees?.forEach((attendee) => {
+
+    const separatedTickets = attendees?.reduce((acc, purchase) => {
+    if (purchase?.tickets) {
+      acc.push(...purchase.tickets); // Use the spread operator to flatten the array
+    }
+    return acc;
+  }, []);
+  separatedTickets?.forEach((attendee) => {
     if (attendee?.checkedIn) {
       totalCheckin += 1;
     }
@@ -83,16 +90,15 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   });
 
   const percentageCheckIn = (
-    (totalCheckin / event?.attendees?.length) *
+    (totalCheckin / separatedTickets?.length) *
     100
   ).toFixed(2);
   const percentageBought = (
-    (event?.attendees?.length /
+    (separatedTickets?.length /
       event?.tickets?.reduce((acc, item) => acc + item?.quantity, 0)) *
     100
   ).toFixed(2);
 
-  console.log(percentageCheckIn);
   let totalTickets = 0;
   event?.tickets?.forEach((ticket) => {
     totalTickets = totalTickets + ticket?.quantity;
@@ -112,7 +118,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
   const fee = 0.07;
 
   const { totalTicketsSold, doorTicketSales, totalCouponUsed } =
-    event?.attendees?.reduce(
+    separatedTickets?.reduce(
       (acc, item) => {
         if (item.doorTicket) {
           acc.doorTicketSales += item.price;
@@ -295,7 +301,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
               <View style={styles.section3}>
                 <Text style={styles.section2}>Vendidos</Text>
                 <Text style={[styles.sectionText2, { color: colors.primary }]}>
-                  {event?.attendees?.length}
+                  {separatedTickets?.length}
                 </Text>
                 <Text
                   style={[
@@ -374,7 +380,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
             ItemSeparatorComponent={<View style={styles.separator} />}
             renderItem={({ item }) => {
               const soldTickets =
-                event?.attendees?.filter(
+                separatedTickets?.filter(
                   (ticket) =>
                     ticket?.category === item?.category && !ticket?.doorTicket
                 )?.length || 0;
@@ -546,7 +552,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                         {/* {item?.quantity - item?.available} */}
 
                         {
-                          event?.attendees?.filter(
+                          separatedTickets?.filter(
                             (ticket) =>
                               ticket?.category === item?.category &&
                               !ticket?.doorTicket
@@ -575,7 +581,7 @@ const Overview = ({ navigation, navigation: { goBack }, route }) => {
                         {/* {item?.quantity - item?.available} */}
 
                         {
-                          event?.attendees?.filter(
+                          separatedTickets?.filter(
                             (ticket) =>
                               ticket?.category === item?.category &&
                               ticket?.doorTicket

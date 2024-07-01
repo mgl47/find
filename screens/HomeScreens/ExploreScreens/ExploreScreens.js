@@ -133,7 +133,7 @@ const ExploreScreens = ({
   //                 Keyboard.dismiss(),
   //                   navigation.navigate("search2", { text: searchText });
   //               }}
-              
+
   //               placeholder=" artistas, eventos ou lugares"
   //               placeholderTextColor={colors.t5}
   //               returnKeyType="search"
@@ -171,9 +171,9 @@ const ExploreScreens = ({
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      
-      <Screen style={{ flex: 1 ,backgroundColor:colors.background}} 
-      // entering={firstMount && SlideInDown}
+      <Screen
+        style={{ flex: 1, backgroundColor: colors.background }}
+        // entering={firstMount && SlideInDown}
       >
         <View
           style={{
@@ -183,7 +183,24 @@ const ExploreScreens = ({
           }}
         >
           <Animated.View
-            // entering={firstMount ? SlideInRight.duration(500) : null}
+            entering={firstMount ? SlideInRight.duration(300) : null}
+          >
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{
+                // left: 20,
+                marginLeft: 20,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={28}
+                color={colors.t2}
+              />
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View
+            entering={firstMount ? SlideInRight.duration(340) : null}
             // exiting={firstMount ? SlideOutRight.duration(250) : null}
             style={{
               width: "100%",
@@ -197,7 +214,7 @@ const ExploreScreens = ({
               style={{
                 flexDirection: "row",
                 width: "80%",
-                left: 15,
+                left: 10,
               }}
             >
               <Entypo
@@ -211,15 +228,15 @@ const ExploreScreens = ({
                 onChangeText={setSearchText}
                 onSubmitEditing={() => {
                   Keyboard.dismiss(),
-                    navigation.navigate("search2", { text: searchText },
-                    
-                    setTimeout(()=>{
-                      setSearchText("")
+                    navigation.navigate(
+                      "search2",
+                      { text: searchText },
 
-                    },500)
+                      setTimeout(() => {
+                        setSearchText("");
+                      }, 500)
                     );
                 }}
-              
                 placeholder=" artistas, eventos ou lugares"
                 placeholderTextColor={colors.t5}
                 returnKeyType="search"
@@ -250,32 +267,6 @@ const ExploreScreens = ({
               )}
             </View>
           </Animated.View>
-          <Animated.View
-          style={{
-            padding: 10,
-            right: 10,
-            position: "absolute",
-            zIndex: 2,
-          }}
-         entering={firstMount ? FadeIn.duration(300) : null}
-        >
-          <TouchableOpacity
-            style={{ left: inSearch ? 20 : 5 ,padding:10}}
-            onPress={() => {
-              navigation.navigate("home"), Keyboard.dismiss();
-            }}
-          >
-            <Text
-              style={{
-                color: colors.t3,
-                fontSize: 16,
-                fontWeight: "600",
-              }}
-            >
-              sair
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
         </View>
         <Tab.Navigator
           screenOptions={({ active }) => ({
@@ -299,9 +290,7 @@ const ExploreScreens = ({
               //   color: active ? colors.t2 : colors.t5,
               // },
               lazy: true,
-
             })}
-            
             name="Explorar"
             component={SearchScreen}
           />
@@ -323,7 +312,6 @@ const ExploreScreens = ({
               //   color: active ? colors.t2 : colors.t5,
               // },
               lazy: true,
-
             })}
             name="Calendário"
             component={CalendarScreen}
@@ -363,8 +351,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingLeft: 35,
     paddingRight: 30,
-    color:colors.t4
-  
+    color: colors.t4,
   },
   headerText: {
     fontSize: 19,

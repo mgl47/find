@@ -40,6 +40,7 @@ import StoreScreen from "../../screens/OrgScreens/ManagingNavigator/QrScanner/St
 import AddVenueScreen from "../../screens/AdminScreens/AddVenueScreen";
 import AddArtistScreen from "../../screens/AdminScreens/AddArtistScreen";
 import FavoriteScreens from "../../screens/authScreens/FavoriteScreens/FavoriteScreens";
+import NotificationDetail from "../../screens/NotificationScreens/NotificationDetail";
 
 // import TabNavigator from "./TabNavigator";
 const Stack = createStackNavigator();
@@ -432,6 +433,14 @@ function StackNavigator() {
         }}
         name="eventStore"
         component={StoreScreen}
+      />
+      <Stack.Screen
+        options={{
+          headerTitle: "Notificação",
+          headerTitleStyle: { color: colors.t3 },
+        }}
+        name="noti"
+        component={NotificationDetail}
       />
       <Stack.Screen
         options={{
